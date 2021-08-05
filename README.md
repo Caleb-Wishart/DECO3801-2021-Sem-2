@@ -5,7 +5,9 @@ Group Members:
 
 Adrian Rahul Kamal Rajkamal (Team Leader)
 
-Matthew Dean,Xurong Liang
+Matthew Dean,
+
+Xurong Liang
 
 Alexander Dubravcic
 
