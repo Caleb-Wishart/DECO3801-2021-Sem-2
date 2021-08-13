@@ -1,0 +1,12 @@
+Host moss
+  HostName moss.labs.eait.uq.edu.au
+  IdentityFile "path/to/id_rsa_moss"
+  User YourUsername
+  Port 22
+Host deco3801
+  HostName s4585694-officialteamname.zones.eait.uq.edu.au
+  IdentityFile "path/to/id_rsa_deco"
+  User YourUsername
+  Port 22
+  # proxy through the host moss in quiet mode
+  ProxyCommand ssh -q -W %h:%p moss
