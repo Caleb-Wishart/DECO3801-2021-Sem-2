@@ -14,7 +14,5 @@
 [Click me](https://drive.google.com/drive/folders/1v6n6aQLNhOdGeML8p-2xQhW5GIJP-ltW?ths=true)
 
 ___
-How to update the live website:
-```bash
-sudo refresh
-```
+## Guides
+Guides / Walkthroughs can be found under the `Guides` branch
