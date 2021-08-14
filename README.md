@@ -16,3 +16,6 @@
 ___
 ## Guides
 Guides / Walkthroughs can be found under the `Guides` branch
+___
+## Tasks
+Caleb: create subdirectories in /var/www/uwsgi/dev for each branch
