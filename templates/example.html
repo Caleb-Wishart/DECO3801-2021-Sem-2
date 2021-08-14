@@ -1,7 +1,9 @@
-<!doctype html>
-<title>Hello World!</title>
-{% if name %}
-    <h1>Hello {{ name }}!</h1>
-{% else %}
-    <h1>Hello, World!</h1>
-{% endif %}
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if name %}
+        <h1>Hello {{ name }}!</h1>
+    {% else %}
+        <h1>Hello, World!</h1>
+    {% endif %} 
+{% endblock %}

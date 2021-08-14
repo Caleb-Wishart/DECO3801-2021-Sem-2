@@ -9,7 +9,7 @@ def index():
     userjson = request.headers['x-kvd-payload']
     user = json.loads(userjson)
     name = user['user']
-    return render_template('example.html', name=name)
+    return render_template('example.html',title='welcome', name=name)
 
 
 @app.route('/foobar')
