@@ -80,7 +80,10 @@ The code source files can either be edtied via the command line using vim or con
 
 Once saved code can be commited using the normal command line git commands (or the IDE)
 
-To update the running webpage the flask instance must be refreshed using the command `sudo refresh` and code in the `/var/www/uwsgi` must be up to date
-
+To update the running webpage to the latest version on the repository (main branch) do the following commands.
+```bash
+git pull
+sudo refresh
+```
 ___
 ## Part 3: TBC
