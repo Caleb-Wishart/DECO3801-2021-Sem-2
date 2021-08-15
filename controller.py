@@ -24,3 +24,7 @@ def githook():
     return render_template('errors/error_404.html');
 
 # Caleb DMZ =====
+
+@app.route("/jason_test")
+def jtest():
+    return render_template("base.html", title="This is a test page")
