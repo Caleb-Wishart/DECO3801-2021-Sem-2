@@ -21,7 +21,12 @@ def foobar():
 # Webpage for github webhook
 @app.route('/githook')
 def githook():
-    return render_template('errors/error_404.html');
+    secret = request.headers['X-Hub-Signature']
+    parsed = json.loads(request.json)
+    with open('/home/s4585694/hook','w') as handle:
+        handle.write(json.dumps(parsed, indent=4, sort_keys=True))
+    return render_template('errors/error_404.html')
+    #return render_template('errors/error_404.html');
 
 # Caleb DMZ =====
 
