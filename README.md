@@ -5,7 +5,7 @@
 * Adrian Rahul Kamal Rajkamal (Team Leader)
 * Matthew Dean
 * Xurong Liang
-* Alexander Dubravcic
+* Alex Dubravcic
 * Kyle Macaskill
 * Caleb Wishart
 
