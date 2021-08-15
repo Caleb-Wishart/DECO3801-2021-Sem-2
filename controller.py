@@ -15,3 +15,12 @@ def index():
 @app.route('/foobar')
 def foobar():
     return "<span style='color:blue'>Hello again!</span>"
+
+# Caleb DMZ =====
+
+# Webpage for github webhook
+@app.route('/githook')
+def githook():
+    return render_template('errors/error_404.html');
+
+# Caleb DMZ =====
