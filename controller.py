@@ -6,9 +6,12 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    userjson = request.headers['x-kvd-payload']
-    user = json.loads(userjson)
-    name = user['user']
+    name = "example"
+    if 'x-kvd-payload' in request.headers:
+        userjson = request.headers['x-kvd-payload']
+        user = json.loads(userjson)
+        name = user['user']
+    name = "test"
     return render_template('example.html',title='welcome', name=name)
 
 
