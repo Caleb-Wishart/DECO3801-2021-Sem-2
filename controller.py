@@ -50,7 +50,8 @@ def jtest():
 
 @app.route("/matthew_test")
 def cool_fun():
-    return render_template("matthew_wuz_here.html", test=name=="s4582166", user=name)
+    name = "Matt"
+    return render_template("matthew_wuz_here.html",title="matt wuz here", test="caleb", user=name)
 
 
 @app.route("/kyle_test")
