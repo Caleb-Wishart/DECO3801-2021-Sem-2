@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, url_for
 import json
 
 app = Flask(__name__)
@@ -62,3 +62,7 @@ def sexy_asian():
 def second_page():
     name = "Kyle Macaskill"
     return render_template("kyle_second_page.html", name = name, title = "Second")
+
+@app.route("/kyle_redirect")
+def kyle_redirect():
+    return redirect(url_for('second_page'))
