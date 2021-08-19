@@ -46,3 +46,8 @@ def cool_fun():
 def sexy_asian():
     name = "Kyle Macaskill"
     return render_template("kyle_is_really_funny.html", name=name, title = "Kyle")
+
+@app.route("/kyle_second")
+def second_page():
+    name = "Kyle Macaskill"
+    return render_template("kyle_second_page.html", name = name, title = "Second")
