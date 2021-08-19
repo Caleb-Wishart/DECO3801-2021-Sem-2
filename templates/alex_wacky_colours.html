@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if colour == (0,0,0) %}
+        <h1> We do a little trolling</h1>
+    {% else %}
+        <style>
+        .square {
+            height: 200px;
+            width: 200px;
+            background-color:#{{ hex }};
+        </style>
+    {% endif %} 
+{% endblock %}

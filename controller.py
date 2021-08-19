@@ -46,3 +46,8 @@ def cool_fun():
 def sexy_asian():
     name = "Kyle Macaskill"
     return render_template("kyle_is_really_funny.html", name=name, title = "Kyle")
+
+@app.route("/alex_test/<hex>")
+def change_colours(hex):
+    return render_template("alex_wacky_colours.html", 
+            title = "welcome", colour = hex)
