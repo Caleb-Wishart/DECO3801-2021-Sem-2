@@ -46,7 +46,7 @@ def big_d_supreme():
 
 @app.route("/jason_test")
 def jtest():
-    return render_template("base.html", title="This is a test page")
+    return render_template("base.html", title="This is a test page", name="Jason")
 
 @app.route("/matthew_test")
 def cool_fun():
