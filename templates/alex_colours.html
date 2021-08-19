@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
-{% block content %}
-    <h1>squarestart</h1>
+
+{% block style %}
     <style>
     .square {
         height: 200px;
@@ -9,6 +9,11 @@
         background-color:#b12222;
     }
     </style>
+{% endblock %}
+
+{% block content %}
+    <h1>squarestart</h1>
+    <div class="square"></div>
     <h1> Squaretest</h1>
 {% endblock %}
 
