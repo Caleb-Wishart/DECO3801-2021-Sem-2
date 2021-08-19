@@ -49,5 +49,5 @@ def sexy_asian():
 
 @app.route("/alex_test")
 def change_colours(hex="b12222"):
-    return render_template("alex_wacky_colours.html", 
+    return render_template("alex_colours.html", 
             title = "welcome", colour = hex)
