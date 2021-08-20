@@ -5,24 +5,27 @@
 # Created by Jason Aug 20, 2021
 ##################################################################
 import datetime
-import base64
 import enum
 
 from sqlalchemy import Column, ForeignKey, Integer, String,\
     Text, DateTime, Numeric, Boolean, Enum
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy import create_engine
 import pytz
+import base64
 
 
 # length of a standard string, use TEXT if longer than that
-STANDARD_STRING_LENGTH = 50
+STANDARD_STRING_LENGTH = 100
 
 DBUSERNAME = "postgres"
 DBPASSWORD = "admin"
 DBDATABASE = DBUSERNAME
 DBPATH = f"postgresql://{DBUSERNAME}:{DBPASSWORD}@localhost/{DBDATABASE}"
+
+# path use for teaching purpose
+# DBPATH = "sqlite:///Doctrina_db.db"
 
 
 class ResourceDifficulty(enum.Enum):
@@ -98,18 +101,19 @@ class User(Base):
     # user honor rating
     user_rating = Column(Numeric, default=0)
 
-    # user email
-    email = Column(String, nullable=False)
+    # user email -- This is unique
+    email = Column(String, nullable=False, unique=True)
 
     # user bio
     bio = Column(Text, default=None, nullable=True)
 
     def __str__(self):
         return f"uid = {self.uid}, username = {self.username}, created at {self.created_at},\n" \
-               f"base64 password = {self.password}, honor rating = {self.user_rating}, " \
-                f"email = {self.email},\nbio = {self.bio}"
+               f"base64 password = {self.password}, original password = {base64_to_ascii(self.password)},\n" \
+               f"honor rating = {self.user_rating}, email = {self.email},\nbio = {self.bio}"
 
 
+# The below 2 functions are used to convert password<-->base64 encrypted code
 def ascii_to_base64(password: str):
     """
     A function to turn explicit password string to base64 encoding string
@@ -145,7 +149,8 @@ class UserTeachingAreas(Base):
     # whether this teaching_area tag is made public
     is_public = Column(Boolean, default=True, nullable=False)
 
-    user = relationship("User", foreign_keys=[uid])
+    user = relationship("User", foreign_keys=[uid],
+                        backref=backref("user_teaching_areas", cascade="all, delete"))
 
 
 class Resource(Base):
@@ -169,6 +174,9 @@ class Resource(Base):
 
     # difficulty of the resource
     difficulty = Column("difficulty", Enum(ResourceDifficulty), nullable=False)
+
+    # subject of the resource
+    subject = Column("subject", Enum(Subject), nullable=False)
 
     # up/down-vote count
     upvote_count = Column(Integer, default=0, nullable=False)
@@ -199,8 +207,14 @@ class VoteInfo(Base):
     # if this vote is upvote
     is_upvote = Column(Boolean, nullable=False)
 
-    user = relationship("User", foreign_keys=[uid])
-    resource = relationship("Resource", foreign_keys=[rid])
+    user = relationship("User", foreign_keys=[uid],
+                        backref=backref("vote_info", cascade="all,delete"))
+    resource = relationship("Resource", foreign_keys=[rid],
+                            backref=backref("vote_info", cascade="all,delete"))
+
+    def __str__(self):
+        return f"Voter id = {self.uid}, resource id = {self.resource}, " \
+               f"upvote = {self.is_upvote}"
 
 
 class ResourceCreater(Base):
@@ -215,8 +229,10 @@ class ResourceCreater(Base):
     # creater id
     uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
 
-    resource = relationship("Resource", foreign_keys=[rid])
-    creater = relationship("User", foreign_keys=[uid])
+    resource = relationship("Resource", foreign_keys=[rid],
+                            backref=backref("resource_creater", cascade="all, delete"))
+    creater = relationship("User", foreign_keys=[uid],
+                           backref=backref("resource_creater", cascade="all, delete"))
 
     def __str__(self):
         return f"creater id = {self.uid}, resource id = {self.rid}"
@@ -244,8 +260,10 @@ class ResourceComment(Base):
     # comment text
     comment = Column(Text, nullable=False)
 
-    user = relationship("User", foreign_keys=[uid])
-    resource = relationship("Resource", foreign_keys=[rid])
+    user = relationship("User", foreign_keys=[uid],
+                        backref=backref("resource_comment", cascade="all, delete"))
+    resource = relationship("Resource", foreign_keys=[rid],
+                            backref=backref("resource_comment", cascade="all, delete"))
 
 
 class ResourceCommentReply(Base):
@@ -269,8 +287,10 @@ class ResourceCommentReply(Base):
     # replier id
     uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
 
-    resource_comment = relationship("ResourceComment", foreign_keys=[resource_comment_id])
-    replier = relationship("User", foreign_keys=[uid])
+    resource_comment = relationship("ResourceComment", foreign_keys=[resource_comment_id],
+                                    backref=backref("resource_comment_reply", cascade="all, delete"))
+    replier = relationship("User", foreign_keys=[uid],
+                           backref=backref("resource_comment_reply", cascade="all, delete"))
 
 
 class PrivateResourcePersonnel(Base):
@@ -279,6 +299,7 @@ class PrivateResourcePersonnel(Base):
     watch particular resources
     """
     # todo: define trigger to avoid public resource be added to this table
+    # implemented in add_resource(), need similar strategy for modifier methods
     __tablename__ = "private_resource_personnel"
 
     # resource id
@@ -287,8 +308,13 @@ class PrivateResourcePersonnel(Base):
     # user who allowed to view this resource
     uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
 
-    resource = relationship("Resource", foreign_keys=[rid])
-    allowed_user = relationship("User", foreign_keys=[uid])
+    resource = relationship("Resource", foreign_keys=[rid],
+                            backref=backref("private_resource_personnel", cascade="all, delete"))
+    allowed_user = relationship("User", foreign_keys=[uid],
+                                backref=backref("private_resource_personnel", cascade="all, delete"))
+
+    def __str__(self):
+        return f"Private personnel: uid = {self.uid}, rid = {self.rid}"
 
 
 class Tag(Base):
@@ -306,6 +332,9 @@ class Tag(Base):
     # description of tag
     tag_description = Column(Text, default=None)
 
+    def __str__(self):
+        return f"tag name = {self.tag_name}, tag id = {self.tag_id}"
+
 
 class ResourceTagRecord(Base):
     """
@@ -319,8 +348,13 @@ class ResourceTagRecord(Base):
     # resource
     rid = Column(Integer, ForeignKey("resource.rid"), primary_key=True)
 
-    tag = relationship("Tag", foreign_keys=[tag_id])
-    resource = relationship("Resource", foreign_keys=[rid])
+    tag = relationship("Tag", foreign_keys=[tag_id],
+                       backref=backref("resource_tag_record", cascade="all, delete"))
+    resource = relationship("Resource", foreign_keys=[rid],
+                            backref=backref("resource_tag_record", cascade="all, delete"))
+
+    def __str__(self):
+        return f"tag id = {self.tag_id}, rid = {self.rid}"
 
 
 class ForumQuestion(Base):
@@ -341,7 +375,8 @@ class ForumQuestion(Base):
     # description of question
     content = Column(Text, nullable=False)
 
-    questioner = relationship("User", foreign_keys=[uid])
+    questioner = relationship("User", foreign_keys=[uid],
+                              backref=backref("forum_question", cascade="all, delete"))
 
 
 class ForumPersonnel(Base):
@@ -356,8 +391,10 @@ class ForumPersonnel(Base):
     # user allowed to view that question and following replies
     uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
 
-    question = relationship("ForumQuestion", foreign_keys=[qid])
-    allowed_user = relationship("User", foreign_keys=[uid])
+    question = relationship("ForumQuestion", foreign_keys=[qid],
+                            backref=backref("forum_personnel", cascade="all, delete"))
+    allowed_user = relationship("User", foreign_keys=[uid],
+                                backref=backref("forum_personnel", cascade="all, delete"))
 
 
 class ForumThread(Base):
@@ -402,8 +439,10 @@ class ForumThreadReply(Base):
     upvote_count = Column(Integer, default=0, nullable=False)
     downvote_count = Column(Integer, default=0, nullable=False)
 
-    thread = relationship("ForumThread", foreign_keys=[tid])
-    replier = relationship("User", foreign_keys=[uid])
+    thread = relationship("ForumThread", foreign_keys=[tid],
+                          backref=backref("forum_thread_reply", cascade="all, delete"))
+    replier = relationship("User", foreign_keys=[uid],
+                           backref=backref("forum_thread_reply", cascade="all, delete"))
 
 
 engine = create_engine(DBPATH)
