@@ -2,6 +2,19 @@
 # This file is used to define all the DataBase Structures used in
 # our project.
 #
+# *******************************Note*****************************
+# Under current config, the deletion of a row will be cascaded
+# to ALL tables that are dependent (i.e. table which uses this table's attribute
+# as foreign key) to this table. This is
+# specified by adding *backref* config for each relationship
+# function call. However, this constraint is enforced using sqlalchemy
+# function instead of adding constraint to DB, so if you modify the DB in psql
+# cli directly, any update will NO LONGER be cascaded to attributes in other
+# tables that referencing it.
+# To see the effect, check DBTester.py - "try delete a user instance with dependency"
+# section.
+#
+#
 # Created by Jason Aug 20, 2021
 ##################################################################
 import datetime
@@ -19,13 +32,18 @@ import base64
 # length of a standard string, use TEXT if longer than that
 STANDARD_STRING_LENGTH = 100
 
-DBUSERNAME = "postgres"
+# OPTIONS for DB testing:
+
+# Option 1: access psql DB and create schema using you own account in your own DB
+DBUSERNAME = "call me by your name" # change this field to your first name (all lowercase)
 DBPASSWORD = "admin"
 DBDATABASE = DBUSERNAME
 DBPATH = f"postgresql://{DBUSERNAME}:{DBPASSWORD}@localhost/{DBDATABASE}"
 
-# path use for teaching purpose
-# DBPATH = "sqlite:///Doctrina_db.db"
+# Option 2: Too lazy to sign in to cli? No worries, play with that using sqlite
+# on your local device
+# uncomment DBPATH below to overwrite the above PATH config
+# DBPATH = "sqlite:///Doctrina.db"
 
 
 class ResourceDifficulty(enum.Enum):

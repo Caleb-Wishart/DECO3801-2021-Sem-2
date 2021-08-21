@@ -1,7 +1,10 @@
 ##################################################################
 # This file provides some basic wrapper functions to create and
 # modify the DB objects
-# todo: add functions for forum and comment part
+# todo: add functions for forum and comment related tables
+#
+# report bug to Jason on messager
+#
 # Created by Jason Aug 20, 2021
 ##################################################################
 from sqlalchemy.orm import Session

@@ -1,5 +1,10 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
+############################################################
+# This is a script used to test and demonstrate
+# the usage of some methods in DBFunc
+# created by Jason Aug 20, 2021
+############################################################
+# import these two modules to do everything with DB, despite demo here we
+# only calls function from DBFunc
 from DBStructure import *
 from DBFunc import *
 
@@ -65,18 +70,9 @@ with Session(engine) as conn:
     for i in conn.query(User).all():
         print(i)
 
+    # observe entry of with uid = 1 in vote_info table is also gone
     for i in conn.query(VoteInfo).all():
         print(f"voter id = {i.uid}, resource id = {i.rid}")
-# test_user1 = User(username="test1", password="123456", email="cumfast@gmail.com")
-#
-# test_user2 = User(username="test2", password="123456", email="bigdaddy@gmail.com")
-
-# test_resource = Resource(title="How to do edging", resource_link="127.0.0.1:8080",
-#                          difficulty=ResourceDifficulty.EASY)
-
-# foreign key
-# test_resource_creater = ResourceCreater(rid=1, uid=1)
-
 
 # insertion test
 # with Session(engine) as conn:
