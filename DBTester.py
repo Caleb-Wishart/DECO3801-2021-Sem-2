@@ -1,28 +1,8 @@
 ############################################################
 # This is a script used to test and demonstrate
 # the usage of some methods in DBFunc
-#
-# ***********************************************************************
-# Some hints for interacting with postgres
-# log in to psql:
-# 1. type "psql firstname firstname" (no uppercase) in cli
-# 2. prompt for password, enter "admin"
-# 3. You are in.
-#
-#
-# view records in a table:
-# In psql cli: type "SELECT * FROM table_name;"
-#
-# delete all tables created in your own DB:
-# see instructions on https://makandracards.com/makandra/62111-how-to-drop-all-tables-in-postgresql
-#
-# more basic commands for psql cli:
-# check out https://gist.github.com/Kartones/dd3ff5ec5ea238d4c546
-# ************************************************************************
-#
 # created by Jason Aug 20, 2021
 ############################################################
-
 # import these two modules to do everything with DB, despite demo here we
 # only calls function from DBFunc
 from DBStructure import *
