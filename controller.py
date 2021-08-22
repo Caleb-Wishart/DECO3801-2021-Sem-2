@@ -143,7 +143,7 @@ def create(type=None):
 
 
 @app.route('/forum/<fName>/<tName>')
-def create(fName=None, tName=None):
+def forum(fName=None, tName=None):
     """The user view a forum page
 
     The home forum page (fName == None, tName == None) shows the list of forums
