@@ -3,7 +3,7 @@
 # modify the DB objects
 # todo: add functions for forum and comment related tables
 #
-# report bug to Jason on messager
+# report bug to Jason on messenger
 #
 # Created by Jason Aug 20, 2021
 ##################################################################
@@ -26,8 +26,8 @@ def add_user(username, password, email, teaching_areas: dict={},
     :param bio: The bio of new user
     :param email: The email address of that user. This field is unique for each user.
     :param verbose: Show creation message
-    :param teaching_areas: Mapping of teaching area - is_public
-            e.g. [Subject.ENGLISH: True, Subject.MATHS_C: False]
+    :param teaching_areas: Mapping of teaching area - [is_public, grade (optional)] list
+            e.g. [Subject.ENGLISH: [True], Subject.MATHS_C: [False, Grade.YEAR_1]
     """
     email = email.lower()
     user = User(username=username, avatar_link=avatar_link, password=ascii_to_base64(password),
@@ -48,10 +48,15 @@ def add_user(username, password, email, teaching_areas: dict={},
         # phase 2: find id of new user -- using email,
         # then update teaching_areas table
         user = conn.query(User).filter_by(email=email).one()
-        for area, is_public in teaching_areas.items():
+        for area, info in teaching_areas.items():
+            grade = None
+            if len(info) == 2:
+                is_public, grade = info[0], info[1]
+            else:
+                is_public = info[0]
             if isinstance(area, Subject):
                 new_teach_area = UserTeachingAreas(uid=user.uid, teaching_area=area,
-                                                   is_public=is_public)
+                                                   is_public=is_public, grade=grade)
                 conn.add(new_teach_area)
         conn.commit()
 
@@ -85,42 +90,54 @@ def get_tags():
     return out
 
 
-def add_resource(title, resource_link, difficulty, subject, is_public=True,
-                 private_personnel=[], tags=[], verbose=True):
+def add_resource(title, resource_link, difficulty, subject, grade, creaters_id=[],
+                 is_public=True, private_personnel_id=[], tags_id=[], verbose=True,
+                 description=None):
     """
     Add a resource to resource table
 
+    :param grade: Tge grade this resource belongs to
     :param title: The name of the resource
     :param resource_link: The link to resource video
     :param difficulty: The difficulty of the resource
     :param subject: what subject this resource relates to
     :param is_public: if the resource is public
-    :param private_personnel: if this resource is private, add all User instances
-            to the private_resource_personnel. Element to be filled in is uid
-    :param tags: The tags associated with this resource -- each element is tag_id
+    :param private_personnel_id: if this resource is private, add all User instances
+            to the private_resource_personnel. *Element to be filled in is uid
+    :param tags_id: The tags associated with this resource *each element is tag_id
     :param verbose: Show creation message
+    :param description: The description of this resource
+    :param creaters_id: The id of creaters * each element is uid
     """
-    if not is_public and not private_personnel:
+    if not is_public and not private_personnel_id:
         print("Please specify the User allowed to access this resource")
         return
 
-    resource = Resource(title=title, resource_link=resource_link,
-                        difficulty=difficulty, subject=subject, is_public=is_public)
+    resource = Resource(title=title, resource_link=resource_link, grade=grade,
+                        difficulty=difficulty, subject=subject, is_public=is_public,
+                        description=description)
     with Session(engine) as conn:
         # phase 1: add new resource
         conn.add(resource)
         conn.commit()
 
-        # phase 2: find the new row, update private_resource_personnel info and tag info
+        # phase 2: find the new row, update private_resource_personnel info, tag info
+        # and resource_creater table
         resource = conn.query(Resource).filter_by(resource_link=resource_link).one()
+
+        for i in creaters_id:
+            creater_instance = ResourceCreater(rid=resource.rid, uid=i)
+            conn.add(creater_instance)
+        conn.commit()
+
         if not is_public:
-            for uid in private_personnel:
+            for uid in private_personnel_id:
                 private_access = PrivateResourcePersonnel(rid=resource.rid, uid=uid)
                 conn.add(private_access)
             conn.commit()
 
-        if tags:
-            for i in tags:
+        if tags_id:
+            for i in tags_id:
                 tag_record = ResourceTagRecord(rid=resource.rid, tag_id=i)
                 conn.add(tag_record)
                 conn.commit()
