@@ -20,7 +20,7 @@
 import datetime
 import enum
 
-from sqlalchemy import Column, ForeignKey, Integer, String, \
+from sqlalchemy import Column, ForeignKey, Integer, String,\
     Text, DateTime, Numeric, Boolean, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
@@ -28,19 +28,19 @@ from sqlalchemy import create_engine
 import pytz
 import base64
 
+
 # length of a standard string, use TEXT if longer than that
-STANDARD_STRING_LENGTH = 300
+STANDARD_STRING_LENGTH = 100
 
 # OPTIONS for DB testing:
 
 # Option 1: access psql DB and create schema using you own account in your own DB
-DBUSERNAME = "call me by your name"  # change this field to your first name (all lowercase)
+DBUSERNAME = "call me by your name" # change this field to your first name (all lowercase)
 DBPASSWORD = "admin"
 DBDATABASE = DBUSERNAME
 DBPATH = f"postgresql://{DBUSERNAME}:{DBPASSWORD}@localhost/{DBDATABASE}"
 
-
-# Option 2: Feel lazy to sign in to cli? No worries, you can play these using sqlite
+# Option 2: Too lazy to sign in to cli? No worries, play with that using sqlite
 # on your local device
 # uncomment DBPATH below to overwrite the above PATH config
 # DBPATH = "sqlite:///Doctrina.db"
@@ -60,7 +60,7 @@ class Subject(enum.Enum):
     """
     The set of available subject tags
 
-    Credit:  https://brisbanesde.eq.edu.au/SupportAndResources/
+    Credits:  https://brisbanesde.eq.edu.au/SupportAndResources/
     FormsAndDocuments/Documents/Subject%20Guides/Lists%20and%20Handbooks/
     subject-guide-y11-12-hb-web.pdf
     """
@@ -91,34 +91,6 @@ class Subject(enum.Enum):
     OTHER = 24
 
 
-class Grade(enum.Enum):
-    """
-    The grades used to classify resources
-    """
-    KINDERGARTEN = 0
-    YEAR_1 = 1
-    YEAR_2 = 2
-    YEAR_3 = 3
-    YEAR_4 = 4
-    YEAR_5 = 5
-    YEAR_6 = 6
-    YEAR_7 = 7
-    YEAR_8 = 8
-    YEAR_9 = 9
-    YEAR_10 = 10
-    YEAR_11 = 11
-    YEAR_12 = 12
-
-
-class ChannelVisibility(enum.Enum):
-    """
-    The visibility of channel
-    """
-    INVITE_ONLY = 0
-    FULLY_PRIVATE = 1
-    PUBLIC = 2
-
-
 Base = declarative_base()
 
 
@@ -141,7 +113,7 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.datetime.now(
         tz=pytz.timezone("Australia/Brisbane")))
 
-    # user password -- base64 encoded
+    # user password
     password = Column(Text, nullable=False)
 
     # user honor rating
@@ -154,10 +126,8 @@ class User(Base):
     bio = Column(Text, default=None, nullable=True)
 
     def __str__(self):
-        return f"User table:\n" \
-               f"uid = {self.uid}, username = {self.username}, created at {self.created_at},\n" \
-               f"base64 password = {self.password}," \
-               f" original password = {base64_to_ascii(self.password)},\n" \
+        return f"uid = {self.uid}, username = {self.username}, created at {self.created_at},\n" \
+               f"base64 password = {self.password}, original password = {base64_to_ascii(self.password)},\n" \
                f"honor rating = {self.user_rating}, email = {self.email},\nbio = {self.bio}"
 
 
@@ -188,29 +158,17 @@ class UserTeachingAreas(Base):
     """
     __tablename__ = "user_teaching_areas"
 
-    # user id
+    # user id > User.uid
     uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
 
     # teaching area
     teaching_area = Column("teaching_area", Enum(Subject), primary_key=True)
-
-    # teaching grade - optional for users
-    grade = Column("teaching_grade", Enum(Grade), nullable=True, default=None)
 
     # whether this teaching_area tag is made public
     is_public = Column(Boolean, default=True, nullable=False)
 
     user = relationship("User", foreign_keys=[uid],
                         backref=backref("user_teaching_areas", cascade="all, delete"))
-
-    def __str__(self):
-        text = f"UserTeachingAreas table:\n" \
-               f"uid = {self.uid}, teaching area = {self.teaching_area}," \
-               f"is_public = {self.is_public}"
-        if self.grade:
-            return text + f", grade = {self.grade.name}"
-        else:
-            return text
 
 
 class Resource(Base):
@@ -238,61 +196,25 @@ class Resource(Base):
     # subject of the resource
     subject = Column("subject", Enum(Subject), nullable=False)
 
-    # grade of the resource
-    grade = Column("grade", Enum(Grade), nullable=False)
-
     # up/down-vote count
-    upvote_count = Column(Integer, default=0, nullable=False, autoincrement=False)
-    downvote_count = Column(Integer, default=0, nullable=False, autoincrement=False)
+    upvote_count = Column(Integer, default=0, nullable=False)
+    downvote_count = Column(Integer, default=0, nullable=False)
 
     # if the resource is public
     is_public = Column(Boolean, default=True, nullable=False)
 
-    # description of a resource
-    description = Column(Text, default=None)
-
     def __str__(self):
-        return f"Resource table:\n" \
-               f"rid = {self.rid}, title = {self.title}, resource " \
-               f"link = {self.resource_link},\ncreated at {self.created_at},\n" \
-               f"grade = {self.grade.name}, " \
-               f"difficulty = {self.difficulty.name}, #upvote = {self.upvote_count}, " \
-               f"#downvote = {self.downvote_count}, is_public = {self.is_public}\n" \
-               f"description = {self.description}"
+        return f"resource id = {self.rid}, title = {self.title}, resource " \
+               f"link = {self.resource_link}, created at {self.created_at}, " \
+               f"difficulty = {self.difficulty.name},\n#upvote = {self.upvote_count}, " \
+               f"#downvote = {self.downvote_count}, is resource public = {self.is_public}"
 
 
-class ResourceView(Base):
-    """
-    A table recording resources viewed by users
-    """
-    __tablename__ = "resource_view"
-
-    # resource id
-    rid = Column(Integer, ForeignKey("resource.rid"), primary_key=True)
-
-    # user id
-    uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
-
-    # timestamp
-    created_at = Column(DateTime, default=datetime.datetime.now(
-        tz=pytz.timezone("Australia/Brisbane")))
-
-    user = relationship("User", foreign_keys=[uid],
-                        backref=backref("resource_view", cascade="all,delete"))
-    resource = relationship("Resource", foreign_keys=[rid],
-                            backref=backref("resource_view", cascade="all,delete"))
-
-    def __str__(self):
-        return f"ResourceView table:\n" \
-               f"rid = {self.rid}, uid = {self.uid},\n" \
-               f"created at = {self.created_at}"
-
-
-class ResourceVoteInfo(Base):
+class VoteInfo(Base):
     """
     A table of vote status for user who voted on a resource
     """
-    __tablename__ = "resource_vote_info"
+    __tablename__ = "vote_info"
 
     # user id
     uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
@@ -304,14 +226,13 @@ class ResourceVoteInfo(Base):
     is_upvote = Column(Boolean, nullable=False)
 
     user = relationship("User", foreign_keys=[uid],
-                        backref=backref("resource_vote_info", cascade="all,delete"))
+                        backref=backref("vote_info", cascade="all,delete"))
     resource = relationship("Resource", foreign_keys=[rid],
-                            backref=backref("resource_vote_info", cascade="all,delete"))
+                            backref=backref("vote_info", cascade="all,delete"))
 
     def __str__(self):
-        return f"ResourceVoteInfo table:\n" \
-               f"Voter id = {self.uid}, rid = {self.rid}, " \
-               f"is_upvote = {self.is_upvote}"
+        return f"Voter id = {self.uid}, resource id = {self.resource}, " \
+               f"upvote = {self.is_upvote}"
 
 
 class ResourceCreater(Base):
@@ -332,8 +253,7 @@ class ResourceCreater(Base):
                            backref=backref("resource_creater", cascade="all, delete"))
 
     def __str__(self):
-        return f"ResourceCreater table:\n" \
-               f"creater id = {self.uid}, rid = {self.rid}"
+        return f"creater id = {self.uid}, resource id = {self.rid}"
 
 
 class ResourceComment(Base):
@@ -363,12 +283,6 @@ class ResourceComment(Base):
     resource = relationship("Resource", foreign_keys=[rid],
                             backref=backref("resource_comment", cascade="all, delete"))
 
-    def __str__(self):
-        return f"ResourceComment table:\n" \
-               f"resource comment id = {self.resource_comment_id}, uid = {self.uid}, " \
-               f"rid = {self.rid},\ncreated at = {self.created_at}\n" \
-               f"comment = {self.comment}"
-
 
 class ResourceCommentReply(Base):
     """
@@ -392,17 +306,9 @@ class ResourceCommentReply(Base):
     uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
 
     resource_comment = relationship("ResourceComment", foreign_keys=[resource_comment_id],
-                                    backref=backref("resource_comment_reply",
-                                                    cascade="all, delete"))
+                                    backref=backref("resource_comment_reply", cascade="all, delete"))
     replier = relationship("User", foreign_keys=[uid],
-                           backref=backref("resource_comment_reply",
-                                           cascade="all, delete"))
-
-    def __str__(self):
-        return f"ResourceCommentReply table:\n" \
-               f"resource_comment_id = {self.resource_comment_id}, " \
-               f"replier id = {self.uid}, created_at = {self.created_at}\n" \
-               f"reply = {self.reply}"
+                           backref=backref("resource_comment_reply", cascade="all, delete"))
 
 
 class PrivateResourcePersonnel(Base):
@@ -410,6 +316,8 @@ class PrivateResourcePersonnel(Base):
     The representation of a personnel that stores users that are allowed to
     watch particular resources
     """
+    # todo: define trigger to avoid public resource be added to this table
+    # implemented in add_resource(), need similar strategy for modifier methods
     __tablename__ = "private_resource_personnel"
 
     # resource id
@@ -424,8 +332,7 @@ class PrivateResourcePersonnel(Base):
                                 backref=backref("private_resource_personnel", cascade="all, delete"))
 
     def __str__(self):
-        return f"PrivateResourcePersonnel table:\n" \
-               f"allowed uid = {self.uid}, rid = {self.rid}"
+        return f"Private personnel: uid = {self.uid}, rid = {self.rid}"
 
 
 class Tag(Base):
@@ -438,15 +345,13 @@ class Tag(Base):
     tag_id = Column(Integer, primary_key=True, autoincrement=True)
 
     # name of the tag
-    tag_name = Column(String(STANDARD_STRING_LENGTH), nullable=False, unique=True)
+    tag_name = Column(String(STANDARD_STRING_LENGTH), nullable=False)
 
     # description of tag
     tag_description = Column(Text, default=None)
 
     def __str__(self):
-        return f"Tag table:\n" \
-               f"tag_id = {self.tag_id}, " \
-               f"tag name = {self.tag_name}, tag id = {self.tag_id}"
+        return f"tag name = {self.tag_name}, tag id = {self.tag_id}"
 
 
 class ResourceTagRecord(Base):
@@ -467,118 +372,60 @@ class ResourceTagRecord(Base):
                             backref=backref("resource_tag_record", cascade="all, delete"))
 
     def __str__(self):
-        return f"ResourceTagRecord table:\n" \
-               f"tag id = {self.tag_id}, rid = {self.rid}"
+        return f"tag id = {self.tag_id}, rid = {self.rid}"
 
 
-class Channel(Base):
+class ForumQuestion(Base):
     """
-    A table used to record channels of the chat functionality
+    A table used to record private (forum) question
     """
-    __tablename__ = "channel"
+    __tablename__ = "forum_question"
 
-    # channel id
-    cid = Column(Integer, primary_key=True, autoincrement=True)
+    # question id
+    qid = Column(Integer, primary_key=True, autoincrement=True)
 
-    # subject of this channel - optional
-    subject = Column("subject", Enum(Subject), nullable=True, default=None)
-
-    # grade of this channel
-    grade = Column("grade", Enum(Grade), nullable=True, default=None)
-
-    # visibility of this channel
-    visibility = Column("visibility", Enum(ChannelVisibility), nullable=False,
-                        default=ChannelVisibility.PUBLIC)
-
-    # name of the channel, enforce unique constraint
-    name = Column(String(STANDARD_STRING_LENGTH), nullable=False, unique=True)
-
-    # channel admin id
-    admin_uid = Column(Integer, ForeignKey("user.uid"))
-
-    # description of the channel
-    description = Column(Text, nullable=True)
-
-    admin = relationship("User", foreign_keys=[admin_uid],
-                         backref=backref("channel", cascade="all, delete"))
-
-    def __str__(self):
-        text = f"Channel table:\n" \
-               f"channel name = {self.name}, admin id = {self.admin_uid},\n" \
-               f"cid = {self.cid}, " \
-               f"visibility = {self.visibility.name}, "
-        if self.subject:
-            text += f"subject={self.subject.name}, "
-        if self.grade:
-            text += f"grade={self.grade.name},"
-        return text + "\n" + f"description = {self.description}"
-
-
-class ChannelPersonnel(Base):
-    """
-    A table defining the people that allowed to see contents of a channel
-    """
-    __tablename__ = "channel_personnel"
-
-    # channel id
-    cid = Column(Integer, ForeignKey("channel.cid"), primary_key=True)
-
-    # user allowed to view that channel
-    uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
-
-    channel = relationship("Channel", foreign_keys=[cid],
-                           backref=backref("channel_personnel", cascade="all, delete"))
-    allowed_user = relationship("User", foreign_keys=[uid],
-                                backref=backref("channel_personnel", cascade="all, delete"))
-
-    def __str__(self):
-        return f"ChannelPersonnel table:\n" \
-               f"cid = {self.cid}, allowed uid = {self.uid}"
-
-
-class ChannelTagRecord(Base):
-    """
-    A table that records all tags associated with channels
-    """
-    __tablename__ = "channel_tag_record"
-
-    # tag id
-    tag_id = Column(Integer, ForeignKey("tag.tag_id"), primary_key=True)
-
-    # channel id
-    cid = Column(Integer, ForeignKey("channel.cid"), primary_key=True)
-
-    tag = relationship("Tag", foreign_keys=[tag_id],
-                       backref=backref("channel_tag_record", cascade="all,delete"))
-    channel = relationship("Channel", foreign_keys=[cid],
-                           backref=backref("channel_tag_record", cascade="all, delete"))
-
-    def __str__(self):
-        return f"ChannelTagRecord table:\n" \
-               f"tag_id = {self.tag_id}, cid = {self.cid}"
-
-
-class ChannelPost(Base):
-    """
-    Representation of a post in a channel
-    """
-    __tablename__ = "channel_post"
-
-    # post id
-    post_id = Column(Integer, primary_key=True, autoincrement=True)
-
-    # creater of the post
-    uid = Column(Integer, ForeignKey("user.uid"))
-
-    # the channel this thread belongs to
-    cid = Column(Integer, ForeignKey("channel.cid"))
-
-    # the title of the post
+    # title of the question
     title = Column(String(STANDARD_STRING_LENGTH), nullable=False)
 
-    # up/down-vote count
-    upvote_count = Column(Integer, default=0, nullable=False, autoincrement=False)
-    downvote_count = Column(Integer, default=0, nullable=False, autoincrement=False)
+    # question creater id
+    uid = Column(Integer, ForeignKey("user.uid"))
+
+    # description of question
+    content = Column(Text, nullable=False)
+
+    questioner = relationship("User", foreign_keys=[uid],
+                              backref=backref("forum_question", cascade="all, delete"))
+
+
+class ForumPersonnel(Base):
+    """
+    A table defining the people that allowed to see contents of a question & thread
+    """
+    __tablename__ = "forum_personnel"
+
+    # question id
+    qid = Column(Integer, ForeignKey("forum_question.qid"), primary_key=True)
+
+    # user allowed to view that question and following replies
+    uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
+
+    question = relationship("ForumQuestion", foreign_keys=[qid],
+                            backref=backref("forum_personnel", cascade="all, delete"))
+    allowed_user = relationship("User", foreign_keys=[uid],
+                                backref=backref("forum_personnel", cascade="all, delete"))
+
+
+class ForumThread(Base):
+    """
+    A thread under a question
+    """
+    __tablename__ = "forum_thread"
+
+    # thread id
+    tid = Column(Integer, primary_key=True, autoincrement=True)
+
+    # the question this thread links to
+    qid = Column(Integer, ForeignKey("forum_question.qid"))
 
     # thread initial reply
     init_text = Column(Text, nullable=False)
@@ -586,106 +433,34 @@ class ChannelPost(Base):
     created_at = Column(DateTime, default=datetime.datetime.now(
         tz=pytz.timezone("Australia/Brisbane")))
 
-    channel = relationship("Channel", foreign_keys=[cid],
-                           backref=backref("channel_post", cascade="all, delete"))
 
-    def __str__(self):
-        return f"ChannelPost table:\n" \
-               f"post_id = {self.post_id}, cid = {self.cid},\n" \
-               f"title = {self.title}, post creater id = {self.uid}\n" \
-               f"#upvote = {self.upvote_count}, #downvote = {self.downvote_count},\n" \
-               f"created at = {self.created_at}\n" \
-               f"init_text = {self.init_text}"
-
-
-class ChannelPostVoteInfo(Base):
-    """
-    Representation of a vote stat for channel post
-    """
-    __tablename__ = "channel_post_vote_info"
-
-    # post to be commented
-    post_id = Column(Integer, ForeignKey("channel_post.post_id"), primary_key=True)
-
-    # voter's id
-    uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
-
-    # vote status
-    is_upvote = Column(Boolean, nullable=False)
-
-    thread = relationship("ChannelPost", foreign_keys=[post_id],
-                          backref=backref("channel_post_vote_info", cascade="all, delete"))
-    voter = relationship("User", foreign_keys=[uid],
-                         backref=backref("channel_post_vote_info", cascade="all, delete"))
-
-    def __str__(self):
-        return f"channel_post_vote_info table:\n" \
-               f"post id = {self.post_id}, voter is = {self.uid}, is upvote = {self.is_upvote}"
-
-
-class PostComment(Base):
+class ForumThreadReply(Base):
     """
     A table recording replies to a thread
     """
-    __tablename__ = "post_comment"
+    __tablename__ = "forum_thread_reply"
 
-    # post comment id
-    post_comment_id = Column(Integer, primary_key=True, autoincrement=True)
-
-    # post to be commented
-    post_id = Column(Integer, ForeignKey("channel_post.post_id"))
+    # thread to be replied
+    tid = Column(Integer, ForeignKey("forum_thread.tid"), primary_key=True)
 
     # datetime when created
     created_at = Column(DateTime, default=datetime.datetime.now(
-        tz=pytz.timezone("Australia/Brisbane")))
+        tz=pytz.timezone("Australia/Brisbane")), primary_key=True)
 
-    # commenter id
-    uid = Column(Integer, ForeignKey("user.uid"))
+    # replier id
+    uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
 
-    # comment content
+    # reply content
     text = Column(Text, nullable=False)
 
     # up/down-vote count
-    upvote_count = Column(Integer, default=0, nullable=False, autoincrement=False)
-    downvote_count = Column(Integer, default=0, nullable=False, autoincrement=False)
+    upvote_count = Column(Integer, default=0, nullable=False)
+    downvote_count = Column(Integer, default=0, nullable=False)
 
-    thread = relationship("ChannelPost", foreign_keys=[post_id],
-                          backref=backref("post_comment", cascade="all, delete"))
-    commenter = relationship("User", foreign_keys=[uid],
-                             backref=backref("post_comment", cascade="all, delete"))
-
-    def __str__(self):
-        return f"PostComment table:\npost comment id = {self.post_comment_id}" \
-               f"post_id = {self.post_id}, commenter uid = {self.uid},\n" \
-               f"created_at = {self.created_at},\n" \
-               f"text = {self.text}\n," \
-               f"#upvote = {self.upvote_count}, #downvote = {self.downvote_count}"
-
-
-class PostCommentVoteInfo(Base):
-    """
-    A table recording all the voting info to a post comment
-    """
-    __tablename__ = "post_comment_vote_info"
-
-    # id of post comment to vote
-    post_comment_id = Column(Integer, ForeignKey("post_comment.post_comment_id"), primary_key=True)
-
-    # voter's id
-    uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
-
-    # vote status
-    is_upvote = Column(Boolean, nullable=False)
-
-    post_comment = relationship("PostComment", foreign_keys=[post_comment_id],
-                                backref=backref("post_comment_vote_info",
-                                                cascade="all, delete"))
-    voter = relationship("User", foreign_keys=[uid],
-                         backref=backref("post_comment_vote_info", cascade="all, delete"))
-
-    def __str__(self):
-        return f"PostCommentVoteInfo table:\npost_comment_id = {self.post_comment_id}, " \
-               f"uid = {self.uid}, is_upvote = {self.is_upvote}"
+    thread = relationship("ForumThread", foreign_keys=[tid],
+                          backref=backref("forum_thread_reply", cascade="all, delete"))
+    replier = relationship("User", foreign_keys=[uid],
+                           backref=backref("forum_thread_reply", cascade="all, delete"))
 
 
 engine = create_engine(DBPATH)
