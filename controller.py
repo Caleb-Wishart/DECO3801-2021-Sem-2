@@ -164,7 +164,6 @@ def forum(fName=None, tName=None):
     """
     return render_template('base.html', title='Post')
 
-
 @app.errorhandler(403)
 def page_not_found(error):
     """Page shown with a HTML 403 status"""
