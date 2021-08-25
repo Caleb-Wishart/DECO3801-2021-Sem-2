@@ -40,10 +40,10 @@ DBDATABASE = DBUSERNAME
 DBPATH = f"postgresql://{DBUSERNAME}:{DBPASSWORD}@localhost/{DBDATABASE}"
 
 
-# Option 2: Too lazy to sign in to cli? No worries, play with that using sqlite
+# Option 2: Feel lazy to sign in to cli? No worries, you can play these using sqlite
 # on your local device
 # uncomment DBPATH below to overwrite the above PATH config
-DBPATH = "sqlite:///Doctrina.db"
+# DBPATH = "sqlite:///Doctrina.db"
 
 
 class ResourceDifficulty(enum.Enum):
@@ -288,11 +288,11 @@ class ResourceView(Base):
                f"created at = {self.created_at}"
 
 
-class VoteInfo(Base):
+class ResourceVoteInfo(Base):
     """
     A table of vote status for user who voted on a resource
     """
-    __tablename__ = "vote_info"
+    __tablename__ = "resource_vote_info"
 
     # user id
     uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
@@ -304,12 +304,12 @@ class VoteInfo(Base):
     is_upvote = Column(Boolean, nullable=False)
 
     user = relationship("User", foreign_keys=[uid],
-                        backref=backref("vote_info", cascade="all,delete"))
+                        backref=backref("resource_vote_info", cascade="all,delete"))
     resource = relationship("Resource", foreign_keys=[rid],
-                            backref=backref("vote_info", cascade="all,delete"))
+                            backref=backref("resource_vote_info", cascade="all,delete"))
 
     def __str__(self):
-        return f"VoteInfo table:\n" \
+        return f"ResourceVoteInfo table:\n" \
                f"Voter id = {self.uid}, rid = {self.rid}, " \
                f"is_upvote = {self.is_upvote}"
 
@@ -365,7 +365,7 @@ class ResourceComment(Base):
 
     def __str__(self):
         return f"ResourceComment table:\n" \
-               f"resource comment id = {self.resource_comment_id}, uid = {self.uid}" \
+               f"resource comment id = {self.resource_comment_id}, uid = {self.uid}, " \
                f"rid = {self.rid},\ncreated at = {self.created_at}\n" \
                f"comment = {self.comment}"
 
@@ -410,8 +410,6 @@ class PrivateResourcePersonnel(Base):
     The representation of a personnel that stores users that are allowed to
     watch particular resources
     """
-    # todo: define trigger to avoid public resource be added to this table
-    # implemented in add_resource(), need similar strategy for modifier methods
     __tablename__ = "private_resource_personnel"
 
     # resource id
@@ -440,7 +438,7 @@ class Tag(Base):
     tag_id = Column(Integer, primary_key=True, autoincrement=True)
 
     # name of the tag
-    tag_name = Column(String(STANDARD_STRING_LENGTH), nullable=False)
+    tag_name = Column(String(STANDARD_STRING_LENGTH), nullable=False, unique=True)
 
     # description of tag
     tag_description = Column(Text, default=None)
@@ -492,8 +490,8 @@ class Channel(Base):
     visibility = Column("visibility", Enum(ChannelVisibility), nullable=False,
                         default=ChannelVisibility.PUBLIC)
 
-    # name of the channel - optional
-    name = Column(String(STANDARD_STRING_LENGTH), nullable=False)
+    # name of the channel, enforce unique constraint
+    name = Column(String(STANDARD_STRING_LENGTH), nullable=False, unique=True)
 
     # channel admin id
     admin_uid = Column(Integer, ForeignKey("user.uid"))
@@ -520,7 +518,6 @@ class ChannelPersonnel(Base):
     """
     A table defining the people that allowed to see contents of a channel
     """
-    # todo: need to check the channel added to here has visibility != PUBLIC
     __tablename__ = "channel_personnel"
 
     # channel id
@@ -601,21 +598,49 @@ class ChannelPost(Base):
                f"init_text = {self.init_text}"
 
 
+class ChannelPostVoteInfo(Base):
+    """
+    Representation of a vote stat for channel post
+    """
+    __tablename__ = "channel_post_vote_info"
+
+    # post to be commented
+    post_id = Column(Integer, ForeignKey("channel_post.post_id"), primary_key=True)
+
+    # voter's id
+    uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
+
+    # vote status
+    is_upvote = Column(Boolean, nullable=False)
+
+    thread = relationship("ChannelPost", foreign_keys=[post_id],
+                          backref=backref("channel_post_vote_info", cascade="all, delete"))
+    voter = relationship("User", foreign_keys=[uid],
+                         backref=backref("channel_post_vote_info", cascade="all, delete"))
+
+    def __str__(self):
+        return f"channel_post_vote_info table:\n" \
+               f"post id = {self.post_id}, voter is = {self.uid}, is upvote = {self.is_upvote}"
+
+
 class PostComment(Base):
     """
     A table recording replies to a thread
     """
     __tablename__ = "post_comment"
 
+    # post comment id
+    post_comment_id = Column(Integer, primary_key=True, autoincrement=True)
+
     # post to be commented
-    post_id = Column(Integer, ForeignKey("channel_post.post_id"), primary_key=True)
+    post_id = Column(Integer, ForeignKey("channel_post.post_id"))
 
     # datetime when created
     created_at = Column(DateTime, default=datetime.datetime.now(
-        tz=pytz.timezone("Australia/Brisbane")), primary_key=True)
+        tz=pytz.timezone("Australia/Brisbane")))
 
     # commenter id
-    uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
+    uid = Column(Integer, ForeignKey("user.uid"))
 
     # comment content
     text = Column(Text, nullable=False)
@@ -630,11 +655,37 @@ class PostComment(Base):
                              backref=backref("post_comment", cascade="all, delete"))
 
     def __str__(self):
-        return f"PostComment table:\n" \
+        return f"PostComment table:\npost comment id = {self.post_comment_id}" \
                f"post_id = {self.post_id}, commenter uid = {self.uid},\n" \
                f"created_at = {self.created_at},\n" \
                f"text = {self.text}\n," \
                f"#upvote = {self.upvote_count}, #downvote = {self.downvote_count}"
+
+
+class PostCommentVoteInfo(Base):
+    """
+    A table recording all the voting info to a post comment
+    """
+    __tablename__ = "post_comment_vote_info"
+
+    # id of post comment to vote
+    post_comment_id = Column(Integer, ForeignKey("post_comment.post_comment_id"), primary_key=True)
+
+    # voter's id
+    uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
+
+    # vote status
+    is_upvote = Column(Boolean, nullable=False)
+
+    post_comment = relationship("PostComment", foreign_keys=[post_comment_id],
+                                backref=backref("post_comment_vote_info",
+                                                cascade="all, delete"))
+    voter = relationship("User", foreign_keys=[uid],
+                         backref=backref("post_comment_vote_info", cascade="all, delete"))
+
+    def __str__(self):
+        return f"PostCommentVoteInfo table:\npost_comment_id = {self.post_comment_id}, " \
+               f"uid = {self.uid}, is_upvote = {self.is_upvote}"
 
 
 engine = create_engine(DBPATH)
