@@ -1,20 +1,49 @@
 ##################################################################
 # This file provides some basic wrapper functions to create and
 # modify the DB objects
-# todo: add functions for forum and comment related tables
 #
 # report bug to Jason on messenger
 #
 # Created by Jason Aug 20, 2021
 ##################################################################
-from sqlalchemy.orm import Session
+import enum
+
+from sqlalchemy.orm import sessionmaker
 from DBStructure import *
 
 
+class ErrorCode(enum.Enum):
+    """
+    This is a enum class representing all the possible error codes when
+    calling the methods below
+    """
+    # user id/info incorrect
+    INVALID_USER = 1
+    # resource id/info incorrect
+    INVALID_RESOURCE = 2
+    # uid not in personnel
+    INCORRECT_PERSONNEL = 3
+    # voter make same vote to same item twice
+    SAME_VOTE_TWICE = 4
+    # channel id/info incorrect
+    INVALID_CHANNEL = 5
+    # post id/info incorrect
+    INVALID_POST = 6
+
+
+class PersonnelModification(enum.Enum):
+    """
+    Defining the type of modification to be done on personnel
+    """
+    PERSONNEL_ADD = 0
+    PERSONNEL_DELETE = 1
+
+
 engine = create_engine(DBPATH)
+Session = sessionmaker(engine)
 
 
-def add_user(username, password, email, teaching_areas: dict={},
+def add_user(username, password, email, teaching_areas: dict = {},
              verbose=True, bio=None, avatar_link=None):
     """
     Add a new user to table user and add teaching_areas to
@@ -28,16 +57,18 @@ def add_user(username, password, email, teaching_areas: dict={},
     :param verbose: Show creation message
     :param teaching_areas: Mapping of teaching area - [is_public, grade (optional)] list
             e.g. [Subject.ENGLISH: [True], Subject.MATHS_C: [False, Grade.YEAR_1]
+    :return The id of the new user if success.
+            ErrorCode.INVALID_USER if email is occupied
     """
     email = email.lower()
     user = User(username=username, avatar_link=avatar_link, password=ascii_to_base64(password),
                 email=email, created_at=datetime.datetime.now(
-                tz=pytz.timezone("Australia/Brisbane")), bio=bio)
+            tz=pytz.timezone("Australia/Brisbane")), bio=bio)
 
-    with Session(engine) as conn:
+    with Session() as conn:
         if conn.query(User).filter_by(email=email).one_or_none():
             print("This email address is registered")
-            return
+            return ErrorCode.INVALID_USER
 
         # phase 1: add a new user
         conn.add(user)
@@ -59,6 +90,7 @@ def add_user(username, password, email, teaching_areas: dict={},
                                                    is_public=is_public, grade=grade)
                 conn.add(new_teach_area)
         conn.commit()
+        return user.uid
 
 
 def add_tag(tag_name, tag_description=None, verbose=True):
@@ -68,12 +100,15 @@ def add_tag(tag_name, tag_description=None, verbose=True):
     :param tag_name: The name of the new tag
     :param tag_description: The description of the tag (optional)
     :param verbose: Show creation message
+    :return the id of the new tag
     """
     tag = Tag(tag_name=tag_name, tag_description=tag_description)
-    with Session(engine) as conn:
+    with Session() as conn:
         conn.add(tag)
         conn.commit()
         print(f"tag {tag_name} added") if verbose else None
+
+        return conn.query(Tag).filter_by(tag_name=tag_name).one().tag_id
 
 
 def get_tags():
@@ -82,7 +117,7 @@ def get_tags():
     """
     out = dict()
 
-    with Session(engine) as conn:
+    with Session() as conn:
         tags = conn.query(Tag).all()
 
         for i in tags:
@@ -90,9 +125,9 @@ def get_tags():
     return out
 
 
-def add_resource(title, resource_link, difficulty, subject, grade, creaters_id=[],
-                 is_public=True, private_personnel_id=[], tags_id=[], verbose=True,
-                 description=None):
+def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: Subject,
+                 grade: Grade, creaters_id=[], is_public=True, private_personnel_id=[],
+                 tags_id=[], verbose=True, description=None):
     """
     Add a resource to resource table
 
@@ -108,15 +143,19 @@ def add_resource(title, resource_link, difficulty, subject, grade, creaters_id=[
     :param verbose: Show creation message
     :param description: The description of this resource
     :param creaters_id: The id of creaters * each element is uid
+    :return The id of the new resource if success.
+            ErrorCode.INCORRECT_PERSONNEL if
+            private_personnel_id is not defined when is_public is False.
+
     """
     if not is_public and not private_personnel_id:
         print("Please specify the User allowed to access this resource")
-        return
+        return ErrorCode.INCORRECT_PERSONNEL
 
     resource = Resource(title=title, resource_link=resource_link, grade=grade,
                         difficulty=difficulty, subject=subject, is_public=is_public,
                         description=description)
-    with Session(engine) as conn:
+    with Session() as conn:
         # phase 1: add new resource
         conn.add(resource)
         conn.commit()
@@ -128,6 +167,11 @@ def add_resource(title, resource_link, difficulty, subject, grade, creaters_id=[
         for i in creaters_id:
             creater_instance = ResourceCreater(rid=resource.rid, uid=i)
             conn.add(creater_instance)
+
+            # creaters must have access to this resource
+            if not is_public:
+                private_access = PrivateResourcePersonnel(rid=resource.rid, uid=i)
+                conn.add(private_access)
         conn.commit()
 
         if not is_public:
@@ -143,6 +187,66 @@ def add_resource(title, resource_link, difficulty, subject, grade, creaters_id=[
                 conn.commit()
         if verbose:
             print(f"Resource {title} added")
+        return resource.rid
+
+
+def modify_resource_personnel(rid, uid, modification: PersonnelModification):
+    """
+    Add/delete a person from a resource personnel
+
+    :param rid: The resource to be modified
+    :param uid: The user to add/delete
+    :param modification: Add or delete
+    :return void on success.
+            ErrorCode.INVALID_USER/-RESOURCE if uid/rid is incorrect or resource is public
+            ErrorCode.INCORRECT_PERSONNEL if mode is delete and personnel info not exist
+    """
+    user, resource = get_user_and_resource_instance(uid=uid, rid=rid)
+    if not user:
+        print("uid is invalid")
+        return ErrorCode.INVALID_USER
+    elif not resource or resource.is_public:
+        print("rid is invalid or resource is public")
+        return ErrorCode.INVALID_RESOURCE
+    with Session() as conn:
+        if modification == PersonnelModification.PERSONNEL_DELETE:
+            # delete
+            personnel = conn.query(PrivateResourcePersonnel).filter_by(uid=uid, rid=rid).\
+                one_or_none()
+            if not personnel:
+                print("Delete failed: User not in personnel")
+                return ErrorCode.INCORRECT_PERSONNEL
+            conn.delete(personnel)
+            msg = "deleted"
+        else:
+            # add
+            personnel = PrivateResourcePersonnel(uid=uid, rid=rid)
+            conn.add(personnel)
+            msg = "added"
+        conn.commit()
+        print(f"user {uid} is {msg} from/to personnel of resource {rid}")
+
+
+def user_has_access_to_resource(uid, rid):
+    """
+    Check if a user has access to a private resource
+
+    :param rid: The resource to be checked
+    :param uid: The user to be checked
+    :return True/False on success.
+            ErrorCode.INVALID_USER/-RESOURCE if uid/rid is incorrect or resource is public
+    """
+    user, resource = get_user_and_resource_instance(uid=uid, rid=rid)
+    if not user:
+        print("uid is invalid")
+        return ErrorCode.INVALID_USER
+    elif not resource or resource.is_public:
+        print("rid is invalid or resource is public")
+        return ErrorCode.INVALID_RESOURCE
+
+    with Session() as conn:
+        return conn.query(PrivateResourcePersonnel).filter_by(uid=uid, rid=rid).\
+            one_or_none() is not None
 
 
 def vote_resource(uid, rid, upvote=True, verbose=True):
@@ -155,14 +259,24 @@ def vote_resource(uid, rid, upvote=True, verbose=True):
     :param rid: The resource to vote
     :param upvote: is this is a upvote
     :param verbose: show process message
+    :return void on Success.
+            ErrorCode.INVALID_RESOURCE/_USER if rid/uid is invalid.
+            ErrorCode.SAME_VOTE_TWICE if current user gave same vote to this
+            resource before.
     """
     msg = "created"
 
-    with Session(engine) as conn:
-        resource = conn.query(Resource).filter_by(rid=rid).one()
+    user, resource = get_user_and_resource_instance(uid, rid)
+    if not resource:
+        print("rid is invalid")
+        return ErrorCode.INVALID_RESOURCE
+    elif not user:
+        print("uid is invalid")
+        return ErrorCode.INVALID_USER
 
+    with Session() as conn:
         # try to find if there is an entry in vote_info
-        vote_info = conn.query(VoteInfo).filter_by(uid=uid, rid=rid).one_or_none()
+        vote_info = conn.query(ResourceVoteInfo).filter_by(uid=uid, rid=rid).one_or_none()
         if vote_info:
             if vote_info.is_upvote != upvote:
                 # user voted, now change vote
@@ -179,10 +293,10 @@ def vote_resource(uid, rid, upvote=True, verbose=True):
             else:
                 if verbose:
                     print("user cannot vote the same item twice")
-                return
+                return ErrorCode.SAME_VOTE_TWICE
         else:
             # new vote
-            vote_info = VoteInfo(rid=rid, uid=uid, is_upvote=upvote)
+            vote_info = ResourceVoteInfo(rid=rid, uid=uid, is_upvote=upvote)
             if upvote:
                 resource.upvote_count += 1
             else:
@@ -191,4 +305,427 @@ def vote_resource(uid, rid, upvote=True, verbose=True):
         conn.add(vote_info)
         conn.add(resource)
         conn.commit()
-        print(f"Vote info {msg}") if verbose else None
+        if verbose:
+            print(f"Vote info {msg} for resource {rid}, user {uid} upvoted = {upvote}")
+
+
+def get_user_and_resource_instance(uid, rid):
+    """
+    Try to get instances User and Resource using provided uid and rid
+
+    Can use this to check if the (uid, rid) is valid
+
+    :param uid: The user id
+    :param rid: The resource id
+    :return The tuple of form User, Resource
+    """
+    with Session() as conn:
+        resource = conn.query(Resource).filter_by(rid=rid).one_or_none()
+        user = conn.query(User).filter_by(uid=uid).one_or_none()
+
+    return user, resource
+
+
+def user_viewed_resource(uid, rid, verbose=True):
+    """
+    Call this function to add a record to resource view table
+
+    :param uid: The user id who viewed the resource
+    :param rid: The id of resource viewed
+    :param verbose: show process message
+    :return void on Success.
+            ErrorCode.INVALID_RESOURCE/_USER if rid/uid is invalid.
+    """
+    user, resource = get_user_and_resource_instance(uid, rid)
+    if not resource:
+        print("rid is invalid")
+        return ErrorCode.INVALID_RESOURCE
+    elif not user:
+        print("uid is invalid")
+        return ErrorCode.INVALID_USER
+
+    with Session() as conn:
+        resource_view = ResourceView(rid=rid, uid=uid)
+        conn.add(resource_view)
+        conn.commit()
+    print(f"user {uid} viewed resource {rid}") if verbose else None
+
+
+def comment_to_resource(uid, rid, comment, verbose=True):
+    """
+    Add a comment to a resource
+
+    :param uid: The commenter user id
+    :param rid: The id of resource to be commented
+    :param comment: The comment to that resource
+    :param verbose: show process message
+    :return The id of the new resource comment on success.
+            ErrorCode.INVALID_RESOURCE/_USER if rid/uid is invalid.
+    """
+    user, resource = get_user_and_resource_instance(uid, rid)
+    if not resource:
+        print("rid is invalid")
+        return ErrorCode.INVALID_RESOURCE
+    elif not user:
+        print("uid is invalid")
+        return ErrorCode.INVALID_USER
+    created_at = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
+    with Session() as conn:
+        resource_comment = ResourceComment(uid=uid, rid=rid, comment=comment, created_at=created_at)
+        conn.add(resource_comment)
+        conn.commit()
+    if verbose:
+        print(f"user {uid} commented resource {rid}")
+    return conn.query(ResourceComment). \
+        filter_by(uid=uid, rid=rid, created_at=created_at).one().resource_comment_id
+
+
+def reply_to_resource_comment(uid, resource_comment_id, reply, verbose=True):
+    """
+    Add a reply to a resource comment
+
+    :param uid: The resource comment replier user id
+    :param resource_comment_id: The id resource
+    :param reply: The reply text
+    :param verbose: show process message
+    :return void on Success.
+            ErrorCode.INVALID_RESOURCE/_USER if rid/uid is invalid.
+    """
+    with Session() as conn:
+        user = conn.query(User).filter_by(uid=uid).one_or_none()
+        resource_comment = conn.query(ResourceComment). \
+            filter_by(resource_comment_id=resource_comment_id).one_or_none()
+        if not resource_comment:
+            print("resource comment id is invalid")
+            return ErrorCode.INVALID_RESOURCE
+        elif not user:
+            print("uid is invalid")
+            return ErrorCode.INVALID_USER
+
+        reply_to_comment = ResourceCommentReply(resource_comment_id=resource_comment_id,
+                                                reply=reply, uid=uid)
+        conn.add(reply_to_comment)
+        conn.commit()
+
+        if verbose:
+            print(f"user {uid} replied to resource comment {resource_comment_id}")
+
+
+def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subject = None,
+                   grade: Grade = None, description=None, verbose=True, tags_id=[],
+                   personnel_id=[]):
+    """
+    Create a channel
+
+    :param name: The name of the channel
+    :param visibility: The visibility of this channel to public
+    :param admin_uid: Admin's user id
+    :param subject: The subject this channel belongs to
+    :param grade: The grade this channel belongs to
+    :param description: The description of this channel
+    :param tags_id: The id of tags of this channel
+    :param personnel_id: If visibility is not Public, then this personnel
+                         is used to define users with access to this channel
+    :param verbose: show process message
+    :return the id of the new channel on success.
+            ErrorCode.INVALID_USER if admin_uid does not exist.
+    """
+    with Session() as conn:
+        admin = conn.query(User).filter_by(uid=admin_uid).one_or_none()
+        if not admin:
+            print("Admin id is invalid")
+            return ErrorCode.INVALID_USER
+
+        # phase 1: create instance
+        channel = Channel(name=name, visibility=visibility, admin_uid=admin_uid,
+                          subject=subject, grade=grade, description=description)
+        conn.add(channel)
+        conn.commit()
+
+        # phase 2: use name (unique) to retrieve instance for next step operation
+        channel = conn.query(Channel).filter_by(name=name).one()
+        for i in tags_id:
+            channel_tag_record = ChannelTagRecord(tag_id=i, cid=channel.cid)
+            conn.add(channel_tag_record)
+        conn.commit()
+
+        if visibility != ChannelVisibility.PUBLIC:
+            # add admin to personnel
+            personnel = ChannelPersonnel(cid=channel.cid, uid=admin_uid)
+            conn.add(personnel)
+            for i in personnel_id:
+                personnel = ChannelPersonnel(cid=channel.cid, uid=i)
+                conn.add(personnel)
+            conn.commit()
+
+        if verbose:
+            print(f"Channel {name} created")
+        return channel.cid
+
+
+def modify_channel_personnel(uid, cid, modification: PersonnelModification, verbose=True):
+    """
+    Add/ delete a user from/to a private personnel
+
+    :param cid: The channel to be modified
+    :param uid: The user to add/delete
+    :param modification: Add or delete
+    :param verbose: show process message
+    :return void on success.
+            ErrorCode.INVALID_USER/-CHANNEL if uid/rid is incorrect or channel is public
+            ErrorCode.INCORRECT_PERSONNEL if mode is delete and personnel info not exist
+    """
+    with Session() as conn:
+        user = conn.query(User).filter_by(uid=uid).one_or_none()
+        if not user:
+            print("uid invalid")
+            return ErrorCode.INVALID_USER
+        channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
+        if not channel or channel.visibility == ChannelVisibility.PUBLIC:
+            print("cid invalid")
+            return ErrorCode.INVALID_CHANNEL
+
+        if modification == PersonnelModification.PERSONNEL_DELETE:
+            # delete
+            personnel = conn.query(ChannelPersonnel).filter_by(uid=uid, cid=cid).\
+                one_or_none()
+            if not personnel:
+                print("personnel does not exists")
+                return ErrorCode.INCORRECT_PERSONNEL
+            conn.delete(personnel)
+            msg = "deleted"
+        else:
+            # add
+            personnel = ChannelPersonnel(cid=cid, uid=uid)
+            conn.add(personnel)
+            msg = "created"
+        conn.commit()
+        if verbose:
+            print(f"user {uid} is {msg} from/to personnel of channel {cid}")
+
+
+def user_has_access_to_channel(uid, cid):
+    """
+    Check if user has access to a channel
+
+    :param uid: The id of user to check
+    :param cid: The id of channel to check
+    :return True/False on success.
+            ErrorCode.INVALID_USER/-CHANNEL if uid/rid is incorrect or resource is public
+    """
+    with Session() as conn:
+        user = conn.query(User).filter_by(uid=uid).one_or_none()
+        if not user:
+            print("uid invalid")
+            return ErrorCode.INVALID_USER
+        channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
+        if not channel or channel.visibility == ChannelVisibility.PUBLIC:
+            print("cid invalid")
+            return ErrorCode.INVALID_CHANNEL
+
+        personnel = conn.query(ChannelPersonnel).filter_by(uid=uid, cid=cid).\
+            one_or_none()
+        return personnel is not None
+
+
+def post_on_channel(uid, title, text, channel_name=None, cid=None, verbose=True):
+    """
+    Make a new post on a channel
+
+    **Must specify a channel name or cid. cid has precedence over channel_name
+
+    :param uid: The user who makes the post
+    :param channel_name: The name of the channel to post
+    :param cid: The id of the channel to post
+    :param title: The title of the post
+    :param text: The text of the post
+    :param verbose: show process message
+    :return the post id on success.
+            ErrorCode.INVALID_CHANNEL if channel_name or cid is invalid
+            ErrorCode.INVALID_USER if uid is invalid
+            ErrorCode.INCORRECT_PERSONNEL if user has permission to visit
+    """
+    if not channel_name and not cid:
+        print("Please supply channel name or cid")
+        return ErrorCode.INVALID_CHANNEL
+
+    with Session() as conn:
+        if not conn.query(User).filter_by(uid=uid).one_or_none():
+            print("invalid uid")
+            return ErrorCode.INVALID_USER
+        if cid:
+            channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
+        else:
+            channel = conn.query(Channel).filter_by(name=channel_name).one_or_none()
+
+        if not channel:
+            print("Invalid channel name")
+            return ErrorCode.INVALID_CHANNEL
+
+        if channel.visibility != ChannelVisibility.PUBLIC:
+            # not public, check if user is in the personnel
+            personnel = conn.query(ChannelPersonnel).\
+                filter_by(cid=channel.cid, uid=uid).one_or_none()
+            if not personnel:
+                print(f"User {uid} is not in channel {channel.name}")
+                return ErrorCode.INCORRECT_PERSONNEL
+
+        channel_post = ChannelPost(cid=channel.cid, title=title, init_text=text)
+        conn.add(channel_post)
+        conn.commit()
+
+        channel_post = conn.query(ChannelPost).filter_by(cid=channel.cid, title=title).one()
+        if verbose:
+            print(f"post {title} by user {uid} is added to {channel_name}")
+        return channel_post.post_id
+
+
+def comment_to_channel_post(uid, post_id, text, verbose=True):
+    """
+    Create a comment to a post in the channel
+
+    :param uid: Commenter's id
+    :param post_id: The id of post to be commented
+    :param text: The comment
+    :param verbose: show process message
+    :return The id of new post comment
+    :param verbose: show process message
+    :return The post_id on success.
+            ErrorCode.INVALID_USER if uid is invalid
+            ErrorCode.INVALID_POST if post_id is invalid
+    """
+    with Session() as conn:
+        if not conn.query(User).filter_by(uid=uid).one_or_none():
+            print("uid is invalid")
+            return ErrorCode.INVALID_USER
+        elif not conn.query(ChannelPost).filter_by(post_id=post_id).one_or_none():
+            print("post_id is invalid")
+            return ErrorCode.INVALID_POST
+        created_at = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
+        post_comment = PostComment(post_id=post_id, uid=uid, created_at=created_at,
+                                   text=text)
+        conn.add(post_comment)
+        conn.commit()
+
+        post_comment = conn.query(PostComment).filter_by(post_id=post_id, uid=uid,
+                                                         created_at=created_at).one()
+        if verbose:
+            print(f"Comment to post {post_id} by user {uid} in created")
+        return post_comment.post_comment_id
+
+
+def vote_channel_post(uid, post_id, upvote=True, verbose=True):
+    """
+    A user vote a channel post
+
+    :param uid: The id of the voter
+    :param post_id: The post to be voted
+    :param upvote: If this vote is a upvote
+    :param verbose: show process message
+    :return void on success.
+            ErrorCode.INVALID_USER if uid is invalid
+            ErrorCode.INVALID_POST if post_id is invalid
+            ErrorCode.SAME_VOTE_TWICE if current user gave same vote to this
+            post before.
+    """
+    with Session() as conn:
+        user = conn.query(User).filter_by(uid=uid).one_or_none()
+        post = conn.query(ChannelPost).filter_by(post_id=post_id).one_or_none()
+        if not user:
+            print("uid is invalid")
+            return ErrorCode.INVALID_USER
+        elif not post:
+            print("post id is invalid")
+            return ErrorCode.INVALID_POST
+
+        # try to find if there is an entry in vote_info
+        vote = conn.query(ChannelPostVoteInfo).filter_by(uid=uid, post_id=post_id).one_or_none()
+        if vote:
+            if vote.is_upvote != upvote:
+                # user voted, now change vote
+                vote.is_upvote = upvote
+
+                # update resource vote count
+                if upvote:
+                    post.downvote_count -= 1
+                    post.upvote_count += 1
+                else:
+                    post.downvote_count += 1
+                    post.upvote_count -= 1
+            else:
+                if verbose:
+                    print("user cannot vote the same item twice")
+                return ErrorCode.SAME_VOTE_TWICE
+        else:
+            # new vote
+            vote = ChannelPostVoteInfo(uid=uid, post_id=post_id, is_upvote=upvote)
+            if upvote:
+                post.upvote_count += 1
+            else:
+                post.downvote_count += 1
+
+        conn.add(vote)
+        conn.add(post)
+        conn.commit()
+        if verbose:
+            print(f"User {uid} voted post {post_id}, is_upvote = {upvote}")
+
+
+def vote_channel_post_comment(uid, post_comment_id, upvote=True, verbose=True):
+    """
+    Make a vote to a channel post comment
+
+    :param uid: The voter's id
+    :param post_comment_id: The id of the post comment
+    :param upvote: If this is an upvote
+    :param verbose: show process message
+    :return void on success.
+            ErrorCode.INVALID_USER if uid is invalid
+            ErrorCode.INVALID_POST if post_id is invalid
+            ErrorCode.SAME_VOTE_TWICE if current user gave same vote to this
+            post comment before.
+    """
+    with Session() as conn:
+        user = conn.query(User).filter_by(uid=uid).one_or_none()
+        post_comment = conn.query(PostComment).filter_by(post_comment_id=post_comment_id).\
+            one_or_none()
+        if not user:
+            print("uid is invalid")
+            return ErrorCode.INVALID_USER
+        elif not post_comment:
+            print("post id is invalid")
+            return ErrorCode.INVALID_POST
+
+        # try to find if there is an entry in vote_info
+        vote = conn.query(PostCommentVoteInfo).filter_by(
+            uid=uid, post_comment_id=post_comment_id).one_or_none()
+        if vote:
+            if vote.is_upvote != upvote:
+                # user voted, now change vote
+                vote.is_upvote = upvote
+
+                # update resource vote count
+                if upvote:
+                    post_comment.downvote_count -= 1
+                    post_comment.upvote_count += 1
+                else:
+                    post_comment.downvote_count += 1
+                    post_comment.upvote_count -= 1
+            else:
+                if verbose:
+                    print("user cannot vote the same item twice")
+                return ErrorCode.SAME_VOTE_TWICE
+        else:
+            # new vote
+            vote = PostCommentVoteInfo(uid=uid, post_comment_id=post_comment_id,
+                                       is_upvote=upvote)
+            if upvote:
+                post_comment.upvote_count += 1
+            else:
+                post_comment.downvote_count += 1
+
+        conn.add(vote)
+        conn.add(post_comment)
+        conn.commit()
+        if verbose:
+            print(f"User {uid} voted post {post_comment_id}, is_upvote = {upvote}")
