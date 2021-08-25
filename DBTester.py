@@ -29,6 +29,7 @@ from DBStructure import *
 from DBFunc import *
 
 engine = create_engine(DBPATH)
+
 Session = sessionmaker(engine)
 
 
@@ -58,6 +59,7 @@ with Session() as conn:
         print(i)
 tags = get_tags()
 print(tags)
+
 
 
 print("\n")
@@ -230,6 +232,7 @@ with Session() as conn:
     conn.commit()
     print(f"user {delete_uid} deleted")
 
+
     for i in conn.query(User).all():
         print(i)
 
@@ -242,3 +245,4 @@ with Session() as conn:
 
     for i in conn.query(PrivateResourcePersonnel).all():
         print(i)
+

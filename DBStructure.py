@@ -21,6 +21,7 @@ import datetime
 import enum
 
 from sqlalchemy import Column, ForeignKey, Integer, String, \
+
     Text, DateTime, Numeric, Boolean, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
@@ -28,19 +29,22 @@ from sqlalchemy import create_engine
 import pytz
 import base64
 
+
 # length of a standard string, use TEXT if longer than that
 STANDARD_STRING_LENGTH = 300
+
 
 # OPTIONS for DB testing:
 
 # Option 1: access psql DB and create schema using you own account in your own DB
 DBUSERNAME = "call me by your name"  # change this field to your first name (all lowercase)
+
 DBPASSWORD = "admin"
 DBDATABASE = DBUSERNAME
 DBPATH = f"postgresql://{DBUSERNAME}:{DBPASSWORD}@localhost/{DBDATABASE}"
 
-
 # Option 2: Feel lazy to sign in to cli? No worries, you can play these using sqlite
+
 # on your local device
 # uncomment DBPATH below to overwrite the above PATH config
 # DBPATH = "sqlite:///Doctrina.db"
@@ -61,6 +65,7 @@ class Subject(enum.Enum):
     The set of available subject tags
 
     Credit:  https://brisbanesde.eq.edu.au/SupportAndResources/
+
     FormsAndDocuments/Documents/Subject%20Guides/Lists%20and%20Handbooks/
     subject-guide-y11-12-hb-web.pdf
     """
@@ -118,7 +123,6 @@ class ChannelVisibility(enum.Enum):
     FULLY_PRIVATE = 1
     PUBLIC = 2
 
-
 Base = declarative_base()
 
 
@@ -142,6 +146,7 @@ class User(Base):
         tz=pytz.timezone("Australia/Brisbane")))
 
     # user password -- base64 encoded
+
     password = Column(Text, nullable=False)
 
     # user honor rating
@@ -158,6 +163,7 @@ class User(Base):
                f"uid = {self.uid}, username = {self.username}, created at {self.created_at},\n" \
                f"base64 password = {self.password}," \
                f" original password = {base64_to_ascii(self.password)},\n" \
+
                f"honor rating = {self.user_rating}, email = {self.email},\nbio = {self.bio}"
 
 
@@ -189,6 +195,7 @@ class UserTeachingAreas(Base):
     __tablename__ = "user_teaching_areas"
 
     # user id
+
     uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
 
     # teaching area
@@ -245,6 +252,7 @@ class Resource(Base):
     upvote_count = Column(Integer, default=0, nullable=False, autoincrement=False)
     downvote_count = Column(Integer, default=0, nullable=False, autoincrement=False)
 
+
     # if the resource is public
     is_public = Column(Boolean, default=True, nullable=False)
 
@@ -294,6 +302,7 @@ class ResourceVoteInfo(Base):
     """
     __tablename__ = "resource_vote_info"
 
+
     # user id
     uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
 
@@ -312,6 +321,7 @@ class ResourceVoteInfo(Base):
         return f"ResourceVoteInfo table:\n" \
                f"Voter id = {self.uid}, rid = {self.rid}, " \
                f"is_upvote = {self.is_upvote}"
+
 
 
 class ResourceCreater(Base):
@@ -334,6 +344,7 @@ class ResourceCreater(Base):
     def __str__(self):
         return f"ResourceCreater table:\n" \
                f"creater id = {self.uid}, rid = {self.rid}"
+
 
 
 class ResourceComment(Base):
@@ -405,11 +416,13 @@ class ResourceCommentReply(Base):
                f"reply = {self.reply}"
 
 
+
 class PrivateResourcePersonnel(Base):
     """
     The representation of a personnel that stores users that are allowed to
     watch particular resources
     """
+
     __tablename__ = "private_resource_personnel"
 
     # resource id
@@ -428,6 +441,7 @@ class PrivateResourcePersonnel(Base):
                f"allowed uid = {self.uid}, rid = {self.rid}"
 
 
+
 class Tag(Base):
     """
     The table representing a set of tags available in the system
@@ -440,6 +454,7 @@ class Tag(Base):
     # name of the tag
     tag_name = Column(String(STANDARD_STRING_LENGTH), nullable=False, unique=True)
 
+
     # description of tag
     tag_description = Column(Text, default=None)
 
@@ -447,6 +462,7 @@ class Tag(Base):
         return f"Tag table:\n" \
                f"tag_id = {self.tag_id}, " \
                f"tag name = {self.tag_name}, tag id = {self.tag_id}"
+
 
 
 class ResourceTagRecord(Base):
@@ -579,6 +595,7 @@ class ChannelPost(Base):
     # up/down-vote count
     upvote_count = Column(Integer, default=0, nullable=False, autoincrement=False)
     downvote_count = Column(Integer, default=0, nullable=False, autoincrement=False)
+
 
     # thread initial reply
     init_text = Column(Text, nullable=False)

@@ -44,6 +44,7 @@ Session = sessionmaker(engine)
 
 
 def add_user(username, password, email, teaching_areas: dict = {},
+
              verbose=True, bio=None, avatar_link=None):
     """
     Add a new user to table user and add teaching_areas to
@@ -59,6 +60,7 @@ def add_user(username, password, email, teaching_areas: dict = {},
             e.g. [Subject.ENGLISH: [True], Subject.MATHS_C: [False, Grade.YEAR_1]
     :return The id of the new user if success.
             ErrorCode.INVALID_USER if email is occupied
+
     """
     email = email.lower()
     user = User(username=username, avatar_link=avatar_link, password=ascii_to_base64(password),
@@ -69,6 +71,7 @@ def add_user(username, password, email, teaching_areas: dict = {},
         if conn.query(User).filter_by(email=email).one_or_none():
             print("This email address is registered")
             return ErrorCode.INVALID_USER
+
 
         # phase 1: add a new user
         conn.add(user)
@@ -93,6 +96,7 @@ def add_user(username, password, email, teaching_areas: dict = {},
         return user.uid
 
 
+
 def add_tag(tag_name, tag_description=None, verbose=True):
     """
     Add a new tag to Database
@@ -104,6 +108,7 @@ def add_tag(tag_name, tag_description=None, verbose=True):
     """
     tag = Tag(tag_name=tag_name, tag_description=tag_description)
     with Session() as conn:
+
         conn.add(tag)
         conn.commit()
         print(f"tag {tag_name} added") if verbose else None
@@ -118,6 +123,8 @@ def get_tags():
     out = dict()
 
     with Session() as conn:
+
+
         tags = conn.query(Tag).all()
 
         for i in tags:
@@ -132,6 +139,7 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
     Add a resource to resource table
 
     :param grade: Tge grade this resource belongs to
+
     :param title: The name of the resource
     :param resource_link: The link to resource video
     :param difficulty: The difficulty of the resource
@@ -156,6 +164,7 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
                         difficulty=difficulty, subject=subject, is_public=is_public,
                         description=description)
     with Session() as conn:
+
         # phase 1: add new resource
         conn.add(resource)
         conn.commit()
@@ -176,12 +185,14 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
 
         if not is_public:
             for uid in private_personnel_id:
+
                 private_access = PrivateResourcePersonnel(rid=resource.rid, uid=uid)
                 conn.add(private_access)
             conn.commit()
 
         if tags_id:
             for i in tags_id:
+
                 tag_record = ResourceTagRecord(rid=resource.rid, tag_id=i)
                 conn.add(tag_record)
                 conn.commit()
@@ -249,6 +260,7 @@ def user_has_access_to_resource(uid, rid):
             one_or_none() is not None
 
 
+
 def vote_resource(uid, rid, upvote=True, verbose=True):
     """
     Give upvote/downvote to a resource:
@@ -277,6 +289,7 @@ def vote_resource(uid, rid, upvote=True, verbose=True):
     with Session() as conn:
         # try to find if there is an entry in vote_info
         vote_info = conn.query(ResourceVoteInfo).filter_by(uid=uid, rid=rid).one_or_none()
+
         if vote_info:
             if vote_info.is_upvote != upvote:
                 # user voted, now change vote
@@ -297,6 +310,7 @@ def vote_resource(uid, rid, upvote=True, verbose=True):
         else:
             # new vote
             vote_info = ResourceVoteInfo(rid=rid, uid=uid, is_upvote=upvote)
+
             if upvote:
                 resource.upvote_count += 1
             else:
