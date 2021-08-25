@@ -7,6 +7,7 @@
 #
 # Created by Jason Aug 20, 2021
 ##################################################################
+from typing import List
 from sqlalchemy.orm import Session
 from DBStructure import *
 
@@ -14,8 +15,10 @@ from DBStructure import *
 engine = create_engine(DBPATH)
 
 
-def add_user(username, password, email, teaching_areas: dict={},
-             verbose=True, bio=None, avatar_link=None):
+epoch = datetime.datetime.utcfromtimestamp(0)
+
+def add_user(username, password, email, teaching_areas: dict = {},
+             verbose=True, bio=None, avatar_link=None) -> None:
     """
     Add a new user to table user and add teaching_areas to
     user_teaching_areas table
@@ -54,6 +57,19 @@ def add_user(username, password, email, teaching_areas: dict={},
                                                    is_public=is_public)
                 conn.add(new_teach_area)
         conn.commit()
+
+
+def get_user(email) -> User:
+    """
+    Retrieve the User with the unique email as the key
+
+    :param email: The identifiying email
+    :return: User structure or None
+    """
+    email = email.lower()
+    with Session(engine) as conn:
+        user = conn.query(User).filter_by(email=email).one_or_none()
+        return user
 
 
 def add_tag(tag_name, tag_description=None, verbose=True):
@@ -112,10 +128,12 @@ def add_resource(title, resource_link, difficulty, subject, is_public=True,
         conn.commit()
 
         # phase 2: find the new row, update private_resource_personnel info and tag info
-        resource = conn.query(Resource).filter_by(resource_link=resource_link).one()
+        resource = conn.query(Resource).filter_by(
+            resource_link=resource_link).one()
         if not is_public:
             for uid in private_personnel:
-                private_access = PrivateResourcePersonnel(rid=resource.rid, uid=uid)
+                private_access = PrivateResourcePersonnel(
+                    rid=resource.rid, uid=uid)
                 conn.add(private_access)
             conn.commit()
 
@@ -126,6 +144,47 @@ def add_resource(title, resource_link, difficulty, subject, is_public=True,
                 conn.commit()
         if verbose:
             print(f"Resource {title} added")
+
+def find_resources(title_type="like",title="",
+    created_type="after",created=epoch,
+    difficulty=None, subject=None,
+    vote_type="more",votes=None
+    ):
+    """Find a resource using the specific keys.
+
+        If a param_type parameter is specified then the corresponding param must
+        be specified.
+
+        If any param does not fall into the valid values the default will be
+        used in its place.
+
+        If no parameters are passed the method should return all Resources.
+
+        :param title_type   : SQL search restriction for the title.
+            Valid values are ["like","exact"]
+            Defaults to "like".
+        :param title        : title to search for
+            Defaults to "".
+        :param created_type : SQL search restriction for the creation date.
+            Valid values are ["after","before","on"]
+            Defaults to "after".
+        :param created      : date to search for as a datetime object.
+            Defaults to epoch.
+        :param difficulty   : The difficult rating of the resource.
+            Valid values are ResourceDifficulty enum values.
+            Defaults to None.
+        :param subject      : The subject of the resource.
+            Valid values are Subject enum values.
+            Defaults to None.
+        :param vote_type    : SQL search restriction for the votes.
+            Valid values are ["more","less"]. Refers to specified amount
+            Defaults to "more".
+        :param votes        : The number of upvotes a resource has.
+            Defaults to None.
+    """
+    with Session(engine) as conn:
+        resource = conn.query(Resource)
+
 
 
 def vote_resource(uid, rid, upvote=True, verbose=True):
@@ -145,7 +204,8 @@ def vote_resource(uid, rid, upvote=True, verbose=True):
         resource = conn.query(Resource).filter_by(rid=rid).one()
 
         # try to find if there is an entry in vote_info
-        vote_info = conn.query(VoteInfo).filter_by(uid=uid, rid=rid).one_or_none()
+        vote_info = conn.query(VoteInfo).filter_by(
+            uid=uid, rid=rid).one_or_none()
         if vote_info:
             if vote_info.is_upvote != upvote:
                 # user voted, now change vote
