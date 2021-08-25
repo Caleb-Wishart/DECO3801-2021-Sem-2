@@ -274,15 +274,13 @@ def user_has_access_to_resource(uid, rid):
             one_or_none() is not None
 
 
-def find_resources(title_type="like",title="",
+def find_resources(title_type="like",title=None,
     created_type="after",created=epoch,
     difficulty=None, subject=None,
-    vote_type="more",votes=None
+    vote_type="more",votes=None,
+    grade=None, email=None
     ):
     """Find a resource using the specific keys.
-
-        If a param_type parameter is specified then the corresponding param must
-        be specified.
 
         If any param does not fall into the valid values the default will be
         used in its place.
@@ -295,7 +293,7 @@ def find_resources(title_type="like",title="",
         :param title        : title to search for
             Defaults to "".
         :param created_type : SQL search restriction for the creation date.
-            Valid values are ["after","before","on"]
+            Valid values are ["after","before"]
             Defaults to "after".
         :param created      : date to search for as a datetime object.
             Defaults to epoch.
@@ -310,9 +308,61 @@ def find_resources(title_type="like",title="",
             Defaults to "more".
         :param votes        : The number of upvotes a resource has.
             Defaults to None.
+        :param grade        : The grade of the resource
+            Valid values are the Grade enum values
+            Defaults to None.
+        :param email         : The logged in users email
+            Defaults to None.
     """
-    with Session(engine) as conn:
-        resource = conn.query(Resource)
+    # Args Checking
+    if title_type not in ["like","exact"]:
+        title_type = "like"
+    if created_type not in ["after","before"]:
+        created_type = "after"
+    if vote_type not in ["more","less"]:
+        vote_type = "more"
+
+
+    with Session() as conn:
+        # get User if exists
+        user = conn.query(User).filter_by(email=email).one_or_none()
+
+        resources = conn.query(Resource)
+
+        if title is not None and isinstance(title,str):
+            if title_type == "like":
+                resources = resources.filter(Resource.title.ilike(f'%{title}%'))
+            else:
+                resources = resources.filter_by(title=title)
+
+        if created != epoch and isinstance(created,datetime):
+            if created_type == "after":
+                resources = resources.filter(Resource.created_at > created)
+           else:
+                resources = resources.filter(Resource.created_at < created)
+
+        if difficulty is not None and isinstance(difficulty,ResourceDifficulty):
+            resources = resources.filter_by(difficulty=difficulty)
+
+        if subject is not None and isinstance(subject,Subject):
+            resources = resources.filter_by(subject=subject)
+
+        if grade is not None and isinstance(grade,Grade):
+            resources = resources.filter_by(grade=grade)
+
+        if votes is not None and isinstance(votes,int):
+            if vote_type == "more":
+                resources = resources.filter(Resource.upvote_count > votes)
+            else:
+                resources = resources.filter(Resource.upvote_count < votes)
+
+        if user is None:
+            resources = resources.filter_by(is_public=True)
+            result = resources.all()
+        else:
+            result = filter(lambda res: user_has_access_to_resource(user.uid,res.rid),resources.all())
+
+    return result
 
 
 
