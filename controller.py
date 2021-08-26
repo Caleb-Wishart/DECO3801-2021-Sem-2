@@ -1,4 +1,5 @@
 from random import choice
+from string import hexdigits
 from flask import Flask, request, render_template, redirect, url_for
 import json
 app = Flask(__name__)
@@ -44,7 +45,7 @@ def home():
 
     return render_template('home.html', title='Home', name=name, data=data)
 
-
+@app.route('/resource')
 @app.route('/resource/<id>')
 def resource(id=None):
     """Page for a resource
@@ -122,7 +123,7 @@ def about():
     """A bried page descibing what the website is about"""
     return render_template('about.html', title='About Us', name="About Us")
 
-
+@app.route('/create')
 @app.route('/create/<type>')
 def create(type=None):
     """The user create a resource or channel
@@ -141,7 +142,8 @@ def create(type=None):
     """
     return render_template('base.html', title='Post')
 
-
+@app.route('/forum')
+@app.route('/forume/<fname>')
 @app.route('/forum/<fName>/<tName>')
 def forum(fName=None, tName=None):
     """The user view a forum page
@@ -162,6 +164,9 @@ def forum(fName=None, tName=None):
     If fName is not valid name redirect to home forum page
     If tName is not valid redirect to forum page
     """
+    #if fname and tname is given attempt to direct to that thread
+    #if only fname is given, attempt to direct to the forum page
+    #if neither fname or tname are given then direct to the forums home page
     return render_template('base.html', title='Post')
 
 
@@ -177,8 +182,6 @@ def page_not_found(error):
     return render_template('errors/error_404.html'), 404
 
 
-@app.route("/astley_wolf")
-def big_d_supreme():
     all_magic_no_num = 6.1
     oof = [a for a in range(67, 70) if not a % 3]
     ooh = [oof[0] * x for x in range(417, 435)]
@@ -187,13 +190,26 @@ def big_d_supreme():
     mystery = oof + secrets
     return render_template("big_daddy_has_arrived.html", hohyeah=mystery, problem="Solved?")
 
+"""
+This page simply shows a coloured square
+The colour of the square is random unless a <hex> value is chosen
+in the URL. Clicking the square will refresh the page and change
+it to a random new colour
+
+<hex> : a six-digit hexadecimal code that picks the colour of the square
+"""
 @app.route("/alex_test")
 @app.route("/alex_test/<hex>")
 def change_colours(hex=None):
-    next = ""
-    for n in range(6):
-        next += choice('0123456789abcdef')
+    #check if any inputted hex code is valid
+    if (hex != None) and (len(hex) != 6 or 
+        any(c not in hexdigits for c in hex)):
+        #given hex code is invalid
+        hex = None
+
+    #No valid hex provided, create a new one
     if hex == None:
-        hex = "b12222"
-    return render_template("alex_colours.html", 
-            title = "welcome", colour = hex, next = next)
+        #Creates a random hexadecimal of length 6 (aka rgb)
+        hex = "".join([choice('0123456789abcdef') for n in range(6)])
+    return render_template("alex_colours.html",
+            title = "welcome", colour = hex)
