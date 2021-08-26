@@ -45,6 +45,7 @@ def home():
     return render_template('home.html', title='Home', name=name, data=data)
 
 
+@app.route('/resource')
 @app.route('/resource/<id>')
 def resource(id=None):
     """Page for a resource
