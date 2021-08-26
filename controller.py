@@ -6,51 +6,169 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    name = "example"
+    """The index root directory of this website"""
+    return redirect(url_for('home'))
+
+
+@app.route('/home')
+def home():
+    """The home page of the website
+    Shows recomendations based on the user profile or if not authenticated the most upvoted
+
+    Also the end point of the search function where the search is a get method
+    """
+    name = "Example User"
     if 'x-kvd-payload' in request.headers:
         userjson = request.headers['x-kvd-payload']
         user = json.loads(userjson)
         name = user['user']
-    name = "test"
-    return render_template('example.html',title='welcome', name=name)
+
+    data = [
+        {
+            'title': "Example 1",
+            'img': url_for('static', filename='img/placeholder.png')
+        }, {
+            'title': "Example 2",
+            'img': url_for('static', filename='img/placeholder.png')
+        }, {
+            'title': "Example 3",
+            'img': url_for('static', filename='img/placeholder.png')
+        }, {
+            'title': "Example 4",
+            'img': url_for('static', filename='img/placeholder.png')
+        }, {
+            'title': "Example 5",
+            'img': url_for('static', filename='img/placeholder.png')
+        }
+    ]
+
+    return render_template('home.html', title='Home', name=name, data=data)
 
 
-@app.route('/foobar')
-def foobar():
-    return "<span style='color:blue'>Hello again!</span>"
+@app.route('/resource/<id>')
+def resource(id=None):
+    """Page for a resource
+
+    Shows information based on the resource type and content
+
+    If resource is none then redirect to home page
+    If not authenticated redirect to login
+    """
+    if(id == None):
+        return redirect(url_for('home'))
+
+    return render_template('base.html', title='Register')
 
 
-@app.route("/astley_wolf")
-def big_d_supreme():
-    all_magic_no_num = 6.1
-    oof = [a for a in range(67, 70) if not a % 3]
-    ooh = [oof[0] * x for x in range(417, 435)]
-    secrets = [max([int(delicious / oof[0]) for delicious in ooh if delicious < oof[0]**2 *
-                    all_magic_no_num])]
-    mystery = oof + secrets
-    return render_template("big_daddy_has_arrived.html", hohyeah=mystery, problem="Solved?")
+@app.route('/register')
+def register():
+    """Page for a user to register for an account
+
+    Must provide: username, email, password (with conditions)
+
+    Optionally provide: interests / subjects tags
+
+    Other user fields are configured in profile()
+    """
+    return render_template('base.html', title='Register')
 
 
-@app.route("/jason_test")
-def jtest():
-    return render_template("base.html", title="This is a test page")
+@app.route('/login')
+def login():
+    """Login page for a user to authenticate
 
-@app.route("/matthew_test")
-def cool_fun():
-    name = "Matt"
-    return render_template("matthew_wuz_here.html",title="matt wuz here", test="caleb", user=name)
+    Asks for the users email and password.
+
+    Gives feedback on fail, redirects to referring page on success
+     (through post data), if not refered then home page
+    """
+    return render_template('base.html', title='Login')
 
 
-@app.route("/kyle_test")
-def sexy_asian():
-    name = "Kyle Macaskill"
-    return render_template("kyle_is_really_funny.html", name=name, title = "Kyle")
+@app.route('/profile')
+def profile():
+    """The default view of a users profile,
+    this can be used to view your own or other users profiles.
+    Specified with the GET request
+    /profile?<id / name>
 
-@app.route("/kyle_second")
-def second_page():
-    name = "Kyle Macaskill"
-    return render_template("kyle_second_page.html", name = name, title = "Second")
+    Shows the following content:
+        Liked resources
+        Created resources
+        Your reviews / comments
 
-@app.route("/kyle_redirect")
-def kyle_redirect():
-    return redirect(url_for('second_page'))
+    Additional options are available if viewing your own profile:
+        Manage account settings
+        Forums you are a part of
+    """
+    return render_template('base.html', title='Login')
+
+
+@app.route('/profile/settings')
+def settings():
+    """The user configuration page,
+    allows the user to edit their:
+        Bio.
+        Email.
+        Password.
+        Avatar.
+        Interests
+    """
+    return render_template('base.html', title='Login')
+
+
+@app.route('/about')
+def about():
+    """A bried page descibing what the website is about"""
+    return render_template('about.html', title='About Us', name="About Us")
+
+
+@app.route('/create/<type>')
+def create(type=None):
+    """The user create a resource or channel
+
+    If type is not resource or channel redirect to home
+
+    If type == None then prompt the user to select which create type they want
+    and redirect to that page
+
+
+    Create Channel
+    Allows the user to give a title, desc., tags
+
+    Create resource
+    Allows the user to give a title, desc., tags, upload content, link to similar
+    """
+    return render_template('base.html', title='Post')
+
+
+@app.route('/forum/<fName>/<tName>')
+def forum(fName=None, tName=None):
+    """The user view a forum page
+
+    The home forum page (fName == None, tName == None) shows the list of forums
+    Allows user to create a channel etc.
+
+    The forum/fName page shows the threads in that forum
+    Allows users to add threads to the forum
+
+    The forum/fName/tName shows the thread on that forum.
+    Allows users to add comments to the forum post
+
+    The forum/fName/tName?<id> shows the comment on that forum page or the top
+    of page if not valid.
+
+    If fName is not valid name redirect to home forum page
+    If tName is not valid redirect to forum page
+    """
+    return render_template('base.html', title='Post')
+
+@app.errorhandler(403)
+def page_not_found(error):
+    """Page shown with a HTML 403 status"""
+    return render_template('errors/error_403.html'), 403
+
+@app.errorhandler(404)
+def page_not_found(error):
+    """Page shown with a HTML 404 status"""
+    return render_template('errors/error_404.html'), 404
