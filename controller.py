@@ -1,3 +1,4 @@
+from random import choice
 from flask import Flask, request, render_template, redirect, url_for
 import json
 app = Flask(__name__)
@@ -188,10 +189,13 @@ def big_d_supreme():
 
 @app.route("/alex_test/<hex>")
 def change_colours(hex=None):
+    next = ""
+    for n in range(7):
+        next += choice('0123456789abcdef')
     if hex == None:
         hex = "b12222"
     return render_template("alex_colours.html", 
-            title = "welcome", colour = hex)
+            title = "welcome", colour = hex, next = next)
 
 """
 

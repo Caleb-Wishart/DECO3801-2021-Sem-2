@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block content %}
-    <a href = {{ url_for('change_colours',next)}}>
+    <a href = {{ url_for('change_colours') + '/' + next }}>
         <div class="square" ></div>
     </a>
 {% endblock %}
