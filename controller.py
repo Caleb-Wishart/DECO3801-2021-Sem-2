@@ -19,19 +19,6 @@ def index():
 def foobar():
     return "<span style='color:blue'>Hello again!</span>"
 
-# Caleb DMZ =====
-
-# Webpage for github webhook
-@app.route('/githook')
-def githook():
-    secret = request.headers['X-Hub-Signature']
-    parsed = json.loads(request.json)
-    with open('/home/s4585694/hook','w') as handle:
-        handle.write(json.dumps(parsed, indent=4, sort_keys=True))
-    return render_template('errors/error_404.html')
-    #return render_template('errors/error_404.html');
-
-# Caleb DMZ =====
 
 @app.route("/astley_wolf")
 def big_d_supreme():
@@ -50,7 +37,8 @@ def jtest():
 
 @app.route("/matthew_test")
 def cool_fun():
-    return render_template("matthew_wuz_here.html", test=name=="s4582166", user=name)
+    name = "Matt"
+    return render_template("matthew_wuz_here.html",title="matt wuz here", test="caleb", user=name)
 
 
 @app.route("/kyle_test")
