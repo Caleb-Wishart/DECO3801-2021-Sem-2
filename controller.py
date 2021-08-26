@@ -1,11 +1,7 @@
-import pytz
-from flask import Flask, request, render_template, redirect, url_for, abort, flash
+from flask import Flask, request, render_template, redirect, url_for
 import json
-from DBFunc import *
 
 app = Flask(__name__)
-# NOTE: added for flush() usage
-app.secret_key = "admin"
 
 
 @app.route('/')
@@ -49,66 +45,19 @@ def home():
     return render_template('home.html', title='Home', name=name, data=data)
 
 
-@app.route('/resource/<int:uid>/<int:rid>', methods=["GET", "POST"])
-def resource(uid=None, rid=None):
+@app.route('/resource')
+@app.route('/resource/<id>')
+def resource(id=None):
     """Page for a resource
 
     Shows information based on the resource type and content
 
-    :param uid: The user id
-    :param rid: The resource id
-    If resource or user is invalid then redirect to 404 page
+    If resource is none then redirect to home page
+    If not authenticated redirect to login
     """
-    user, res = get_user_and_resource_instance(uid=uid, rid=rid)
-    if not user or not res:
-        # invalid user or resource, pop 404
-        abort(404, description="Invalid user or resource id")
-        # return redirect(url_for('home'))
-    elif is_user_session_expired(uid=uid):
-        # user instance is expired, go back to login
-        return redirect(url_for("login"))
-    elif not is_resource_public(rid=rid) and not user_has_access_to_resource(uid=uid, rid=rid):
-        # resource is private and user does not have access
-        # todo: possibly a link to no access reminder page?
-        abort(404, description=f"User {uid} does not have access to resource {rid}")
+    if(id == None):
+        return redirect(url_for('home'))
 
-    if request.method == "GET":
-        # show resource detail
-
-        # convert to human readable form
-        subject = enum_to_website_output(res.subject)
-        grade = enum_to_website_output(res.grade)
-        difficulty = enum_to_website_output(res.difficulty)
-
-        # convert utc time to AEST
-        created_at = res.created_at.astimezone(pytz.timezone("Australia/Brisbane"))
-
-        # get a list of resource_comment objects
-        resource_comment_list = get_resource_comments(rid=rid)
-        # get a dict of resource_comment instance -> resource_comment_replies instances to that comment
-        resource_comment_replies_list = get_resource_comment_replies(resource_comment_list)
-
-        # FIXME: modify "base.html" webpage to resource page
-        return render_template("base.html", rid=rid, rtitle=res.title,
-                               resource_link=res.resource_link, created_at=created_at,
-                               difficulty=difficulty, subject=subject, grade=grade,
-                               upvote_count=res.upvote_count, downvote_count=res.downvote_count,
-                               description=res.description, uid=uid,
-                               resource_comment_list=resource_comment_list,
-                               resource_comment_replies_list=resource_comment_replies_list)
-    elif request.method == "POST":
-        # FIXME: here assume upvote and downvote are two separate buttons like Quora
-        # example see https://predictivehacks.com/?all-tips=how-to-add-action-buttons-in-flask
-        # update do upvote/downvote
-        up, down = request.form.get("upvote"), request.form.get("downvote")
-        vote_res = vote_resource(uid=uid, rid=rid, upvote=up is not None)
-        if vote_res == ErrorCode.SAME_VOTE_TWICE:
-            # the user voted the same vote twice
-            # todo: here I do flash message, you can modify it
-            flash("Oh please don't vote the same thing twice, will ya?")
-
-        # reach here a vote is made or vote is invalid, now refresh resource page
-        return redirect(url_for("resource", uid=uid, rid=rid))
     return render_template('base.html', title='Register')
 
 
@@ -214,7 +163,6 @@ def forum(fName=None, tName=None):
     If tName is not valid redirect to forum page
     """
     return render_template('base.html', title='Post')
-
 
 @app.errorhandler(403)
 def page_not_found(error):
