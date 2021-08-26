@@ -187,31 +187,13 @@ def big_d_supreme():
     mystery = oof + secrets
     return render_template("big_daddy_has_arrived.html", hohyeah=mystery, problem="Solved?")
 
+@app.route("/alex_test")
 @app.route("/alex_test/<hex>")
 def change_colours(hex=None):
     next = ""
-    for n in range(7):
+    for n in range(6):
         next += choice('0123456789abcdef')
     if hex == None:
         hex = "b12222"
     return render_template("alex_colours.html", 
             title = "welcome", colour = hex, next = next)
-
-"""
-
-@app.route("/jason_test")
-def jtest():
-    return render_template("base.html", title="This is a test page", name="Jason")
-
-@app.route("/matthew_test")
-def cool_fun():
-    name = "Matt"
-    return render_template("matthew_wuz_here.html",title="matt wuz here", test="caleb", user=name)
-
-
-@app.route("/kyle_test")
-def sexy_asian():
-    name = "Kyle Macaskill"
-    return render_template("kyle_is_really_funny.html", name=name, title = "Kyle")
-
-"""

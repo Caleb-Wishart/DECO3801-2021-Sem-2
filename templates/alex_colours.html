@@ -12,9 +12,8 @@
 {% endblock %}
 
 {% block content %}
-<h1> {{url_for('change_colours', hex='b12222') }} </h1>
-    <div class="square" alt={{next}}>
-        <a href = "" ></a>
-    </div>
+    <a href = "{{url_for('change_colours', hex=next) }}" >
+        <div class="square" alt={{next}}></div>
+    </a>
 {% endblock %}
 
