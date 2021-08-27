@@ -34,7 +34,7 @@ STANDARD_STRING_LENGTH = 300
 # OPTIONS for DB testing:
 
 # Option 1: access psql DB and create schema using you own account in your own DB
-DBUSERNAME = "call me by your name"  # change this field to your first name (all lowercase)
+DBUSERNAME = "jason"  # change this field to your first name (all lowercase)
 
 DBPASSWORD = "admin"
 DBDATABASE = DBUSERNAME
