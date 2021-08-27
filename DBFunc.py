@@ -72,7 +72,6 @@ def add_user(username, password, email, teaching_areas: dict = {},
             print("This email address is registered")
             return ErrorCode.INVALID_USER
 
-
         # phase 1: add a new user
         conn.add(user)
         conn.commit()
@@ -94,7 +93,6 @@ def add_user(username, password, email, teaching_areas: dict = {},
                 conn.add(new_teach_area)
         conn.commit()
         return user.uid
-
 
 
 def add_tag(tag_name, tag_description=None, verbose=True):
@@ -123,7 +121,6 @@ def get_tags():
     out = dict()
 
     with Session() as conn:
-
 
         tags = conn.query(Tag).all()
 
@@ -258,7 +255,6 @@ def user_has_access_to_resource(uid, rid):
     with Session() as conn:
         return conn.query(PrivateResourcePersonnel).filter_by(uid=uid, rid=rid).\
             one_or_none() is not None
-
 
 
 def vote_resource(uid, rid, upvote=True, verbose=True):
