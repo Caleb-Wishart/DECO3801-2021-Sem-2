@@ -59,7 +59,7 @@ def resource(uid=None, rid=None):
     if not user or not res:
         # invalid user or resource, return to homepage
         # todo: do we want to show 404 instead?
-        return redirect(url_for("page_not_found"))
+        return render_template('errors/error_404.html'), 404
         # return redirect(url_for('home'))
 
     if request.method == "GET":
