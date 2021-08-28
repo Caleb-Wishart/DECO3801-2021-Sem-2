@@ -37,7 +37,7 @@ STANDARD_STRING_LENGTH = 300
 DBUSERNAME = "postgres"  # change this field to your first name (all lowercase), "call me by your name"
 
 DBPASSWORD = "admin"
-DBDATABASE = "project"  # = DBUSERNAME
+DBDATABASE = "project"  # DBUSERNAME
 DBPATH = f"postgresql://{DBUSERNAME}:{DBPASSWORD}@localhost/{DBDATABASE}"
 
 
@@ -45,7 +45,7 @@ DBPATH = f"postgresql://{DBUSERNAME}:{DBPASSWORD}@localhost/{DBDATABASE}"
 
 # on your local device
 # uncomment DBPATH below to overwrite the above PATH config
-DBPATH = "sqlite:///Doctrina.db"
+# DBPATH = "sqlite:///Doctrina.db"
 
 
 class ResourceDifficulty(enum.Enum):
