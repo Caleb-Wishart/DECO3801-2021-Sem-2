@@ -21,7 +21,6 @@ import datetime
 import enum
 
 from sqlalchemy import Column, ForeignKey, Integer, String, \
-
     Text, DateTime, Numeric, Boolean, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
@@ -29,25 +28,24 @@ from sqlalchemy import create_engine
 import pytz
 import base64
 
-
 # length of a standard string, use TEXT if longer than that
 STANDARD_STRING_LENGTH = 300
-
 
 # OPTIONS for DB testing:
 
 # Option 1: access psql DB and create schema using you own account in your own DB
-DBUSERNAME = "call me by your name"  # change this field to your first name (all lowercase)
+DBUSERNAME = "postgres"  # change this field to your first name (all lowercase), "call me by your name"
 
 DBPASSWORD = "admin"
-DBDATABASE = DBUSERNAME
+DBDATABASE = "project"  # = DBUSERNAME
 DBPATH = f"postgresql://{DBUSERNAME}:{DBPASSWORD}@localhost/{DBDATABASE}"
+
 
 # Option 2: Feel lazy to sign in to cli? No worries, you can play these using sqlite
 
 # on your local device
 # uncomment DBPATH below to overwrite the above PATH config
-# DBPATH = "sqlite:///Doctrina.db"
+DBPATH = "sqlite:///Doctrina.db"
 
 
 class ResourceDifficulty(enum.Enum):
@@ -113,6 +111,7 @@ class Grade(enum.Enum):
     YEAR_10 = 10
     YEAR_11 = 11
     YEAR_12 = 12
+    TERTIARY = 13
 
 
 class ChannelVisibility(enum.Enum):
@@ -122,6 +121,40 @@ class ChannelVisibility(enum.Enum):
     INVITE_ONLY = 0
     FULLY_PRIVATE = 1
     PUBLIC = 2
+
+
+def enum_to_website_output(item: enum.Enum) -> str:
+    """
+    Convert an enum value to human friendly format: to lowercase, capitalize first
+    letter of each word and get rid of underscore, if any
+
+    e.g. Subject.MATHS_A -> "Maths A:
+
+    :param item: The enum item to convert
+    :return The human friendly string value of the enum item
+    """
+    return item.name.lower().replace('_', ' ', 1).title()
+
+
+def website_input_to_enum(readable_string: str, enum_class: enum.Enum, verbose=True):
+    """
+    Convert a human readable enum value to an appropriate enum variable.
+    i.e. applicable to Subject, Grade and ChannelVisibility only
+
+    :param readable_string: The enum string value human can understand
+    :param enum_class: The class of this enum value to return
+    :param verbose: Show creation message
+    :return if corresponding enum variable in the nominated enum_class is found,
+            it returns it. Otherwise
+    """
+    value = readable_string.upper().replace(' ', '_', 1)
+    try:
+        return enum_class[value]
+    except KeyError:
+        # no such enum variable
+        print(f"value {readable_string} not found in enum class {enum_class}")
+        return None
+
 
 Base = declarative_base()
 
@@ -163,7 +196,6 @@ class User(Base):
                f"uid = {self.uid}, username = {self.username}, created at {self.created_at},\n" \
                f"base64 password = {self.password}," \
                f" original password = {base64_to_ascii(self.password)},\n" \
-
                f"honor rating = {self.user_rating}, email = {self.email},\nbio = {self.bio}"
 
 
@@ -252,7 +284,6 @@ class Resource(Base):
     upvote_count = Column(Integer, default=0, nullable=False, autoincrement=False)
     downvote_count = Column(Integer, default=0, nullable=False, autoincrement=False)
 
-
     # if the resource is public
     is_public = Column(Boolean, default=True, nullable=False)
 
@@ -302,7 +333,6 @@ class ResourceVoteInfo(Base):
     """
     __tablename__ = "resource_vote_info"
 
-
     # user id
     uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
 
@@ -321,7 +351,6 @@ class ResourceVoteInfo(Base):
         return f"ResourceVoteInfo table:\n" \
                f"Voter id = {self.uid}, rid = {self.rid}, " \
                f"is_upvote = {self.is_upvote}"
-
 
 
 class ResourceCreater(Base):
@@ -344,7 +373,6 @@ class ResourceCreater(Base):
     def __str__(self):
         return f"ResourceCreater table:\n" \
                f"creater id = {self.uid}, rid = {self.rid}"
-
 
 
 class ResourceComment(Base):
@@ -416,7 +444,6 @@ class ResourceCommentReply(Base):
                f"reply = {self.reply}"
 
 
-
 class PrivateResourcePersonnel(Base):
     """
     The representation of a personnel that stores users that are allowed to
@@ -441,7 +468,6 @@ class PrivateResourcePersonnel(Base):
                f"allowed uid = {self.uid}, rid = {self.rid}"
 
 
-
 class Tag(Base):
     """
     The table representing a set of tags available in the system
@@ -454,7 +480,6 @@ class Tag(Base):
     # name of the tag
     tag_name = Column(String(STANDARD_STRING_LENGTH), nullable=False, unique=True)
 
-
     # description of tag
     tag_description = Column(Text, default=None)
 
@@ -462,7 +487,6 @@ class Tag(Base):
         return f"Tag table:\n" \
                f"tag_id = {self.tag_id}, " \
                f"tag name = {self.tag_name}, tag id = {self.tag_id}"
-
 
 
 class ResourceTagRecord(Base):
@@ -595,7 +619,6 @@ class ChannelPost(Base):
     # up/down-vote count
     upvote_count = Column(Integer, default=0, nullable=False, autoincrement=False)
     downvote_count = Column(Integer, default=0, nullable=False, autoincrement=False)
-
 
     # thread initial reply
     init_text = Column(Text, nullable=False)
