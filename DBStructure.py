@@ -45,7 +45,7 @@ DBPATH = f"postgresql://{DBUSERNAME}:{DBPASSWORD}@localhost/{DBDATABASE}"
 
 # on your local device
 # uncomment DBPATH below to overwrite the above PATH config
-# DBPATH = "sqlite:///Doctrina.db"
+DBPATH = "sqlite:///Doctrina.db"
 
 
 class ResourceDifficulty(enum.Enum):
@@ -121,6 +121,39 @@ class ChannelVisibility(enum.Enum):
     INVITE_ONLY = 0
     FULLY_PRIVATE = 1
     PUBLIC = 2
+
+
+def enum_to_website_output(item: enum.Enum) -> str:
+    """
+    Convert an enum value to human friendly format: to lowercase, capitalize first
+    letter of each word and get rid of underscore, if any
+
+    e.g. Subject.MATHS_A -> "Maths A:
+
+    :param item: The enum item to convert
+    :return The human friendly string value of the enum item
+    """
+    return item.name.lower().replace('_', ' ', 1).title()
+
+
+def website_input_to_enum(readable_string: str, enum_class: enum.Enum, verbose=True):
+    """
+    Convert a human readable enum value to an appropriate enum variable.
+    i.e. applicable to Subject, Grade and ChannelVisibility only
+
+    :param readable_string: The enum string value human can understand
+    :param enum_class: The class of this enum value to return
+    :param verbose: Show creation message
+    :return if corresponding enum variable in the nominated enum_class is found,
+            it returns it. Otherwise
+    """
+    value = readable_string.upper().replace(' ', '_', 1)
+    try:
+        return enum_class[value]
+    except KeyError:
+        # no such enum variable
+        print(f"value {readable_string} not found in enum class {enum_class}")
+        return None
 
 
 Base = declarative_base()
