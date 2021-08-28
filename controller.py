@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for
 import json
+from DBFunc import *
 
 app = Flask(__name__)
 
@@ -45,8 +46,8 @@ def home():
     return render_template('home.html', title='Home', name=name, data=data)
 
 
-@app.route('/resource/<id>')
-def resource(id=None):
+@app.route('/resource/<int:uid>/<int:rid>', methods=["GET", "POST"])
+def resource(uid=None, rid=None):
     """Page for a resource
 
     Shows information based on the resource type and content
@@ -54,8 +55,15 @@ def resource(id=None):
     If resource is none then redirect to home page
     If not authenticated redirect to login
     """
-    if(id == None):
-        return redirect(url_for('home'))
+    user, res = get_user_and_resource_instance(uid=uid, rid=rid)
+    if not user or not res:
+        # invalid user or resource, return to homepage
+        # todo: do we want to show 404 instead?
+        return redirect(url_for("page_not_found"))
+        # return redirect(url_for('home'))
+
+    if request.method == "GET":
+        pass
 
     return render_template('base.html', title='Register')
 
@@ -163,6 +171,7 @@ def forum(fName=None, tName=None):
     If tName is not valid redirect to forum page
     """
     return render_template('base.html', title='Post')
+
 
 @app.errorhandler(403)
 def page_not_found(error):
