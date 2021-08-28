@@ -175,7 +175,7 @@ class User(Base):
     avatar_link = Column(String(STANDARD_STRING_LENGTH), nullable=True, default=None)
 
     # user account created time
-    created_at = Column(DateTime, default=datetime.datetime.now(
+    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
         tz=pytz.timezone("Australia/Brisbane")))
 
     # user password -- base64 encoded
@@ -268,7 +268,7 @@ class Resource(Base):
     resource_link = Column(String(STANDARD_STRING_LENGTH), nullable=False)
 
     # date and time of creation
-    created_at = Column(DateTime, default=datetime.datetime.now(
+    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
         tz=pytz.timezone("Australia/Brisbane")))
 
     # difficulty of the resource
@@ -313,7 +313,7 @@ class ResourceView(Base):
     uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
 
     # timestamp
-    created_at = Column(DateTime, default=datetime.datetime.now(
+    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
         tz=pytz.timezone("Australia/Brisbane")))
 
     user = relationship("User", foreign_keys=[uid],
@@ -388,7 +388,7 @@ class ResourceComment(Base):
     uid = Column(Integer, ForeignKey("user.uid"))
 
     # comment created time
-    created_at = Column(DateTime, default=datetime.datetime.now(
+    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
         tz=pytz.timezone("Australia/Brisbane")))
 
     # resource to be commented
@@ -424,7 +424,7 @@ class ResourceCommentReply(Base):
     reply = Column(Text, nullable=False)
 
     # reply time
-    created_at = Column(DateTime, default=datetime.datetime.now(
+    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
         tz=pytz.timezone("Australia/Brisbane")), primary_key=True)
 
     # replier id
@@ -623,7 +623,7 @@ class ChannelPost(Base):
     # thread initial reply
     init_text = Column(Text, nullable=False)
 
-    created_at = Column(DateTime, default=datetime.datetime.now(
+    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
         tz=pytz.timezone("Australia/Brisbane")))
 
     channel = relationship("Channel", foreign_keys=[cid],
@@ -676,7 +676,7 @@ class PostComment(Base):
     post_id = Column(Integer, ForeignKey("channel_post.post_id"))
 
     # datetime when created
-    created_at = Column(DateTime, default=datetime.datetime.now(
+    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
         tz=pytz.timezone("Australia/Brisbane")))
 
     # commenter id
