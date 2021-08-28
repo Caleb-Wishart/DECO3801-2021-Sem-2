@@ -43,8 +43,9 @@ engine = create_engine(DBPATH)
 Session = sessionmaker(engine)
 
 
-def add_user(username, password, email, teaching_areas: dict = {},
+epoch = datetime.datetime.utcfromtimestamp(0)
 
+def add_user(username, password, email, teaching_areas: dict = {},
              verbose=True, bio=None, avatar_link=None):
     """
     Add a new user to table user and add teaching_areas to
@@ -93,6 +94,19 @@ def add_user(username, password, email, teaching_areas: dict = {},
                 conn.add(new_teach_area)
         conn.commit()
         return user.uid
+
+      
+def get_user(email) -> User:
+    """
+    Retrieve the User with the unique email as the key
+
+    :param email: The identifiying email
+    :return: User structure or None
+    """
+    email = email.lower()
+    with Session(engine) as conn:
+        user = conn.query(User).filter_by(email=email).one_or_none()
+        return user
 
 
 def add_tag(tag_name, tag_description=None, verbose=True):
@@ -272,6 +286,97 @@ def user_has_access_to_resource(uid, rid):
     with Session() as conn:
         return conn.query(PrivateResourcePersonnel).filter_by(uid=uid, rid=rid).\
             one_or_none() is not None
+
+
+def find_resources(title_type="like",title=None,
+    created_type="after",created=epoch,
+    difficulty=None, subject=None,
+    vote_type="more",votes=None,
+    grade=None, email=None
+    ):
+    """Find a resource using the specific keys.
+
+        If any param does not fall into the valid values the default will be
+        used in its place.
+
+        If no parameters are passed the method should return all Resources.
+
+        :param title_type   : SQL search restriction for the title.
+            Valid values are ["like","exact"]
+            Defaults to "like".
+        :param title        : title to search for
+            Defaults to "".
+        :param created_type : SQL search restriction for the creation date.
+            Valid values are ["after","before"]
+            Defaults to "after".
+        :param created      : date to search for as a datetime object.
+            Defaults to epoch.
+        :param difficulty   : The difficult rating of the resource.
+            Valid values are ResourceDifficulty enum values.
+            Defaults to None.
+        :param subject      : The subject of the resource.
+            Valid values are Subject enum values.
+            Defaults to None.
+        :param vote_type    : SQL search restriction for the votes.
+            Valid values are ["more","less"]. Refers to specified amount
+            Defaults to "more".
+        :param votes        : The number of upvotes a resource has.
+            Defaults to None.
+        :param grade        : The grade of the resource
+            Valid values are the Grade enum values
+            Defaults to None.
+        :param email         : The logged in users email
+            Defaults to None.
+    """
+    # Args Checking
+    if title_type not in ["like","exact"]:
+        title_type = "like"
+    if created_type not in ["after","before"]:
+        created_type = "after"
+    if vote_type not in ["more","less"]:
+        vote_type = "more"
+
+
+    with Session() as conn:
+        # get User if exists
+        user = conn.query(User).filter_by(email=email).one_or_none()
+
+        resources = conn.query(Resource)
+
+        if title is not None and isinstance(title,str):
+            if title_type == "like":
+                resources = resources.filter(Resource.title.ilike(f'%{title}%'))
+            else:
+                resources = resources.filter_by(title=title)
+
+        if created != epoch and isinstance(created,datetime):
+            if created_type == "after":
+                resources = resources.filter(Resource.created_at > created)
+           else:
+                resources = resources.filter(Resource.created_at < created)
+
+        if difficulty is not None and isinstance(difficulty,ResourceDifficulty):
+            resources = resources.filter_by(difficulty=difficulty)
+
+        if subject is not None and isinstance(subject,Subject):
+            resources = resources.filter_by(subject=subject)
+
+        if grade is not None and isinstance(grade,Grade):
+            resources = resources.filter_by(grade=grade)
+
+        if votes is not None and isinstance(votes,int):
+            if vote_type == "more":
+                resources = resources.filter(Resource.upvote_count > votes)
+            else:
+                resources = resources.filter(Resource.upvote_count < votes)
+
+        if user is None:
+            resources = resources.filter_by(is_public=True)
+            result = resources.all()
+        else:
+            result = filter(lambda res: user_has_access_to_resource(user.uid,res.rid),resources.all())
+
+    return result
 
 
 def vote_resource(uid, rid, upvote=True, verbose=True):

@@ -187,7 +187,6 @@ def forum(fName=None, tName=None):
     The home forum page (fName == None, tName == None) shows the list of forums
     Allows user to create a channel etc.
 
-
     The forum/fName page shows the threads in that forum
     Allows users to add threads to the forum
 
@@ -207,7 +206,6 @@ def forum(fName=None, tName=None):
 def page_not_found(error):
     """Page shown with a HTML 403 status"""
     return render_template('errors/error_403.html'), 403
-
 
 @app.errorhandler(404)
 def page_not_found(error):
