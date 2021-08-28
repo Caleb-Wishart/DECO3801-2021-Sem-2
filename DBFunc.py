@@ -198,6 +198,23 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
         return resource.rid
 
 
+def resource_is_public(rid: int):
+    """
+    Check if a resource is public
+
+    :param rid: The resource id
+    :return: True if the resource is public, False otherwise.
+             ErrorCode.INVALID_RESOURCE is resource id is invalid
+    """
+    with Session() as conn:
+        resource = conn.query(Resource).filter_by(rid=rid).one_or_none()
+
+        if not resource:
+            # resource not exist
+            return ErrorCode.INVALID_RESOURCE
+        return resource.is_public
+
+
 def modify_resource_personnel(rid, uid, modification: PersonnelModification):
     """
     Add/delete a person from a resource personnel

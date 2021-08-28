@@ -59,8 +59,10 @@ def resource(uid=None, rid=None):
     if not user or not res:
         # invalid user or resource, return to homepage
         # todo: do we want to show 404 instead?
-        # return render_template('errors/error_404.html'), 404
-        return redirect(url_for('home'))
+        return render_template('errors/error_404.html'), 404
+        # return redirect(url_for('home'))
+    # if not resource_is_public(rid=rid) and not user_has_access_to_resource(uid=uid, rid=rid):
+
 
     if request.method == "GET":
         pass
