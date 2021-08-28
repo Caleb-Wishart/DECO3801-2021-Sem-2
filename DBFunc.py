@@ -206,10 +206,10 @@ def find_resources(title_type="like",title=None,
             else:
                 resources = resources.filter_by(title=title)
 
-        if created != epoch and isinstance(created,datetime):
+        if created != epoch and isinstance(created, datetime):
             if created_type == "after":
                 resources = resources.filter(Resource.created_at > created)
-           else:
+            else:
                 resources = resources.filter(Resource.created_at < created)
 
         if difficulty is not None and isinstance(difficulty,ResourceDifficulty):
