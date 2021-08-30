@@ -142,7 +142,7 @@ def is_user_session_expired(uid: int):
         user_session = conn.query(UserSession).filter_by(uid=uid).one_or_none()
         # tz = pytz.timezone("Australia/Brisbane")
         current = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
-        print(user_session.last_action_time)
+        print(f"current time = {current},last_action_time = {user_session.last_action_time}")
         return current - user_session.last_action_time > USER_SESSION_EXPIRE_INTERVAL
 
 
