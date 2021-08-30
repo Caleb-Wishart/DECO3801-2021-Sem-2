@@ -11,6 +11,9 @@ import enum
 from sqlalchemy.orm import sessionmaker
 from DBStructure import *
 
+# define if you want method output messages for debugging
+verbose = True
+
 
 class ErrorCode(enum.Enum):
     """
@@ -29,6 +32,8 @@ class ErrorCode(enum.Enum):
     INVALID_CHANNEL = 5
     # post id/info incorrect
     INVALID_POST = 6
+    # user session expired
+    USER_SESSION_EXPIRED = 7
 
 
 class PersonnelModification(enum.Enum):
@@ -42,21 +47,25 @@ class PersonnelModification(enum.Enum):
 engine = create_engine(DBPATH)
 Session = sessionmaker(engine)
 
-
 epoch = datetime.datetime.utcfromtimestamp(0)
 
+
+# maximum time length for session without new action -- set as 30min
+USER_SESSION_EXPIRE_INTERVAL = datetime.timedelta(seconds=10)
+
+
 def add_user(username, password, email, teaching_areas: dict = {},
-             verbose=True, bio=None, avatar_link=None):
+             bio=None, avatar_link=None, profile_background_link=None):
     """
     Add a new user to table user and add teaching_areas to
     user_teaching_areas table
 
     :param username: username
     :param avatar_link: The link to avatar, default is null
+    :param profile_background_link: The link of profile background, default is null
     :param password: The password of new user
     :param bio: The bio of new user
     :param email: The email address of that user. This field is unique for each user.
-    :param verbose: Show creation message
     :param teaching_areas: Mapping of teaching area - [is_public, grade (optional)] list
             e.g. [Subject.ENGLISH: [True], Subject.MATHS_C: [False, Grade.YEAR_1]
     :return The id of the new user if success.
@@ -66,7 +75,8 @@ def add_user(username, password, email, teaching_areas: dict = {},
     email = email.lower()
     user = User(username=username, avatar_link=avatar_link, password=ascii_to_base64(password),
                 email=email, created_at=datetime.datetime.now(
-            tz=pytz.timezone("Australia/Brisbane")), bio=bio)
+            tz=pytz.timezone("Australia/Brisbane")), bio=bio,
+                profile_background_link=profile_background_link)
 
     with Session() as conn:
         if conn.query(User).filter_by(email=email).one_or_none():
@@ -82,6 +92,11 @@ def add_user(username, password, email, teaching_areas: dict = {},
         # phase 2: find id of new user -- using email,
         # then update teaching_areas table
         user = conn.query(User).filter_by(email=email).one()
+
+        user_session = UserSession(uid=user.uid)
+        conn.add(user_session)
+        conn.commit()
+
         for area, info in teaching_areas.items():
             grade = None
             if len(info) == 2:
@@ -95,32 +110,82 @@ def add_user(username, password, email, teaching_areas: dict = {},
         conn.commit()
         return user.uid
 
-      
-def get_user(email) -> User:
+
+def get_user_by_email(email):
     """
     Retrieve the User with the unique email as the key
 
-    :param email: The identifiying email
-    :return: User structure or None
+    :param email: The identifying email
+    :return: User structure on success
+             ErrorCode.INVALID_USER if no match
     """
     email = email.lower()
-    with Session(engine) as conn:
+    with Session() as conn:
         user = conn.query(User).filter_by(email=email).one_or_none()
-        return user
+        if user:
+            if verbose:
+                print(f"email {email} is registered by user uid = {user.uid}")
+
+            return user
+        print(f"No user has email {email}")
+        return ErrorCode.INVALID_USER
 
 
-def add_tag(tag_name, tag_description=None, verbose=True):
+def is_user_session_expired(uid: int):
+    """
+    Check if a user session is expired
+
+    :param uid: The user id to check
+    :return True if the session is expired, False otherwise
+    """
+    with Session() as conn:
+        user_session = conn.query(UserSession).filter_by(uid=uid).one_or_none()
+        # tz = pytz.timezone("Australia/Brisbane")
+        current = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
+        print(user_session.last_action_time)
+        return current - user_session.last_action_time > USER_SESSION_EXPIRE_INTERVAL
+
+
+def renew_user_session(uid: int):
+    """
+    Create a new session instance in Session table, if not exists;
+    otherwise, update last_action_time to current datetime
+
+    Call this when user sign in or a function requires uid and is_user_session_expired()
+    is false
+
+    :param uid: effective user id
+    :return on success, None is returned.
+            If uid does not exist, it returns ErrorCode.INVALID_USER
+    """
+    with Session() as conn:
+        user = conn.query(User).filter_by(uid=uid).one_or_none()
+        if not user:
+            print(f"user {uid} does not exists")
+            return ErrorCode.INVALID_USER
+
+        user_session = conn.query(UserSession).filter_by(uid=uid).one_or_none()
+        if not user_session:
+            user_session = UserSession(uid=uid)
+        else:
+            user_session.last_action_time = datetime.datetime.now(
+                    tz=pytz.timezone("Australia/Brisbane"))
+        conn.add(user_session)
+        conn.commit()
+        if verbose:
+            print(f"user {uid} last action time updated")
+
+
+def add_tag(tag_name, tag_description=None):
     """
     Add a new tag to Database
 
     :param tag_name: The name of the new tag
     :param tag_description: The description of the tag (optional)
-    :param verbose: Show creation message
     :return the id of the new tag
     """
     tag = Tag(tag_name=tag_name, tag_description=tag_description)
     with Session() as conn:
-
         conn.add(tag)
         conn.commit()
         print(f"tag {tag_name} added") if verbose else None
@@ -135,7 +200,6 @@ def get_tags():
     out = dict()
 
     with Session() as conn:
-
         tags = conn.query(Tag).all()
 
         for i in tags:
@@ -145,7 +209,7 @@ def get_tags():
 
 def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: Subject,
                  grade: Grade, creaters_id=[], is_public=True, private_personnel_id=[],
-                 tags_id=[], verbose=True, description=None):
+                 tags_id=[], description=None, resource_thumbnail_links=[]):
     """
     Add a resource to resource table
 
@@ -159,9 +223,9 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
     :param private_personnel_id: if this resource is private, add all User instances
             to the private_resource_personnel. *Element to be filled in is uid
     :param tags_id: The tags associated with this resource *each element is tag_id
-    :param verbose: Show creation message
     :param description: The description of this resource
     :param creaters_id: The id of creaters * each element is uid
+    :param resource_thumbnail_links: A list contains the link to all thumbnails of this resource
     :return The id of the new resource if success.
             ErrorCode.INCORRECT_PERSONNEL if
             private_personnel_id is not defined when is_public is False.
@@ -174,6 +238,7 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
     resource = Resource(title=title, resource_link=resource_link, grade=grade,
                         difficulty=difficulty, subject=subject, is_public=is_public,
                         description=description)
+
     with Session() as conn:
 
         # phase 1: add new resource
@@ -181,8 +246,13 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
         conn.commit()
 
         # phase 2: find the new row, update private_resource_personnel info, tag info
-        # and resource_creater table
+        # and resource_creater table, resource_thumbnail
         resource = conn.query(Resource).filter_by(resource_link=resource_link).one()
+
+        for i in resource_thumbnail_links:
+            thumbnail = ResourceThumbnail(rid=resource.rid, thumbnail_link=i)
+            conn.add(thumbnail)
+        conn.commit()
 
         for i in creaters_id:
             creater_instance = ResourceCreater(rid=resource.rid, uid=i)
@@ -196,14 +266,12 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
 
         if not is_public:
             for uid in private_personnel_id:
-
                 private_access = PrivateResourcePersonnel(rid=resource.rid, uid=uid)
                 conn.add(private_access)
             conn.commit()
 
         if tags_id:
             for i in tags_id:
-
                 tag_record = ResourceTagRecord(rid=resource.rid, tag_id=i)
                 conn.add(tag_record)
                 conn.commit()
@@ -212,7 +280,7 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
         return resource.rid
 
 
-def resource_is_public(rid: int):
+def is_resource_public(rid: int):
     """
     Check if a resource is public
 
@@ -239,6 +307,7 @@ def modify_resource_personnel(rid, uid, modification: PersonnelModification):
     :return void on success.
             ErrorCode.INVALID_USER/-RESOURCE if uid/rid is incorrect or resource is public
             ErrorCode.INCORRECT_PERSONNEL if mode is delete and personnel info not exist
+            ErrorCode.USER_SESSION_EXPIRED when user session is expired
     """
     user, resource = get_user_and_resource_instance(uid=uid, rid=rid)
     if not user:
@@ -247,10 +316,17 @@ def modify_resource_personnel(rid, uid, modification: PersonnelModification):
     elif not resource or resource.is_public:
         print("rid is invalid or resource is public")
         return ErrorCode.INVALID_RESOURCE
+
+    # check user session and renew
+    if is_user_session_expired(uid):
+        print("User session expired")
+        return ErrorCode.USER_SESSION_EXPIRED
+    renew_user_session(uid)
+
     with Session() as conn:
         if modification == PersonnelModification.PERSONNEL_DELETE:
             # delete
-            personnel = conn.query(PrivateResourcePersonnel).filter_by(uid=uid, rid=rid).\
+            personnel = conn.query(PrivateResourcePersonnel).filter_by(uid=uid, rid=rid). \
                 one_or_none()
             if not personnel:
                 print("Delete failed: User not in personnel")
@@ -274,6 +350,7 @@ def user_has_access_to_resource(uid, rid):
     :param uid: The user to be checked
     :return True/False on success.
             ErrorCode.INVALID_USER/-RESOURCE if uid/rid is incorrect or resource is public
+            ErrorCode.USER_SESSION_EXPIRED if user session is expired
     """
     user, resource = get_user_and_resource_instance(uid=uid, rid=rid)
     if not user:
@@ -283,17 +360,23 @@ def user_has_access_to_resource(uid, rid):
         print("rid is invalid or resource is public")
         return ErrorCode.INVALID_RESOURCE
 
+    # check user session and renew
+    if is_user_session_expired(uid):
+        print("User session expired")
+        return ErrorCode.USER_SESSION_EXPIRED
+    renew_user_session(uid)
+
     with Session() as conn:
-        return conn.query(PrivateResourcePersonnel).filter_by(uid=uid, rid=rid).\
-            one_or_none() is not None
+        return conn.query(PrivateResourcePersonnel).filter_by(uid=uid, rid=rid). \
+                   one_or_none() is not None
 
 
-def find_resources(title_type="like",title=None,
-    created_type="after",created=epoch,
-    difficulty=None, subject=None,
-    vote_type="more",votes=None,
-    grade=None, email=None
-    ):
+def find_resources(title_type="like", title=None,
+                   created_type="after", created=epoch,
+                   difficulty=None, subject=None,
+                   vote_type="more", votes=None,
+                   grade=None, email=None
+                   ):
     """Find a resource using the specific keys.
 
         If any param does not fall into the valid values the default will be
@@ -329,13 +412,12 @@ def find_resources(title_type="like",title=None,
             Defaults to None.
     """
     # Args Checking
-    if title_type not in ["like","exact"]:
+    if title_type not in ["like", "exact"]:
         title_type = "like"
-    if created_type not in ["after","before"]:
+    if created_type not in ["after", "before"]:
         created_type = "after"
-    if vote_type not in ["more","less"]:
+    if vote_type not in ["more", "less"]:
         vote_type = "more"
-
 
     with Session() as conn:
         # get User if exists
@@ -343,28 +425,28 @@ def find_resources(title_type="like",title=None,
 
         resources = conn.query(Resource)
 
-        if title is not None and isinstance(title,str):
+        if title is not None and isinstance(title, str):
             if title_type == "like":
                 resources = resources.filter(Resource.title.ilike(f'%{title}%'))
             else:
                 resources = resources.filter_by(title=title)
 
-        if created != epoch and isinstance(created, datetime):
+        if created != epoch and isinstance(created, datetime.datetime):
             if created_type == "after":
                 resources = resources.filter(Resource.created_at > created)
             else:
                 resources = resources.filter(Resource.created_at < created)
 
-        if difficulty is not None and isinstance(difficulty,ResourceDifficulty):
+        if difficulty is not None and isinstance(difficulty, ResourceDifficulty):
             resources = resources.filter_by(difficulty=difficulty)
 
-        if subject is not None and isinstance(subject,Subject):
+        if subject is not None and isinstance(subject, Subject):
             resources = resources.filter_by(subject=subject)
 
-        if grade is not None and isinstance(grade,Grade):
+        if grade is not None and isinstance(grade, Grade):
             resources = resources.filter_by(grade=grade)
 
-        if votes is not None and isinstance(votes,int):
+        if votes is not None and isinstance(votes, int):
             if vote_type == "more":
                 resources = resources.filter(Resource.upvote_count > votes)
             else:
@@ -374,12 +456,12 @@ def find_resources(title_type="like",title=None,
             resources = resources.filter_by(is_public=True)
             result = resources.all()
         else:
-            result = filter(lambda res: user_has_access_to_resource(user.uid,res.rid),resources.all())
+            result = filter(lambda res: user_has_access_to_resource(user.uid, res.rid), resources.all())
 
     return result
 
 
-def vote_resource(uid, rid, upvote=True, verbose=True):
+def vote_resource(uid, rid, upvote=True):
     """
     Give upvote/downvote to a resource:
     1. update up/down-vote count of the nominated resource; and
@@ -388,21 +470,19 @@ def vote_resource(uid, rid, upvote=True, verbose=True):
     :param uid: The voter's user id
     :param rid: The resource to vote
     :param upvote: is this is a upvote
-    :param verbose: show process message
     :return void on Success.
             ErrorCode.INVALID_RESOURCE/_USER if rid/uid is invalid.
             ErrorCode.SAME_VOTE_TWICE if current user gave same vote to this
             resource before.
+            ErrorCode.USER_SESSION_EXPIRED if current session is expired
     """
     msg = "created"
 
-    user, resource = get_user_and_resource_instance(uid, rid)
-    if not resource:
-        print("rid is invalid")
-        return ErrorCode.INVALID_RESOURCE
-    elif not user:
-        print("uid is invalid")
-        return ErrorCode.INVALID_USER
+    res = check_user_and_resource_validity_and_renew_user_session(uid=uid, rid=rid)
+    if isinstance(res, ErrorCode):
+        return res
+
+    user, resource = res
 
     with Session() as conn:
         # try to find if there is an entry in vote_info
@@ -458,23 +538,21 @@ def get_user_and_resource_instance(uid, rid):
     return user, resource
 
 
-def user_viewed_resource(uid, rid, verbose=True):
+def user_viewed_resource(uid, rid):
     """
     Call this function to add a record to resource view table
 
     :param uid: The user id who viewed the resource
     :param rid: The id of resource viewed
-    :param verbose: show process message
     :return void on Success.
             ErrorCode.INVALID_RESOURCE/_USER if rid/uid is invalid.
+            ErrorCode.USER_SESSION_EXPIRED if user session is expired
     """
-    user, resource = get_user_and_resource_instance(uid, rid)
-    if not resource:
-        print("rid is invalid")
-        return ErrorCode.INVALID_RESOURCE
-    elif not user:
-        print("uid is invalid")
-        return ErrorCode.INVALID_USER
+    res = check_user_and_resource_validity_and_renew_user_session(uid=uid, rid=rid)
+    if isinstance(res, ErrorCode):
+        return res
+
+    user, resource = res
 
     with Session() as conn:
         resource_view = ResourceView(rid=rid, uid=uid)
@@ -483,16 +561,15 @@ def user_viewed_resource(uid, rid, verbose=True):
     print(f"user {uid} viewed resource {rid}") if verbose else None
 
 
-def comment_to_resource(uid, rid, comment, verbose=True):
+def check_user_and_resource_validity_and_renew_user_session(uid, rid):
     """
-    Add a comment to a resource
+    Check uid and rid's validity and renew the user session for current user
 
-    :param uid: The commenter user id
-    :param rid: The id of resource to be commented
-    :param comment: The comment to that resource
-    :param verbose: show process message
-    :return The id of the new resource comment on success.
+    :param uid: The user id to check
+    :param rid: The resource id to check
+    :return If valid, user, resource instances are returned and user session is updated.
             ErrorCode.INVALID_RESOURCE/_USER if rid/uid is invalid.
+            ErrorCode.USER_SESSION_EXPIRED is current session is expired
     """
     user, resource = get_user_and_resource_instance(uid, rid)
     if not resource:
@@ -501,6 +578,31 @@ def comment_to_resource(uid, rid, comment, verbose=True):
     elif not user:
         print("uid is invalid")
         return ErrorCode.INVALID_USER
+
+    # check user session and renew
+    if is_user_session_expired(uid):
+        print("User session expired")
+        return ErrorCode.USER_SESSION_EXPIRED
+    renew_user_session(uid)
+
+    return user, resource
+
+
+def comment_to_resource(uid, rid, comment):
+    """
+    Add a comment to a resource
+
+    :param uid: The commenter user id
+    :param rid: The id of resource to be commented
+    :param comment: The comment to that resource
+    :return The id of the new resource comment on success.
+            ErrorCode.INVALID_RESOURCE/_USER if rid/uid is invalid.
+            ErrorCode.USER_SESSION_EXPIRED is current session is expired
+    """
+    res = check_user_and_resource_validity_and_renew_user_session(uid=uid, rid=rid)
+    if isinstance(res, ErrorCode):
+        return res
+
     created_at = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
     with Session() as conn:
         resource_comment = ResourceComment(uid=uid, rid=rid, comment=comment, created_at=created_at)
@@ -512,16 +614,16 @@ def comment_to_resource(uid, rid, comment, verbose=True):
         filter_by(uid=uid, rid=rid, created_at=created_at).one().resource_comment_id
 
 
-def reply_to_resource_comment(uid, resource_comment_id, reply, verbose=True):
+def reply_to_resource_comment(uid, resource_comment_id, reply):
     """
     Add a reply to a resource comment
 
     :param uid: The resource comment replier user id
     :param resource_comment_id: The id resource
     :param reply: The reply text
-    :param verbose: show process message
     :return void on Success.
             ErrorCode.INVALID_RESOURCE/_USER if rid/uid is invalid.
+            ErrorCode.USER_SESSION_EXPIRED is user session is expired
     """
     with Session() as conn:
         user = conn.query(User).filter_by(uid=uid).one_or_none()
@@ -534,6 +636,12 @@ def reply_to_resource_comment(uid, resource_comment_id, reply, verbose=True):
             print("uid is invalid")
             return ErrorCode.INVALID_USER
 
+        # check user session and renew
+        if is_user_session_expired(uid):
+            print("User session expired")
+            return ErrorCode.USER_SESSION_EXPIRED
+        renew_user_session(uid)
+
         reply_to_comment = ResourceCommentReply(resource_comment_id=resource_comment_id,
                                                 reply=reply, uid=uid)
         conn.add(reply_to_comment)
@@ -544,7 +652,7 @@ def reply_to_resource_comment(uid, resource_comment_id, reply, verbose=True):
 
 
 def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subject = None,
-                   grade: Grade = None, description=None, verbose=True, tags_id=[],
+                   grade: Grade = None, description=None, tags_id=[],
                    personnel_id=[]):
     """
     Create a channel
@@ -558,15 +666,21 @@ def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subj
     :param tags_id: The id of tags of this channel
     :param personnel_id: If visibility is not Public, then this personnel
                          is used to define users with access to this channel
-    :param verbose: show process message
     :return the id of the new channel on success.
             ErrorCode.INVALID_USER if admin_uid does not exist.
+            ErrorCode.USER_SESSION_EXPIRED if current session is expired
     """
     with Session() as conn:
         admin = conn.query(User).filter_by(uid=admin_uid).one_or_none()
         if not admin:
             print("Admin id is invalid")
             return ErrorCode.INVALID_USER
+
+        # check user session and renew
+        if is_user_session_expired(admin_uid):
+            print("User session expired")
+            return ErrorCode.USER_SESSION_EXPIRED
+        renew_user_session(admin_uid)
 
         # phase 1: create instance
         channel = Channel(name=name, visibility=visibility, admin_uid=admin_uid,
@@ -595,14 +709,13 @@ def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subj
         return channel.cid
 
 
-def modify_channel_personnel(uid, cid, modification: PersonnelModification, verbose=True):
+def modify_channel_personnel(uid, cid, modification: PersonnelModification):
     """
     Add/ delete a user from/to a private personnel
 
     :param cid: The channel to be modified
     :param uid: The user to add/delete
     :param modification: Add or delete
-    :param verbose: show process message
     :return void on success.
             ErrorCode.INVALID_USER/-CHANNEL if uid/rid is incorrect or channel is public
             ErrorCode.INCORRECT_PERSONNEL if mode is delete and personnel info not exist
@@ -619,7 +732,7 @@ def modify_channel_personnel(uid, cid, modification: PersonnelModification, verb
 
         if modification == PersonnelModification.PERSONNEL_DELETE:
             # delete
-            personnel = conn.query(ChannelPersonnel).filter_by(uid=uid, cid=cid).\
+            personnel = conn.query(ChannelPersonnel).filter_by(uid=uid, cid=cid). \
                 one_or_none()
             if not personnel:
                 print("personnel does not exists")
@@ -644,23 +757,31 @@ def user_has_access_to_channel(uid, cid):
     :param cid: The id of channel to check
     :return True/False on success.
             ErrorCode.INVALID_USER/-CHANNEL if uid/rid is incorrect or resource is public
+            ErrorCode.USER_SESSION_EXPIRED is current session is invalid
     """
     with Session() as conn:
         user = conn.query(User).filter_by(uid=uid).one_or_none()
         if not user:
             print("uid invalid")
             return ErrorCode.INVALID_USER
+
+        # check user session and renew
+        if is_user_session_expired(uid):
+            print("User session expired")
+            return ErrorCode.USER_SESSION_EXPIRED
+        renew_user_session(uid)
+
         channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
         if not channel or channel.visibility == ChannelVisibility.PUBLIC:
             print("cid invalid")
             return ErrorCode.INVALID_CHANNEL
 
-        personnel = conn.query(ChannelPersonnel).filter_by(uid=uid, cid=cid).\
+        personnel = conn.query(ChannelPersonnel).filter_by(uid=uid, cid=cid). \
             one_or_none()
         return personnel is not None
 
 
-def post_on_channel(uid, title, text, channel_name=None, cid=None, verbose=True):
+def post_on_channel(uid, title, text, channel_name=None, cid=None):
     """
     Make a new post on a channel
 
@@ -671,11 +792,11 @@ def post_on_channel(uid, title, text, channel_name=None, cid=None, verbose=True)
     :param cid: The id of the channel to post
     :param title: The title of the post
     :param text: The text of the post
-    :param verbose: show process message
     :return the post id on success.
             ErrorCode.INVALID_CHANNEL if channel_name or cid is invalid
             ErrorCode.INVALID_USER if uid is invalid
             ErrorCode.INCORRECT_PERSONNEL if user has permission to visit
+            ErrorCode.USER_SESSION_EXPIRED if user session is expired
     """
     if not channel_name and not cid:
         print("Please supply channel name or cid")
@@ -685,6 +806,13 @@ def post_on_channel(uid, title, text, channel_name=None, cid=None, verbose=True)
         if not conn.query(User).filter_by(uid=uid).one_or_none():
             print("invalid uid")
             return ErrorCode.INVALID_USER
+
+        # check user session and renew
+        if is_user_session_expired(uid):
+            print("User session expired")
+            return ErrorCode.USER_SESSION_EXPIRED
+        renew_user_session(uid)
+
         if cid:
             channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
         else:
@@ -696,7 +824,7 @@ def post_on_channel(uid, title, text, channel_name=None, cid=None, verbose=True)
 
         if channel.visibility != ChannelVisibility.PUBLIC:
             # not public, check if user is in the personnel
-            personnel = conn.query(ChannelPersonnel).\
+            personnel = conn.query(ChannelPersonnel). \
                 filter_by(cid=channel.cid, uid=uid).one_or_none()
             if not personnel:
                 print(f"User {uid} is not in channel {channel.name}")
@@ -712,19 +840,18 @@ def post_on_channel(uid, title, text, channel_name=None, cid=None, verbose=True)
         return channel_post.post_id
 
 
-def comment_to_channel_post(uid, post_id, text, verbose=True):
+def comment_to_channel_post(uid, post_id, text):
     """
     Create a comment to a post in the channel
 
     :param uid: Commenter's id
     :param post_id: The id of post to be commented
     :param text: The comment
-    :param verbose: show process message
     :return The id of new post comment
-    :param verbose: show process message
     :return The post_id on success.
             ErrorCode.INVALID_USER if uid is invalid
             ErrorCode.INVALID_POST if post_id is invalid
+            ErrorCode.USER_SESSSION_EXPIRED if current session is expired
     """
     with Session() as conn:
         if not conn.query(User).filter_by(uid=uid).one_or_none():
@@ -733,6 +860,13 @@ def comment_to_channel_post(uid, post_id, text, verbose=True):
         elif not conn.query(ChannelPost).filter_by(post_id=post_id).one_or_none():
             print("post_id is invalid")
             return ErrorCode.INVALID_POST
+
+        # check user session and renew
+        if is_user_session_expired(uid):
+            print("User session expired")
+            return ErrorCode.USER_SESSION_EXPIRED
+        renew_user_session(uid)
+
         created_at = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
         post_comment = PostComment(post_id=post_id, uid=uid, created_at=created_at,
                                    text=text)
@@ -746,19 +880,19 @@ def comment_to_channel_post(uid, post_id, text, verbose=True):
         return post_comment.post_comment_id
 
 
-def vote_channel_post(uid, post_id, upvote=True, verbose=True):
+def vote_channel_post(uid, post_id, upvote=True):
     """
     A user vote a channel post
 
     :param uid: The id of the voter
     :param post_id: The post to be voted
     :param upvote: If this vote is a upvote
-    :param verbose: show process message
     :return void on success.
             ErrorCode.INVALID_USER if uid is invalid
             ErrorCode.INVALID_POST if post_id is invalid
             ErrorCode.SAME_VOTE_TWICE if current user gave same vote to this
             post before.
+            ErrorCode.USER_SESSION_EXPIRED if current user is expired
     """
     with Session() as conn:
         user = conn.query(User).filter_by(uid=uid).one_or_none()
@@ -769,6 +903,12 @@ def vote_channel_post(uid, post_id, upvote=True, verbose=True):
         elif not post:
             print("post id is invalid")
             return ErrorCode.INVALID_POST
+
+        # check user session and renew
+        if is_user_session_expired(uid):
+            print("User session expired")
+            return ErrorCode.USER_SESSION_EXPIRED
+        renew_user_session(uid)
 
         # try to find if there is an entry in vote_info
         vote = conn.query(ChannelPostVoteInfo).filter_by(uid=uid, post_id=post_id).one_or_none()
@@ -803,23 +943,23 @@ def vote_channel_post(uid, post_id, upvote=True, verbose=True):
             print(f"User {uid} voted post {post_id}, is_upvote = {upvote}")
 
 
-def vote_channel_post_comment(uid, post_comment_id, upvote=True, verbose=True):
+def vote_channel_post_comment(uid, post_comment_id, upvote=True):
     """
     Make a vote to a channel post comment
 
     :param uid: The voter's id
     :param post_comment_id: The id of the post comment
     :param upvote: If this is an upvote
-    :param verbose: show process message
     :return void on success.
             ErrorCode.INVALID_USER if uid is invalid
             ErrorCode.INVALID_POST if post_id is invalid
             ErrorCode.SAME_VOTE_TWICE if current user gave same vote to this
             post comment before.
+            ErrorCode.USER_SESSION_EXPIRED if user session is expired
     """
     with Session() as conn:
         user = conn.query(User).filter_by(uid=uid).one_or_none()
-        post_comment = conn.query(PostComment).filter_by(post_comment_id=post_comment_id).\
+        post_comment = conn.query(PostComment).filter_by(post_comment_id=post_comment_id). \
             one_or_none()
         if not user:
             print("uid is invalid")

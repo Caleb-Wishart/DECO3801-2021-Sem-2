@@ -27,11 +27,25 @@
 # only calls function from DBFunc
 from DBStructure import *
 from DBFunc import *
+import time
 
 engine = create_engine(DBPATH)
 
 Session = sessionmaker(engine)
 
+# need to change USER_SESSION_EXPIRE_INTERVAL in DBFunc to 10s
+# test is_user_expired(), renew_user_session(), get_user_by_email(), user_session table
+session_test_user = add_user("test_session", "123456", "lol@mail.com")
+time.sleep(5)
+print(f"user {session_test_user} is expired after 5s = "
+      f"{is_user_session_expired(session_test_user)}")
+time.sleep(11)
+print(f"user {session_test_user} is expired after 11s = "
+      f"{is_user_session_expired(session_test_user)}")
+renew_user_session(session_test_user)
+print(f"After renewal, user {session_test_user} is expired = "
+      f"{is_user_session_expired(session_test_user)}")
+exit(1)
 
 # test add_user(), user, user_teaching_areas tables
 teaching_areas1 = {Subject.CHINESE: [True], Subject.BIOLOGY: [False, Grade.YEAR_1]}

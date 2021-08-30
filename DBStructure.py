@@ -34,10 +34,10 @@ STANDARD_STRING_LENGTH = 300
 # OPTIONS for DB testing:
 
 # Option 1: access psql DB and create schema using you own account in your own DB
-DBUSERNAME = "postgres"  # change this field to your first name (all lowercase), "call me by your name"
+DBUSERNAME = "jason"#"postgres"  # change this field to your first name (all lowercase), "call me by your name"
 
 DBPASSWORD = "admin"
-DBDATABASE = "project"  # DBUSERNAME
+DBDATABASE = DBUSERNAME # "project"  # DBUSERNAME
 DBPATH = f"postgresql://{DBUSERNAME}:{DBPASSWORD}@localhost/{DBDATABASE}"
 
 
@@ -136,14 +136,13 @@ def enum_to_website_output(item: enum.Enum) -> str:
     return item.name.lower().replace('_', ' ', 1).title()
 
 
-def website_input_to_enum(readable_string: str, enum_class: enum.Enum, verbose=True):
+def website_input_to_enum(readable_string: str, enum_class: enum.Enum):
     """
     Convert a human readable enum value to an appropriate enum variable.
     i.e. applicable to Subject, Grade and ChannelVisibility only
 
     :param readable_string: The enum string value human can understand
     :param enum_class: The class of this enum value to return
-    :param verbose: Show creation message
     :return if corresponding enum variable in the nominated enum_class is found,
             it returns it. Otherwise
     """
@@ -174,9 +173,12 @@ class User(Base):
     # link to avatar image
     avatar_link = Column(String(STANDARD_STRING_LENGTH), nullable=True, default=None)
 
+    # profile background link
+    profile_background_link = Column(String(STANDARD_STRING_LENGTH), nullable=True, default=None)
+
     # user account created time
     created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
-        tz=pytz.timezone("Australia/Brisbane")))
+        tz=pytz.timezone("Australia/Brisbane")), nullable=False)
 
     # user password -- base64 encoded
 
@@ -196,7 +198,8 @@ class User(Base):
                f"uid = {self.uid}, username = {self.username}, created at {self.created_at},\n" \
                f"base64 password = {self.password}," \
                f" original password = {base64_to_ascii(self.password)},\n" \
-               f"honor rating = {self.user_rating}, email = {self.email},\nbio = {self.bio}"
+               f"honor rating = {self.user_rating}, email = {self.email}," \
+               f"profile background link = {self.profile_background_link}\nbio = {self.bio}"
 
 
 # The below 2 functions are used to convert password<-->base64 encrypted code
@@ -220,6 +223,23 @@ def base64_to_ascii(encoded_password: str):
     return base64.b64decode(encoded_password.encode()).decode()
 
 
+class UserSession(Base):
+    """
+    A concept of a user login session
+    """
+    __tablename__ = "user_session"
+
+    # user id
+    uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
+
+    # last action request time
+    last_action_time = Column(DateTime(timezone=True), default=datetime.datetime.now(
+        tz=pytz.timezone("Australia/Brisbane")), nullable=False)
+
+    user = relationship("User", foreign_keys=[uid],
+                        backref=backref("user_session", cascade="all, delete"))
+
+
 class UserTeachingAreas(Base):
     """
     The table specifying users' teaching areas
@@ -227,7 +247,6 @@ class UserTeachingAreas(Base):
     __tablename__ = "user_teaching_areas"
 
     # user id
-
     uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
 
     # teaching area
@@ -269,7 +288,7 @@ class Resource(Base):
 
     # date and time of creation
     created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
-        tz=pytz.timezone("Australia/Brisbane")))
+        tz=pytz.timezone("Australia/Brisbane")), nullable=False)
 
     # difficulty of the resource
     difficulty = Column("difficulty", Enum(ResourceDifficulty), nullable=False)
@@ -314,7 +333,7 @@ class ResourceView(Base):
 
     # timestamp
     created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
-        tz=pytz.timezone("Australia/Brisbane")))
+        tz=pytz.timezone("Australia/Brisbane")), nullable=False)
 
     user = relationship("User", foreign_keys=[uid],
                         backref=backref("resource_view", cascade="all,delete"))
@@ -325,6 +344,27 @@ class ResourceView(Base):
         return f"ResourceView table:\n" \
                f"rid = {self.rid}, uid = {self.uid},\n" \
                f"created at = {self.created_at}"
+
+
+class ResourceThumbnail(Base):
+    """
+    A table which stores all the thumbnails of resources, which are displayed
+    in resource preview
+    """
+    __tablename__ = "resource_thumbnail"
+
+    # resource id
+    rid = Column(Integer, ForeignKey("resource.rid"), primary_key=True)
+
+    # link to thumbnail
+    thumbnail_link = Column(Text, nullable=False)
+
+    resource = relationship("Resource", foreign_keys=[rid],
+                            backref=backref("resource_thumbnail", cascade="all,delete"))
+
+    def __str__(self):
+        return f"ResourceThumbnail table:\n" \
+               f"rid = {self.rid}, thumbnail link = {self.thumbnail_link}"
 
 
 class ResourceVoteInfo(Base):
@@ -389,7 +429,7 @@ class ResourceComment(Base):
 
     # comment created time
     created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
-        tz=pytz.timezone("Australia/Brisbane")))
+        tz=pytz.timezone("Australia/Brisbane")), nullable=False)
 
     # resource to be commented
     rid = Column(Integer, ForeignKey("resource.rid"))
@@ -624,7 +664,7 @@ class ChannelPost(Base):
     init_text = Column(Text, nullable=False)
 
     created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
-        tz=pytz.timezone("Australia/Brisbane")))
+        tz=pytz.timezone("Australia/Brisbane")), nullable=False)
 
     channel = relationship("Channel", foreign_keys=[cid],
                            backref=backref("channel_post", cascade="all, delete"))
@@ -677,7 +717,7 @@ class PostComment(Base):
 
     # datetime when created
     created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
-        tz=pytz.timezone("Australia/Brisbane")))
+        tz=pytz.timezone("Australia/Brisbane")), nullable=False)
 
     # commenter id
     uid = Column(Integer, ForeignKey("user.uid"))
