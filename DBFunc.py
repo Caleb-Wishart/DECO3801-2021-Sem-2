@@ -51,7 +51,7 @@ epoch = datetime.datetime.utcfromtimestamp(0)
 
 
 # maximum time length for session without new action -- set as 30min
-USER_SESSION_EXPIRE_INTERVAL = datetime.timedelta(seconds=10)
+USER_SESSION_EXPIRE_INTERVAL = datetime.timedelta(minutes=30)
 
 
 def add_user(username, password, email, teaching_areas: dict = {},
@@ -140,9 +140,9 @@ def is_user_session_expired(uid: int):
     """
     with Session() as conn:
         user_session = conn.query(UserSession).filter_by(uid=uid).one_or_none()
-        # tz = pytz.timezone("Australia/Brisbane")
+        # NOTE: tz = pytz.timezone("Australia/Brisbane") does not work in sqlite
         current = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
-        print(f"current time = {current},last_action_time = {user_session.last_action_time}")
+        # print(f"current time = {current},last_action_time = {user_session.last_action_time}")
         return current - user_session.last_action_time > USER_SESSION_EXPIRE_INTERVAL
 
 
