@@ -1,3 +1,4 @@
+import pytz
 from flask import Flask, request, render_template, redirect, url_for, abort, flash
 import json
 from DBFunc import *
@@ -63,7 +64,10 @@ def resource(uid=None, rid=None):
         # invalid user or resource, pop 404
         abort(404, description="Invalid user or resource id")
         # return redirect(url_for('home'))
-    elif not resource_is_public(rid=rid) and not user_has_access_to_resource(uid=uid, rid=rid):
+    elif is_user_session_expired(uid=uid):
+        # user instance is expired, go back to login
+        return redirect(url_for("login"))
+    elif not is_resource_public(rid=rid) and not user_has_access_to_resource(uid=uid, rid=rid):
         # resource is private and user does not have access
         # todo: possibly a link to no access reminder page?
         abort(404, description=f"User {uid} does not have access to resource {rid}")
@@ -76,9 +80,12 @@ def resource(uid=None, rid=None):
         grade = enum_to_website_output(res.grade)
         difficulty = enum_to_website_output(res.difficulty)
 
+        # convert utc time to AEST
+        created_at = res.created_at.astimezone(pytz.timezone("Australia/Brisbane"))
+
         # FIXME: modify "base.html" webpage to resource page
         return render_template("base.html", rid=rid, rtitle=res.title,
-                               resource_link=res.resource_link, created_at=res.created_at,
+                               resource_link=res.resource_link, created_at=created_at,
                                difficulty=difficulty, subject=subject, grade=grade,
                                upvote_count=res.upvote_count, downvote_count=res.downvote_count,
                                description=res.description, uid=uid)
