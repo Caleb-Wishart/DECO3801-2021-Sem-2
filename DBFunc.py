@@ -49,9 +49,9 @@ Session = sessionmaker(engine)
 
 epoch = datetime.datetime.utcfromtimestamp(0)
 
-
+# FIXME: change this back to 30min after demo
 # maximum time length for session without new action -- set as 30min
-USER_SESSION_EXPIRE_INTERVAL = datetime.timedelta(minutes=30)
+USER_SESSION_EXPIRE_INTERVAL = datetime.timedelta(weeks=3)
 
 
 def add_user(username, password, email, teaching_areas: dict = {},

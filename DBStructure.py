@@ -34,10 +34,10 @@ STANDARD_STRING_LENGTH = 300
 # OPTIONS for DB testing:
 
 # Option 1: access psql DB and create schema using you own account in your own DB
-DBUSERNAME = "jason"#"postgres"  # change this field to your first name (all lowercase), "call me by your name"
+DBUSERNAME = "postgres"  # change this field to your first name (all lowercase), "call me by your name"
 
 DBPASSWORD = "admin"
-DBDATABASE = DBUSERNAME # "project"  # DBUSERNAME
+DBDATABASE = "project"  # DBUSERNAME
 DBPATH = f"postgresql://{DBUSERNAME}:{DBPASSWORD}@localhost/{DBDATABASE}"
 
 
