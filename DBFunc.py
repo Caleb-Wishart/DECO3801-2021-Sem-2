@@ -141,7 +141,7 @@ def is_user_session_expired(uid: int):
     with Session() as conn:
         user_session = conn.query(UserSession).filter_by(uid=uid).one_or_none()
         # NOTE: tz = pytz.timezone("Australia/Brisbane") does not work in sqlite
-        current = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
+        current = datetime.datetime.now(tz = pytz.timezone("Australia/Brisbane"))
         # print(f"current time = {current},last_action_time = {user_session.last_action_time}")
         return current - user_session.last_action_time > USER_SESSION_EXPIRE_INTERVAL
 
@@ -649,6 +649,37 @@ def reply_to_resource_comment(uid, resource_comment_id, reply):
 
         if verbose:
             print(f"user {uid} replied to resource comment {resource_comment_id}")
+
+
+def get_resource_comments(rid: int) -> list:
+    """
+    Load and returns a list of resource comments for a resource
+
+    :param rid: The resource id
+    :return a list of all comment instances to this resource, if any
+    """
+    with Session() as conn:
+        return conn.query(ResourceComment).filter_by(rid=rid).all()
+
+
+def get_resource_comment_replies(resource_comment_instance_list: list) -> dict:
+    """
+    Get a dict of resource comment replies of the form
+    resource_comment instance -> [resource_comment_reply objects with that resource_comment_id]
+
+    :param resource_comment_instance_list: The list of resource_comment instances,
+            obtained typically from get_resource_comments()
+    return a dictionary of the form
+            resource_comment instance -> [resource_comment_reply objects with that resource_comment_id]
+    """
+    out = {}
+    with Session() as conn:
+        for i in resource_comment_instance_list:
+            replies = conn.query(ResourceCommentReply).filter_by(
+                resource_comment_id=i.resource_comment_id).all()
+            if replies:
+                out[i] = replies
+        return out
 
 
 def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subject = None,

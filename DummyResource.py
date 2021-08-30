@@ -165,6 +165,12 @@ for i in range(1, 7):
     rid = globals()[f"src{i}"]
     add_pseudo_comment_to_resource(rid=rid, uid=uid1)
 
+    resource_comments = get_resource_comments(rid=rid)
+    resource_comment_replies = get_resource_comment_replies(resource_comments)
+    print(f"rid = {rid}, number of resource comment = {len(resource_comments)},"
+          f"number of resource comment replies to that comment = "
+          f"{len(resource_comment_replies)}")
+
 
 with Session() as conn:
     for i in conn.query(Resource).all():

@@ -83,12 +83,19 @@ def resource(uid=None, rid=None):
         # convert utc time to AEST
         created_at = res.created_at.astimezone(pytz.timezone("Australia/Brisbane"))
 
+        # get a list of resource_comment objects
+        resource_comment_list = get_resource_comments(rid=rid)
+        # get a dict of resource_comment instance -> resource_comment_replies instances to that comment
+        resource_comment_replies_list = get_resource_comment_replies(resource_comment_list)
+
         # FIXME: modify "base.html" webpage to resource page
         return render_template("base.html", rid=rid, rtitle=res.title,
                                resource_link=res.resource_link, created_at=created_at,
                                difficulty=difficulty, subject=subject, grade=grade,
                                upvote_count=res.upvote_count, downvote_count=res.downvote_count,
-                               description=res.description, uid=uid)
+                               description=res.description, uid=uid,
+                               resource_comment_list=resource_comment_list,
+                               resource_comment_replies_list=resource_comment_replies_list)
     elif request.method == "POST":
         # FIXME: here assume upvote and downvote are two separate buttons like Quora
         # example see https://predictivehacks.com/?all-tips=how-to-add-action-buttons-in-flask
