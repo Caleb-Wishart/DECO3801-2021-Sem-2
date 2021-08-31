@@ -20,26 +20,26 @@
 import datetime
 import enum
 
-from sqlalchemy import Column, ForeignKey, Integer, String, \
-    Text, DateTime, Numeric, Boolean, Enum
+from sqlalchemy import Column, ForeignKey, Integer, String, Text, DateTime, Numeric, Boolean, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import create_engine
 import pytz
 import base64
 
+
 # length of a standard string, use TEXT if longer than that
 STANDARD_STRING_LENGTH = 300
+
 
 # OPTIONS for DB testing:
 
 # Option 1: access psql DB and create schema using you own account in your own DB
-DBUSERNAME = "postgres"  # change this field to your first name (all lowercase), "call me by your name"
+DBUSERNAME = "call me by your name"  # change this field to your first name (all lowercase)
 
 DBPASSWORD = "admin"
-DBDATABASE = "project"  # DBUSERNAME
+DBDATABASE = DBUSERNAME
 DBPATH = f"postgresql://{DBUSERNAME}:{DBPASSWORD}@localhost/{DBDATABASE}"
-
 
 # Option 2: Feel lazy to sign in to cli? No worries, you can play these using sqlite
 
@@ -56,7 +56,6 @@ class ResourceDifficulty(enum.Enum):
     MODERATE = 1
     HARD = 2
     SPECIALIST = 3
-
 
 class Subject(enum.Enum):
     """
@@ -111,7 +110,6 @@ class Grade(enum.Enum):
     YEAR_10 = 10
     YEAR_11 = 11
     YEAR_12 = 12
-    TERTIARY = 13
 
 
 class ChannelVisibility(enum.Enum):
@@ -121,43 +119,6 @@ class ChannelVisibility(enum.Enum):
     INVITE_ONLY = 0
     FULLY_PRIVATE = 1
     PUBLIC = 2
-
-
-def enum_to_website_output(item: enum.Enum) -> str:
-    """
-    Convert an enum value to human friendly format: to lowercase, capitalize first
-    letter of each word and get rid of underscore, if any
-
-    e.g. Subject.MATHS_A -> "Maths A:
-
-    :param item: The enum item to convert
-    :return The human friendly string value of the enum item
-    """
-    name = item.name
-    if len(name) == 2:
-        # Subject.IT/PE, no need to convert to lowercase
-        return name
-    return name.lower().replace('_', ' ', 1).title()
-
-
-def website_input_to_enum(readable_string: str, enum_class: enum.Enum):
-    """
-    Convert a human readable enum value to an appropriate enum variable.
-    i.e. applicable to Subject, Grade and ChannelVisibility only
-
-    :param readable_string: The enum string value human can understand
-    :param enum_class: The class of this enum value to return
-    :return if corresponding enum variable in the nominated enum_class is found,
-            it returns it. Otherwise
-    """
-    value = readable_string.upper().replace(' ', '_', 1)
-    try:
-        return enum_class[value]
-    except KeyError:
-        # no such enum variable
-        print(f"value {readable_string} not found in enum class {enum_class}")
-        return None
-
 
 Base = declarative_base()
 
@@ -177,12 +138,9 @@ class User(Base):
     # link to avatar image
     avatar_link = Column(String(STANDARD_STRING_LENGTH), nullable=True, default=None)
 
-    # profile background link
-    profile_background_link = Column(String(STANDARD_STRING_LENGTH), nullable=True, default=None)
-
     # user account created time
-    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
-        tz=pytz.timezone("Australia/Brisbane")), nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.now(
+        tz=pytz.timezone("Australia/Brisbane")))
 
     # user password -- base64 encoded
 
@@ -202,8 +160,7 @@ class User(Base):
                f"uid = {self.uid}, username = {self.username}, created at {self.created_at},\n" \
                f"base64 password = {self.password}," \
                f" original password = {base64_to_ascii(self.password)},\n" \
-               f"honor rating = {self.user_rating}, email = {self.email}," \
-               f"profile background link = {self.profile_background_link}\nbio = {self.bio}"
+               f"honor rating = {self.user_rating}, email = {self.email},\nbio = {self.bio}"
 
 
 # The below 2 functions are used to convert password<-->base64 encrypted code
@@ -227,23 +184,6 @@ def base64_to_ascii(encoded_password: str):
     return base64.b64decode(encoded_password.encode()).decode()
 
 
-class UserSession(Base):
-    """
-    A concept of a user login session
-    """
-    __tablename__ = "user_session"
-
-    # user id
-    uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
-
-    # last action request time
-    last_action_time = Column(DateTime(timezone=True), default=datetime.datetime.now(
-        tz=pytz.timezone("Australia/Brisbane")), nullable=False)
-
-    user = relationship("User", foreign_keys=[uid],
-                        backref=backref("user_session", cascade="all, delete"))
-
-
 class UserTeachingAreas(Base):
     """
     The table specifying users' teaching areas
@@ -251,6 +191,7 @@ class UserTeachingAreas(Base):
     __tablename__ = "user_teaching_areas"
 
     # user id
+
     uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
 
     # teaching area
@@ -291,8 +232,8 @@ class Resource(Base):
     resource_link = Column(String(STANDARD_STRING_LENGTH), nullable=False)
 
     # date and time of creation
-    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
-        tz=pytz.timezone("Australia/Brisbane")), nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.now(
+        tz=pytz.timezone("Australia/Brisbane")))
 
     # difficulty of the resource
     difficulty = Column("difficulty", Enum(ResourceDifficulty), nullable=False)
@@ -306,6 +247,7 @@ class Resource(Base):
     # up/down-vote count
     upvote_count = Column(Integer, default=0, nullable=False, autoincrement=False)
     downvote_count = Column(Integer, default=0, nullable=False, autoincrement=False)
+
 
     # if the resource is public
     is_public = Column(Boolean, default=True, nullable=False)
@@ -336,8 +278,8 @@ class ResourceView(Base):
     uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
 
     # timestamp
-    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
-        tz=pytz.timezone("Australia/Brisbane")), nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.now(
+        tz=pytz.timezone("Australia/Brisbane")))
 
     user = relationship("User", foreign_keys=[uid],
                         backref=backref("resource_view", cascade="all,delete"))
@@ -350,32 +292,12 @@ class ResourceView(Base):
                f"created at = {self.created_at}"
 
 
-class ResourceThumbnail(Base):
-    """
-    A table which stores all the thumbnails of resources, which are displayed
-    in resource preview
-    """
-    __tablename__ = "resource_thumbnail"
-
-    # resource id
-    rid = Column(Integer, ForeignKey("resource.rid"), primary_key=True)
-
-    # link to thumbnail
-    thumbnail_link = Column(Text, nullable=False)
-
-    resource = relationship("Resource", foreign_keys=[rid],
-                            backref=backref("resource_thumbnail", cascade="all,delete"))
-
-    def __str__(self):
-        return f"ResourceThumbnail table:\n" \
-               f"rid = {self.rid}, thumbnail link = {self.thumbnail_link}"
-
-
 class ResourceVoteInfo(Base):
     """
     A table of vote status for user who voted on a resource
     """
     __tablename__ = "resource_vote_info"
+
 
     # user id
     uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
@@ -395,6 +317,7 @@ class ResourceVoteInfo(Base):
         return f"ResourceVoteInfo table:\n" \
                f"Voter id = {self.uid}, rid = {self.rid}, " \
                f"is_upvote = {self.is_upvote}"
+
 
 
 class ResourceCreater(Base):
@@ -419,6 +342,7 @@ class ResourceCreater(Base):
                f"creater id = {self.uid}, rid = {self.rid}"
 
 
+
 class ResourceComment(Base):
     """
     A table representing the comments of resources
@@ -432,8 +356,8 @@ class ResourceComment(Base):
     uid = Column(Integer, ForeignKey("user.uid"))
 
     # comment created time
-    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
-        tz=pytz.timezone("Australia/Brisbane")), nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.now(
+        tz=pytz.timezone("Australia/Brisbane")))
 
     # resource to be commented
     rid = Column(Integer, ForeignKey("resource.rid"))
@@ -468,7 +392,7 @@ class ResourceCommentReply(Base):
     reply = Column(Text, nullable=False)
 
     # reply time
-    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
+    created_at = Column(DateTime, default=datetime.datetime.now(
         tz=pytz.timezone("Australia/Brisbane")), primary_key=True)
 
     # replier id
@@ -486,6 +410,7 @@ class ResourceCommentReply(Base):
                f"resource_comment_id = {self.resource_comment_id}, " \
                f"replier id = {self.uid}, created_at = {self.created_at}\n" \
                f"reply = {self.reply}"
+
 
 
 class PrivateResourcePersonnel(Base):
@@ -512,6 +437,7 @@ class PrivateResourcePersonnel(Base):
                f"allowed uid = {self.uid}, rid = {self.rid}"
 
 
+
 class Tag(Base):
     """
     The table representing a set of tags available in the system
@@ -524,6 +450,7 @@ class Tag(Base):
     # name of the tag
     tag_name = Column(String(STANDARD_STRING_LENGTH), nullable=False, unique=True)
 
+
     # description of tag
     tag_description = Column(Text, default=None)
 
@@ -531,6 +458,7 @@ class Tag(Base):
         return f"Tag table:\n" \
                f"tag_id = {self.tag_id}, " \
                f"tag name = {self.tag_name}, tag id = {self.tag_id}"
+
 
 
 class ResourceTagRecord(Base):
@@ -664,11 +592,12 @@ class ChannelPost(Base):
     upvote_count = Column(Integer, default=0, nullable=False, autoincrement=False)
     downvote_count = Column(Integer, default=0, nullable=False, autoincrement=False)
 
+
     # thread initial reply
     init_text = Column(Text, nullable=False)
 
-    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
-        tz=pytz.timezone("Australia/Brisbane")), nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.now(
+        tz=pytz.timezone("Australia/Brisbane")))
 
     channel = relationship("Channel", foreign_keys=[cid],
                            backref=backref("channel_post", cascade="all, delete"))
@@ -720,8 +649,8 @@ class PostComment(Base):
     post_id = Column(Integer, ForeignKey("channel_post.post_id"))
 
     # datetime when created
-    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
-        tz=pytz.timezone("Australia/Brisbane")), nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.now(
+        tz=pytz.timezone("Australia/Brisbane")))
 
     # commenter id
     uid = Column(Integer, ForeignKey("user.uid"))
