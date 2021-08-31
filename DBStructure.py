@@ -57,7 +57,6 @@ class ResourceDifficulty(enum.Enum):
     HARD = 2
     SPECIALIST = 3
 
-
 class Subject(enum.Enum):
     """
     The set of available subject tags

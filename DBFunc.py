@@ -95,7 +95,6 @@ def add_user(username, password, email, teaching_areas: dict = {},
         conn.commit()
         return user.uid
 
-      
 def get_user(email) -> User:
     """
     Retrieve the User with the unique email as the key
@@ -128,7 +127,7 @@ def add_tag(tag_name, tag_description=None, verbose=True):
         return conn.query(Tag).filter_by(tag_name=tag_name).one().tag_id
 
 
-def get_tags():
+def get_tags() -> dict:
     """
     :return: A dictionary of mapping tag_name -> tag_id
     """

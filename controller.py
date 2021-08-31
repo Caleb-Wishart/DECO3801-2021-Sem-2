@@ -1,5 +1,8 @@
 from flask import Flask, request, render_template, redirect, url_for, abort, flash
 import json
+# If in branch use the following
+# from .DBFunc import *
+# If in main use the following
 from DBFunc import *
 
 app = Flask(__name__)
@@ -48,6 +51,7 @@ def home():
     return render_template('home.html', title='Home', name=name, data=data)
 
 
+@app.route('/resource')
 @app.route('/resource/<int:uid>/<int:rid>', methods=["GET", "POST"])
 def resource(uid=None, rid=None):
     """Page for a resource
@@ -58,6 +62,15 @@ def resource(uid=None, rid=None):
     :param rid: The resource id
     If resource or user is invalid then redirect to 404 page
     """
+    # base resource page
+    if uid is None or rid is None:
+        return render_template('resource.html',
+            title='Resources',
+            subject=[e.name for e in Subject],
+            grade=[e.name for e in Grade],
+            tag=get_tags().keys(),
+            resources=find_resources())
+    # indifivual resource page
     user, res = get_user_and_resource_instance(uid=uid, rid=rid)
     if not user or not res:
         # invalid user or resource, pop 404
@@ -96,7 +109,6 @@ def resource(uid=None, rid=None):
         # reach here a vote is made or vote is invalid, now refresh resource page
         return redirect(url_for("resource", uid=uid, rid=rid))
     return render_template('base.html', title='Register')
-
 
 @app.route('/register')
 def register():
@@ -161,6 +173,7 @@ def about():
     return render_template('about.html', title='About Us', name="About Us")
 
 
+@app.route('/create')
 @app.route('/create/<type>')
 def create(type=None):
     """The user create a resource or channel
