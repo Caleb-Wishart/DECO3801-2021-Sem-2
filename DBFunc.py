@@ -95,7 +95,6 @@ def add_user(username, password, email, teaching_areas: dict = {},
         conn.commit()
         return user.uid
 
-
 def get_user(email) -> User:
     """
     Retrieve the User with the unique email as the key

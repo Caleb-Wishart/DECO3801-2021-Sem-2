@@ -232,7 +232,6 @@ with Session() as conn:
     conn.commit()
     print(f"user {delete_uid} deleted")
 
-
     for i in conn.query(User).all():
         print(i)
 

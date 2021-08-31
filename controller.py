@@ -1,11 +1,13 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, abort, flash
 import json
 # If in branch use the following
-from .DBFunc import *
+# from .DBFunc import *
 # If in main use the following
-# from DBFunc import *
+from DBFunc import *
 
 app = Flask(__name__)
+# NOTE: added for flush() usage
+app.secret_key = "admin"
 
 
 @app.route('/')
@@ -50,24 +52,63 @@ def home():
 
 
 @app.route('/resource')
-@app.route('/resource/<id>')
-def resource(id=None):
+@app.route('/resource/<int:uid>/<int:rid>', methods=["GET", "POST"])
+def resource(uid=None, rid=None):
     """Page for a resource
 
     Shows information based on the resource type and content
 
-    If resource is none then redirect to home page
-    If not authenticated redirect to login
+    :param uid: The user id
+    :param rid: The resource id
+    If resource or user is invalid then redirect to 404 page
     """
-    # if(id == None):
-    #     return redirect(url_for('home'))
-    return render_template('resource.html',
-        title='Resources',
-        subject=[e.name for e in Subject],
-        grade=[e.name for e in Grade],
-        tag=get_tags().keys(),
-        resources=find_resources())
+    # base resource page
+    if uid is None or rid is None:
+        return render_template('resource.html',
+            title='Resources',
+            subject=[e.name for e in Subject],
+            grade=[e.name for e in Grade],
+            tag=get_tags().keys(),
+            resources=find_resources())
+    # indifivual resource page
+    user, res = get_user_and_resource_instance(uid=uid, rid=rid)
+    if not user or not res:
+        # invalid user or resource, pop 404
+        abort(404, description="Invalid user or resource id")
+        # return redirect(url_for('home'))
+    elif not resource_is_public(rid=rid) and not user_has_access_to_resource(uid=uid, rid=rid):
+        # resource is private and user does not have access
+        # todo: possibly a link to no access reminder page?
+        abort(404, description=f"User {uid} does not have access to resource {rid}")
 
+    if request.method == "GET":
+        # show resource detail
+
+        # convert to human readable form
+        subject = enum_to_website_output(res.subject)
+        grade = enum_to_website_output(res.grade)
+        difficulty = enum_to_website_output(res.difficulty)
+
+        # FIXME: modify "base.html" webpage to resource page
+        return render_template("base.html", rid=rid, rtitle=res.title,
+                               resource_link=res.resource_link, created_at=res.created_at,
+                               difficulty=difficulty, subject=subject, grade=grade,
+                               upvote_count=res.upvote_count, downvote_count=res.downvote_count,
+                               description=res.description, uid=uid)
+    elif request.method == "POST":
+        # FIXME: here assume upvote and downvote are two separate buttons like Quora
+        # example see https://predictivehacks.com/?all-tips=how-to-add-action-buttons-in-flask
+        # update do upvote/downvote
+        up, down = request.form.get("upvote"), request.form.get("downvote")
+        vote_res = vote_resource(uid=uid, rid=rid, upvote=up is not None)
+        if vote_res == ErrorCode.SAME_VOTE_TWICE:
+            # the user voted the same vote twice
+            # todo: here I do flash message, you can modify it
+            flash("Oh please don't vote the same thing twice, will ya?")
+
+        # reach here a vote is made or vote is invalid, now refresh resource page
+        return redirect(url_for("resource", uid=uid, rid=rid))
+    return render_template('base.html', title='Register')
 
 @app.route('/register')
 def register():
@@ -172,6 +213,7 @@ def forum(fName=None, tName=None):
     If tName is not valid redirect to forum page
     """
     return render_template('base.html', title='Post')
+
 
 @app.errorhandler(403)
 def page_not_found(error):
