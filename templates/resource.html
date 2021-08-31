@@ -1,5 +1,25 @@
 {% extends 'base.html' %}
 
+{% block style %}
+<style>
+    a:link {
+        text-decoration: none;
+    }
+
+    a:visited {
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: none;
+    }
+
+    a:active {
+        text-decoration: none;
+    }
+</style>
+{% endblock %}
+
 {% block script %}
 <script>
     $(function () {
@@ -113,10 +133,11 @@
                     {% for res in resources %}
                     <!-- Resource -->
                     <div class="col-4 p-2">
-                        <div class="card shadow-sm">
+                        <a class="text-dark card shadow-sm" href="{{url_for('resource', uid=1, rid=res.rid)}}">
                             <img class="bd-placeholder-img card-img-top"
                                 src="{{url_for('static', filename='img/placeholder.png')}}" , alt="Logo" , width="150" ,
                                 height="150">
+                            <!-- FIXME Change UID admin to logged in user -->
                             <div class="card-body">
                                 <p class="card-text">{{res.title}}</p>
                                 <div class="d-flex">
@@ -128,7 +149,7 @@
                                         , height="20">
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                     {% endfor %}
                 </div>

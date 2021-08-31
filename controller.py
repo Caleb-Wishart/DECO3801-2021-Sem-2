@@ -1,9 +1,9 @@
 from flask import Flask, request, render_template, redirect, url_for, abort, flash
 import json
 # If in branch use the following
-# from .DBFunc import *
+from .DBFunc import *
 # If in main use the following
-from DBFunc import *
+# from DBFunc import *
 
 app = Flask(__name__)
 # NOTE: added for flush() usage
@@ -62,12 +62,13 @@ def resource(uid=None, rid=None):
     :param rid: The resource id
     If resource or user is invalid then redirect to 404 page
     """
-    # base resource page
+    if (uid is None and rid is not None) or (uid is not None and rid is None):
+        redirect(url_for('resource'))    # base resource page
     if uid is None or rid is None:
         return render_template('resource.html',
             title='Resources',
-            subject=[e.name for e in Subject],
-            grade=[e.name for e in Grade],
+            subject=[enum_to_website_output(e) for e in Subject],
+            grade=[enum_to_website_output(e) for e in Grade],
             tag=get_tags().keys(),
             resources=find_resources())
     # indifivual resource page
@@ -75,7 +76,6 @@ def resource(uid=None, rid=None):
     if not user or not res:
         # invalid user or resource, pop 404
         abort(404, description="Invalid user or resource id")
-        # return redirect(url_for('home'))
     elif not resource_is_public(rid=rid) and not user_has_access_to_resource(uid=uid, rid=rid):
         # resource is private and user does not have access
         # todo: possibly a link to no access reminder page?
@@ -90,11 +90,13 @@ def resource(uid=None, rid=None):
         difficulty = enum_to_website_output(res.difficulty)
 
         # FIXME: modify "base.html" webpage to resource page
-        return render_template("base.html", rid=rid, rtitle=res.title,
-                               resource_link=res.resource_link, created_at=res.created_at,
-                               difficulty=difficulty, subject=subject, grade=grade,
-                               upvote_count=res.upvote_count, downvote_count=res.downvote_count,
-                               description=res.description, uid=uid)
+        # return render_template("resource_item.html", rid=rid, rtitle=res.title,
+        #                        resource_link=res.resource_link, created_at=res.created_at,
+        #                        difficulty=difficulty, subject=subject, grade=grade,
+        #                        upvote_count=res.upvote_count, downvote_count=res.downvote_count,
+        #                        description=res.description, uid=uid)
+        return render_template("resource_item.html", rid=rid, uid=uid,
+            res=res, difficulty=difficulty, subject=subject, grade=grade)
     elif request.method == "POST":
         # FIXME: here assume upvote and downvote are two separate buttons like Quora
         # example see https://predictivehacks.com/?all-tips=how-to-add-action-buttons-in-flask
