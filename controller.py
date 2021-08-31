@@ -1,5 +1,9 @@
 from flask import Flask, request, render_template, redirect, url_for
 import json
+# If in branch use the following
+from .DBFunc import *
+# If in main use the following
+# from DBFunc import *
 
 app = Flask(__name__)
 
@@ -55,10 +59,14 @@ def resource(id=None):
     If resource is none then redirect to home page
     If not authenticated redirect to login
     """
-    if(id == None):
-        return redirect(url_for('home'))
-
-    return render_template('base.html', title='Register')
+    # if(id == None):
+    #     return redirect(url_for('home'))
+    return render_template('resource.html',
+        title='Resources',
+        subject=[e.name for e in Subject],
+        grade=[e.name for e in Grade],
+        tag=get_tags().keys(),
+        resources=find_resources())
 
 
 @app.route('/register')
@@ -124,6 +132,7 @@ def about():
     return render_template('about.html', title='About Us', name="About Us")
 
 
+@app.route('/create')
 @app.route('/create/<type>')
 def create(type=None):
     """The user create a resource or channel

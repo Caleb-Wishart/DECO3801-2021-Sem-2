@@ -20,9 +20,7 @@
 import datetime
 import enum
 
-from sqlalchemy import Column, ForeignKey, Integer, String, \
-
-    Text, DateTime, Numeric, Boolean, Enum
+from sqlalchemy import Column, ForeignKey, Integer, String, Text, DateTime, Numeric, Boolean, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import create_engine
@@ -58,7 +56,6 @@ class ResourceDifficulty(enum.Enum):
     MODERATE = 1
     HARD = 2
     SPECIALIST = 3
-
 
 class Subject(enum.Enum):
     """
@@ -163,7 +160,6 @@ class User(Base):
                f"uid = {self.uid}, username = {self.username}, created at {self.created_at},\n" \
                f"base64 password = {self.password}," \
                f" original password = {base64_to_ascii(self.password)},\n" \
-
                f"honor rating = {self.user_rating}, email = {self.email},\nbio = {self.bio}"
 
 
