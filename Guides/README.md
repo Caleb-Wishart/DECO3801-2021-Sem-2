@@ -4,7 +4,7 @@ Part 1: Connecting to the UQCloud
 
 Part 2: Updating the project code
 
-Part 3: TBC
+Part 3: Debugging errors
 ___
 ## Part 1: Connecting to the UQCloud
 
@@ -86,4 +86,12 @@ git pull
 sudo refresh
 ```
 ___
-## Part 3: TBC
+## Part 3: Debugging errors
+
+The following commands are available system wide
+```bash
+refresh     # refresh the contents of the web page
+cconfig     # check the configuration of the website. Useful to debug ERROR 500 INTERNAL SERVER ERROR
+log         # open the UWSGI log in less
+gpid        # get the PID of the UWSGI parent process
+```

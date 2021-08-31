@@ -74,7 +74,6 @@ def add_user(username, password, email, teaching_areas: dict = {},
             print("This email address is registered")
             return ErrorCode.INVALID_USER
 
-
         # phase 1: add a new user
         conn.add(user)
         conn.commit()
@@ -97,8 +96,7 @@ def add_user(username, password, email, teaching_areas: dict = {},
         conn.commit()
         return user.uid
 
-
-
+      
 def get_user(email) -> User:
     """
     Retrieve the User with the unique email as the key
@@ -138,7 +136,6 @@ def get_tags():
     out = dict()
 
     with Session() as conn:
-
 
         tags = conn.query(Tag).all()
 
@@ -214,6 +211,23 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
         if verbose:
             print(f"Resource {title} added")
         return resource.rid
+
+
+def resource_is_public(rid: int):
+    """
+    Check if a resource is public
+
+    :param rid: The resource id
+    :return: True if the resource is public, False otherwise.
+             ErrorCode.INVALID_RESOURCE is resource id is invalid
+    """
+    with Session() as conn:
+        resource = conn.query(Resource).filter_by(rid=rid).one_or_none()
+
+        if not resource:
+            # resource not exist
+            return ErrorCode.INVALID_RESOURCE
+        return resource.is_public
 
 
 def modify_resource_personnel(rid, uid, modification: PersonnelModification):
@@ -336,10 +350,10 @@ def find_resources(title_type="like",title=None,
             else:
                 resources = resources.filter_by(title=title)
 
-        if created != epoch and isinstance(created,datetime):
+        if created != epoch and isinstance(created, datetime):
             if created_type == "after":
                 resources = resources.filter(Resource.created_at > created)
-           else:
+            else:
                 resources = resources.filter(Resource.created_at < created)
 
         if difficulty is not None and isinstance(difficulty,ResourceDifficulty):
@@ -364,7 +378,6 @@ def find_resources(title_type="like",title=None,
             result = filter(lambda res: user_has_access_to_resource(user.uid,res.rid),resources.all())
 
     return result
-
 
 
 def vote_resource(uid, rid, upvote=True, verbose=True):
