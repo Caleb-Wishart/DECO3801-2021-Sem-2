@@ -1,5 +1,25 @@
 {% extends 'base.html' %}
 
+{% block style %}
+<style>
+    a:link {
+        text-decoration: none;
+    }
+
+    a:visited {
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: none;
+    }
+
+    a:active {
+        text-decoration: none;
+    }
+</style>
+{% endblock %}
+
 {% block script %}
 <script>
     $(function () {
@@ -19,6 +39,7 @@
     <div class="row p-3">
         <div class="col-3">
         </div>
+        <!-- Search Bar -->
         <div class="col d-flex justify-content-md-between">
             <div class="input-group">
                 <input type="search" class="form-control" placeholder="Search">
@@ -29,9 +50,11 @@
         </div>
     </div>
     <div class="row p-3">
+        <!-- Tags section -->
         <div class="col-3">
             <p class="h3">Tags</p>
         </div>
+        <!-- Resources selection -->
         <div class="col d-flex justify-content-md-between">
             <p class="h3">Trending Resources</p>
             <div class="d-flex">
@@ -54,6 +77,7 @@
     </div>
     <div class="row p-3">
         <div class="col-3">
+            <!-- Subject selection -->
             <div class="row pe-5">
                 <div class="card">
                     <p class="h4">Subject</p>
@@ -69,6 +93,7 @@
                     </div>
                 </div>
             </div>
+            <!-- Year selection -->
             <div class="row pe-5 py-3">
                 <div class="card overflow-auto">
                     <p class="h4">Year</p>
@@ -84,6 +109,7 @@
                     </div>
                 </div>
             </div>
+            <!-- Other Tag selection -->
             <div class="row pe-5">
                 <div class="card overflow-auto">
                     <p class="h4">Other</p>
@@ -101,14 +127,17 @@
             </div>
         </div>
         <div class="col d-flex justify-content-md-between">
+            <!-- Resources top level -->
             <div class="card flex-fill">
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 p-3">
                     {% for res in resources %}
+                    <!-- Resource -->
                     <div class="col-4 p-2">
-                        <div class="card shadow-sm">
+                        <a class="text-dark card shadow-sm" href="{{url_for('resource', uid=1, rid=res.rid)}}">
                             <img class="bd-placeholder-img card-img-top"
                                 src="{{url_for('static', filename='img/placeholder.png')}}" , alt="Logo" , width="150" ,
                                 height="150">
+                            <!-- FIXME Change UID admin to logged in user -->
                             <div class="card-body">
                                 <p class="card-text">{{res.title}}</p>
                                 <div class="d-flex">
@@ -120,7 +149,7 @@
                                         , height="20">
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                     {% endfor %}
                 </div>
