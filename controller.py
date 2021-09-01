@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for, abort, flash
+from flask import Flask, request, render_template, redirect, url_for, abort, flash, Response, jsonify
 import json
 # If in branch use the following
 from .DBFunc import *
@@ -111,6 +111,12 @@ def resource(uid=None, rid=None):
         # reach here a vote is made or vote is invalid, now refresh resource page
         return redirect(url_for("resource", uid=uid, rid=rid))
     return render_template('base.html', title='Register')
+
+@app.route('/search')
+def search():
+    title = request.args.get('title')
+    return jsonify([i.serialize for i in find_resources(title=title)])
+    # return Response(json.dumps([i.serialize for i in find_resources(title=title)]),  mimetype='application/json')
 
 @app.route('/register')
 def register():
