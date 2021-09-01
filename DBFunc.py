@@ -9,7 +9,10 @@
 import enum
 
 from sqlalchemy.orm import sessionmaker
-from .DBStructure import *
+# use this in branch
+#from .DBStructure import *
+# use this in main
+from DBStructure import *
 
 
 class ErrorCode(enum.Enum):
