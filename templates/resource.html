@@ -21,7 +21,35 @@
 {% endblock %}
 
 {% block script %}
+<script type="text/template" id="resource_card">
+     <% _.each(data,  function(res) { %>
+        <!-- Resource -->
+        <div class="col-4 p-2">
+            <!-- FIXME Change UID 1 to logged in user -->
+            <a class="text-dark card shadow-sm" href="{{url_for('resource')}}/1/<%= res.rid %>">
+                <img class="bd-placeholder-img card-img-top" src="{{url_for('static', filename='img/placeholder.png')}}" ,
+                    alt="Logo" , width="150" , height="150">
+                <div class="card-body">
+                    <p class="card-text">
+                        <%= res.title %>
+                    </p>
+                    <div class="d-flex">
+                        <p class="card-text px-1">
+                            <%= res.upvote_count %>
+                        </p>
+                        <img src="{{url_for('static', filename='img/up.png')}}" , alt="Down" , width="20" , height="20">
+                        <p class="card-text px-1">
+                            <%= res.downvote_count %>
+                        </p>
+                        <img src="{{url_for('static', filename='img/down.png')}}" , alt="Down" , width="20" , height="20">
+                    </div>
+                </div>
+            </a>
+        </div>
+    <% }); %>
+</script>
 <script>
+    // DROPDOWN
     $(function () {
 
         $(".dropdown-menu a").click(function () {
@@ -30,6 +58,41 @@
             $("#dropdownMenuButton1").val($(this).text());
         });
 
+    });
+    // AJAX
+    $(document).on("keyup", "#search_content", function (e) {
+        var search_term = $('input[name=title]').val();
+        $.ajax(
+            {
+                type: "GET",
+                url: "{{url_for('search')}}",
+                data: { "title": search_term },
+                success: function (response) {
+                    $("#result").empty(); // remove current results
+                    var resource_card = _.template($("#resource_card").html());
+                    $("#result").html(resource_card({ data: response })); // set new results
+                    if (response.length == 0) {
+                        $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
+                    }
+
+                }
+            }
+        )
+    });
+    // Seed AJAX
+    $(document).ready(function () {
+        $.ajax(
+            {
+                type: "GET",
+                url: "{{url_for('search')}}",
+                data: { "title": "" },
+                success: function (response) {
+                    $("#result").empty(); // remove current results
+                    var resource_card = _.template($("#resource_card").html());
+                    $("#result").html(resource_card({ data: response })); // set new results
+                }
+            }
+        )
     });
 </script>
 {% endblock %}
@@ -42,10 +105,8 @@
         <!-- Search Bar -->
         <div class="col d-flex justify-content-md-between">
             <div class="input-group">
-                <input type="search" class="form-control" placeholder="Search">
-                <button type="button" class="btn btn-info px-5">
-                    &#128270;
-                </button>
+                <input type="search" name="title" class="form-control" placeholder="&#128270; Search"
+                    id="search_content">
             </div>
         </div>
     </div>
@@ -129,29 +190,7 @@
         <div class="col d-flex justify-content-md-between">
             <!-- Resources top level -->
             <div class="card flex-fill">
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 p-3">
-                    {% for res in resources %}
-                    <!-- Resource -->
-                    <div class="col-4 p-2">
-                        <a class="text-dark card shadow-sm" href="{{url_for('resource', uid=1, rid=res.rid)}}">
-                            <img class="bd-placeholder-img card-img-top"
-                                src="{{url_for('static', filename='img/placeholder.png')}}" , alt="Logo" , width="150" ,
-                                height="150">
-                            <!-- FIXME Change UID admin to logged in user -->
-                            <div class="card-body">
-                                <p class="card-text">{{res.title}}</p>
-                                <div class="d-flex">
-                                    <p class="card-text px-1">{{res.upvote_count}}</p>
-                                    <img src="{{url_for('static', filename='img/up.png')}}" , alt="Down" , width="20" ,
-                                        height="20">
-                                    <p class="card-text px-1">{{res.downvote_count}}</p>
-                                    <img src="{{url_for('static', filename='img/down.png')}}" , alt="Down" , width="20"
-                                        , height="20">
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                    {% endfor %}
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 p-3" id="result">
                 </div>
             </div>
         </div>

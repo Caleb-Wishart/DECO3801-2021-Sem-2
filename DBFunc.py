@@ -9,7 +9,7 @@
 import enum
 
 from sqlalchemy.orm import sessionmaker
-from DBStructure import *
+from .DBStructure import *
 
 
 class ErrorCode(enum.Enum):
@@ -292,7 +292,7 @@ def find_resources(title_type="like",title=None,
     created_type="after",created=epoch,
     difficulty=None, subject=None,
     vote_type="more",votes=None,
-    grade=None, email=None
+    grade=None, email=None, sort_by="natrual"
     ):
     """Find a resource using the specific keys.
 
@@ -327,6 +327,9 @@ def find_resources(title_type="like",title=None,
             Defaults to None.
         :param email         : The logged in users email
             Defaults to None.
+        :param sort_by         : The sort by parameter
+            Valid values are ["natural","newest","upvotes"].
+            Defaults to "natural".
     """
     # Args Checking
     if title_type not in ["like","exact"]:
@@ -335,6 +338,8 @@ def find_resources(title_type="like",title=None,
         created_type = "after"
     if vote_type not in ["more","less"]:
         vote_type = "more"
+    if sort_by not in ["Natural","newest","upvotes"]:
+        sort_by = "natural"
 
 
     with Session() as conn:
@@ -370,11 +375,20 @@ def find_resources(title_type="like",title=None,
             else:
                 resources = resources.filter(Resource.upvote_count < votes)
 
+        if sort_by != "natural":
+            if sort_by == "newest":
+                resources = resources.order_by(Resource.created_at)
+            elif sort_by == "upvotes":
+                resources = resources.order_by(Resource.upvote_count)
+
         if user is None:
             resources = resources.filter_by(is_public=True)
             result = resources.all()
         else:
             result = filter(lambda res: user_has_access_to_resource(user.uid,res.rid),resources.all())
+
+
+
 
     return result
 
