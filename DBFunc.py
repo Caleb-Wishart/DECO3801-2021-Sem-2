@@ -95,7 +95,7 @@ def add_user(username, password, email, teaching_areas: dict = {},
 
         user_session = UserSession(uid=user.uid)
         conn.add(user_session)
-        conn.commit()
+        # conn.commit()
 
         for area, info in teaching_areas.items():
             grade = None
@@ -107,6 +107,7 @@ def add_user(username, password, email, teaching_areas: dict = {},
                 new_teach_area = UserTeachingAreas(uid=user.uid, teaching_area=area,
                                                    is_public=is_public, grade=grade)
                 conn.add(new_teach_area)
+
         conn.commit()
         return user.uid
 
@@ -252,7 +253,7 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
         for i in resource_thumbnail_links:
             thumbnail = ResourceThumbnail(rid=resource.rid, thumbnail_link=i)
             conn.add(thumbnail)
-        conn.commit()
+        # conn.commit()
 
         for i in creaters_id:
             creater_instance = ResourceCreater(rid=resource.rid, uid=i)
@@ -262,19 +263,20 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
             if not is_public:
                 private_access = PrivateResourcePersonnel(rid=resource.rid, uid=i)
                 conn.add(private_access)
-        conn.commit()
+        # conn.commit()
 
         if not is_public:
             for uid in private_personnel_id:
                 private_access = PrivateResourcePersonnel(rid=resource.rid, uid=uid)
                 conn.add(private_access)
-            conn.commit()
+            # conn.commit()
 
         if tags_id:
             for i in tags_id:
                 tag_record = ResourceTagRecord(rid=resource.rid, tag_id=i)
                 conn.add(tag_record)
-                conn.commit()
+
+        conn.commit()
         if verbose:
             print(f"Resource {title} added")
         return resource.rid
@@ -338,6 +340,7 @@ def modify_resource_personnel(rid, uid, modification: PersonnelModification):
             personnel = PrivateResourcePersonnel(uid=uid, rid=rid)
             conn.add(personnel)
             msg = "added"
+
         conn.commit()
         print(f"user {uid} is {msg} from/to personnel of resource {rid}")
 
@@ -552,8 +555,6 @@ def user_viewed_resource(uid, rid):
     if isinstance(res, ErrorCode):
         return res
 
-    user, resource = res
-
     with Session() as conn:
         resource_view = ResourceView(rid=rid, uid=uid)
         conn.add(resource_view)
@@ -724,7 +725,7 @@ def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subj
         for i in tags_id:
             channel_tag_record = ChannelTagRecord(tag_id=i, cid=channel.cid)
             conn.add(channel_tag_record)
-        conn.commit()
+        # conn.commit()
 
         if visibility != ChannelVisibility.PUBLIC:
             # add admin to personnel
@@ -733,7 +734,8 @@ def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subj
             for i in personnel_id:
                 personnel = ChannelPersonnel(cid=channel.cid, uid=i)
                 conn.add(personnel)
-            conn.commit()
+
+        conn.commit()
 
         if verbose:
             print(f"Channel {name} created")
@@ -775,6 +777,7 @@ def modify_channel_personnel(uid, cid, modification: PersonnelModification):
             personnel = ChannelPersonnel(cid=cid, uid=uid)
             conn.add(personnel)
             msg = "created"
+
         conn.commit()
         if verbose:
             print(f"user {uid} is {msg} from/to personnel of channel {cid}")
