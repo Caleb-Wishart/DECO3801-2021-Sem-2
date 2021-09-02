@@ -9,6 +9,9 @@
 import enum
 
 from sqlalchemy.orm import sessionmaker
+# use this in branch
+#from .DBStructure import *
+# use this in main
 from DBStructure import *
 
 # define if you want method output messages for debugging
@@ -112,7 +115,7 @@ def add_user(username, password, email, teaching_areas: dict = {},
         return user.uid
 
 
-def get_user_by_email(email):
+def get_user(email) -> User:
     """
     Retrieve the User with the unique email as the key
 
@@ -194,7 +197,7 @@ def add_tag(tag_name, tag_description=None):
         return conn.query(Tag).filter_by(tag_name=tag_name).one().tag_id
 
 
-def get_tags():
+def get_tags() -> dict:
     """
     :return: A dictionary of mapping tag_name -> tag_id
     """
@@ -374,12 +377,12 @@ def user_has_access_to_resource(uid, rid):
                    one_or_none() is not None
 
 
-def find_resources(title_type="like", title=None,
-                   created_type="after", created=epoch,
-                   difficulty=None, subject=None,
-                   vote_type="more", votes=None,
-                   grade=None, email=None
-                   ):
+def find_resources(title_type="like",title=None,
+    created_type="after",created=epoch,
+    difficulty=None, subject=None,
+    vote_type="more",votes=None,
+    grade=None, email=None, sort_by="natrual"
+    ):
     """Find a resource using the specific keys.
 
         If any param does not fall into the valid values the default will be
@@ -413,6 +416,9 @@ def find_resources(title_type="like", title=None,
             Defaults to None.
         :param email         : The logged in users email
             Defaults to None.
+        :param sort_by         : The sort by parameter
+            Valid values are ["natural","newest","upvotes"].
+            Defaults to "natural".
     """
     # Args Checking
     if title_type not in ["like", "exact"]:
@@ -421,6 +427,8 @@ def find_resources(title_type="like", title=None,
         created_type = "after"
     if vote_type not in ["more", "less"]:
         vote_type = "more"
+    if sort_by not in ["Natural","newest","upvotes"]:
+        sort_by = "natural"
 
     with Session() as conn:
         # get User if exists
@@ -455,11 +463,20 @@ def find_resources(title_type="like", title=None,
             else:
                 resources = resources.filter(Resource.upvote_count < votes)
 
+        if sort_by != "natural":
+            if sort_by == "newest":
+                resources = resources.order_by(Resource.created_at)
+            elif sort_by == "upvotes":
+                resources = resources.order_by(Resource.upvote_count)
+
         if user is None:
             resources = resources.filter_by(is_public=True)
             result = resources.all()
         else:
             result = filter(lambda res: user_has_access_to_resource(user.uid, res.rid), resources.all())
+
+
+
 
     return result
 
