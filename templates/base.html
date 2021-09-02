@@ -50,8 +50,7 @@
                 </a>
 
                 <!-- Links for the web page -->
-                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                    <li><a href="{{url_for('home')}}" class="h4 nav-link px-4 pt-3  text-dark">Home</a></li>
+                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0" style="padding-left: 6rem!important">
                     <li><a href="{{url_for('resource')}}" class="h4 nav-link px-4 pt-3 text-dark">Resources</a></li>
                     <li><a href="{{url_for('about')}}" class="h4 nav-link px-4 pt-3 text-dark">About</a></li>
                     <li><a href="{{url_for('forum')}}" class="h4 nav-link px-4 pt-3 text-dark">Forum</a></li>
@@ -62,8 +61,8 @@
                 <!-- Changle link to profile or login if not logged in -->
                 <a class="navbar-brand" href="{{url_for('profile')}}"
                     class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-                    <img src="{{url_for('static', filename='img/default_profile.png')}}" , alt="profile" , width="55" ,
-                        height="55">
+                    <img src="{{url_for('static', filename='img/default_profile.png')}}" , alt="profile" , width="40" ,
+                        height="40">
                 </a>
             </div>
         </div>
