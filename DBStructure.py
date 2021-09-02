@@ -133,7 +133,11 @@ def enum_to_website_output(item: enum.Enum) -> str:
     :param item: The enum item to convert
     :return The human friendly string value of the enum item
     """
-    return item.name.lower().replace('_', ' ', 1).title()
+    name = item.name
+    if len(name) == 2:
+        # Subject.IT/PE, no need to convert to lowercase
+        return name
+    return name.lower().replace('_', ' ', 1).title()
 
 
 def website_input_to_enum(readable_string: str, enum_class: enum.Enum):
