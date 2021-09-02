@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block style %}
+<style>
+    .avatar {
+        vertical-align: middle;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="container">
+    <div class="row p-3">
+        <!-- Resource Thumbnail -->
+        <div class="col d-flex">
+            <div class="card">
+                <img src="{{url_for('static', filename='img/placeholder.png')}}" , alt="Logo" , width="900" ,
+                    height="200">
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="card">
+                <button class="btn btn-info">&#10730; Download</button>
+                <p><small>Redirects to download page<br>PDF (Approx 2MB)</small></p>
+                <br>
+                <button class="btn btn-info">&#9998; Annotate</button>
+                <br>
+                <p><strong>Subject: </strong>{{subject}}</p>
+                <p><strong>Year Level: </strong>{{grade}}</p>
+            </div>
+        </div>
+    </div>
+    <div class="row p-3">
+        <p class="h3">{{res.title}}</p>
+        <div class="d-flex">
+            <p><strong>Rating: </strong></p>
+            <p class="card-text px-1">{{res.upvote_count}}</p>
+            <img src="{{url_for('static', filename='img/up.png')}}" , alt="Down" , width="20" , height="20">
+            <p class="card-text px-1">{{res.downvote_count}}</p>
+            <img src="{{url_for('static', filename='img/down.png')}}" , alt="Down" , width="20" , height="20">
+        </div>
+        <p><strong>Public: </strong>{{res.is_public}}</p>
+        <p><strong>Tags: </strong>[Tags go here]</p>
+    </div>
+    <div class="row p-3">
+        <div class="card">
+            <p class="card-title">Description</p>
+            <div class="card-body">
+                <p>{{res.description}}</p>
+                <hr class="px-3">
+            </div>
+            <p class="card-title">Author</p>
+            <div class="card-body">
+                <img class="avatar" src="{{url_for('static', filename='img/placeholder.png')}}" , alt="Logo">
+                <p class="h6">[Author Name]</p>
+                <p><small>[Author Bio]</small></p>
+            </div>
+        </div>
+    </div>
+    <div class="row p-3">
+        <div class="card">
+            <p class="card-title">Comments</p>
+            <p>[Comments go here]</p>
+            {% for comm in comment %}
+            <div class="card-body">
+                <div class="row p-3">
+                    <div class="col d-flex">
+                        <img class="avatar" src="{{url_for('static', filename='img/placeholder.png')}}" , alt="Logo">
+                    </div>
+                    <div class="col">
+                        <p class="h5">[Author Name]</p>
+                        <p>[Comment content]</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

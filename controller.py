@@ -1,8 +1,15 @@
 from random import choice
 from string import hexdigits
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, abort, flash, Response, jsonify
 import json
+# If in branch use the following
+# from .DBFunc import *
+# If in main use the following
+from DBFunc import *
+
 app = Flask(__name__)
+# NOTE: added for flush() usage
+app.secret_key = "admin"
 
 
 @app.route('/')
@@ -45,21 +52,73 @@ def home():
 
     return render_template('home.html', title='Home', name=name, data=data)
 
+
 @app.route('/resource')
-@app.route('/resource/<id>')
-def resource(id=None):
+@app.route('/resource/<int:uid>/<int:rid>', methods=["GET", "POST"])
+def resource(uid=None, rid=None):
     """Page for a resource
 
     Shows information based on the resource type and content
 
-    If resource is none then redirect to home page
-    If not authenticated redirect to login
+    :param uid: The user id
+    :param rid: The resource id
+    If resource or user is invalid then redirect to 404 page
     """
-    if(id == None):
-        return redirect(url_for('home'))
+    if (uid is None and rid is not None) or (uid is not None and rid is None):
+        redirect(url_for('resource'))    # base resource page
+    if uid is None or rid is None:
+        return render_template('resource.html',
+            title='Resources',
+            subject=[enum_to_website_output(e) for e in Subject],
+            grade=[enum_to_website_output(e) for e in Grade],
+            tag=get_tags().keys(),
+            resources=find_resources())
+    # indifivual resource page
+    user, res = get_user_and_resource_instance(uid=uid, rid=rid)
+    if not user or not res:
+        # invalid user or resource, pop 404
+        abort(404, description="Invalid user or resource id")
+    elif not resource_is_public(rid=rid) and not user_has_access_to_resource(uid=uid, rid=rid):
+        # resource is private and user does not have access
+        # todo: possibly a link to no access reminder page?
+        abort(404, description=f"User {uid} does not have access to resource {rid}")
 
+    if request.method == "GET":
+        # show resource detail
+
+        # convert to human readable form
+        subject = enum_to_website_output(res.subject)
+        grade = enum_to_website_output(res.grade)
+        difficulty = enum_to_website_output(res.difficulty)
+
+        # FIXME: modify "base.html" webpage to resource page
+        # return render_template("resource_item.html", rid=rid, rtitle=res.title,
+        #                        resource_link=res.resource_link, created_at=res.created_at,
+        #                        difficulty=difficulty, subject=subject, grade=grade,
+        #                        upvote_count=res.upvote_count, downvote_count=res.downvote_count,
+        #                        description=res.description, uid=uid)
+        return render_template("resource_item.html", rid=rid, uid=uid,
+            res=res, difficulty=difficulty, subject=subject, grade=grade)
+    elif request.method == "POST":
+        # FIXME: here assume upvote and downvote are two separate buttons like Quora
+        # example see https://predictivehacks.com/?all-tips=how-to-add-action-buttons-in-flask
+        # update do upvote/downvote
+        up, down = request.form.get("upvote"), request.form.get("downvote")
+        vote_res = vote_resource(uid=uid, rid=rid, upvote=up is not None)
+        if vote_res == ErrorCode.SAME_VOTE_TWICE:
+            # the user voted the same vote twice
+            # todo: here I do flash message, you can modify it
+            flash("Oh please don't vote the same thing twice, will ya?")
+
+        # reach here a vote is made or vote is invalid, now refresh resource page
+        return redirect(url_for("resource", uid=uid, rid=rid))
     return render_template('base.html', title='Register')
 
+@app.route('/search')
+def search():
+    title = request.args.get('title')
+    return jsonify([i.serialize for i in find_resources(title=title)])
+    # return Response(json.dumps([i.serialize for i in find_resources(title=title)]),  mimetype='application/json')
 
 @app.route('/register')
 def register():
@@ -151,7 +210,6 @@ def forum(fName=None, tName=None):
     The home forum page (fName == None, tName == None) shows the list of forums
     Allows user to create a channel etc.
 
-
     The forum/fName page shows the threads in that forum
     Allows users to add threads to the forum
 
@@ -174,7 +232,6 @@ def forum(fName=None, tName=None):
 def page_not_found(error):
     """Page shown with a HTML 403 status"""
     return render_template('errors/error_403.html'), 403
-
 
 @app.errorhandler(404)
 def page_not_found(error):
