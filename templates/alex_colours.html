@@ -4,8 +4,8 @@
 {% block style %}
     <style>
     .square {
-        height: 200px;
-        width: 200px;
+        height: 500px;
+        width: 500px;
         background-color:#{{ colour }};
     }
     </style>
@@ -13,6 +13,11 @@
 
 {% block content %}
     <a href = "{{url_for('change_colours') }}" alt = {{colour}}>
-        <div class="square" alt={{colour}}></div>
+        <div class="square" alt={{colour}}>
+            <iframe width="500" height="282" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
     </a>
+    
+    
 {% endblock %}
+
