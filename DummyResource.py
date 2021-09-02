@@ -5,10 +5,32 @@
 ###############################################################################
 from DBStructure import *
 from DBFunc import *
+from random import choice
 
 engine = create_engine(DBPATH)
 
 Session = sessionmaker(engine)
+
+# get a list of random sentences from Harvard sentences
+random_comments = []
+with open("./static/files_for_testing/harvard-sentences.txt", "r") as fp:
+    for i in fp.readlines():
+        if not i.startswith("#"):
+            sentence = i.rstrip("\n")
+            random_comments.append(sentence)
+
+
+def add_pseudo_comment_to_resource(rid: int, uid: int):
+    """
+    For an rid give, add a comment followed by a reply to it to this resource
+    """
+    comment_id = comment_to_resource(uid=uid, rid=rid, comment=choice(random_comments))
+
+    reply_to_resource_comment(uid=uid, resource_comment_id=comment_id,
+                              reply=choice(random_comments))
+
+    print(f"comment and comment reply to resource {rid} added")
+
 
 # test user 1
 teaching_areas = {Subject.MATHS_A: [True], Subject.CHEMISTRY: [True], Subject.ENGLISH: [True]}
@@ -19,7 +41,7 @@ uid1 = add_user(username="Ashley Gibbons", password="123456", email="a.gibbsons@
                     " 4 years and honestly I wanna leave. But I am stuck while I pay for"
                     " the bills while fucking Harold spends all our money on the Pokies"
                     "Yall will see contents I uploaded not just restrict to Math, but"
-                    "a little of this and a little of that. Don't ask why. I need that money!",
+                    "a little bit of this and a little bit of that. Don't ask why. I need that money!",
                 teaching_areas=teaching_areas)
 
 # add tag
@@ -138,17 +160,39 @@ src6 = add_resource(title="4th Grade Math Input-Output Tables",
                                 " or numerical expressions. Two examples are given"
                                 " in the video.")
 
+# add comments and comment replies to each src above
+for i in range(1, 7):
+    rid = globals()[f"src{i}"]
+    add_pseudo_comment_to_resource(rid=rid, uid=uid1)
+
+    resource_comments = get_resource_comments(rid=rid)
+    resource_comment_replies = get_resource_comment_replies(resource_comments)
+    print(f"rid = {rid}, number of resource comment = {len(resource_comments)},"
+          f"number of resource comment replies to that comment = "
+          f"{len(resource_comment_replies)}")
+
+
 with Session() as conn:
     for i in conn.query(Resource).all():
         print(i)
+    print("\n")
 
     for i in conn.query(ResourceTagRecord).all():
         print(i)
+    print("\n")
 
     for i in conn.query(PrivateResourcePersonnel).all():
         print(i)
+    print("\n")
 
     for i in conn.query(ResourceCreater).all():
         print(i)
+    print("\n")
 
-print("\n")
+    for i in conn.query(ResourceComment).all():
+        print(i)
+    print("\n")
+
+    for i in conn.query(ResourceCommentReply).all():
+        print(i)
+
