@@ -57,6 +57,7 @@ class ResourceDifficulty(enum.Enum):
     HARD = 2
     SPECIALIST = 3
 
+
 class Subject(enum.Enum):
     """
     The set of available subject tags
@@ -157,11 +158,13 @@ def website_input_to_enum(readable_string: str, enum_class: enum.Enum):
         print(f"value {readable_string} not found in enum class {enum_class}")
         return None
 
+
 def dump_datetime(value):
     """Deserialize datetime object into string form for JSON processing."""
     if value is None:
         return None
     return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")]
+
 
 Base = declarative_base()
 
@@ -330,17 +333,17 @@ class Resource(Base):
     def serialize(self):
         """Return object data in serialisable format """
         return {
-                "rid" : self.rid,
-                "title" : self.title,
-                "resource_link": self.resource_link,
-                "created_at" : dump_datetime(self.created_at),
-                "grade" : self.grade.name,
-                "difficulty" : self.difficulty.name,
-                "upvote_count" : self.upvote_count,
-                "downvote_count" : self.downvote_count,
-                "is_public" : self.is_public,
-                "description" : self.description
-               }
+            "rid": self.rid,
+            "title": self.title,
+            "resource_link": self.resource_link,
+            "created_at": dump_datetime(self.created_at),
+            "grade": self.grade.name,
+            "difficulty": self.difficulty.name,
+            "upvote_count": self.upvote_count,
+            "downvote_count": self.downvote_count,
+            "is_public": self.is_public,
+            "description": self.description
+        }
 
 
 class ResourceView(Base):

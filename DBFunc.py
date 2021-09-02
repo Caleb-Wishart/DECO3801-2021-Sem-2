@@ -10,7 +10,7 @@ import enum
 
 from sqlalchemy.orm import sessionmaker
 # use this in branch
-#from .DBStructure import *
+# from .DBStructure import *
 # use this in main
 from DBStructure import *
 
@@ -115,7 +115,7 @@ def add_user(username, password, email, teaching_areas: dict = {},
         return user.uid
 
 
-def get_user(email) -> User:
+def get_user(email):
     """
     Retrieve the User with the unique email as the key
 
@@ -145,7 +145,7 @@ def is_user_session_expired(uid: int):
     with Session() as conn:
         user_session = conn.query(UserSession).filter_by(uid=uid).one_or_none()
         # NOTE: tz = pytz.timezone("Australia/Brisbane") does not work in sqlite
-        current = datetime.datetime.now(tz = pytz.timezone("Australia/Brisbane"))
+        current = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
         # print(f"current time = {current},last_action_time = {user_session.last_action_time}")
         return current - user_session.last_action_time > USER_SESSION_EXPIRE_INTERVAL
 
@@ -173,7 +173,7 @@ def renew_user_session(uid: int):
             user_session = UserSession(uid=uid)
         else:
             user_session.last_action_time = datetime.datetime.now(
-                    tz=pytz.timezone("Australia/Brisbane"))
+                tz=pytz.timezone("Australia/Brisbane"))
         conn.add(user_session)
         conn.commit()
         if verbose:
@@ -377,12 +377,12 @@ def user_has_access_to_resource(uid, rid):
                    one_or_none() is not None
 
 
-def find_resources(title_type="like",title=None,
-    created_type="after",created=epoch,
-    difficulty=None, subject=None,
-    vote_type="more",votes=None,
-    grade=None, email=None, sort_by="natrual"
-    ):
+def find_resources(title_type="like", title=None,
+                   created_type="after", created=epoch,
+                   difficulty=None, subject=None,
+                   vote_type="more", votes=None,
+                   grade=None, email=None, sort_by="natrual"
+                   ):
     """Find a resource using the specific keys.
 
         If any param does not fall into the valid values the default will be
@@ -427,7 +427,7 @@ def find_resources(title_type="like",title=None,
         created_type = "after"
     if vote_type not in ["more", "less"]:
         vote_type = "more"
-    if sort_by not in ["Natural","newest","upvotes"]:
+    if sort_by not in ["Natural", "newest", "upvotes"]:
         sort_by = "natural"
 
     with Session() as conn:
@@ -474,9 +474,6 @@ def find_resources(title_type="like",title=None,
             result = resources.all()
         else:
             result = filter(lambda res: user_has_access_to_resource(user.uid, res.rid), resources.all())
-
-
-
 
     return result
 
