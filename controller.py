@@ -190,17 +190,19 @@ def page_not_found(error):
     mystery = oof + secrets
     return render_template("big_daddy_has_arrived.html", hohyeah=mystery, problem="Solved?")
 
-"""
-This page simply shows a coloured square
-The colour of the square is random unless a <hex> value is chosen
-in the URL. Clicking the square will refresh the page and change
-it to a random new colour
 
-<hex> : a six-digit hexadecimal code that picks the colour of the square
-"""
-@app.route("/alex_test")
-@app.route("/alex_test/<hex>")
+@app.route("/colours")
+@app.route("/colours/<hex>")
 def change_colours(hex=None):
+    """
+    This page simply shows a coloured square
+    The colour of the square is random unless a <hex> value is chosen
+    in the URL. Clicking the square will refresh the page and change
+    it to a random new colour
+
+    <hex> : a six-digit hexadecimal code that picks the colour of the square
+    """
+
     #check if any inputted hex code is valid
     if (hex != None) and (len(hex) != 6 or 
         any(c not in hexdigits for c in hex)):
