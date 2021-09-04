@@ -53,9 +53,8 @@ Session = sessionmaker(engine)
 
 epoch = datetime.datetime.utcfromtimestamp(0)
 
-# FIXME: change this back to 30min after demo
 # maximum time length for session without new action -- set as 30min
-USER_SESSION_EXPIRE_INTERVAL = datetime.timedelta(weeks=10)
+# USER_SESSION_EXPIRE_INTERVAL = datetime.timedelta(weeks=10)
 
 
 def add_user(username, password, email, teaching_areas: dict = {},
@@ -98,8 +97,8 @@ def add_user(username, password, email, teaching_areas: dict = {},
         # then update teaching_areas table
         user = conn.query(User).filter_by(email=email).one()
 
-        user_session = UserSession(uid=user.uid)
-        conn.add(user_session)
+        # user_session = UserSession(uid=user.uid)
+        # conn.add(user_session)
         # conn.commit()
 
         for area, info in teaching_areas.items():
@@ -137,49 +136,49 @@ def get_user(email):
         return ErrorCode.INVALID_USER
 
 
-def is_user_session_expired(uid: int):
-    """
-    Check if a user session is expired
+# def is_user_session_expired(uid: int):
+#     """
+#     Check if a user session is expired
+#
+#     :param uid: The user id to check
+#     :return True if the session is expired, False otherwise
+#     """
+#     with Session() as conn:
+#         user_session = conn.query(UserSession).filter_by(uid=uid).one_or_none()
+#         # NOTE: tz = pytz.timezone("Australia/Brisbane") does not work in sqlite
+#         current = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
+#         # print(f"current time = {current},last_action_time = {user_session.last_action_time}")
+#         return current - user_session.last_action_time > USER_SESSION_EXPIRE_INTERVAL
 
-    :param uid: The user id to check
-    :return True if the session is expired, False otherwise
-    """
-    with Session() as conn:
-        user_session = conn.query(UserSession).filter_by(uid=uid).one_or_none()
-        # NOTE: tz = pytz.timezone("Australia/Brisbane") does not work in sqlite
-        current = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
-        # print(f"current time = {current},last_action_time = {user_session.last_action_time}")
-        return current - user_session.last_action_time > USER_SESSION_EXPIRE_INTERVAL
 
-
-def renew_user_session(uid: int):
-    """
-    Create a new session instance in Session table, if not exists;
-    otherwise, update last_action_time to current datetime
-
-    Call this when user sign in or a function requires uid and is_user_session_expired()
-    is false
-
-    :param uid: effective user id
-    :return on success, None is returned.
-            If uid does not exist, it returns ErrorCode.INVALID_USER
-    """
-    with Session() as conn:
-        user = conn.query(User).filter_by(uid=uid).one_or_none()
-        if not user:
-            print(f"user {uid} does not exists")
-            return ErrorCode.INVALID_USER
-
-        user_session = conn.query(UserSession).filter_by(uid=uid).one_or_none()
-        if not user_session:
-            user_session = UserSession(uid=uid)
-        else:
-            user_session.last_action_time = datetime.datetime.now(
-                tz=pytz.timezone("Australia/Brisbane"))
-        conn.add(user_session)
-        conn.commit()
-        if verbose:
-            print(f"user {uid} last action time updated")
+# def renew_user_session(uid: int):
+#     """
+#     Create a new session instance in Session table, if not exists;
+#     otherwise, update last_action_time to current datetime
+#
+#     Call this when user sign in or a function requires uid and is_user_session_expired()
+#     is false
+#
+#     :param uid: effective user id
+#     :return on success, None is returned.
+#             If uid does not exist, it returns ErrorCode.INVALID_USER
+#     """
+#     with Session() as conn:
+#         user = conn.query(User).filter_by(uid=uid).one_or_none()
+#         if not user:
+#             print(f"user {uid} does not exists")
+#             return ErrorCode.INVALID_USER
+#
+#         user_session = conn.query(UserSession).filter_by(uid=uid).one_or_none()
+#         if not user_session:
+#             user_session = UserSession(uid=uid)
+#         else:
+#             user_session.last_action_time = datetime.datetime.now(
+#                 tz=pytz.timezone("Australia/Brisbane"))
+#         conn.add(user_session)
+#         conn.commit()
+#         if verbose:
+#             print(f"user {uid} last action time updated")
 
 
 def add_tag(tag_name, tag_description=None):
@@ -325,10 +324,10 @@ def modify_resource_personnel(rid, uid, modification: PersonnelModification):
         return ErrorCode.INVALID_RESOURCE
 
     # check user session and renew
-    if is_user_session_expired(uid):
-        print("User session expired")
-        return ErrorCode.USER_SESSION_EXPIRED
-    renew_user_session(uid)
+    # if is_user_session_expired(uid):
+    #     print("User session expired")
+    #     return ErrorCode.USER_SESSION_EXPIRED
+    # renew_user_session(uid)
 
     with Session() as conn:
         if modification == PersonnelModification.PERSONNEL_DELETE:
@@ -369,10 +368,10 @@ def user_has_access_to_resource(uid, rid):
         return ErrorCode.INVALID_RESOURCE
 
     # check user session and renew
-    if is_user_session_expired(uid):
-        print("User session expired")
-        return ErrorCode.USER_SESSION_EXPIRED
-    renew_user_session(uid)
+    # if is_user_session_expired(uid):
+    #     print("User session expired")
+    #     return ErrorCode.USER_SESSION_EXPIRED
+    # renew_user_session(uid)
 
     with Session() as conn:
         return conn.query(PrivateResourcePersonnel).filter_by(uid=uid, rid=rid). \
@@ -597,10 +596,10 @@ def check_user_and_resource_validity_and_renew_user_session(uid, rid):
         return ErrorCode.INVALID_USER
 
     # check user session and renew
-    if is_user_session_expired(uid):
-        print("User session expired")
-        return ErrorCode.USER_SESSION_EXPIRED
-    renew_user_session(uid)
+    # if is_user_session_expired(uid):
+    #     print("User session expired")
+    #     return ErrorCode.USER_SESSION_EXPIRED
+    # renew_user_session(uid)
 
     return user, resource
 
@@ -654,10 +653,10 @@ def reply_to_resource_comment(uid, resource_comment_id, reply):
             return ErrorCode.INVALID_USER
 
         # check user session and renew
-        if is_user_session_expired(uid):
-            print("User session expired")
-            return ErrorCode.USER_SESSION_EXPIRED
-        renew_user_session(uid)
+        # if is_user_session_expired(uid):
+        #     print("User session expired")
+        #     return ErrorCode.USER_SESSION_EXPIRED
+        # renew_user_session(uid)
 
         reply_to_comment = ResourceCommentReply(resource_comment_id=resource_comment_id,
                                                 reply=reply, uid=uid)
@@ -725,10 +724,10 @@ def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subj
             return ErrorCode.INVALID_USER
 
         # check user session and renew
-        if is_user_session_expired(admin_uid):
-            print("User session expired")
-            return ErrorCode.USER_SESSION_EXPIRED
-        renew_user_session(admin_uid)
+        # if is_user_session_expired(admin_uid):
+        #     print("User session expired")
+        #     return ErrorCode.USER_SESSION_EXPIRED
+        # renew_user_session(admin_uid)
 
         # phase 1: create instance
         channel = Channel(name=name, visibility=visibility, admin_uid=admin_uid,
@@ -816,10 +815,10 @@ def user_has_access_to_channel(uid, cid):
             return ErrorCode.INVALID_USER
 
         # check user session and renew
-        if is_user_session_expired(uid):
-            print("User session expired")
-            return ErrorCode.USER_SESSION_EXPIRED
-        renew_user_session(uid)
+        # if is_user_session_expired(uid):
+        #     print("User session expired")
+        #     return ErrorCode.USER_SESSION_EXPIRED
+        # renew_user_session(uid)
 
         channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
         if not channel or channel.visibility == ChannelVisibility.PUBLIC:
@@ -858,10 +857,10 @@ def post_on_channel(uid, title, text, channel_name=None, cid=None):
             return ErrorCode.INVALID_USER
 
         # check user session and renew
-        if is_user_session_expired(uid):
-            print("User session expired")
-            return ErrorCode.USER_SESSION_EXPIRED
-        renew_user_session(uid)
+        # if is_user_session_expired(uid):
+        #     print("User session expired")
+        #     return ErrorCode.USER_SESSION_EXPIRED
+        # renew_user_session(uid)
 
         if cid:
             channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
@@ -912,10 +911,10 @@ def comment_to_channel_post(uid, post_id, text):
             return ErrorCode.INVALID_POST
 
         # check user session and renew
-        if is_user_session_expired(uid):
-            print("User session expired")
-            return ErrorCode.USER_SESSION_EXPIRED
-        renew_user_session(uid)
+        # if is_user_session_expired(uid):
+        #     print("User session expired")
+        #     return ErrorCode.USER_SESSION_EXPIRED
+        # renew_user_session(uid)
 
         created_at = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
         post_comment = PostComment(post_id=post_id, uid=uid, created_at=created_at,
@@ -955,10 +954,10 @@ def vote_channel_post(uid, post_id, upvote=True):
             return ErrorCode.INVALID_POST
 
         # check user session and renew
-        if is_user_session_expired(uid):
-            print("User session expired")
-            return ErrorCode.USER_SESSION_EXPIRED
-        renew_user_session(uid)
+        # if is_user_session_expired(uid):
+        #     print("User session expired")
+        #     return ErrorCode.USER_SESSION_EXPIRED
+        # renew_user_session(uid)
 
         # try to find if there is an entry in vote_info
         vote = conn.query(ChannelPostVoteInfo).filter_by(uid=uid, post_id=post_id).one_or_none()
