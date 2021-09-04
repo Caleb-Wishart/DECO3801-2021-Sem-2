@@ -191,9 +191,8 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
         tz=pytz.timezone("Australia/Brisbane")), nullable=False)
 
-    # user password -- base64 encoded
-
-    password = Column(Text, nullable=False)
+    # user hash_password -- sha256 encoded
+    hash_password = Column(Text, nullable=False)
 
     # user honor rating
     user_rating = Column(Numeric, default=0)
@@ -207,31 +206,9 @@ class User(Base):
     def __str__(self):
         return f"User table:\n" \
                f"uid = {self.uid}, username = {self.username}, created at {self.created_at},\n" \
-               f"base64 password = {self.password}," \
-               f" original password = {base64_to_ascii(self.password)},\n" \
+               f"sha256 password = {self.password}," \
                f"honor rating = {self.user_rating}, email = {self.email}," \
                f"profile background link = {self.profile_background_link}\nbio = {self.bio}"
-
-
-# The below 2 functions are used to convert password<-->base64 encrypted code
-def ascii_to_base64(password: str):
-    """
-    A function to turn explicit password string to base64 encoding string
-
-    :param password: The password string to be encoded
-    :return:The base64 encoded password string
-    """
-    return base64.b64encode(password.encode()).decode()
-
-
-def base64_to_ascii(encoded_password: str):
-    """
-    Turn base64 encoded string back to human readable format
-
-    :param encoded_password: The base64 encoded string
-    :return: Human readable password string
-    """
-    return base64.b64decode(encoded_password.encode()).decode()
 
 
 class UserSession(Base):

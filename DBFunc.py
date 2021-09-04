@@ -13,6 +13,7 @@ from sqlalchemy.orm import sessionmaker
 # from .DBStructure import *
 # use this in main
 from DBStructure import *
+from werkzeug.security import generate_password_hash
 
 # define if you want method output messages for debugging
 verbose = True
@@ -66,7 +67,7 @@ def add_user(username, password, email, teaching_areas: dict = {},
     :param username: username
     :param avatar_link: The link to avatar, default is null
     :param profile_background_link: The link of profile background, default is null
-    :param password: The password of new user
+    :param password: The original password of new user
     :param bio: The bio of new user
     :param email: The email address of that user. This field is unique for each user.
     :param teaching_areas: Mapping of teaching area - [is_public, grade (optional)] list
@@ -76,9 +77,10 @@ def add_user(username, password, email, teaching_areas: dict = {},
 
     """
     email = email.lower()
-    user = User(username=username, avatar_link=avatar_link, password=ascii_to_base64(password),
+    user = User(username=username, avatar_link=avatar_link,
+                hash_password=generate_password_hash(password, "sha256"),
                 email=email, created_at=datetime.datetime.now(
-            tz=pytz.timezone("Australia/Brisbane")), bio=bio,
+                    tz=pytz.timezone("Australia/Brisbane")), bio=bio,
                 profile_background_link=profile_background_link)
 
     with Session() as conn:
