@@ -71,7 +71,7 @@ def resource(uid=None, rid=None):
                                grade=[enum_to_website_output(e) for e in Grade],
                                tag=get_tags().keys(),
                                resources=find_resources())
-    # indifivual resource page
+    # individual resource page
     user, res = get_user_and_resource_instance(uid=uid, rid=rid)
     if not user or not res:
         # invalid user or resource, pop 404
