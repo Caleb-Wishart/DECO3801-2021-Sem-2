@@ -206,7 +206,7 @@ class User(Base):
     def __str__(self):
         return f"User table:\n" \
                f"uid = {self.uid}, username = {self.username}, created at {self.created_at},\n" \
-               f"sha256 password = {self.password}," \
+               f"sha256 password = {self.hash_password}," \
                f"honor rating = {self.user_rating}, email = {self.email}," \
                f"profile background link = {self.profile_background_link}\nbio = {self.bio}"
 
