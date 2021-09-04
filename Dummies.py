@@ -1,5 +1,5 @@
 ###############################################################################
-# This script is used to import dummy resources to our website
+# This script is used to import dummy resources/users/forum comments to our website
 #
 # created by Jason Aug 26, 2021
 ###############################################################################
