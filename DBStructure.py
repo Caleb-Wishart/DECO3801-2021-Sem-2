@@ -26,7 +26,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import create_engine
 import pytz
-import base64
+
 
 # length of a standard string, use TEXT if longer than that
 STANDARD_STRING_LENGTH = 300
@@ -36,8 +36,8 @@ STANDARD_STRING_LENGTH = 300
 # Option 1: access psql DB and create schema using you own account in your own DB
 DBUSERNAME = "postgres"  # change this field to your first name (all lowercase), "call me by your name"
 
-DBPASSWORD = "admin"
-DBDATABASE = "project"  # DBUSERNAME
+DBPASSWORD = "jason"
+DBDATABASE = "jason"  # DBUSERNAME
 DBPATH = f"postgresql://{DBUSERNAME}:{DBPASSWORD}@localhost/{DBDATABASE}"
 
 
@@ -361,7 +361,7 @@ class ResourceThumbnail(Base):
     rid = Column(Integer, ForeignKey("resource.rid"), primary_key=True)
 
     # link to thumbnail
-    thumbnail_link = Column(Text, nullable=False)
+    thumbnail_link = Column(Text, nullable=False, primary_key=True)
 
     resource = relationship("Resource", foreign_keys=[rid],
                             backref=backref("resource_thumbnail", cascade="all,delete"))

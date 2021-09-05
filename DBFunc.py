@@ -254,6 +254,15 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
         # and resource_creater table, resource_thumbnail
         resource = conn.query(Resource).filter_by(resource_link=resource_link).one()
 
+        # get rid of duplicate
+        creaters_id = list(set(creaters_id))
+        if resource_thumbnail_links:
+            resource_thumbnail_links = list(set(resource_thumbnail_links))
+        if private_personnel_id:
+            private_personnel_id = list(set(private_personnel_id))
+        if tags_id:
+            tags_id = list(set(tags_id))
+
         for i in resource_thumbnail_links:
             thumbnail = ResourceThumbnail(rid=resource.rid, thumbnail_link=i)
             conn.add(thumbnail)
@@ -264,7 +273,7 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
             conn.add(creater_instance)
 
             # creaters must have access to this resource
-            if not is_public:
+            if not is_public and i not in private_personnel_id:
                 private_access = PrivateResourcePersonnel(rid=resource.rid, uid=i)
                 conn.add(private_access)
         # conn.commit()
@@ -737,15 +746,22 @@ def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subj
 
         # phase 2: use name (unique) to retrieve instance for next step operation
         channel = conn.query(Channel).filter_by(name=name).one()
+        # get rid of duplicate
+        if tags_id:
+            tags_id = list(set(tags_id))
+        if personnel_id:
+            personnel_id = list(set(personnel_id))
+
         for i in tags_id:
             channel_tag_record = ChannelTagRecord(tag_id=i, cid=channel.cid)
             conn.add(channel_tag_record)
         # conn.commit()
 
         if visibility != ChannelVisibility.PUBLIC:
-            # add admin to personnel
-            personnel = ChannelPersonnel(cid=channel.cid, uid=admin_uid)
-            conn.add(personnel)
+            if admin_uid not in personnel_id:
+                # add admin to personnel if not in personnel id yet
+                personnel = ChannelPersonnel(cid=channel.cid, uid=admin_uid)
+                conn.add(personnel)
             for i in personnel_id:
                 personnel = ChannelPersonnel(cid=channel.cid, uid=i)
                 conn.add(personnel)
@@ -885,7 +901,7 @@ def post_on_channel(uid, title, text, channel_name=None, cid=None):
 
         channel_post = conn.query(ChannelPost).filter_by(cid=channel.cid, title=title).one()
         if verbose:
-            print(f"post {title} by user {uid} is added to {channel_name}")
+            print(f"post {title} by user {uid} is added to {channel.name}")
         return channel_post.post_id
 
 

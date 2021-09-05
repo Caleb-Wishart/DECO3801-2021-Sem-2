@@ -1,3 +1,4 @@
+import pytz
 from flask import Flask, request, render_template, redirect, url_for, abort, flash, Response, jsonify
 import json
 # If in branch use the following
@@ -76,7 +77,11 @@ def resource(uid=None, rid=None):
     if not user or not res:
         # invalid user or resource, pop 404
         abort(404, description="Invalid user or resource id")
-    elif not resource_is_public(rid=rid) and not user_has_access_to_resource(uid=uid, rid=rid):
+        # return redirect(url_for('home'))
+    # elif is_user_session_expired(uid=uid):
+    #     # user instance is expired, go back to login
+    #     return redirect(url_for("login"))
+    elif not is_resource_public(rid=rid) and not user_has_access_to_resource(uid=uid, rid=rid):
         # resource is private and user does not have access
         # todo: possibly a link to no access reminder page?
         abort(404, description=f"User {uid} does not have access to resource {rid}")
@@ -89,12 +94,15 @@ def resource(uid=None, rid=None):
         grade = enum_to_website_output(res.grade)
         difficulty = enum_to_website_output(res.difficulty)
 
+        # convert utc time to AEST
+        created_at = res.created_at.astimezone(pytz.timezone("Australia/Brisbane"))
+
+        # get a list of resource_comment objects
+        resource_comment_list = get_resource_comments(rid=rid)
+        # get a dict of resource_comment instance -> resource_comment_replies instances to that comment
+        resource_comment_replies_list = get_resource_comment_replies(resource_comment_list)
+
         # FIXME: modify "base.html" webpage to resource page
-        # return render_template("resource_item.html", rid=rid, rtitle=res.title,
-        #                        resource_link=res.resource_link, created_at=res.created_at,
-        #                        difficulty=difficulty, subject=subject, grade=grade,
-        #                        upvote_count=res.upvote_count, downvote_count=res.downvote_count,
-        #                        description=res.description, uid=uid)
         return render_template("resource_item.html", rid=rid, uid=uid,
                                res=res, difficulty=difficulty, subject=subject, grade=grade)
     elif request.method == "POST":
@@ -202,7 +210,7 @@ def create(type=None):
     """
     return render_template('base.html', title='Post')
 
-@app.route('/forum')
+
 @app.route('/forum/<fName>/<tName>')
 def forum(fName=None, tName=None):
     """The user view a forum page
