@@ -371,7 +371,7 @@ for i in range(0, 5):
                                           subject=channel_subjects[i],
                                           grade=channel_grades[i],
                                           description=descriptions[i],
-                                          tags_id=sample(list(tags.keys()), k=random.randint(1, len(tags))),
+                                          tags_id=sample(list(tags.values()), k=random.randint(1, len(tags))),
                                           personnel_id=personnel)
     # print(f"personnel for cid = {globals()[f'cid{i}']} is {personnel}")
 
