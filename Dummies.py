@@ -5,10 +5,8 @@
 ###############################################################################
 import random
 
-from DBStructure import *
 from DBFunc import *
 from random import choice, sample
-import copy
 from faker import Faker
 import pagan
 
