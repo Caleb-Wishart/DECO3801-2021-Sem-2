@@ -132,16 +132,17 @@ add_tag("Math practice sheet")
 add_tag("1-min tutorial")
 add_tag("brainstorming")
 add_tag('distance teaching')
+add_tag("metric math")
 
-add_tag("metric math")
-with Session() as conn:
-    for i in conn.query(Tag).all():
-        print(i.tag_name)
-# trigger unique constraint
-add_tag("metric math")
-with Session() as conn:
-    for i in conn.query(Tag).all():
-        print(i.tag_name)
+# used to test unique violation rollback
+# with Session() as conn:
+#     for i in conn.query(Tag).all():
+#         print(i.tag_name)
+# # trigger unique constraint
+# add_tag("metric math")
+# with Session() as conn:
+#     for i in conn.query(Tag).all():
+#         print(i.tag_name)
 
 tags = get_tags()
 print(tags)

@@ -25,7 +25,7 @@ VERBOSE = True
 # on the contrary, when DB is not in this mode, any operations within the transaction
 # that causes commit error will be roll-backed. Error message will be shown as
 # a warning on screen
-DEBUG_MODE = False
+DEBUG_MODE = True
 
 
 class ErrorCode(enum.Enum):
@@ -235,9 +235,9 @@ def add_tag(tag_name, tag_description=None):
     """
     tag = Tag(tag_name=tag_name, tag_description=tag_description)
     with Session() as conn:
-        # if conn.query(Tag).filter_by(tag_name=tag_name).one_or_none():
-        #     warnings.warn("tag already exists")
-        #     return
+        if conn.query(Tag).filter_by(tag_name=tag_name).one_or_none():
+            warnings.warn("tag already exists")
+            return
 
         conn.add(tag)
         if not try_to_commit(conn):
