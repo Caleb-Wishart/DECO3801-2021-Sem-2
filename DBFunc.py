@@ -235,9 +235,9 @@ def add_tag(tag_name, tag_description=None):
     """
     tag = Tag(tag_name=tag_name, tag_description=tag_description)
     with Session() as conn:
-        if conn.query(Tag).filter_by(tag_name=tag_name).one_or_none():
-            warnings.warn("tag already exists")
-            return
+        # if conn.query(Tag).filter_by(tag_name=tag_name).one_or_none():
+        #     warnings.warn("tag already exists")
+        #     return
 
         conn.add(tag)
         if not try_to_commit(conn):
