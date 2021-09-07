@@ -132,7 +132,6 @@ add_tag("Math practice sheet")
 add_tag("1-min tutorial")
 add_tag("brainstorming")
 add_tag('distance teaching')
-add_tag("metric math")
 
 tags = get_tags()
 print(tags)
