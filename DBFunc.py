@@ -25,7 +25,7 @@ VERBOSE = True
 # on the contrary, when DB is not in this mode, any operations within the transaction
 # that causes commit error will be roll-backed. Error message will be shown as
 # a warning on screen
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 
 class ErrorCode(enum.Enum):
