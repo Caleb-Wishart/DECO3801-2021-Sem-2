@@ -46,7 +46,7 @@
         <div class="container-fluid">
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                 <!-- Logo -->
-                <a class="navbar-brand" href="{{url_for('home')}}"
+                <a class="navbar-brand" style = "margin-right: auto!important; margin-left: auto!important;" href="{{url_for('home')}}"
                     class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
                     <img src="{{url_for('static', filename='img/logo.png')}}" , alt="Logo" , width="150" , height="45">
                 </a>
@@ -65,10 +65,10 @@
 
                 <!-- Changle default profile to the logged in user with sessions -->
                 <!-- Changle link to profile or login if not logged in -->
-                <a class="navbar-brand" href="{{url_for('profile')}}"
+                <a class="navbar-brand" style = "margin-right: auto!important; margin-left: auto!important;" href="{{url_for('profile')}}"
                     class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-                    <img src="{{url_for('static', filename='img/default_profile.png')}}" , alt="profile" , width="40" ,
-                        height="40">
+                    <img src="{{url_for('static', filename='img/default_profile.png')}}" , alt="profile" , width="30" ,
+                        height="30">
                 </a>
             </div>
         </div>
