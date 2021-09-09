@@ -19,12 +19,18 @@
 {% endblock %}
 
 {% block content %}
-    <a href = "{{url_for('change_colours') }}" alt = {{colour}}>
+    <a href = "{{url_for('change_colours')}}" alt = {{colour}}>
         <div class="square" alt={{colour}}>
             <iframe width="500" height="282" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
     </a>
-    <p class="commentbox" contenteditable = "true"> Write a comment! </p>
-    <textarea rows = "4" cols = "64" placeholder = "Write a comment"></textarea>
+        <!-- <textarea rows = "4" cols = "64" placeholder = "Write a comment"></textarea> -->
+        {# <p class="commentbox" contenteditable = "true" style = "width: 500px;"> Write a comment! </p> #}
+    <form action = "{{url_for('change_colours')}}" method = "GET" style = "background-color: aqua;"style = "width: 1600px;">
+        <input type = "text" name = "newcolour" id = "hexcode" placeholder="Write a Comment!" width="600">
+        <br>
+        <input type = "submit" value = "submit">
+    </form>
+   <br><br><br>
 {% endblock %}
 

@@ -257,8 +257,8 @@ def page_not_found(error):
     mystery = oof + secrets
     return render_template("big_daddy_has_arrived.html", hohyeah=mystery, problem="Solved?")
 
-
 @app.route("/colours")
+@app.route("/colours", methods=["GET"])
 @app.route("/colours/<hex>")
 def change_colours(hex=None):
     """
@@ -269,7 +269,10 @@ def change_colours(hex=None):
 
     <hex> : a six-digit hexadecimal code that picks the colour of the square
     """
-
+    title = "Welcome"
+    if hex == None and request.method == "GET":
+        hex = request.args.get("newcolour")
+        title = hex #title becomes raw input regardless of what it is
     #check if any inputted hex code is valid
     if (hex != None) and (len(hex) != 6 or
         any(c not in hexdigits for c in hex)):
@@ -281,4 +284,4 @@ def change_colours(hex=None):
         #Creates a random hexadecimal of length 6 (aka rgb)
         hex = "".join([choice('0123456789abcdef') for n in range(6)])
     return render_template("alex_colours.html",
-            title = "welcome", colour = hex)
+            title = title, colour = hex)
