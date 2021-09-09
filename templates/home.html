@@ -1,24 +1,38 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    {% if name %}
-        <h1>Hello {{ name }}!</h1>
-    {% else %}
-        <h1>Hello, World!</h1>
-    {% endif %}
     <div class="container">
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-    {% for dic in data %}
-        <div class="col-4 p-2">
-            <div class="card shadow-sm">
-                <img class="bd-placeholder-img card-img-top" src="{{dic['img']}}" , alt="Logo" ,
-                    width="150" , height="150">
-                <div class="card-body">
-                    <p class="card-text">{{dic['title']}}</p>
-                </div>
-            </div>
-        </div>
-    {% endfor %}
     </div>
+
+    <!-- search bar -->
+    <div class="col d-flex justify-content-md-between">
+        <div class="input-group">
+            <input type="search" name="title" class="form-control" placeholder="&#128270; Search"
+                id="search_content">
+        </div>
+    </div>
+
+    <!-- Recommended -->
+    <div class="container">
+        <h1>Recommended</h1>
+        <!-- recommendations go here -->
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            {% for dic in data %}
+                <div class="col-4 p-2">
+                    <div class="card shadow-sm">
+                        <img class="bd-placeholder-img card-img-top" src="{{dic['img']}}" , alt="Logo" ,
+                            width="150" , height="150">
+                        <div class="card-body">
+                            <p class="card-text">{{dic['title']}}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="container">
+        <h1>Notifications</h1>
     </div>
 {% endblock %}
