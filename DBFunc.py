@@ -10,9 +10,9 @@ import enum
 
 from sqlalchemy.orm import sessionmaker
 # use this in branch
-#from .DBStructure import *
+from .DBStructure import *
 # use this in main
-from DBStructure import *
+# from DBStructure import *
 
 # define if you want method output messages for debugging
 verbose = True
