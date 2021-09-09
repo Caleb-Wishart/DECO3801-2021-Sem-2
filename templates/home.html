@@ -20,31 +20,31 @@
             </div>
         </div>
     </div>
-    <div class="row">
-        <!-- Recommended -->
-        <div class="column">
-            <h1>Recommended</h1>
-            <!-- recommendations go here -->
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-                {% for dic in data %}
-                    <div class="col-4 p-2">
-                        <div class="card shadow-sm">
-                            <img class="bd-placeholder-img card-img-top" src="{{dic['img']}}" , alt="Logo" ,
-                                width="150" , height="150">
-                            <div class="card-body">
-                                <p class="card-text">{{dic['title']}}</p>
+    <div class="container">
+        <div class="row">
+            <div class="column">
+                <!-- Recommended -->
+                <h1>Recommended</h1>
+                <!-- recommendations go here -->
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                    {% for dic in data %}
+                        <div class="col-4 p-2">
+                            <div class="card shadow-sm">
+                                <img class="bd-placeholder-img card-img-top" src="{{dic['img']}}" , alt="Logo" ,
+                                    width="150" , height="150">
+                                <div class="card-body">
+                                    <p class="card-text">{{dic['title']}}</p>
+                                </div>
                             </div>
                         </div>
+                    {% endfor %}
                     </div>
-                {% endfor %}
                 </div>
             </div>
-        </div>
-        <!-- Notifications -->
-        <div class="column">
-            <div class="container">
+            <!-- Notifications -->
+            <div class="column">
                 <h1>Notifications</h1>
             </div>
-        </div>
-    </div>  
+        </div>  
+    </div>
 {% endblock %}
