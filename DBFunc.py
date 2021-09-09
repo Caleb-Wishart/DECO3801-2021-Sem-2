@@ -445,7 +445,7 @@ def find_resources(title_type="like", title=None,
                    created_type="after", created=epoch,
                    difficulty=None, subject=None,
                    vote_type="more", votes=None,
-                   grade=None, email=None, sort_by="natrual"
+                   grade=None, email=None, sort_by="natural"
                    ):
     """Find a resource using the specific keys.
 
