@@ -7,15 +7,25 @@
 # Created by Jason Aug 20, 2021
 ##################################################################
 import enum
+import traceback
 
 from sqlalchemy.orm import sessionmaker
 # use this in branch
 from .DBStructure import *
 # use this in main
 # from DBStructure import *
+from werkzeug.security import generate_password_hash
+import warnings
 
 # define if you want method output messages for debugging
-verbose = True
+VERBOSE = True
+
+# this controls how DB response in case of sql commit error:
+# if DEBUG_MODE is on, when error in commit happens, simply raise error and exit program
+# on the contrary, when DB is not in this mode, any operations within the transaction
+# that causes commit error will be roll-backed. Error message will be shown as
+# a warning on screen
+DEBUG_MODE = True
 
 
 class ErrorCode(enum.Enum):
@@ -37,6 +47,8 @@ class ErrorCode(enum.Enum):
     INVALID_POST = 6
     # user session expired
     USER_SESSION_EXPIRED = 7
+    # commit failure
+    COMMIT_ERROR = 8
 
 
 class PersonnelModification(enum.Enum):
@@ -52,9 +64,34 @@ Session = sessionmaker(engine)
 
 epoch = datetime.datetime.utcfromtimestamp(0)
 
-# FIXME: change this back to 30min after demo
+
 # maximum time length for session without new action -- set as 30min
-USER_SESSION_EXPIRE_INTERVAL = datetime.timedelta(weeks=3)
+# USER_SESSION_EXPIRE_INTERVAL = datetime.timedelta(weeks=10)
+
+
+def try_to_commit(trans):
+    """
+    Call commit for a transaction (i.e. conn)
+
+    :param trans: The transaction to be committed
+    :return: True if the transaction is committed.
+            In case of commit error, if DEBUG_MODE is False, then let error raised
+            and program terminates itself. Otherwise, show error message as a
+            warning and rollback this transaction
+    """
+    if DEBUG_MODE:
+        trans.commit()
+        return True
+
+    try:
+        trans.commit()
+        return True
+    except:
+        # commit error, show as warning
+        warnings.warn(traceback.format_exc())
+        trans.rollback()
+        warnings.warn("Transaction is roll-backed")
+    return False
 
 
 def add_user(username, password, email, teaching_areas: dict = {},
@@ -66,38 +103,39 @@ def add_user(username, password, email, teaching_areas: dict = {},
     :param username: username
     :param avatar_link: The link to avatar, default is null
     :param profile_background_link: The link of profile background, default is null
-    :param password: The password of new user
+    :param password: The original password of new user
     :param bio: The bio of new user
     :param email: The email address of that user. This field is unique for each user.
     :param teaching_areas: Mapping of teaching area - [is_public, grade (optional)] list
             e.g. [Subject.ENGLISH: [True], Subject.MATHS_C: [False, Grade.YEAR_1]
     :return The id of the new user if success.
             ErrorCode.INVALID_USER if email is occupied
-
+            ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     email = email.lower()
-    user = User(username=username, avatar_link=avatar_link, password=ascii_to_base64(password),
+    user = User(username=username, avatar_link=avatar_link,
+                hash_password=generate_password_hash(password, "sha256"),
                 email=email, created_at=datetime.datetime.now(
-            tz=pytz.timezone("Australia/Brisbane")), bio=bio,
+                    tz=pytz.timezone("Australia/Brisbane")), bio=bio,
                 profile_background_link=profile_background_link)
 
     with Session() as conn:
         if conn.query(User).filter_by(email=email).one_or_none():
-            print("This email address is registered")
+            warnings.warn("This email address is registered")
             return ErrorCode.INVALID_USER
 
         # phase 1: add a new user
         conn.add(user)
-        conn.commit()
-        if verbose:
-            print(f"User {username} created")
+        if not try_to_commit(conn):
+            warnings.warn(f"failed to commit user creation {username}")
+            return ErrorCode.COMMIT_ERROR
 
         # phase 2: find id of new user -- using email,
         # then update teaching_areas table
         user = conn.query(User).filter_by(email=email).one()
 
-        user_session = UserSession(uid=user.uid)
-        conn.add(user_session)
+        # user_session = UserSession(uid=user.uid)
+        # conn.add(user_session)
         # conn.commit()
 
         for area, info in teaching_areas.items():
@@ -110,12 +148,18 @@ def add_user(username, password, email, teaching_areas: dict = {},
                 new_teach_area = UserTeachingAreas(uid=user.uid, teaching_area=area,
                                                    is_public=is_public, grade=grade)
                 conn.add(new_teach_area)
-
-        conn.commit()
+        if not try_to_commit(conn):
+            warnings.warn(f"failed to commit user creation {username}")
+            conn.delete(user)
+            # rollback obsolete user object
+            conn.commit()
+            return ErrorCode.COMMIT_ERROR
+        if VERBOSE:
+            print(f"User {username} created")
         return user.uid
 
 
-def get_user(email) -> User:
+def get_user(email):
     """
     Retrieve the User with the unique email as the key
 
@@ -127,57 +171,57 @@ def get_user(email) -> User:
     with Session() as conn:
         user = conn.query(User).filter_by(email=email).one_or_none()
         if user:
-            if verbose:
-                print(f"email {email} is registered by user uid = {user.uid}")
+            if VERBOSE:
+                warnings.warn(f"email {email} is registered by user uid = {user.uid}")
 
             return user
-        print(f"No user has email {email}")
+        warnings.warn(f"No user has email {email}")
         return ErrorCode.INVALID_USER
 
 
-def is_user_session_expired(uid: int):
-    """
-    Check if a user session is expired
+# def is_user_session_expired(uid: int):
+#     """
+#     Check if a user session is expired
+#
+#     :param uid: The user id to check
+#     :return True if the session is expired, False otherwise
+#     """
+#     with Session() as conn:
+#         user_session = conn.query(UserSession).filter_by(uid=uid).one_or_none()
+#         # NOTE: tz = pytz.timezone("Australia/Brisbane") does not work in sqlite
+#         current = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
+#         # print(f"current time = {current},last_action_time = {user_session.last_action_time}")
+#         return current - user_session.last_action_time > USER_SESSION_EXPIRE_INTERVAL
 
-    :param uid: The user id to check
-    :return True if the session is expired, False otherwise
-    """
-    with Session() as conn:
-        user_session = conn.query(UserSession).filter_by(uid=uid).one_or_none()
-        # NOTE: tz = pytz.timezone("Australia/Brisbane") does not work in sqlite
-        current = datetime.datetime.now(tz = pytz.timezone("Australia/Brisbane"))
-        # print(f"current time = {current},last_action_time = {user_session.last_action_time}")
-        return current - user_session.last_action_time > USER_SESSION_EXPIRE_INTERVAL
 
-
-def renew_user_session(uid: int):
-    """
-    Create a new session instance in Session table, if not exists;
-    otherwise, update last_action_time to current datetime
-
-    Call this when user sign in or a function requires uid and is_user_session_expired()
-    is false
-
-    :param uid: effective user id
-    :return on success, None is returned.
-            If uid does not exist, it returns ErrorCode.INVALID_USER
-    """
-    with Session() as conn:
-        user = conn.query(User).filter_by(uid=uid).one_or_none()
-        if not user:
-            print(f"user {uid} does not exists")
-            return ErrorCode.INVALID_USER
-
-        user_session = conn.query(UserSession).filter_by(uid=uid).one_or_none()
-        if not user_session:
-            user_session = UserSession(uid=uid)
-        else:
-            user_session.last_action_time = datetime.datetime.now(
-                    tz=pytz.timezone("Australia/Brisbane"))
-        conn.add(user_session)
-        conn.commit()
-        if verbose:
-            print(f"user {uid} last action time updated")
+# def renew_user_session(uid: int):
+#     """
+#     Create a new session instance in Session table, if not exists;
+#     otherwise, update last_action_time to current datetime
+#
+#     Call this when user sign in or a function requires uid and is_user_session_expired()
+#     is false
+#
+#     :param uid: effective user id
+#     :return on success, None is returned.
+#             If uid does not exist, it returns ErrorCode.INVALID_USER
+#     """
+#     with Session() as conn:
+#         user = conn.query(User).filter_by(uid=uid).one_or_none()
+#         if not user:
+#             print(f"user {uid} does not exists")
+#             return ErrorCode.INVALID_USER
+#
+#         user_session = conn.query(UserSession).filter_by(uid=uid).one_or_none()
+#         if not user_session:
+#             user_session = UserSession(uid=uid)
+#         else:
+#             user_session.last_action_time = datetime.datetime.now(
+#                 tz=pytz.timezone("Australia/Brisbane"))
+#         conn.add(user_session)
+#         conn.commit()
+#         if verbose:
+#             print(f"user {uid} last action time updated")
 
 
 def add_tag(tag_name, tag_description=None):
@@ -186,13 +230,20 @@ def add_tag(tag_name, tag_description=None):
 
     :param tag_name: The name of the new tag
     :param tag_description: The description of the tag (optional)
-    :return the id of the new tag
+    :return On success, the id of the new tag is returned
+            ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     tag = Tag(tag_name=tag_name, tag_description=tag_description)
     with Session() as conn:
+        if conn.query(Tag).filter_by(tag_name=tag_name).one_or_none():
+            warnings.warn("tag already exists")
+            return
+
         conn.add(tag)
-        conn.commit()
-        print(f"tag {tag_name} added") if verbose else None
+        if not try_to_commit(conn):
+            warnings.warn(f"tag {tag_name} creation failed")
+            return ErrorCode.COMMIT_ERROR
+        print(f"tag {tag_name} added") if VERBOSE else None
 
         return conn.query(Tag).filter_by(tag_name=tag_name).one().tag_id
 
@@ -233,10 +284,10 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
     :return The id of the new resource if success.
             ErrorCode.INCORRECT_PERSONNEL if
             private_personnel_id is not defined when is_public is False.
-
+            ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     if not is_public and not private_personnel_id:
-        print("Please specify the User allowed to access this resource")
+        warnings.warn("Please specify the User allowed to access this resource")
         return ErrorCode.INCORRECT_PERSONNEL
 
     resource = Resource(title=title, resource_link=resource_link, grade=grade,
@@ -247,40 +298,52 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
 
         # phase 1: add new resource
         conn.add(resource)
-        conn.commit()
+        if not try_to_commit(conn):
+            warnings.warn(f"resource {title} creation failed")
+            return ErrorCode.COMMIT_ERROR
 
         # phase 2: find the new row, update private_resource_personnel info, tag info
         # and resource_creater table, resource_thumbnail
         resource = conn.query(Resource).filter_by(resource_link=resource_link).one()
 
+        # get rid of duplicate
+        creaters_id = list(set(creaters_id))
+        if resource_thumbnail_links:
+            resource_thumbnail_links = list(set(resource_thumbnail_links))
+        if private_personnel_id:
+            private_personnel_id = list(set(private_personnel_id))
+        if tags_id:
+            tags_id = list(set(tags_id))
+
         for i in resource_thumbnail_links:
             thumbnail = ResourceThumbnail(rid=resource.rid, thumbnail_link=i)
             conn.add(thumbnail)
-        # conn.commit()
 
         for i in creaters_id:
             creater_instance = ResourceCreater(rid=resource.rid, uid=i)
             conn.add(creater_instance)
 
             # creaters must have access to this resource
-            if not is_public:
+            if not is_public and i not in private_personnel_id:
                 private_access = PrivateResourcePersonnel(rid=resource.rid, uid=i)
                 conn.add(private_access)
-        # conn.commit()
 
         if not is_public:
             for uid in private_personnel_id:
                 private_access = PrivateResourcePersonnel(rid=resource.rid, uid=uid)
                 conn.add(private_access)
-            # conn.commit()
 
         if tags_id:
             for i in tags_id:
                 tag_record = ResourceTagRecord(rid=resource.rid, tag_id=i)
                 conn.add(tag_record)
-
-        conn.commit()
-        if verbose:
+        if not try_to_commit(conn):
+            warnings.warn(f"resource {title} creation failed")
+            # roll back process
+            conn.delete(resource)
+            conn.commit()
+            return ErrorCode.COMMIT_ERROR
+        if VERBOSE:
             print(f"Resource {title} added")
         return resource.rid
 
@@ -316,17 +379,17 @@ def modify_resource_personnel(rid, uid, modification: PersonnelModification):
     """
     user, resource = get_user_and_resource_instance(uid=uid, rid=rid)
     if not user:
-        print("uid is invalid")
+        warnings.warn("uid is invalid")
         return ErrorCode.INVALID_USER
     elif not resource or resource.is_public:
-        print("rid is invalid or resource is public")
+        warnings.warn("rid is invalid or resource is public")
         return ErrorCode.INVALID_RESOURCE
 
     # check user session and renew
-    if is_user_session_expired(uid):
-        print("User session expired")
-        return ErrorCode.USER_SESSION_EXPIRED
-    renew_user_session(uid)
+    # if is_user_session_expired(uid):
+    #     print("User session expired")
+    #     return ErrorCode.USER_SESSION_EXPIRED
+    # renew_user_session(uid)
 
     with Session() as conn:
         if modification == PersonnelModification.PERSONNEL_DELETE:
@@ -334,7 +397,7 @@ def modify_resource_personnel(rid, uid, modification: PersonnelModification):
             personnel = conn.query(PrivateResourcePersonnel).filter_by(uid=uid, rid=rid). \
                 one_or_none()
             if not personnel:
-                print("Delete failed: User not in personnel")
+                warnings.warn("Delete failed: User not in personnel")
                 return ErrorCode.INCORRECT_PERSONNEL
             conn.delete(personnel)
             msg = "deleted"
@@ -343,8 +406,9 @@ def modify_resource_personnel(rid, uid, modification: PersonnelModification):
             personnel = PrivateResourcePersonnel(uid=uid, rid=rid)
             conn.add(personnel)
             msg = "added"
-
-        conn.commit()
+        if not try_to_commit(conn):
+            warnings.warn(f"User {uid} cannot be added to personnel of resource {rid}")
+            return ErrorCode.COMMIT_ERROR
         print(f"user {uid} is {msg} from/to personnel of resource {rid}")
 
 
@@ -360,29 +424,29 @@ def user_has_access_to_resource(uid, rid):
     """
     user, resource = get_user_and_resource_instance(uid=uid, rid=rid)
     if not user:
-        print("uid is invalid")
+        warnings.warn("uid is invalid")
         return ErrorCode.INVALID_USER
     elif not resource or resource.is_public:
-        print("rid is invalid or resource is public")
+        warnings.warn("rid is invalid or resource is public")
         return ErrorCode.INVALID_RESOURCE
 
     # check user session and renew
-    if is_user_session_expired(uid):
-        print("User session expired")
-        return ErrorCode.USER_SESSION_EXPIRED
-    renew_user_session(uid)
+    # if is_user_session_expired(uid):
+    #     print("User session expired")
+    #     return ErrorCode.USER_SESSION_EXPIRED
+    # renew_user_session(uid)
 
     with Session() as conn:
         return conn.query(PrivateResourcePersonnel).filter_by(uid=uid, rid=rid). \
                    one_or_none() is not None
 
 
-def find_resources(title_type="like",title=None,
-    created_type="after",created=epoch,
-    difficulty=None, subject=None,
-    vote_type="more",votes=None,
-    grade=None, email=None, sort_by="natrual"
-    ):
+def find_resources(title_type="like", title=None,
+                   created_type="after", created=epoch,
+                   difficulty=None, subject=None,
+                   vote_type="more", votes=None,
+                   grade=None, email=None, sort_by="natrual"
+                   ):
     """Find a resource using the specific keys.
 
         If any param does not fall into the valid values the default will be
@@ -427,7 +491,7 @@ def find_resources(title_type="like",title=None,
         created_type = "after"
     if vote_type not in ["more", "less"]:
         vote_type = "more"
-    if sort_by not in ["Natural","newest","upvotes"]:
+    if sort_by not in ["Natural", "newest", "upvotes"]:
         sort_by = "natural"
 
     with Session() as conn:
@@ -475,9 +539,6 @@ def find_resources(title_type="like",title=None,
         else:
             result = filter(lambda res: user_has_access_to_resource(user.uid, res.rid), resources.all())
 
-
-
-
     return result
 
 
@@ -495,6 +556,7 @@ def vote_resource(uid, rid, upvote=True):
             ErrorCode.SAME_VOTE_TWICE if current user gave same vote to this
             resource before.
             ErrorCode.USER_SESSION_EXPIRED if current session is expired
+            ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     msg = "created"
 
@@ -522,8 +584,8 @@ def vote_resource(uid, rid, upvote=True):
                     resource.upvote_count -= 1
                 msg = "updated"
             else:
-                if verbose:
-                    print("user cannot vote the same item twice")
+                if VERBOSE:
+                    warnings.warn("user cannot vote the same item twice")
                 return ErrorCode.SAME_VOTE_TWICE
         else:
             # new vote
@@ -536,8 +598,10 @@ def vote_resource(uid, rid, upvote=True):
 
         conn.add(vote_info)
         conn.add(resource)
-        conn.commit()
-        if verbose:
+        if not try_to_commit(conn):
+            warnings.warn(f"user {uid} vote resource {rid} failed")
+            return ErrorCode.COMMIT_ERROR
+        if VERBOSE:
             print(f"Vote info {msg} for resource {rid}, user {uid} upvoted = {upvote}")
 
 
@@ -567,6 +631,7 @@ def user_viewed_resource(uid, rid):
     :return void on Success.
             ErrorCode.INVALID_RESOURCE/_USER if rid/uid is invalid.
             ErrorCode.USER_SESSION_EXPIRED if user session is expired
+            ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     res = check_user_and_resource_validity_and_renew_user_session(uid=uid, rid=rid)
     if isinstance(res, ErrorCode):
@@ -575,8 +640,10 @@ def user_viewed_resource(uid, rid):
     with Session() as conn:
         resource_view = ResourceView(rid=rid, uid=uid)
         conn.add(resource_view)
-        conn.commit()
-    print(f"user {uid} viewed resource {rid}") if verbose else None
+        if not try_to_commit(conn):
+            warnings.warn(f"User {uid} view resource {rid} record cannot be committed")
+            return ErrorCode.COMMIT_ERROR
+    print(f"user {uid} viewed resource {rid}") if VERBOSE else None
 
 
 def check_user_and_resource_validity_and_renew_user_session(uid, rid):
@@ -591,17 +658,17 @@ def check_user_and_resource_validity_and_renew_user_session(uid, rid):
     """
     user, resource = get_user_and_resource_instance(uid, rid)
     if not resource:
-        print("rid is invalid")
+        warnings.warn("rid is invalid")
         return ErrorCode.INVALID_RESOURCE
     elif not user:
-        print("uid is invalid")
+        warnings.warn("uid is invalid")
         return ErrorCode.INVALID_USER
 
     # check user session and renew
-    if is_user_session_expired(uid):
-        print("User session expired")
-        return ErrorCode.USER_SESSION_EXPIRED
-    renew_user_session(uid)
+    # if is_user_session_expired(uid):
+    #     print("User session expired")
+    #     return ErrorCode.USER_SESSION_EXPIRED
+    # renew_user_session(uid)
 
     return user, resource
 
@@ -616,6 +683,7 @@ def comment_to_resource(uid, rid, comment):
     :return The id of the new resource comment on success.
             ErrorCode.INVALID_RESOURCE/_USER if rid/uid is invalid.
             ErrorCode.USER_SESSION_EXPIRED is current session is expired
+            ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     res = check_user_and_resource_validity_and_renew_user_session(uid=uid, rid=rid)
     if isinstance(res, ErrorCode):
@@ -625,8 +693,10 @@ def comment_to_resource(uid, rid, comment):
     with Session() as conn:
         resource_comment = ResourceComment(uid=uid, rid=rid, comment=comment, created_at=created_at)
         conn.add(resource_comment)
-        conn.commit()
-    if verbose:
+        if not try_to_commit(conn):
+            warnings.warn(f"User {uid} comment resource {rid} failed")
+            return ErrorCode.COMMIT_ERROR
+    if VERBOSE:
         print(f"user {uid} commented resource {rid}")
     return conn.query(ResourceComment). \
         filter_by(uid=uid, rid=rid, created_at=created_at).one().resource_comment_id
@@ -648,24 +718,25 @@ def reply_to_resource_comment(uid, resource_comment_id, reply):
         resource_comment = conn.query(ResourceComment). \
             filter_by(resource_comment_id=resource_comment_id).one_or_none()
         if not resource_comment:
-            print("resource comment id is invalid")
+            warnings.warn("resource comment id is invalid")
             return ErrorCode.INVALID_RESOURCE
         elif not user:
-            print("uid is invalid")
+            warnings.warn("uid is invalid")
             return ErrorCode.INVALID_USER
 
         # check user session and renew
-        if is_user_session_expired(uid):
-            print("User session expired")
-            return ErrorCode.USER_SESSION_EXPIRED
-        renew_user_session(uid)
+        # if is_user_session_expired(uid):
+        #     print("User session expired")
+        #     return ErrorCode.USER_SESSION_EXPIRED
+        # renew_user_session(uid)
 
         reply_to_comment = ResourceCommentReply(resource_comment_id=resource_comment_id,
                                                 reply=reply, uid=uid)
         conn.add(reply_to_comment)
-        conn.commit()
+        if not try_to_commit(conn):
+            warnings.warn(f"user {uid} failed to reply to resource comment {resource_comment_id}")
 
-        if verbose:
+        if VERBOSE:
             print(f"user {uid} replied to resource comment {resource_comment_id}")
 
 
@@ -718,43 +789,57 @@ def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subj
     :return the id of the new channel on success.
             ErrorCode.INVALID_USER if admin_uid does not exist.
             ErrorCode.USER_SESSION_EXPIRED if current session is expired
+            ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     with Session() as conn:
         admin = conn.query(User).filter_by(uid=admin_uid).one_or_none()
         if not admin:
-            print("Admin id is invalid")
+            warnings.warn("Admin id is invalid")
             return ErrorCode.INVALID_USER
 
         # check user session and renew
-        if is_user_session_expired(admin_uid):
-            print("User session expired")
-            return ErrorCode.USER_SESSION_EXPIRED
-        renew_user_session(admin_uid)
+        # if is_user_session_expired(admin_uid):
+        #     print("User session expired")
+        #     return ErrorCode.USER_SESSION_EXPIRED
+        # renew_user_session(admin_uid)
 
         # phase 1: create instance
         channel = Channel(name=name, visibility=visibility, admin_uid=admin_uid,
                           subject=subject, grade=grade, description=description)
         conn.add(channel)
-        conn.commit()
+        if not try_to_commit(conn):
+            warnings.warn(f"channel {name} cannot be created")
+            return ErrorCode.COMMIT_ERROR
 
         # phase 2: use name (unique) to retrieve instance for next step operation
         channel = conn.query(Channel).filter_by(name=name).one()
+        # get rid of duplicate
+        if tags_id:
+            tags_id = list(set(tags_id))
+        if personnel_id:
+            personnel_id = list(set(personnel_id))
+
         for i in tags_id:
             channel_tag_record = ChannelTagRecord(tag_id=i, cid=channel.cid)
             conn.add(channel_tag_record)
-        # conn.commit()
 
         if visibility != ChannelVisibility.PUBLIC:
-            # add admin to personnel
-            personnel = ChannelPersonnel(cid=channel.cid, uid=admin_uid)
-            conn.add(personnel)
+            if admin_uid not in personnel_id:
+                # add admin to personnel if not in personnel id yet
+                personnel = ChannelPersonnel(cid=channel.cid, uid=admin_uid)
+                conn.add(personnel)
             for i in personnel_id:
                 personnel = ChannelPersonnel(cid=channel.cid, uid=i)
                 conn.add(personnel)
 
-        conn.commit()
+        if not try_to_commit(conn):
+            warnings.warn(f"channel {name} cannot be created")
+            # delete obsolete channel object
+            conn.delete(channel)
+            conn.commit()
+            return ErrorCode.COMMIT_ERROR
 
-        if verbose:
+        if VERBOSE:
             print(f"Channel {name} created")
         return channel.cid
 
@@ -769,15 +854,16 @@ def modify_channel_personnel(uid, cid, modification: PersonnelModification):
     :return void on success.
             ErrorCode.INVALID_USER/-CHANNEL if uid/rid is incorrect or channel is public
             ErrorCode.INCORRECT_PERSONNEL if mode is delete and personnel info not exist
+            ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     with Session() as conn:
         user = conn.query(User).filter_by(uid=uid).one_or_none()
         if not user:
-            print("uid invalid")
+            warnings.warn("uid invalid")
             return ErrorCode.INVALID_USER
         channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
         if not channel or channel.visibility == ChannelVisibility.PUBLIC:
-            print("cid invalid")
+            warnings.warn("cid invalid")
             return ErrorCode.INVALID_CHANNEL
 
         if modification == PersonnelModification.PERSONNEL_DELETE:
@@ -785,7 +871,7 @@ def modify_channel_personnel(uid, cid, modification: PersonnelModification):
             personnel = conn.query(ChannelPersonnel).filter_by(uid=uid, cid=cid). \
                 one_or_none()
             if not personnel:
-                print("personnel does not exists")
+                warnings.warn("personnel does not exists")
                 return ErrorCode.INCORRECT_PERSONNEL
             conn.delete(personnel)
             msg = "deleted"
@@ -795,8 +881,10 @@ def modify_channel_personnel(uid, cid, modification: PersonnelModification):
             conn.add(personnel)
             msg = "created"
 
-        conn.commit()
-        if verbose:
+        if not try_to_commit(conn):
+            warnings.warn(f"user {uid} is failed to be {msg} from/to personnel of channel {cid}")
+            return ErrorCode.COMMIT_ERROR
+        if VERBOSE:
             print(f"user {uid} is {msg} from/to personnel of channel {cid}")
 
 
@@ -813,18 +901,18 @@ def user_has_access_to_channel(uid, cid):
     with Session() as conn:
         user = conn.query(User).filter_by(uid=uid).one_or_none()
         if not user:
-            print("uid invalid")
+            warnings.warn("uid invalid")
             return ErrorCode.INVALID_USER
 
         # check user session and renew
-        if is_user_session_expired(uid):
-            print("User session expired")
-            return ErrorCode.USER_SESSION_EXPIRED
-        renew_user_session(uid)
+        # if is_user_session_expired(uid):
+        #     print("User session expired")
+        #     return ErrorCode.USER_SESSION_EXPIRED
+        # renew_user_session(uid)
 
         channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
         if not channel or channel.visibility == ChannelVisibility.PUBLIC:
-            print("cid invalid")
+            warnings.warn("cid invalid")
             return ErrorCode.INVALID_CHANNEL
 
         personnel = conn.query(ChannelPersonnel).filter_by(uid=uid, cid=cid). \
@@ -848,21 +936,22 @@ def post_on_channel(uid, title, text, channel_name=None, cid=None):
             ErrorCode.INVALID_USER if uid is invalid
             ErrorCode.INCORRECT_PERSONNEL if user has permission to visit
             ErrorCode.USER_SESSION_EXPIRED if user session is expired
+            ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     if not channel_name and not cid:
-        print("Please supply channel name or cid")
+        warnings.warn("Please supply channel name or cid")
         return ErrorCode.INVALID_CHANNEL
 
     with Session() as conn:
         if not conn.query(User).filter_by(uid=uid).one_or_none():
-            print("invalid uid")
+            warnings.warn("invalid uid")
             return ErrorCode.INVALID_USER
 
         # check user session and renew
-        if is_user_session_expired(uid):
-            print("User session expired")
-            return ErrorCode.USER_SESSION_EXPIRED
-        renew_user_session(uid)
+        # if is_user_session_expired(uid):
+        #     print("User session expired")
+        #     return ErrorCode.USER_SESSION_EXPIRED
+        # renew_user_session(uid)
 
         if cid:
             channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
@@ -870,7 +959,7 @@ def post_on_channel(uid, title, text, channel_name=None, cid=None):
             channel = conn.query(Channel).filter_by(name=channel_name).one_or_none()
 
         if not channel:
-            print("Invalid channel name")
+            warnings.warn("Invalid channel name")
             return ErrorCode.INVALID_CHANNEL
 
         if channel.visibility != ChannelVisibility.PUBLIC:
@@ -878,16 +967,18 @@ def post_on_channel(uid, title, text, channel_name=None, cid=None):
             personnel = conn.query(ChannelPersonnel). \
                 filter_by(cid=channel.cid, uid=uid).one_or_none()
             if not personnel:
-                print(f"User {uid} is not in channel {channel.name}")
+                warnings.warn(f"User {uid} is not in channel {channel.name}")
                 return ErrorCode.INCORRECT_PERSONNEL
 
         channel_post = ChannelPost(cid=channel.cid, title=title, init_text=text)
         conn.add(channel_post)
-        conn.commit()
+        if not try_to_commit(conn):
+            warnings.warn(f"post {title} by user {uid} failed to be added to {channel.name}")
+            return ErrorCode.COMMIT_ERROR
 
         channel_post = conn.query(ChannelPost).filter_by(cid=channel.cid, title=title).one()
-        if verbose:
-            print(f"post {title} by user {uid} is added to {channel_name}")
+        if VERBOSE:
+            print(f"post {title} by user {uid} is added to {channel.name}")
         return channel_post.post_id
 
 
@@ -903,31 +994,34 @@ def comment_to_channel_post(uid, post_id, text):
             ErrorCode.INVALID_USER if uid is invalid
             ErrorCode.INVALID_POST if post_id is invalid
             ErrorCode.USER_SESSSION_EXPIRED if current session is expired
+            ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     with Session() as conn:
         if not conn.query(User).filter_by(uid=uid).one_or_none():
-            print("uid is invalid")
+            warnings.warn("uid is invalid")
             return ErrorCode.INVALID_USER
         elif not conn.query(ChannelPost).filter_by(post_id=post_id).one_or_none():
-            print("post_id is invalid")
+            warnings.warn("post_id is invalid")
             return ErrorCode.INVALID_POST
 
         # check user session and renew
-        if is_user_session_expired(uid):
-            print("User session expired")
-            return ErrorCode.USER_SESSION_EXPIRED
-        renew_user_session(uid)
+        # if is_user_session_expired(uid):
+        #     print("User session expired")
+        #     return ErrorCode.USER_SESSION_EXPIRED
+        # renew_user_session(uid)
 
         created_at = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
         post_comment = PostComment(post_id=post_id, uid=uid, created_at=created_at,
                                    text=text)
         conn.add(post_comment)
-        conn.commit()
+        if not try_to_commit(conn):
+            warnings.warn(f"Comment to post {post_id} by user {uid} failed")
+            return ErrorCode.COMMIT_ERROR
 
         post_comment = conn.query(PostComment).filter_by(post_id=post_id, uid=uid,
                                                          created_at=created_at).one()
-        if verbose:
-            print(f"Comment to post {post_id} by user {uid} in created")
+        if VERBOSE:
+            print(f"Comment to post {post_id} by user {uid} is created")
         return post_comment.post_comment_id
 
 
@@ -944,22 +1038,23 @@ def vote_channel_post(uid, post_id, upvote=True):
             ErrorCode.SAME_VOTE_TWICE if current user gave same vote to this
             post before.
             ErrorCode.USER_SESSION_EXPIRED if current user is expired
+            ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     with Session() as conn:
         user = conn.query(User).filter_by(uid=uid).one_or_none()
         post = conn.query(ChannelPost).filter_by(post_id=post_id).one_or_none()
         if not user:
-            print("uid is invalid")
+            warnings.warn("uid is invalid")
             return ErrorCode.INVALID_USER
         elif not post:
-            print("post id is invalid")
+            warnings.warn("post id is invalid")
             return ErrorCode.INVALID_POST
 
         # check user session and renew
-        if is_user_session_expired(uid):
-            print("User session expired")
-            return ErrorCode.USER_SESSION_EXPIRED
-        renew_user_session(uid)
+        # if is_user_session_expired(uid):
+        #     print("User session expired")
+        #     return ErrorCode.USER_SESSION_EXPIRED
+        # renew_user_session(uid)
 
         # try to find if there is an entry in vote_info
         vote = conn.query(ChannelPostVoteInfo).filter_by(uid=uid, post_id=post_id).one_or_none()
@@ -976,8 +1071,8 @@ def vote_channel_post(uid, post_id, upvote=True):
                     post.downvote_count += 1
                     post.upvote_count -= 1
             else:
-                if verbose:
-                    print("user cannot vote the same item twice")
+                if VERBOSE:
+                    warnings.warn("user cannot vote the same item twice")
                 return ErrorCode.SAME_VOTE_TWICE
         else:
             # new vote
@@ -989,8 +1084,10 @@ def vote_channel_post(uid, post_id, upvote=True):
 
         conn.add(vote)
         conn.add(post)
-        conn.commit()
-        if verbose:
+        if not try_to_commit(conn):
+            warnings.warn(f"User {uid} failed vote to post {post_id}")
+            return ErrorCode.COMMIT_ERROR
+        if VERBOSE:
             print(f"User {uid} voted post {post_id}, is_upvote = {upvote}")
 
 
@@ -1007,16 +1104,17 @@ def vote_channel_post_comment(uid, post_comment_id, upvote=True):
             ErrorCode.SAME_VOTE_TWICE if current user gave same vote to this
             post comment before.
             ErrorCode.USER_SESSION_EXPIRED if user session is expired
+            ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     with Session() as conn:
         user = conn.query(User).filter_by(uid=uid).one_or_none()
         post_comment = conn.query(PostComment).filter_by(post_comment_id=post_comment_id). \
             one_or_none()
         if not user:
-            print("uid is invalid")
+            warnings.warn("uid is invalid")
             return ErrorCode.INVALID_USER
         elif not post_comment:
-            print("post id is invalid")
+            warnings.warn("post id is invalid")
             return ErrorCode.INVALID_POST
 
         # try to find if there is an entry in vote_info
@@ -1035,8 +1133,8 @@ def vote_channel_post_comment(uid, post_comment_id, upvote=True):
                     post_comment.downvote_count += 1
                     post_comment.upvote_count -= 1
             else:
-                if verbose:
-                    print("user cannot vote the same item twice")
+                if VERBOSE:
+                    warnings.warn("user cannot vote the same item twice")
                 return ErrorCode.SAME_VOTE_TWICE
         else:
             # new vote
@@ -1049,6 +1147,8 @@ def vote_channel_post_comment(uid, post_comment_id, upvote=True):
 
         conn.add(vote)
         conn.add(post_comment)
-        conn.commit()
-        if verbose:
+        if not try_to_commit(conn):
+            warnings.warn(f"User {uid} failed to vote post {post_comment_id}")
+            return ErrorCode.COMMIT_ERROR
+        if VERBOSE:
             print(f"User {uid} voted post {post_comment_id}, is_upvote = {upvote}")
