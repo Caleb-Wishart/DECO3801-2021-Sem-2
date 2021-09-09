@@ -10,9 +10,11 @@
     }
 
     .commentbox {
-        background-color: #b12222;
-        border: 5px #dddddd; 
+        background-color: #999999;
     }
+
+    textarea { height : auto; 
+        width : auto;};
     </style>
 {% endblock %}
 
@@ -23,6 +25,6 @@
         </div>
     </a>
     <p class="commentbox" contenteditable = "true"> Write a comment! </p>
-    
+    <textarea rows = "4" cols = "64" placeholder = "Write a comment"></textarea>
 {% endblock %}
 

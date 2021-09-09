@@ -210,7 +210,6 @@ def create(type=None):
     return render_template('base.html', title='Post')
 
 @app.route('/forum')
-@app.route('/forume/<fname>')
 @app.route('/forum/<fName>/<tName>')
 def forum(fName=None, tName=None):
     """The user view a forum page
