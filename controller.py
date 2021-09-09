@@ -2,9 +2,9 @@ import pytz
 from flask import Flask, request, render_template, redirect, url_for, abort, flash, Response, jsonify
 import json
 # If in branch use the following
-# from .DBFunc import *
+from .DBFunc import *
 # If in main use the following
-from DBFunc import *
+# from DBFunc import *
 
 app = Flask(__name__)
 # NOTE: added for flush() usage
