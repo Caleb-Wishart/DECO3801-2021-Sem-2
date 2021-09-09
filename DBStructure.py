@@ -26,7 +26,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import create_engine
 import pytz
-import base64
+
 
 # length of a standard string, use TEXT if longer than that
 STANDARD_STRING_LENGTH = 300
@@ -42,7 +42,6 @@ DBPATH = f"postgresql://{DBUSERNAME}:{DBPASSWORD}@localhost/{DBDATABASE}"
 
 
 # Option 2: Feel lazy to sign in to cli? No worries, you can play these using sqlite
-
 # on your local device
 # uncomment DBPATH below to overwrite the above PATH config
 # DBPATH = "sqlite:///Doctrina.db"
@@ -56,6 +55,7 @@ class ResourceDifficulty(enum.Enum):
     MODERATE = 1
     HARD = 2
     SPECIALIST = 3
+
 
 class Subject(enum.Enum):
     """
@@ -157,11 +157,13 @@ def website_input_to_enum(readable_string: str, enum_class: enum.Enum):
         print(f"value {readable_string} not found in enum class {enum_class}")
         return None
 
+
 def dump_datetime(value):
     """Deserialize datetime object into string form for JSON processing."""
     if value is None:
         return None
     return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")]
+
 
 Base = declarative_base()
 
@@ -188,9 +190,8 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
         tz=pytz.timezone("Australia/Brisbane")), nullable=False)
 
-    # user password -- base64 encoded
-
-    password = Column(Text, nullable=False)
+    # user hash_password -- sha256 encoded
+    hash_password = Column(Text, nullable=False)
 
     # user honor rating
     user_rating = Column(Numeric, default=0)
@@ -204,31 +205,9 @@ class User(Base):
     def __str__(self):
         return f"User table:\n" \
                f"uid = {self.uid}, username = {self.username}, created at {self.created_at},\n" \
-               f"base64 password = {self.password}," \
-               f" original password = {base64_to_ascii(self.password)},\n" \
+               f"sha256 password = {self.hash_password}," \
                f"honor rating = {self.user_rating}, email = {self.email}," \
                f"profile background link = {self.profile_background_link}\nbio = {self.bio}"
-
-
-# The below 2 functions are used to convert password<-->base64 encrypted code
-def ascii_to_base64(password: str):
-    """
-    A function to turn explicit password string to base64 encoding string
-
-    :param password: The password string to be encoded
-    :return:The base64 encoded password string
-    """
-    return base64.b64encode(password.encode()).decode()
-
-
-def base64_to_ascii(encoded_password: str):
-    """
-    Turn base64 encoded string back to human readable format
-
-    :param encoded_password: The base64 encoded string
-    :return: Human readable password string
-    """
-    return base64.b64decode(encoded_password.encode()).decode()
 
 
 class UserSession(Base):
@@ -330,17 +309,17 @@ class Resource(Base):
     def serialize(self):
         """Return object data in serialisable format """
         return {
-                "rid" : self.rid,
-                "title" : self.title,
-                "resource_link": self.resource_link,
-                "created_at" : dump_datetime(self.created_at),
-                "grade" : self.grade.name,
-                "difficulty" : self.difficulty.name,
-                "upvote_count" : self.upvote_count,
-                "downvote_count" : self.downvote_count,
-                "is_public" : self.is_public,
-                "description" : self.description
-               }
+            "rid": self.rid,
+            "title": self.title,
+            "resource_link": self.resource_link,
+            "created_at": dump_datetime(self.created_at),
+            "grade": self.grade.name,
+            "difficulty": self.difficulty.name,
+            "upvote_count": self.upvote_count,
+            "downvote_count": self.downvote_count,
+            "is_public": self.is_public,
+            "description": self.description
+        }
 
 
 class ResourceView(Base):
@@ -381,7 +360,7 @@ class ResourceThumbnail(Base):
     rid = Column(Integer, ForeignKey("resource.rid"), primary_key=True)
 
     # link to thumbnail
-    thumbnail_link = Column(Text, nullable=False)
+    thumbnail_link = Column(Text, nullable=False, primary_key=True)
 
     resource = relationship("Resource", foreign_keys=[rid],
                             backref=backref("resource_thumbnail", cascade="all,delete"))
