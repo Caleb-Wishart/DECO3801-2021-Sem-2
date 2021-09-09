@@ -4,9 +4,9 @@ import pytz
 from flask import Flask, request, render_template, redirect, url_for, abort, flash, Response, jsonify
 import json
 # If in branch use the following
-# from .DBFunc import *
+from .DBFunc import *
 # If in main use the following
-from DBFunc import *
+# from DBFunc import *
 
 app = Flask(__name__)
 # NOTE: added for flush() usage
@@ -269,7 +269,7 @@ def change_colours(hex=None):
     """
 
     #check if any inputted hex code is valid
-    if (hex != None) and (len(hex) != 6 or 
+    if (hex != None) and (len(hex) != 6 or
         any(c not in hexdigits for c in hex)):
         #given hex code is invalid
         hex = None
