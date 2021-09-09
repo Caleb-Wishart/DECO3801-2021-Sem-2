@@ -5,4 +5,5 @@ pyvenv.cfg
 pass.txt
 branch/
 __pycache__/
+static/avatar
 static/resource
