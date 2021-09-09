@@ -12,7 +12,7 @@ from sqlalchemy.orm import sessionmaker
 # use this in branch
 #from .DBStructure import *
 # use this in main
-from DBStructure import *
+from .DBStructure import *
 
 
 class ErrorCode(enum.Enum):
