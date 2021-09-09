@@ -66,23 +66,23 @@ def resource(uid=None, rid=None):
     If resource or user is invalid then redirect to 404 page
     """
     if (uid is None and rid is not None) or (uid is not None and rid is None):
-        redirect(url_for('resource'))    # base resource page
+        redirect(url_for('resource'))  # base resource page
     if uid is None or rid is None:
         return render_template('resource.html',
-            title='Resources',
-            subject=[enum_to_website_output(e) for e in Subject],
-            grade=[enum_to_website_output(e) for e in Grade],
-            tag=get_tags().keys(),
-            resources=find_resources())
-    # indifivual resource page
+                               title='Resources',
+                               subject=[enum_to_website_output(e) for e in Subject],
+                               grade=[enum_to_website_output(e) for e in Grade],
+                               tag=get_tags().keys(),
+                               resources=find_resources())
+    # individual resource page
     user, res = get_user_and_resource_instance(uid=uid, rid=rid)
     if not user or not res:
         # invalid user or resource, pop 404
         abort(404, description="Invalid user or resource id")
         # return redirect(url_for('home'))
-    elif is_user_session_expired(uid=uid):
-        # user instance is expired, go back to login
-        return redirect(url_for("login"))
+    # elif is_user_session_expired(uid=uid):
+    #     # user instance is expired, go back to login
+    #     return redirect(url_for("login"))
     elif not is_resource_public(rid=rid) and not user_has_access_to_resource(uid=uid, rid=rid):
         # resource is private and user does not have access
         # todo: possibly a link to no access reminder page?
@@ -106,7 +106,7 @@ def resource(uid=None, rid=None):
 
         # FIXME: modify "base.html" webpage to resource page
         return render_template("resource_item.html", rid=rid, uid=uid,
-            res=res, difficulty=difficulty, subject=subject, grade=grade)
+                               res=res, difficulty=difficulty, subject=subject, grade=grade)
     elif request.method == "POST":
         # FIXME: here assume upvote and downvote are two separate buttons like Quora
         # example see https://predictivehacks.com/?all-tips=how-to-add-action-buttons-in-flask
@@ -122,11 +122,13 @@ def resource(uid=None, rid=None):
         return redirect(url_for("resource", uid=uid, rid=rid))
     return render_template('base.html', title='Register')
 
+
 @app.route('/search')
 def search():
     title = request.args.get('title')
     return jsonify([i.serialize for i in find_resources(title=title)])
     # return Response(json.dumps([i.serialize for i in find_resources(title=title)]),  mimetype='application/json')
+
 
 @app.route('/register')
 def register():
@@ -239,6 +241,7 @@ def forum(fName=None, tName=None):
 def page_not_found(error):
     """Page shown with a HTML 403 status"""
     return render_template('errors/error_403.html'), 403
+
 
 @app.errorhandler(404)
 def page_not_found(error):
