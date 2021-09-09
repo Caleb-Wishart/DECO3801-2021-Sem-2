@@ -169,7 +169,7 @@ def profile():
         Manage account settings
         Forums you are a part of
     """
-    return render_template('base.html', title='Login')
+    return render_template('profile.html', title='Profile')
 
 
 @app.route('/profile/settings')
