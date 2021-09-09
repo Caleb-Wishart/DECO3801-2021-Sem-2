@@ -11,7 +11,7 @@
                 <div class="col d-flex justify-content-md-between">
                     <div class="input-group">
                         <input type="search" name="title" class="form-control" placeholder="&#128270; Search"
-                            id="search_content">
+                            id="search_content" style="margin-top: 50px;margin-bottom: 20px;">
                     </div>
                 </div>
             </div>
@@ -22,28 +22,33 @@
     </div>
     <div class="container">
         <div class="row">
-            <div class="column">
+            <div class="col">
                 <!-- Recommended -->
-                <h1>Recommended</h1>
-                <!-- recommendations go here -->
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-                    {% for dic in data %}
-                        <div class="col-4 p-2">
-                            <div class="card shadow-sm">
-                                <img class="bd-placeholder-img card-img-top" src="{{dic['img']}}" , alt="Logo" ,
-                                    width="150" , height="150">
-                                <div class="card-body">
-                                    <p class="card-text">{{dic['title']}}</p>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                    </div>
-                </div>
+                <p>Recommended</p>
             </div>
-            <!-- Notifications -->
-            <div class="column">
-                <h1>Notifications</h1>
+            <div class="col">
+		<!-- Notifications -->
+		<!-- <p>Notifications</p> 
+		<div class="dropdown">
+		    <button type="button" class="btn btn-primary">
+		        Notifications <span class="badge bg-secondary">69420 <!-- number of notifications go here --> </span>
+		    </button>
+		     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+		     <li><a class="dropdown-item" href="#">Action</a></li>
+		     <li><a class="dropdown-item" href="#">Another action</a></li>
+		     <li><a class="dropdown-item" href="#">Something else here</a></li>
+		     </ul>
+		</div> -->
+		<div class="dropdown">
+			  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+				      Dropdown button
+				        </button>
+					  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+						      <li><a class="dropdown-item" href="#">Action</a></li>
+						          <li><a class="dropdown-item" href="#">Another action</a></li>
+							      <li><a class="dropdown-item" href="#">Something else here</a></li>
+							        </ul>
+		</div>
             </div>
         </div>  
     </div>
