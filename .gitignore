@@ -6,3 +6,4 @@ branch/
 __pycache__/
 static/avatar
 static/resource
+.idea/
