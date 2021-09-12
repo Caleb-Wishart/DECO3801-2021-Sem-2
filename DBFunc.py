@@ -622,7 +622,7 @@ def find_channels(title_type="like", channel_name=None,
             channels.filter_by(admin_uid=admin_uid)
         else:
             # only show public item
-            channels.filter_by(Channel.visibility == ChannelVisibility.PUBLIC)
+            channels.filter_by(visibility=ChannelVisibility.PUBLIC)
 
         return channels.all()
 
