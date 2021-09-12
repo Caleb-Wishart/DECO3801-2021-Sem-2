@@ -619,6 +619,7 @@ def find_channels(title_type="like", channel_name=None,
             channels.filter(or_(Channel.visibility == ChannelVisibility.PUBLIC,
                                 Channel.cid.in_(accessible)))
         elif admin_uid:
+            print(f"admin_uid = {admin_uid}")
             channels.filter(Channel.admin_uid == admin_uid)
         # else:
         #     # only show public item
