@@ -592,20 +592,6 @@ def find_channels(title_type="like", channel_name=None,
             # no tag_id supplied, get all the channels
             channels = conn.query(Channel)
 
-        if subject:
-            channels = channels.filter_by(subject=subject)
-        if grade:
-            channels = channels.filter_by(grade=grade)
-        if visibility:
-            channels = channels.filter_by(visibility=visibility)
-
-        if channel_name:
-            if title_type == "like":
-                channels = channels.filter(Channel.name.ilike(f'%{channel_name}%'))
-            else:
-                # exact match
-                channels = channels.filter_by(name=channel_name)
-
         if caller_uid:
             # find all private channels this caller has access to
             personnel = conn.query(ChannelPersonnel).filter_by(uid=caller_uid)
@@ -621,10 +607,36 @@ def find_channels(title_type="like", channel_name=None,
         elif admin_uid:
             print(f"admin_uid = {admin_uid}")
             channels.filter(Channel.admin_uid == admin_uid)
-        # else:
-        #     # only show public item
-        #     print("now only show public channels")
-        #     channels.filter_by(visibility=ChannelVisibility.PUBLIC)
+
+        if subject:
+            channels = channels.filter_by(subject=subject)
+        if grade:
+            channels = channels.filter_by(grade=grade)
+        if visibility:
+            channels = channels.filter_by(visibility=visibility)
+
+        if channel_name:
+            if title_type == "like":
+                channels = channels.filter(Channel.name.ilike(f'%{channel_name}%'))
+            else:
+                # exact match
+                channels = channels.filter_by(name=channel_name)
+
+        # if caller_uid:
+        #     # find all private channels this caller has access to
+        #     personnel = conn.query(ChannelPersonnel).filter_by(uid=caller_uid)
+        #     accessible = set()
+        #     for i in personnel:
+        #         accessible.add(i.cid)
+        #     accessible = tuple(accessible)
+        #
+        #     # return channels that this user can access: either public or
+        #     # private but accessible
+        #     channels.filter(or_(Channel.visibility == ChannelVisibility.PUBLIC,
+        #                         Channel.cid.in_(accessible)))
+        # elif admin_uid:
+        #     print(f"admin_uid = {admin_uid}")
+        #     channels.filter(Channel.admin_uid == admin_uid)
 
         return channels.all()
 
