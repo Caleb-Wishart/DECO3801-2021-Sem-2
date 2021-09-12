@@ -278,6 +278,11 @@ print("\n")
 print("all channels created by admin user 1")
 for i in find_channels(admin_uid=1):
     print(i.cid)
+with Session() as conn:
+    print("manual lookup")
+    for i in conn.query(Channel).filter_by(admin_uid=1).all():
+        print(i.cid)
+exit(13)
 
 print('all channels created by 1, tag_id == 8')
 for i in find_channels(admin_uid=1, tag_ids=[8]):
