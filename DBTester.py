@@ -259,21 +259,22 @@ Session = sessionmaker(engine)
 #         print(i)
 
 
+# NOTE: below tests are run after channels are created using Dummies script
 # check find_channels
-# print("No parameters provided")
-# for i in find_channels():
-#     print(i.cid)
-# print("\n")
-#
-# print("grade = year 3 only, accessed by uid = 3")
-# for i in find_channels(grade=Grade.YEAR_3, caller_uid=3):
-#     print(i.cid)
-# print("\n")
-#
-# print("grade = year 3, subject = math A, accessed by uid = 3")
-# for i in find_channels(grade=Grade.YEAR_3, caller_uid=3, subject=Subject.MATHS_A):
-#     print(i.cid)
-# print("\n")
+print("No parameters provided")
+for i in find_channels():
+    print(i.cid)
+print("\n")
+
+print("grade = year 3 only, accessed by uid = 3")
+for i in find_channels(grade=Grade.YEAR_3, caller_uid=3):
+    print(i.cid)
+print("\n")
+
+print("grade = year 3, subject = math A, accessed by uid = 3")
+for i in find_channels(grade=Grade.YEAR_3, caller_uid=3, subject=Subject.MATHS_A):
+    print(i.cid)
+print("\n")
 
 print("all channels created by admin user 1")
 for i in find_channels(admin_uid=1):
@@ -283,7 +284,7 @@ print('all channels created by 1, tag_id == 8')
 for i in find_channels(admin_uid=1, tag_ids=[8]):
     print(i.cid)
 
-# print("visibility == PUBLIC")
-# for i in find_channels(visibility=ChannelVisibility.PUBLIC):
-#     print(i.cid)
+print("visibility == PUBLIC")
+for i in find_channels(visibility=ChannelVisibility.PUBLIC):
+    print(i.cid)
 

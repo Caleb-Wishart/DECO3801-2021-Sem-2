@@ -591,8 +591,7 @@ def find_channels(title_type="like", channel_name=None,
         else:
             # no tag_id supplied, get all the channels
             channels = conn.query(Channel)
-        # todo test
-        channels.filter_by(admin_uid=admin_uid)
+
         if subject:
             channels = channels.filter_by(subject=subject)
         if grade:
@@ -617,11 +616,10 @@ def find_channels(title_type="like", channel_name=None,
 
             # return channels that this user can access: either public or
             # private but accessible
-            channels.filter(or_(Channel.visibility == ChannelVisibility.PUBLIC,
-                                Channel.cid.in_(accessible)))
+            channels = channels.filter(or_(Channel.visibility == ChannelVisibility.PUBLIC,
+                                           Channel.cid.in_(accessible)))
         elif admin_uid:
-            print(f"admin_uid = {admin_uid}")
-            channels.filter_by(admin_uid=int(admin_uid))
+            channels = channels.filter_by(admin_uid=admin_uid)
 
         return channels.all()
 
