@@ -620,7 +620,7 @@ def find_channels(title_type="like", channel_name=None,
                                 Channel.cid.in_(accessible)))
         elif admin_uid:
             print(f"admin_uid = {admin_uid}")
-            channels.filter(Channel.admin_uid == admin_uid)
+            channels.filter_by(admin_uid=int(admin_uid))
 
         return channels.all()
 
