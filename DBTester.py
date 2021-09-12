@@ -277,7 +277,7 @@ print("\n")
 
 print("all channels created by admin user 1")
 for i in find_channels(admin_uid=1):
-    print(i.cid)
+    print(f"cid = {i.cid}, admin_uid = {i.admin_uid}")
 
 print('all channels created by 1, tag_id == 8')
 for i in find_channels(admin_uid=1, tag_ids=[8]):
