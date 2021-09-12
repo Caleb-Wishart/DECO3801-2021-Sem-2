@@ -10,6 +10,7 @@ import enum
 import traceback
 
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import or_
 # use this in branch
 # from .DBStructure import *
 # use this in main
@@ -62,7 +63,8 @@ class PersonnelModification(enum.Enum):
 engine = create_engine(DBPATH)
 Session = sessionmaker(engine)
 
-epoch = datetime.datetime.utcfromtimestamp(0)
+# starting timestamp of UTC
+EPOCH = datetime.datetime.utcfromtimestamp(0)
 
 
 # maximum time length for session without new action -- set as 30min
@@ -116,7 +118,7 @@ def add_user(username, password, email, teaching_areas: dict = {},
     user = User(username=username, avatar_link=avatar_link,
                 hash_password=generate_password_hash(password, "sha256"),
                 email=email, created_at=datetime.datetime.now(
-                    tz=pytz.timezone("Australia/Brisbane")), bio=bio,
+            tz=pytz.timezone("Australia/Brisbane")), bio=bio,
                 profile_background_link=profile_background_link)
 
     with Session() as conn:
@@ -442,7 +444,7 @@ def user_has_access_to_resource(uid, rid):
 
 
 def find_resources(title_type="like", title=None,
-                   created_type="after", created=epoch,
+                   created_type="after", created=EPOCH,
                    difficulty=None, subject=None,
                    vote_type="more", votes=None,
                    grade=None, email=None, sort_by="natural"
@@ -506,7 +508,7 @@ def find_resources(title_type="like", title=None,
             else:
                 resources = resources.filter_by(title=title)
 
-        if created != epoch and isinstance(created, datetime.datetime):
+        if created != EPOCH and isinstance(created, datetime.datetime):
             if created_type == "after":
                 resources = resources.filter(Resource.created_at > created)
             else:
@@ -540,6 +542,89 @@ def find_resources(title_type="like", title=None,
             result = filter(lambda res: user_has_access_to_resource(user.uid, res.rid), resources.all())
 
     return result
+
+
+def find_channels(title_type="like", channel_name=None,
+                  subject: Subject = None, visibility: ChannelVisibility = None,
+                  grade: Grade = None, caller_uid=None, admin_uid=None, tag_ids=[]):
+    """
+    find_channels method mainly follows the style of find_resources() and is capable
+    of finding channels that match all the conditions specified in parameter values
+
+    If caller_uid is supplied, it returns channels this caller has access to.
+
+    If admin_uid is supplied, it returns channel this admin controls
+
+    * if both caller_uid and admin_uid are supplied, the return results will be
+    channels viewable by caller_uid
+
+    When no parameters are passed to the method, it returns all channels with
+    ChannelVisibility == PUBLIC
+    :param title_type: SQL search restriction for the title.
+            Valid values are ["like","exact"]
+    :param channel_name: The name of the channel to look up
+    :param subject: The subject the channel is related to.
+    :param visibility: The visibility of the channel
+    :param grade: The grade the channel is related to
+    :param caller_uid: The user who call find channels function
+    :param admin_uid: The admin id of channel
+    :param tag_ids: The list of tag ids the channel is related to
+    :return List of Channel objects
+    """
+    # Args Checking
+    if title_type not in ["like", "exact"]:
+        title_type = "like"
+
+    with Session() as conn:
+        # list of channel id projects
+        channel_id_obj = []
+        if tag_ids:
+            channel_id_obj = conn.query(ChannelTagRecord).filter(
+                ChannelTagRecord.tag_id.in_(tag_ids)).all()
+        if channel_id_obj:
+            # find channels that match the tags, if any
+            cids = set()
+            for i in channel_id_obj:
+                cids.add(i.cid)
+                cids = tuple(cids)
+                channels = conn.query(Channel).filter(Channel.cid.in_(cids))
+        else:
+            # no tag_id supplied, get all the channels
+            channels = conn.query(Channel)
+
+        if subject:
+            channels = channels.filter_by(subject=subject)
+        if grade:
+            channels = channels.filter_by(grade=grade)
+        if visibility:
+            channels = channels.filter_by(visibility=visibility)
+
+        if channel_name:
+            if title_type == "like":
+                channels = channels.filter(Channel.name.ilike(f'%{channel_name}%'))
+            else:
+                # exact match
+                channels = channels.filter_by(name=channel_name)
+
+        if caller_uid:
+            # find all private channels this caller has access to
+            personnel = conn.query(ChannelPersonnel).filter_by(uid=caller_uid)
+            accessible = set()
+            for i in personnel:
+                accessible.add(i.cid)
+            accessible = tuple(accessible)
+
+            # return channels that this user can access: either public or
+            # private but accessible
+            channels.filter(or_(Channel.visibility == ChannelVisibility.PUBLIC,
+                                Channel.cid.in_(accessible)))
+        elif admin_uid:
+            channels.filter_by(admin_uid=admin_uid)
+        else:
+            # only show public item
+            channels.filter_by(Channel.visibility == ChannelVisibility.PUBLIC)
+
+        return channels.all()
 
 
 def vote_resource(uid, rid, upvote=True):
