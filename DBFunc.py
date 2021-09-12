@@ -591,7 +591,8 @@ def find_channels(title_type="like", channel_name=None,
         else:
             # no tag_id supplied, get all the channels
             channels = conn.query(Channel)
-
+        # todo test
+        channels.filter_by(admin_uid=admin_uid)
         if subject:
             channels = channels.filter_by(subject=subject)
         if grade:
