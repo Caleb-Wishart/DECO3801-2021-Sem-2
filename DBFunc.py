@@ -586,8 +586,8 @@ def find_channels(title_type="like", channel_name=None,
             cids = set()
             for i in channel_id_obj:
                 cids.add(i.cid)
-                cids = tuple(cids)
-                channels = conn.query(Channel).filter(Channel.cid.in_(cids))
+            cids = tuple(cids)
+            channels = conn.query(Channel).filter(Channel.cid.in_(cids))
         else:
             # no tag_id supplied, get all the channels
             channels = conn.query(Channel)
@@ -622,6 +622,7 @@ def find_channels(title_type="like", channel_name=None,
             channels.filter_by(admin_uid=admin_uid)
         else:
             # only show public item
+            print("now only show public channels")
             channels.filter_by(visibility=ChannelVisibility.PUBLIC)
 
         return channels.all()
