@@ -6,17 +6,18 @@
 #
 # Created by Jason Aug 20, 2021
 ##################################################################
-import enum
 import traceback
+import warnings
 
-from sqlalchemy.orm import sessionmaker
+import sqlalchemy.exc
 from sqlalchemy import or_
+from sqlalchemy.orm import sessionmaker
+from werkzeug.security import generate_password_hash
+
 # use this in branch
 # from .DBStructure import *
 # use this in main
 from DBStructure import *
-from werkzeug.security import generate_password_hash
-import warnings
 
 # define if you want method output messages for debugging
 VERBOSE = True
@@ -88,15 +89,15 @@ def try_to_commit(trans):
     try:
         trans.commit()
         return True
-    except:
-        # commit error, show as warning
+    except sqlalchemy.exc.SQLAlchemyError:
+        # errors while commit, show as warning
         warnings.warn(traceback.format_exc())
         trans.rollback()
         warnings.warn("Transaction is roll-backed")
     return False
 
 
-def add_user(username, password, email, teaching_areas: dict = {},
+def add_user(username, password, email, teaching_areas: dict = None,
              bio=None, avatar_link=None, profile_background_link=None):
     """
     Add a new user to table user and add teaching_areas to
@@ -117,8 +118,8 @@ def add_user(username, password, email, teaching_areas: dict = {},
     email = email.lower()
     user = User(username=username, avatar_link=avatar_link,
                 hash_password=generate_password_hash(password, "sha256"),
-                email=email, created_at=datetime.datetime.now(
-            tz=pytz.timezone("Australia/Brisbane")), bio=bio,
+                email=email, bio=bio,
+                created_at=datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane")),
                 profile_background_link=profile_background_link)
 
     with Session() as conn:
@@ -140,16 +141,17 @@ def add_user(username, password, email, teaching_areas: dict = {},
         # conn.add(user_session)
         # conn.commit()
 
-        for area, info in teaching_areas.items():
-            grade = None
-            if len(info) == 2:
-                is_public, grade = info[0], info[1]
-            else:
-                is_public = info[0]
-            if isinstance(area, Subject):
-                new_teach_area = UserTeachingAreas(uid=user.uid, teaching_area=area,
-                                                   is_public=is_public, grade=grade)
-                conn.add(new_teach_area)
+        if teaching_areas:
+            for area, info in teaching_areas.items():
+                grade = None
+                if len(info) == 2:
+                    is_public, grade = info[0], info[1]
+                else:
+                    is_public = info[0]
+                if isinstance(area, Subject):
+                    new_teach_area = UserTeachingAreas(uid=user.uid, teaching_area=area,
+                                                       is_public=is_public, grade=grade)
+                    conn.add(new_teach_area)
         if not try_to_commit(conn):
             warnings.warn(f"failed to commit user creation {username}")
             conn.delete(user)
@@ -265,8 +267,9 @@ def get_tags() -> dict:
 
 
 def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: Subject,
-                 grade: Grade, creaters_id=[], is_public=True, private_personnel_id=[],
-                 tags_id=[], description=None, resource_thumbnail_links=[]):
+                 grade: Grade, creaters_id: list = None, is_public=True,
+                 private_personnel_id: list = None, tags_id: list = None,
+                 description=None, resource_thumbnail_links: list = None):
     """
     Add a resource to resource table
 
@@ -288,6 +291,15 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
             private_personnel_id is not defined when is_public is False.
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
+    if resource_thumbnail_links is None:
+        resource_thumbnail_links = []
+    if tags_id is None:
+        tags_id = []
+    if private_personnel_id is None:
+        private_personnel_id = []
+    if creaters_id is None:
+        creaters_id = []
+
     if not is_public and not private_personnel_id:
         warnings.warn("Please specify the User allowed to access this resource")
         return ErrorCode.INCORRECT_PERSONNEL
@@ -688,7 +700,7 @@ def find_resources(title_type="like", title=None,
 
 def find_channels(title_type="like", channel_name=None,
                   subject: Subject = None, visibility: ChannelVisibility = None,
-                  grade: Grade = None, caller_uid=None, admin_uid=None, tag_ids=[]):
+                  grade: Grade = None, caller_uid=None, admin_uid=None, tag_ids: list = None):
     """
     find_channels method mainly follows the style of find_resources() and is capable
     of finding channels that match all the conditions specified in parameter values
@@ -714,6 +726,9 @@ def find_channels(title_type="like", channel_name=None,
     :return List of Channel objects
     """
     # Args Checking
+    if tag_ids is None:
+        tag_ids = []
+
     if title_type not in ["like", "exact"]:
         title_type = "like"
 
@@ -996,8 +1011,8 @@ def get_resource_comment_replies(resource_comment_instance_list: list) -> dict:
 
 
 def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subject = None,
-                   grade: Grade = None, description=None, tags_id=[],
-                   personnel_id=[]):
+                   grade: Grade = None, description=None, tags_id: list = None,
+                   personnel_id: list = None):
     """
     Create a channel
 
@@ -1015,6 +1030,11 @@ def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subj
             ErrorCode.USER_SESSION_EXPIRED if current session is expired
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
+    if personnel_id is None:
+        personnel_id = []
+    if tags_id is None:
+        tags_id = []
+
     with Session() as conn:
         admin = conn.query(User).filter_by(uid=admin_uid).one_or_none()
         if not admin:
@@ -1068,6 +1088,29 @@ def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subj
         return channel.cid
 
 
+def get_user_and_channel_instance(uid, cid):
+    """
+    Try to get instances User and Channel using provided uid and rid
+
+    Can use this to check if the (uid, cid) is valid
+
+    :param uid: The user id
+    :param cid: The channel id
+    :return On success, the tuple of form User, Channel is returned
+            ErrorCode.INVALID_USER/-CHANNEL if uid/rid is incorrect
+    """
+    with Session() as conn:
+        user = conn.query(User).filter_by(uid=uid).one_or_none()
+        channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
+        if not user:
+            warnings.warn("uid invalid")
+            return ErrorCode.INVALID_USER
+        if not channel:
+            warnings.warn("cid invalid")
+            return ErrorCode.INVALID_CHANNEL
+    return user, channel
+
+
 def modify_channel_personnel(uid, cid, modification: PersonnelModification):
     """
     Add/ delete a user from/to a private personnel
@@ -1080,16 +1123,15 @@ def modify_channel_personnel(uid, cid, modification: PersonnelModification):
             ErrorCode.INCORRECT_PERSONNEL if mode is delete and personnel info not exist
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
-    with Session() as conn:
-        user = conn.query(User).filter_by(uid=uid).one_or_none()
-        if not user:
-            warnings.warn("uid invalid")
-            return ErrorCode.INVALID_USER
-        channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
-        if not channel or channel.visibility == ChannelVisibility.PUBLIC:
-            warnings.warn("cid invalid")
-            return ErrorCode.INVALID_CHANNEL
+    res = get_user_and_channel_instance(uid=uid, cid=cid)
+    if isinstance(res, ErrorCode):
+        return res
+    channel = res[1]
+    if channel.visibility == ChannelVisibility.PUBLIC:
+        warnings.warn("Channel is public")
+        return ErrorCode.INVALID_CHANNEL
 
+    with Session() as conn:
         if modification == PersonnelModification.PERSONNEL_DELETE:
             # delete
             personnel = conn.query(ChannelPersonnel).filter_by(uid=uid, cid=cid). \
@@ -1123,21 +1165,19 @@ def user_has_access_to_channel(uid, cid):
             ErrorCode.USER_SESSION_EXPIRED is current session is invalid
     """
     with Session() as conn:
-        user = conn.query(User).filter_by(uid=uid).one_or_none()
-        if not user:
-            warnings.warn("uid invalid")
-            return ErrorCode.INVALID_USER
+        res = get_user_and_channel_instance(uid=uid, cid=cid)
+        if isinstance(res, ErrorCode):
+            return res
+        channel = res[1]
+        if channel.visibility == ChannelVisibility.PUBLIC:
+            warnings.warn("Channel is public")
+            return ErrorCode.INVALID_CHANNEL
 
         # check user session and renew
         # if is_user_session_expired(uid):
         #     print("User session expired")
         #     return ErrorCode.USER_SESSION_EXPIRED
         # renew_user_session(uid)
-
-        channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
-        if not channel or channel.visibility == ChannelVisibility.PUBLIC:
-            warnings.warn("cid invalid")
-            return ErrorCode.INVALID_CHANNEL
 
         personnel = conn.query(ChannelPersonnel).filter_by(uid=uid, cid=cid). \
             one_or_none()
