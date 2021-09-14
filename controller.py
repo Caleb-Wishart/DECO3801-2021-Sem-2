@@ -189,7 +189,7 @@ def settings():
 
 @app.route('/about')
 def about():
-    """A bried page descibing what the website is about"""
+    """A brief page descibing what the website is about"""
     return render_template('about.html', title='About Us', name="About Us")
 
 @app.route('/create')
@@ -232,9 +232,14 @@ def forum(fName=None, tName=None):
     If tName is not valid redirect to forum page
     """
     #if fname and tname is given attempt to direct to that thread
+    #thread page
+    #collect thread data
+
     #if only fname is given, attempt to direct to the forum page
+    #forum page
     #if neither fname or tname are given then direct to the forums home page
-    return render_template('base.html', title='Post')
+
+    return render_template('forum.html', title='Post')
 
 
 @app.errorhandler(403)
