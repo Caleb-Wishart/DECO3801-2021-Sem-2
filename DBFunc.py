@@ -375,7 +375,7 @@ def modify_resource_personnel(rid, uid, modification: PersonnelModification):
     :param uid: The user to add/delete
     :param modification: Add or delete
     :return void on success.
-            ErrorCode.INVALID_USER/-RESOURCE if uid/rid is incorrect or resource is public
+            ErrorCode.INVALID_USER/-RESOURCE if uid/rid is incorrect
             ErrorCode.INCORRECT_PERSONNEL if mode is delete and personnel info not exist
             ErrorCode.USER_SESSION_EXPIRED when user session is expired
     """
@@ -383,8 +383,8 @@ def modify_resource_personnel(rid, uid, modification: PersonnelModification):
     if not user:
         warnings.warn("uid is invalid")
         return ErrorCode.INVALID_USER
-    elif not resource or resource.is_public:
-        warnings.warn("rid is invalid or resource is public")
+    elif not resource:
+        warnings.warn("rid is invalid")
         return ErrorCode.INVALID_RESOURCE
 
     # check user session and renew
@@ -417,7 +417,7 @@ def modify_resource_personnel(rid, uid, modification: PersonnelModification):
 def modify_resource(rid: int, title=None, resource_link=None,
                     difficulty: ResourceDifficulty = None, subject: Subject = None,
                     grade: Grade = None, creaters_id: list = None, is_public: bool = None,
-                    ids_to_delete_from_personnel: list = None, description=None,
+                    ids_to_delete_from_personnel: list = None, description="NULL",
                     ids_to_add_to_personnel: list = None, tags_id: list = None,
                     resource_thumbnail_links: list = None):
     """
@@ -441,7 +441,8 @@ def modify_resource(rid: int, title=None, resource_link=None,
     :param ids_to_delete_from_personnel: The private personnel ids to be removed
     :param ids_to_add_to_personnel: The private personnel ids to be added
     :param tags_id: The tag ids to be removed/added
-    :param description: The new description of the resource
+    :param description: The new description of the resource. By default, "NULL" does
+                        not change description contents; None clears original description
     :param resource_thumbnail_links: The links of thumbnails to be removed/added
     :return on success, void is returned.
             ErrorCode.INVALID_RESOURCE is rid is invalid
@@ -461,8 +462,11 @@ def modify_resource(rid: int, title=None, resource_link=None,
             resource.subject = subject
         if grade:
             resource.grade = grade
-        if description:
+        if description and description != "NULL":
             resource.description = description
+        elif not description:
+            resource.description = None
+
         if creaters_id:
             creaters = conn.query(ResourceCreater).filter(
                 ResourceCreater.uid.in_(creaters_id),
@@ -519,6 +523,20 @@ def modify_resource(rid: int, title=None, resource_link=None,
                     for i in conn.query(PrivateResourcePersonnel). \
                             filter_by(rid=rid).all():
                         conn.delete(i)
+                elif is_public is None:
+                    # modify the personnel for a private resource
+                    if ids_to_add_to_personnel:
+                        # only add new records to personnel
+                        for i in ids_to_add_to_personnel:
+                            modify_resource_personnel(
+                                rid=rid, uid=i,
+                                modification=PersonnelModification.PERSONNEL_ADD)
+                    if ids_to_delete_from_personnel:
+                        # only delete records from personnel
+                        for i in ids_to_delete_from_personnel:
+                            modify_resource_personnel(
+                                rid=rid, uid=i,
+                                modification=PersonnelModification.PERSONNEL_DELETE)
             else:
                 # resource is originally public
                 if not is_public:
@@ -535,19 +553,6 @@ def modify_resource(rid: int, title=None, resource_link=None,
                     for i in ids_to_add_to_personnel:
                         modify_resource_personnel(
                             rid=rid, uid=i, modification=PersonnelModification.PERSONNEL_ADD)
-                elif is_public is None:
-                    if ids_to_add_to_personnel:
-                        # only add new records to personnel
-                        for i in ids_to_add_to_personnel:
-                            modify_resource_personnel(
-                                rid=rid, uid=i,
-                                modification=PersonnelModification.PERSONNEL_ADD)
-                    if ids_to_delete_from_personnel:
-                        # only delete records from personnel
-                        for i in ids_to_delete_from_personnel:
-                            modify_resource_personnel(
-                                rid=rid, uid=i,
-                                modification=PersonnelModification.PERSONNEL_DELETE)
         try_to_commit(conn)
 
 
