@@ -414,6 +414,143 @@ def modify_resource_personnel(rid, uid, modification: PersonnelModification):
         print(f"user {uid} is {msg} from/to personnel of resource {rid}")
 
 
+def modify_resource(rid: int, title=None, resource_link=None,
+                    difficulty: ResourceDifficulty = None, subject: Subject = None,
+                    grade: Grade = None, creaters_id: list = None, is_public: bool = None,
+                    ids_to_delete_from_personnel: list = None, description=None,
+                    ids_to_add_to_personnel: list = None, tags_id: list = None,
+                    resource_thumbnail_links: list = None):
+    """
+    This method is used to modify the information of a resource
+
+    Notes:
+    1. Only fill in the parameters that needed to be modified.
+    2. For creaters_id, tags_id and resource_thumbnail_links lists,
+    every element will be checked, if that element already exists for this resource,
+    it will then be removed; if an element does not exist for this resource,
+    it will then be added.
+
+    :param rid: The id of resource to be modified
+    :param title: The new title
+    :param resource_link: The new resource link
+    :param difficulty: The new difficulty tag
+    :param subject: The new subject tag
+    :param grade: The new grade tag
+    :param creaters_id: Creater ids to be removed/added
+    :param is_public: whether the resource is made public or not
+    :param ids_to_delete_from_personnel: The private personnel ids to be removed
+    :param ids_to_add_to_personnel: The private personnel ids to be added
+    :param tags_id: The tag ids to be removed/added
+    :param description: The new description of the resource
+    :param resource_thumbnail_links: The links of thumbnails to be removed/added
+    :return on success, void is returned.
+            ErrorCode.INVALID_RESOURCE is rid is invalid
+    """
+    with Session() as conn:
+        resource = conn.query(Resource).filter_by(rid=rid).one_or_none()
+        if not resource:
+            warnings.warn("Invalid rid")
+            return ErrorCode.INVALID_RESOURCE
+        if title:
+            resource.title = title
+        if resource_link:
+            resource.resource_link = resource_link
+        if difficulty:
+            resource.difficulty = difficulty
+        if subject:
+            resource.subject = subject
+        if grade:
+            resource.grade = grade
+        if description:
+            resource.description = description
+        if creaters_id:
+            creaters = conn.query(ResourceCreater).filter(
+                ResourceCreater.uid.in_(creaters_id),
+                ResourceCreater.rid == rid).all()
+            deleted_creaters = set()
+            for i in creaters:
+                conn.delete(i)
+                deleted_creaters.add(i.uid)
+            new_creaters = list(set(creaters_id).difference(deleted_creaters))
+            if new_creaters:
+                for i in new_creaters:
+                    creater = ResourceCreater(rid=rid, uid=i)
+                    conn.add(creater)
+
+        if tags_id:
+            tags = conn.query(ResourceTagRecord).filter(
+                ResourceTagRecord.rid == rid,
+                ResourceTagRecord.tag_id.in_(tags_id))
+            deleted_tags = set()
+            for i in tags:
+                conn.delete(i)
+                deleted_tags.add(i.tag_id)
+            new_tags = list(set(tags_id).difference(deleted_tags))
+            if new_tags:
+                for i in new_tags:
+                    tag = ResourceTagRecord(rid=rid, tag_id=i)
+                    conn.add(tag)
+
+        if resource_thumbnail_links:
+            thumbnails = conn.query(ResourceThumbnail).filter(
+                ResourceThumbnail.rid == rid,
+                ResourceThumbnail.thumbnail_link.in_(resource_thumbnail_links))
+            deleted_thumbnails = set()
+            for i in thumbnails:
+                deleted_thumbnails.add(i.thumbnail_link)
+                conn.delete(i)
+            new_thumbnails = list(set(
+                resource_thumbnail_links).difference(deleted_thumbnails))
+            if new_thumbnails:
+                for i in new_thumbnails:
+                    thumbnail = ResourceThumbnail(rid=rid, thumbnail_link=i)
+                    conn.add(thumbnail)
+
+        # commit before making changes to resource access permission
+        try_to_commit(conn)
+
+        if is_public is not None or \
+                ids_to_add_to_personnel or ids_to_delete_from_personnel:
+            if not resource.is_public:
+                if is_public is not None and is_public:
+                    # originally private, now public
+                    resource.is_public = True
+                    conn.add(resource)
+                    for i in conn.query(PrivateResourcePersonnel). \
+                            filter_by(rid=rid).all():
+                        conn.delete(i)
+            else:
+                # resource is originally public
+                if not is_public:
+                    # now change to private and add users allow to view the resource
+                    # to personnel
+                    resource.is_public = False
+                    # creaters must have access to private resource
+                    creaters = conn.query(ResourceCreater).filter_by(rid=rid).all()
+                    if not ids_to_add_to_personnel:
+                        ids_to_add_to_personnel = []
+                    ids_to_add_to_personnel = set(ids_to_add_to_personnel)
+                    for i in creaters:
+                        ids_to_add_to_personnel.add(i.uid)
+                    for i in ids_to_add_to_personnel:
+                        modify_resource_personnel(
+                            rid=rid, uid=i, modification=PersonnelModification.PERSONNEL_ADD)
+                elif is_public is None:
+                    if ids_to_add_to_personnel:
+                        # only add new records to personnel
+                        for i in ids_to_add_to_personnel:
+                            modify_resource_personnel(
+                                rid=rid, uid=i,
+                                modification=PersonnelModification.PERSONNEL_ADD)
+                    if ids_to_delete_from_personnel:
+                        # only delete records from personnel
+                        for i in ids_to_delete_from_personnel:
+                            modify_resource_personnel(
+                                rid=rid, uid=i,
+                                modification=PersonnelModification.PERSONNEL_DELETE)
+        try_to_commit(conn)
+
+
 def user_has_access_to_resource(uid, rid):
     """
     Check if a user has access to a private resource

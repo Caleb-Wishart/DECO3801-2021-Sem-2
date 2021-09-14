@@ -261,30 +261,48 @@ Session = sessionmaker(engine)
 
 # NOTE: below tests are run after channels are created using Dummies script
 # check find_channels
-print("No parameters provided")
-for i in find_channels():
-    print(i.cid)
-print("\n")
+# print("No parameters provided")
+# for i in find_channels():
+#     print(i.cid)
+# print("\n")
+#
+# print("grade = year 3 only, accessed by uid = 3")
+# for i in find_channels(grade=Grade.YEAR_3, caller_uid=3):
+#     print(i.cid)
+# print("\n")
+#
+# print("grade = year 3, subject = math A, accessed by uid = 3")
+# for i in find_channels(grade=Grade.YEAR_3, caller_uid=3, subject=Subject.MATHS_A):
+#     print(i.cid)
+# print("\n")
+#
+# print("all channels created by admin user 1")
+# for i in find_channels(admin_uid=1):
+#     print(f"cid = {i.cid}, admin_uid = {i.admin_uid}")
+#
+# print('all channels created by 1, tag_id == 8')
+# for i in find_channels(admin_uid=1, tag_ids=[8]):
+#     print(i.cid)
+#
+# print("visibility == PUBLIC")
+# for i in find_channels(visibility=ChannelVisibility.PUBLIC):
+#     print(i.cid)
 
-print("grade = year 3 only, accessed by uid = 3")
-for i in find_channels(grade=Grade.YEAR_3, caller_uid=3):
-    print(i.cid)
-print("\n")
 
-print("grade = year 3, subject = math A, accessed by uid = 3")
-for i in find_channels(grade=Grade.YEAR_3, caller_uid=3, subject=Subject.MATHS_A):
-    print(i.cid)
-print("\n")
 
-print("all channels created by admin user 1")
-for i in find_channels(admin_uid=1):
-    print(f"cid = {i.cid}, admin_uid = {i.admin_uid}")
+# NOTE: below tests are run after channels are created using Dummies script
+# test modify_resource
+# change title, resource_link, difficulty, subject, grade and remove tag 1 and
+# add tags 2, 3, 4, 5, add 2 resource thumbnail links, delete creater 5 and add
+# creater 1; change public to private, no private personnel list provided
+modify_resource(rid=1, title="Temp title", resource_link="Temp link",
+                difficulty=ResourceDifficulty.SPECIALIST, subject=Subject.ACCOUNTING,
+                grade=Grade.KINDERGARTEN, description=None, tags_id=[1, 2, 3, 4, 5],
+                resource_thumbnail_links=["temp1", "temp2"], is_public=False
+                )
 
-print('all channels created by 1, tag_id == 8')
-for i in find_channels(admin_uid=1, tag_ids=[8]):
-    print(i.cid)
+# private resource change to public
+modify_resource(rid=7, is_public=True)
 
-print("visibility == PUBLIC")
-for i in find_channels(visibility=ChannelVisibility.PUBLIC):
-    print(i.cid)
-
+# private resource, add personnel 1 and remove personnel [2, 3]
+modify_resource(rid=10, ids_to_add_to_personnel=[1], ids_to_delete_from_personnel=[2, 3])
