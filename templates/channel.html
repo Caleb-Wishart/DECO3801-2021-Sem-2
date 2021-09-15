@@ -1,8 +1,197 @@
 {% extends 'base.html' %}
 
+{% block style %}
+<style>
+    a:link {
+        text-decoration: none;
+    }
+
+    a:visited {
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: none;
+    }
+
+    a:active {
+        text-decoration: none;
+    }
+</style>
+{% endblock %}
+
+{% block script %}
+<script type="text/template" id="resource_card">
+     <% _.each(data,  function(res) { %>
+        <!-- Resource -->
+        <div class="col-4 p-2">
+            <!-- FIXME Change UID 1 to logged in user -->
+            <a class="text-dark card shadow-sm" href="{{url_for('resource')}}/1/<%= res.rid %>">
+                <img class="bd-placeholder-img card-img-top" src="{{url_for('static', filename='img/placeholder.png')}}" ,
+                    alt="Logo" , width="150" , height="150">
+                <div class="card-body">
+                    <p class="card-text">
+                        <%= res.title %>
+                    </p>
+                    <div class="d-flex">
+                        <p class="card-text px-1">
+                            <%= res.upvote_count %>
+                        </p>
+                        <img src="{{url_for('static', filename='img/up.png')}}" , alt="Down" , width="20" , height="20">
+                        <p class="card-text px-1">
+                            <%= res.downvote_count %>
+                        </p>
+                        <img src="{{url_for('static', filename='img/down.png')}}" , alt="Down" , width="20" , height="20">
+                    </div>
+                </div>
+            </a>
+        </div>
+    <% }); %>
+</script>
+<script>
+    // DROPDOWN
+    $(function () {
+
+        $(".dropdown-menu a").click(function () {
+
+            $("#dropdownMenuButton1").text($(this).text());
+            $("#dropdownMenuButton1").val($(this).text());
+        });
+
+    });
+    // AJAX
+    $(document).on("keyup", "#search_content", function (e) {
+        var search_term = $('input[name=title]').val();
+        $.ajax(
+            {
+                type: "GET",
+                url: "{{url_for('search')}}",
+                data: { "title": search_term },
+                success: function (response) {
+                    $("#result").empty(); // remove current results
+                    var resource_card = _.template($("#resource_card").html());
+                    $("#result").html(resource_card({ data: response })); // set new results
+                    if (response.length == 0) {
+                        $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
+                    }
+
+                }
+            }
+        )
+    });
+    // Seed AJAX
+    $(document).ready(function () {
+        $.ajax(
+            {
+                type: "GET",
+                url: "{{url_for('search')}}",
+                data: { "title": "" },
+                success: function (response) {
+                    $("#result").empty(); // remove current results
+                    var resource_card = _.template($("#resource_card").html());
+                    $("#result").html(resource_card({ data: response })); // set new results
+                }
+            }
+        )
+    });
+</script>
+{% endblock %}
+
 {% block content %}
-    <p>This is a page about us</p>
-    {% for i in range(300) %}
-        <p>{{i}}</p>
-    {% endfor %}
+<div class="container">
+    <div class="row p-3">
+        <!-- Search Bar -->
+        <div class="col d-flex justify-content-md-between">
+            <div class="input-group">
+                <input type="search" name="title" class="form-control" placeholder="&#Search Channels"
+                    id="search_content">
+            </div>
+        </div>
+    </div>
+    <div class="row p-3">
+        <!-- Tags section -->
+        <div class="col-3">
+            <p class="h3">Tags</p>
+        </div>
+        <!-- Resources selection -->
+        <div class="col d-flex justify-content-md-between">
+            <p class="h3">Trending Resources</p>
+            <div class="d-flex">
+                <p class="h3">Sort by</p>
+                <div class="dropdown px-3">
+                    <button class="btn btn-secondary dropdown-toggle" style="min-width: 100px;" type="button"
+                        id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                        Newest
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">Newest </a>
+                        <a class="dropdown-item" href="#">Upvotes</a>
+                    </div>
+                </div>
+            </div>
+            <a href="{{url_for('create')}}" class="btn btn-primary" aria-haspopup="true" aria-expanded="false">
+                Create Resource
+            </a>
+        </div>
+    </div>
+    <div class="row p-3">
+        <div class="col-3">
+            <!-- Subject selection -->
+            <div class="row pe-5">
+                <div class="card">
+                    <p class="h4">Subject</p>
+                    <div class="card-body overflow-auto" style="max-height: 350px;">
+                        {% for item in subject %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="check{{item}}">
+                            <label class="form-check-label" for="flexCheckDefault">
+                                {{item}}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <!-- Year selection -->
+            <div class="row pe-5 py-3">
+                <div class="card overflow-auto">
+                    <p class="h4">Year</p>
+                    <div class="card-body overflow-auto" style="max-height: 350px;">
+                        {% for item in grade %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="check{{item}}">
+                            <label class="form-check-label" for="flexCheckDefault">
+                                {{item}}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <!-- Other Tag selection -->
+            <div class="row pe-5">
+                <div class="card overflow-auto">
+                    <p class="h4">Other</p>
+                    <div class="card-body overflow-auto" style="max-height: 200px;">
+                        {% for item in tag %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="check{{item}}">
+                            <label class="form-check-label" for="flexCheckDefault">
+                                {{item}}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col d-flex justify-content-md-between">
+            <!-- Resources top level -->
+            <div class="card flex-fill">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 p-3" id="result">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
