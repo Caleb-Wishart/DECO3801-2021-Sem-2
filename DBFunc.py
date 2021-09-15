@@ -27,7 +27,12 @@ VERBOSE = True
 # on the contrary, when DB is not in this mode, any operations within the transaction
 # that causes commit error will be roll-backed. Error message will be shown as
 # a warning on screen
-DEBUG_MODE = True
+DEBUG_MODE = False
+
+# link to default user profile background
+DEFAULT_PROFILE_BACKGROUND_LINK = "static/profile_background/default_background.jpg"
+# link to default user avatar
+DEFAULT_USER_AVATAR_LINK = "static/avatar/ashley_gibbon.png"
 
 
 class ErrorCode(enum.Enum):
@@ -51,14 +56,16 @@ class ErrorCode(enum.Enum):
     USER_SESSION_EXPIRED = 7
     # commit failure
     COMMIT_ERROR = 8
+    # email exists in DB
+    EMAIL_USED = 9
 
 
-class PersonnelModification(enum.Enum):
+class Modification(enum.Enum):
     """
-    Defining the type of modification to be done on personnel
+    Defining the type of modification to be done
     """
-    PERSONNEL_ADD = 0
-    PERSONNEL_DELETE = 1
+    MODIFY_ADD = 0
+    MODIFY_DELETE = 1
 
 
 engine = create_engine(DBPATH)
@@ -98,7 +105,8 @@ def try_to_commit(trans):
 
 
 def add_user(username, password, email, teaching_areas: dict = None,
-             bio=None, avatar_link=None, profile_background_link=None):
+             bio=None, avatar_link=DEFAULT_USER_AVATAR_LINK,
+             profile_background_link=DEFAULT_PROFILE_BACKGROUND_LINK):
     """
     Add a new user to table user and add teaching_areas to
     user_teaching_areas table
@@ -112,7 +120,7 @@ def add_user(username, password, email, teaching_areas: dict = None,
     :param teaching_areas: Mapping of teaching area - [is_public, grade (optional)] list
             e.g. [Subject.ENGLISH: [True], Subject.MATHS_C: [False, Grade.YEAR_1]
     :return The id of the new user if success.
-            ErrorCode.INVALID_USER if email is occupied
+            ErrorCode.EMAIL_USED if email is occupied
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     email = email.lower()
@@ -125,7 +133,7 @@ def add_user(username, password, email, teaching_areas: dict = None,
     with Session() as conn:
         if conn.query(User).filter_by(email=email).one_or_none():
             warnings.warn("This email address is registered")
-            return ErrorCode.INVALID_USER
+            return ErrorCode.EMAIL_USED
 
         # phase 1: add a new user
         conn.add(user)
@@ -142,16 +150,8 @@ def add_user(username, password, email, teaching_areas: dict = None,
         # conn.commit()
 
         if teaching_areas:
-            for area, info in teaching_areas.items():
-                grade = None
-                if len(info) == 2:
-                    is_public, grade = info[0], info[1]
-                else:
-                    is_public = info[0]
-                if isinstance(area, Subject):
-                    new_teach_area = UserTeachingAreas(uid=user.uid, teaching_area=area,
-                                                       is_public=is_public, grade=grade)
-                    conn.add(new_teach_area)
+            modify_user_teaching_areas(uid=user.uid, conn=conn, teaching_areas=teaching_areas,
+                                       modification=Modification.MODIFY_ADD)
         if not try_to_commit(conn):
             warnings.warn(f"failed to commit user creation {username}")
             conn.delete(user)
@@ -161,6 +161,117 @@ def add_user(username, password, email, teaching_areas: dict = None,
         if VERBOSE:
             print(f"User {username} created")
         return user.uid
+
+
+def modify_user_teaching_areas(uid, conn, modification: Modification,
+                               teaching_areas: dict = None):
+    """
+    Modify a sequence of teaching areas to user instance
+
+    :param uid: The id of user
+    :param conn: The Session() initiated
+    :param modification: Add or Delete
+    :param teaching_areas: Mapping of teaching area - [is_public, grade (optional)] list
+            e.g. [Subject.ENGLISH: [True], Subject.MATHS_C: [False, Grade.YEAR_1]
+    """
+    for area, info in teaching_areas.items():
+        grade = None
+        if len(info) == 2:
+            is_public, grade = info[0], info[1]
+        else:
+            is_public = info[0]
+        if isinstance(area, Subject):
+            if modification == Modification.MODIFY_ADD:
+                # insert new user teaching areas
+                new_teach_area = UserTeachingAreas(uid=uid, teaching_area=area,
+                                                   is_public=is_public, grade=grade)
+                conn.add(new_teach_area)
+            else:
+                # delete user teaching areas
+                teaching_area = conn.query(UserTeachingAreas).\
+                    filter_by(uid=uid, teaching_area=area,
+                              is_public=is_public, grade=grade).one_or_none()
+                if teaching_area:
+                    conn.delete(teaching_area)
+
+
+def modify_user(uid: int, username=None, password=None, email=None,
+                teaching_areas_to_add: dict = None,
+                teaching_areas_to_delete: dict = None,
+                profile_background_link: str = "NULL",
+                bio: str = "NULL", avatar_link: str = "NULL"):
+    """
+    Modify the information of a user instance
+
+    :param uid: The id of user to be modified
+    :param username: The new username
+    :param password: The new password (not hashed)
+    :param email: The new email address
+    :param teaching_areas_to_add: Mapping of teaching area
+                                - [is_public, grade (optional)] list
+                                The new teaching areas to be added
+                                e.g. [Subject.ENGLISH: [True],
+                                 Subject.MATHS_C: [False, Grade.YEAR_1]
+    :param teaching_areas_to_delete: Mapping of teaching area
+                                - [is_public, grade (optional)] list
+                                The new teaching areas to be deleted
+                                e.g. [Subject.ENGLISH: [True],
+                                 Subject.MATHS_C: [False, Grade.YEAR_1]
+    :param profile_background_link: The new link to profile_background image.
+                                    By default, "NULL" does not change profile link;
+                                    None turns the profile background back to default one
+    :param bio: The new bio. By default, "NULL" does not change the bio.
+                None clears the original bio
+    :param avatar_link: The new link to avatar. By default, "NULL" does not change
+                        link to avatar. None turns the avatar link to default one
+    :return void on success
+            ErrorCode.INVALID_USER if cid is invalid
+            ErrorCode.EMAIL_USED if new email is already registered
+            ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
+    """
+    with Session() as conn:
+        user = conn.query(User).filter_by(uid=uid).one_or_none()
+        if not user:
+            warnings.warn("Invalid uid")
+            return ErrorCode.INVALID_USER
+
+        if email:
+            if isinstance(User, get_user(email)):
+                print("email is already registered")
+                return ErrorCode.EMAIL_USED
+            user.email = email
+        if username:
+            user.username = username
+        if password:
+            user.hash_password = generate_password_hash(password, "sha256")
+        if profile_background_link != "NULL":
+            if not profile_background_link:
+                user.profile_background_link = DEFAULT_PROFILE_BACKGROUND_LINK
+            else:
+                user.profile_background_link = profile_background_link
+        if bio != "NULL":
+            if not bio:
+                user.bio = None
+            else:
+                user.bio = bio
+        if avatar_link != "NULL":
+            if not avatar_link:
+                user.avatar_link = DEFAULT_USER_AVATAR_LINK
+            else:
+                user.avatar_link = avatar_link
+
+        conn.add(user)
+
+        if teaching_areas_to_add:
+            modify_user_teaching_areas(uid=uid, conn=conn, teaching_areas=teaching_areas_to_add,
+                                       modification=Modification.MODIFY_ADD)
+        if teaching_areas_to_delete:
+            modify_user_teaching_areas(uid=uid, conn=conn, teaching_areas=teaching_areas_to_delete,
+                                       modification=Modification.MODIFY_DELETE)
+
+        if not try_to_commit(conn):
+            warnings.warn("Error committing")
+            return ErrorCode.COMMIT_ERROR
 
 
 def get_user(email):
@@ -379,7 +490,7 @@ def is_resource_public(rid: int):
         return resource.is_public
 
 
-def modify_resource_personnel(rid, uid, modification: PersonnelModification):
+def modify_resource_personnel(rid, uid, modification: Modification):
     """
     Add/delete a person from a resource personnel
 
@@ -406,7 +517,7 @@ def modify_resource_personnel(rid, uid, modification: PersonnelModification):
     # renew_user_session(uid)
 
     with Session() as conn:
-        if modification == PersonnelModification.PERSONNEL_DELETE:
+        if modification == Modification.MODIFY_DELETE:
             # delete
             personnel = conn.query(PrivateResourcePersonnel).filter_by(uid=uid, rid=rid). \
                 one_or_none()
@@ -458,6 +569,7 @@ def modify_resource(rid: int, title=None, resource_link=None,
     :param resource_thumbnail_links: The links of thumbnails to be removed/added
     :return on success, void is returned.
             ErrorCode.INVALID_RESOURCE is rid is invalid
+            ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     with Session() as conn:
         resource = conn.query(Resource).filter_by(rid=rid).one_or_none()
@@ -523,7 +635,16 @@ def modify_resource(rid: int, title=None, resource_link=None,
                     conn.add(thumbnail)
 
         # commit before making changes to resource access permission
-        try_to_commit(conn)
+        conn.add(resource)
+        # todo: fake unique constraint violation
+        test = conn.query(Resource).filter_by(uid=2).first()
+        test.title = "temp title"
+        conn.add(test)
+
+
+        if not try_to_commit(conn):
+            warnings.warn("Error committing")
+            return ErrorCode.COMMIT_ERROR
 
         if is_public is not None or \
                 ids_to_add_to_personnel or ids_to_delete_from_personnel:
@@ -531,7 +652,6 @@ def modify_resource(rid: int, title=None, resource_link=None,
                 if is_public is not None and is_public:
                     # originally private, now public
                     resource.is_public = True
-                    conn.add(resource)
                     for i in conn.query(PrivateResourcePersonnel). \
                             filter_by(rid=rid).all():
                         conn.delete(i)
@@ -542,13 +662,13 @@ def modify_resource(rid: int, title=None, resource_link=None,
                         for i in ids_to_add_to_personnel:
                             modify_resource_personnel(
                                 rid=rid, uid=i,
-                                modification=PersonnelModification.PERSONNEL_ADD)
+                                modification=Modification.MODIFY_ADD)
                     if ids_to_delete_from_personnel:
                         # only delete records from personnel
                         for i in ids_to_delete_from_personnel:
                             modify_resource_personnel(
                                 rid=rid, uid=i,
-                                modification=PersonnelModification.PERSONNEL_DELETE)
+                                modification=Modification.MODIFY_DELETE)
             else:
                 # resource is originally public
                 if not is_public:
@@ -564,8 +684,11 @@ def modify_resource(rid: int, title=None, resource_link=None,
                         ids_to_add_to_personnel.add(i.uid)
                     for i in ids_to_add_to_personnel:
                         modify_resource_personnel(
-                            rid=rid, uid=i, modification=PersonnelModification.PERSONNEL_ADD)
-        try_to_commit(conn)
+                            rid=rid, uid=i, modification=Modification.MODIFY_ADD)
+        conn.add(resource)
+        if not try_to_commit(conn):
+            warnings.warn("Error committing")
+            return ErrorCode.COMMIT_ERROR
 
 
 def user_has_access_to_resource(uid, rid):
@@ -1111,7 +1234,7 @@ def get_user_and_channel_instance(uid, cid):
     return user, channel
 
 
-def modify_channel_personnel(uid, cid, modification: PersonnelModification):
+def modify_channel_personnel(uid, cid, modification: Modification):
     """
     Add/ delete a user from/to a private personnel
 
@@ -1132,7 +1255,7 @@ def modify_channel_personnel(uid, cid, modification: PersonnelModification):
         return ErrorCode.INVALID_CHANNEL
 
     with Session() as conn:
-        if modification == PersonnelModification.PERSONNEL_DELETE:
+        if modification == Modification.MODIFY_DELETE:
             # delete
             personnel = conn.query(ChannelPersonnel).filter_by(uid=uid, cid=cid). \
                 one_or_none()

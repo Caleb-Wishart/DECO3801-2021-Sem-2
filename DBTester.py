@@ -300,9 +300,11 @@ modify_resource(rid=1, title="Temp title", resource_link="Temp link",
                 grade=Grade.KINDERGARTEN, description=None, tags_id=[1, 2, 3, 4, 5],
                 resource_thumbnail_links=["temp1", "temp2"], is_public=False
                 )
-
+# todo
+exit(3)
 # private resource change to public
 modify_resource(rid=7, is_public=True)
 
 # private resource, add personnel 1 and remove personnel [2, 3]
 modify_resource(rid=10, ids_to_add_to_personnel=[1], ids_to_delete_from_personnel=[2, 3])
+
