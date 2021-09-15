@@ -294,15 +294,17 @@ Session = sessionmaker(engine)
 # change title, resource_link, difficulty, subject, grade and remove tag 1 and
 # add tags 2, 3, 4, 5, add 2 resource thumbnail links, delete creater 5 and add
 # creater 1; change public to private, no private personnel list provided
-modify_resource(rid=1, title="Temp title", resource_link="Temp link",
-                difficulty=ResourceDifficulty.SPECIALIST, subject=Subject.ACCOUNTING,
-                grade=Grade.KINDERGARTEN, description=None, tags_id=[1, 2, 3, 4, 5],
-                resource_thumbnail_links=["temp1", "temp2"], is_public=False
-                )
+# modify_resource(rid=1, title="Temp title", resource_link="Temp link",
+#                 difficulty=ResourceDifficulty.SPECIALIST, subject=Subject.ACCOUNTING,
+#                 grade=Grade.KINDERGARTEN, description=None, tags_id=[1, 2, 3, 4, 5],
+#                 resource_thumbnail_links=["temp1", "temp2"], is_public=False
+#                 )
+#
+# # private resource change to public
+# modify_resource(rid=7, is_public=True)
+#
+# # private resource, add personnel 1 and remove personnel [2, 3]
+# modify_resource(rid=10, ids_to_add_to_personnel=[1], ids_to_delete_from_personnel=[2, 3])
 
-# private resource change to public
-modify_resource(rid=7, is_public=True)
-
-# private resource, add personnel 1 and remove personnel [2, 3]
-modify_resource(rid=10, ids_to_add_to_personnel=[1], ids_to_delete_from_personnel=[2, 3])
-
+# test remove a resource 7
+remove_resource(rid=7)

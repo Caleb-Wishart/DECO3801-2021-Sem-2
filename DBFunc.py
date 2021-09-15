@@ -274,6 +274,22 @@ def modify_user(uid: int, username=None, password=None, email=None,
             return ErrorCode.COMMIT_ERROR
 
 
+def remove_resource(rid: int):
+    """
+    Remove a resource entity. This also removes all the records relevant to
+    this resource entity in ResourceTagRecord, ResourceThumbnail,
+    ResourceVoteInfo, ResourceCreater, ResourcePersonnel, ResourceComment,
+    ResourceCommentReply tables
+
+    :param rid: The id of resource to be removed
+    """
+    with Session() as conn:
+        resource = conn.query(Resource).filter_by(rid=rid).one_or_none()
+        if resource:
+            conn.delete(resource)
+            conn.commit()
+
+
 def get_user(email):
     """
     Retrieve the User with the unique email as the key
