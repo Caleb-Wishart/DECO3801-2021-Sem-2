@@ -210,9 +210,9 @@ def create(type=None):
     """
     return render_template('base.html', title='Post')
 
-@app.route('/forum')
-@app.route('/forum/<fName>/<tName>')
-def forum(fName=None, tName=None):
+@app.route('/channel')
+@app.route('/channel/<fName>/<tName>')
+def channel(fName=None, tName=None):
     """The user view a forum page
 
     The home forum page (fName == None, tName == None) shows the list of forums
