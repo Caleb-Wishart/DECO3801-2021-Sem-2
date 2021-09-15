@@ -638,7 +638,7 @@ def modify_resource(rid: int, title=None, resource_link=None,
         conn.add(resource)
         # todo: fake unique constraint violation
         test = conn.query(Resource).filter_by(rid=2).first()
-        test.title = "temp title"
+        test.title = "Temp title"
         conn.add(test)
 
 
