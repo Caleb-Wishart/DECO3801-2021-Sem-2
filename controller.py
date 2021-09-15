@@ -230,7 +230,7 @@ def channel(fName=None, tName=None):
     If fName is not valid name redirect to home forum page
     If tName is not valid redirect to forum page
     """
-    return render_template('base.html', title='Post')
+    return render_template('channel.html', title='Post')
 
 
 @app.errorhandler(403)
