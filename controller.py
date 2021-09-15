@@ -233,7 +233,7 @@ def channel(fName=None, tName=None):
 
     if fName is None or tName is None:
         return render_template('resource.html',
-                               title='Resources',
+                               title='Channels',
                                subject=[enum_to_website_output(e) for e in Subject],
                                grade=[enum_to_website_output(e) for e in Grade],
                                tag=get_tags().keys(),
