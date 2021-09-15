@@ -637,7 +637,7 @@ def modify_resource(rid: int, title=None, resource_link=None,
         # commit before making changes to resource access permission
         conn.add(resource)
         # todo: fake unique constraint violation
-        test = conn.query(Resource).filter_by(uid=2).first()
+        test = conn.query(Resource).filter_by(rid=2).first()
         test.title = "temp title"
         conn.add(test)
 
