@@ -289,7 +289,6 @@ Session = sessionmaker(engine)
 #     print(i.cid)
 
 
-
 # NOTE: below tests are run after channels are created using Dummies script
 # test modify_resource
 # change title, resource_link, difficulty, subject, grade and remove tag 1 and
@@ -300,8 +299,7 @@ modify_resource(rid=1, title="Temp title", resource_link="Temp link",
                 grade=Grade.KINDERGARTEN, description=None, tags_id=[1, 2, 3, 4, 5],
                 resource_thumbnail_links=["temp1", "temp2"], is_public=False
                 )
-# todo
-exit(3)
+
 # private resource change to public
 modify_resource(rid=7, is_public=True)
 

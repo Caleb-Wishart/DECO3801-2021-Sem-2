@@ -27,7 +27,7 @@ VERBOSE = True
 # on the contrary, when DB is not in this mode, any operations within the transaction
 # that causes commit error will be roll-backed. Error message will be shown as
 # a warning on screen
-DEBUG_MODE = False
+DEBUG_MODE = True
 
 # link to default user profile background
 DEFAULT_PROFILE_BACKGROUND_LINK = "static/profile_background/default_background.jpg"
@@ -636,11 +636,11 @@ def modify_resource(rid: int, title=None, resource_link=None,
 
         # commit before making changes to resource access permission
         conn.add(resource)
-        # todo: fake unique constraint violation
-        test = conn.query(Resource).filter_by(rid=2).first()
-        test.title = "Temp title"
-        conn.add(test)
 
+        # test: here fake unique constraint violation
+        # test = conn.query(Resource).filter_by(rid=2).first()
+        # test.title = "Temp title"
+        # conn.add(test)
 
         if not try_to_commit(conn):
             warnings.warn("Error committing")

@@ -268,8 +268,7 @@ class Resource(Base):
     rid = Column(Integer, primary_key=True, autoincrement=True)
 
     # title of the resource
-    # todo
-    title = Column(String(STANDARD_STRING_LENGTH), nullable=False, unique=True)
+    title = Column(String(STANDARD_STRING_LENGTH), nullable=False)
 
     # link to video
     resource_link = Column(String(STANDARD_STRING_LENGTH), nullable=False)
