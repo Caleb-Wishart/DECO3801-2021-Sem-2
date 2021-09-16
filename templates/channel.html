@@ -17,6 +17,16 @@
     a:active {
         text-decoration: none;
     }
+
+
+        body {
+            /* Adds a Hex honeycomb background */
+            /* background-image: url({{url_for('static', filename='img/hex_back.png')}}),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
+            background-color: #F5F5FF;
+            background-image: radial-gradient(rgb(254, 239, 255), rgb(246, 244, 255), rgb(254, 239, 255));
+            background-color: rgb(245, 245, 255);
+        }
+
 </style>
 {% endblock %}
 
@@ -114,7 +124,7 @@
         <div class="shadow p-2 bg-white rounded">
             <dt class="row">
                 <dt class="col-sm-3" style = "padding-left: 8rem!important; font-size: larger">Channel Home</dt>
-                    <dd class="row-3" style = "padding-left: 8rem!important; font-size: medium">
+                    <dd class="row-3" style = "padding-left: 8rem!important; font-size: small">
                         <p>Ask any questions you have in the relevant channels below. To see private channels you have access to, click private channels</p>
                     </dd>
             </dt>
