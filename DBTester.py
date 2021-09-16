@@ -329,15 +329,15 @@ Session = sessionmaker(engine)
 
 # test for channel post hierarchy: remove post_id =1, check
 # existence of post comment
-remove_channel_post(post_id=1)
-
-# remove post comment = 10
-remove_channel_post_comment(post_comment_id=10)
-
-# test for resource comment reply = 20 removal
-remove_resource_comment_reply(resource_comment_id=20)
-
-# test for resource comment hierarchy:
-# remove post_comment_id = 1, expected 2 records removed from
-# resource_comment_reply table
-remove_resource_comment(resource_comment_id=1)
+# remove_channel_post(post_id=1)
+#
+# # remove post comment = 10
+# remove_channel_post_comment(post_comment_id=10)
+#
+# # test for resource comment reply = 20 removal
+# remove_resource_comment_reply(resource_comment_id=20)
+#
+# # test for resource comment hierarchy:
+# # remove post_comment_id = 1, expected 2 records removed from
+# # resource_comment_reply table
+# remove_resource_comment(resource_comment_id=1)
