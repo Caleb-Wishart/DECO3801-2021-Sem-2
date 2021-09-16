@@ -323,4 +323,3 @@ modify_channel(cid=3, name="test name", admin_uid=5, subject=Subject.ANCIENT_HIS
 modify_channel(cid=4, ids_to_add_to_personnel=[1, 4, 9],
                ids_to_delete_from_personnel=[2])
 
-#

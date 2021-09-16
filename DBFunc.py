@@ -1379,7 +1379,7 @@ def modify_channel(cid: int, name=None, visibility: ChannelVisibility = None,
                     deleted_tags.add(i.tag_id)
             new_tags = tags_id.difference(deleted_tags)
             for i in new_tags:
-                tag = ChannelTagRecord(cid=cid, tags_id=i)
+                tag = ChannelTagRecord(cid=cid, tag_id=i)
                 conn.add(tag)
 
         if visibility:
