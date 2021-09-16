@@ -10,113 +10,83 @@
 
 {% block content %}
 <div class="container">
+    <!-- Profile Image/Background -->
     <div class="row p-3">
-        <!-- Profile Image/Background -->
         <div class="col d-flex justify-content-md-between">
             <div class="card">
-                    <div class="card-body overflow-auto" style="max-height: 350px;">
-                        <img src="{{dic['img']}}" class="img-fluid" alt="User Profile Banner">
-                        <img src="{{dic['img']}}" class="img-thumbnail" alt="User Profile Pic">
-                    </div>
+                <div class="card-body overflow-auto" style="max-height: 350px;">
+                    <img src="{{dic['img']}}" class="img-fluid" alt="User Profile Banner">
+                    <img src="{{dic['img']}}" class="img-thumbnail" alt="User Profile Pic">
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Rest of page -->
     <div class="row p-3">
-        <!-- Bio -->
+        <!-- Left Sidebar -->
         <div class="col-3">
+            <!-- Bio -->
             <div class="row pe-5">
                 <div class="card">
-                    <p class="h4">Subject</p>
+                    <p class="h4">Bio</p>
                     <div class="card-body overflow-auto" style="max-height: 350px;">
-                        {% for item in subject %}
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="check{{item}}">
-                            <label class="form-check-label" for="flexCheckDefault">
-                                {{item}}
-                            </label>
-                        </div>
-                        {% endfor %}
+                        <p class="lead">USER BIO FROM DB PLS :)</p>
                     </div>
                 </div>
             </div>
-            <p class="h3">Bio</p>
-        </div>
-        <!-- Resources selection -->
-        <div class="col d-flex justify-content-md-between">
-            <p class="h3">Trending Resources</p>
-            <div class="d-flex">
-                <p class="h3">Sort by</p>
-                <div class="dropdown px-3">
-                    <button class="btn btn-secondary dropdown-toggle" style="min-width: 100px;" type="button"
-                        id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                        Newest
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" href="#">Newest </a>
-                        <a class="dropdown-item" href="#">Upvotes</a>
-                    </div>
-                </div>
-            </div>
-            <a href="{{url_for('create')}}" class="btn btn-primary" aria-haspopup="true" aria-expanded="false">
-                Create Resource
-            </a>
-        </div>
-    </div>
-    <div class="row p-3">
-        <div class="col-3">
-            <!-- Subject selection -->
+
+            <!-- Educator Rating -->
             <div class="row pe-5">
                 <div class="card">
-                    <p class="h4">Subject</p>
+                    <p class="h4">Educator Rating</p>
                     <div class="card-body overflow-auto" style="max-height: 350px;">
-                        {% for item in subject %}
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="check{{item}}">
-                            <label class="form-check-label" for="flexCheckDefault">
-                                {{item}}
-                            </label>
-                        </div>
-                        {% endfor %}
+                        STARS HERE
+                        <a href="#">How is this calculated?</a>
                     </div>
                 </div>
             </div>
-            <!-- Year selection -->
-            <div class="row pe-5 py-3">
-                <div class="card overflow-auto">
-                    <p class="h4">Year</p>
-                    <div class="card-body overflow-auto" style="max-height: 350px;">
-                        {% for item in grade %}
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="check{{item}}">
-                            <label class="form-check-label" for="flexCheckDefault">
-                                {{item}}
-                            </label>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-            <!-- Other Tag selection -->
+
+            <!-- Tags -->
             <div class="row pe-5">
-                <div class="card overflow-auto">
-                    <p class="h4">Other</p>
-                    <div class="card-body overflow-auto" style="max-height: 200px;">
-                        {% for item in tag %}
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="check{{item}}">
-                            <label class="form-check-label" for="flexCheckDefault">
-                                {{item}}
-                            </label>
-                        </div>
-                        {% endfor %}
+                <div class="card">
+                    <p class="h4">Tags</p>
+                    <div class="card-body overflow-auto" style="max-height: 350px;">
+                       {# {% for TAG in TAGS %} #}
+                            <button type="button" class="btn btn-danger"
+                                    style="border-radius: 50px">TAGS PLEASE</button>
+                        {# {% endfor %} #}
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- All Resource Content -->
         <div class="col d-flex justify-content-md-between">
-            <!-- Resources top level -->
-            <div class="card flex-fill">
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 p-3" id="result">
+            <div class="row pe-5">
+                <!-- Resource Headings -->
+                <p class="h3">My Resources</p>
+                <p class="h3">My Forums</p>
+                <p class="h3">Upvoted Resources</p>
+                <p class="h3">Private Resources</p>
+            </div>
+            <!-- Search Bar -->
+            <div class="row pe-5">
+                <div class="col d-flex justify-content-md-between">
+                    <div class="input-group">
+                        <input type="search" name="title" class="form-control" placeholder="&#128270; Search"
+                            id="search_content">
+                    </div>
+                </div>
+            </div>
+            <!-- Items -->
+            <div class="row pe-5">
+                <div class="col d-flex justify-content-md-between">
+                <!-- Resources top level -->
+                    <div class="card flex-fill">
+                        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 p-3" id="result">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
