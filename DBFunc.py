@@ -188,7 +188,7 @@ def modify_user_teaching_areas(uid, conn, modification: Modification,
                 conn.add(new_teach_area)
             else:
                 # delete user teaching areas
-                teaching_area = conn.query(UserTeachingAreas).\
+                teaching_area = conn.query(UserTeachingAreas). \
                     filter_by(uid=uid, teaching_area=area,
                               is_public=is_public, grade=grade).one_or_none()
                 if teaching_area:
@@ -237,7 +237,7 @@ def modify_user(uid: int, username=None, password=None, email=None,
 
         if email:
             if isinstance(User, get_user(email)):
-                print("email is already registered")
+                warnings.warn("email is already registered")
                 return ErrorCode.EMAIL_USED
             user.email = email
         if username:
@@ -1080,6 +1080,20 @@ def comment_to_resource(uid, rid, comment):
         filter_by(uid=uid, rid=rid, created_at=created_at).one().resource_comment_id
 
 
+def remove_resource_comment(resource_comment_id: int):
+    """
+    Remove a resource comment, if resource_comment_id is valid
+
+    :param resource_comment_id: The id of the resource comment to be removed
+    """
+    with Session() as conn:
+        comment = conn.query(ResourceComment).\
+                filter_by(resource_comment_id=resource_comment_id).one_or_none()
+        if comment:
+            conn.delete(comment)
+            try_to_commit(conn)
+
+
 def reply_to_resource_comment(uid, resource_comment_id, reply):
     """
     Add a reply to a resource comment
@@ -1116,6 +1130,23 @@ def reply_to_resource_comment(uid, resource_comment_id, reply):
 
         if VERBOSE:
             print(f"user {uid} replied to resource comment {resource_comment_id}")
+
+
+def remove_resource_comment_reply(resource_comment_id: int, created_at):
+    """
+    Remove a resource comment reply. If any matches for
+     (resource_comment_id, created_at)
+
+     * Since resource comment reply does not have a unique identifier,
+     this operation may be non-deterministic
+    """
+    with Session() as conn:
+        resource_comment_reply = conn.query(ResourceCommentReply).\
+                filter_by(resource_comment_id=resource_comment_id,
+                          created_at=created_at).one_or_none()
+        if resource_comment_reply:
+            conn.delete(resource_comment_reply)
+            try_to_commit(conn)
 
 
 def get_resource_comments(rid: int) -> list:
@@ -1258,17 +1289,16 @@ def modify_channel_personnel(uid, cid, modification: Modification):
     :param uid: The user to add/delete
     :param modification: Add or delete
     :return void on success.
-            ErrorCode.INVALID_USER/-CHANNEL if uid/rid is incorrect or channel is public
+            ErrorCode.INVALID_USER/-CHANNEL if uid/rid is incorrect
             ErrorCode.INCORRECT_PERSONNEL if mode is delete and personnel info not exist
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     res = get_user_and_channel_instance(uid=uid, cid=cid)
     if isinstance(res, ErrorCode):
         return res
-    channel = res[1]
-    if channel.visibility == ChannelVisibility.PUBLIC:
-        warnings.warn("Channel is public")
-        return ErrorCode.INVALID_CHANNEL
+    # if channel.visibility == ChannelVisibility.PUBLIC:
+    #     warnings.warn("Channel is public")
+    #     return ErrorCode.INVALID_CHANNEL
 
     with Session() as conn:
         if modification == Modification.MODIFY_DELETE:
@@ -1291,6 +1321,101 @@ def modify_channel_personnel(uid, cid, modification: Modification):
             return ErrorCode.COMMIT_ERROR
         if VERBOSE:
             print(f"user {uid} is {msg} from/to personnel of channel {cid}")
+
+
+def modify_channel(cid: int, name=None, visibility: ChannelVisibility = None,
+                   admin_uid=None, subject: Subject = Subject.NULL,
+                   grade: Grade = Grade.NULL, description="NULL", tags_id: list = None,
+                   ids_to_delete_from_personnel: list = None,
+                   ids_to_add_to_personnel: list = None):
+    """
+        This method is used to modify the information of a channel
+
+        Notes:
+        1. Only fill in the parameters that needed to be modified.
+        2. For tags_id lists, every element will be checked, if that element
+        already exists for this resource, it will then be removed; if an element
+        does not exist for this resource, it will then be added.
+
+        :param cid: The id of channel to be modified
+        :param name: The new name of the channel
+        :param visibility: The new visibility of the channel
+        :param subject: The new subject tag. By default, Subject.NULL does not change
+                        the subject tag; None clears original subject tag
+        :param grade: The new grade tag. By default, Grade.NULL does not change
+                        the grade tag; None clears original grade tag
+        :param admin_uid: The new admin of this channel
+        :param ids_to_delete_from_personnel: The private personnel ids to be removed
+        :param ids_to_add_to_personnel: The private personnel ids to be added
+        :param tags_id: The tag ids to be removed/added
+        :param description: The new description of the channel. By default, "NULL" does
+                            not change description contents; None clears original description
+        :return on success, void is returned.
+                ErrorCode.INVALID_CHANNEL if cid is invalid
+                ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
+        """
+    with Session() as conn:
+        channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
+        if not channel:
+            warnings.warn("Invalid cid")
+            return ErrorCode.INVALID_CHANNEL
+        if name:
+            channel.name = name
+        if admin_uid:
+            channel.admin_uid = admin_uid
+        if subject != Subject.NULL:
+            channel.subject = subject
+        if grade != Grade.NULL:
+            channel.grade = grade
+        if description != "NULL":
+            channel.description = description
+        if tags_id:
+            old_tags = conn.query(ChannelTagRecord).filter_by(cid=cid).all()
+            deleted_tags = set()
+            tags_id = set(tags_id)
+            for i in old_tags:
+                if i.tag_id in tags_id:
+                    conn.delete(i)
+                    deleted_tags.add(i.tag_id)
+            new_tags = tags_id.difference(deleted_tags)
+            for i in new_tags:
+                tag = ChannelTagRecord(cid=cid, tags_id=i)
+                conn.add(tag)
+
+        if visibility:
+            if visibility == ChannelVisibility.PUBLIC and \
+                    channel.visibility != ChannelVisibility.PUBLIC:
+                # originally private, now public
+                channel.visibility = visibility
+                conn.query(ChannelPersonnel).filter_by(cid=cid).delete()
+            elif visibility != ChannelVisibility.PUBLIC and \
+                    channel.visibility == ChannelVisibility.PUBLIC:
+                # originally public, now private
+                # admin must be in the channel personnel
+                modify_channel_personnel(uid=admin_uid, cid=cid,
+                                         modification=Modification.MODIFY_ADD)
+        # commit before proceed to personnel modification
+        conn.add(channel)
+        if not try_to_commit(conn):
+            warnings.warn("Error committing")
+            return ErrorCode.COMMIT_ERROR
+
+        # now deal with ids add/delete to/from personnel
+        channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
+        if channel.visibility != ChannelVisibility.PUBLIC:
+            if ids_to_add_to_personnel:
+                for i in ids_to_add_to_personnel:
+                    personnel = ChannelPersonnel(cid=cid, uid=i)
+                    conn.add(personnel)
+            if ids_to_delete_from_personnel:
+                for i in ids_to_delete_from_personnel:
+                    personnel = conn.query(ChannelPersonnel).\
+                        filter_by(cid=cid, uid=i).one_or_none()
+                    if personnel:
+                        conn.delete(personnel)
+        if not try_to_commit(conn):
+            warnings.warn("Error committing")
+            return ErrorCode.COMMIT_ERROR
 
 
 def user_has_access_to_channel(uid, cid):
@@ -1385,6 +1510,19 @@ def post_on_channel(uid, title, text, channel_name=None, cid=None):
         return channel_post.post_id
 
 
+def remove_channel_post(post_id: int):
+    """
+    Remove a channel post comment, if the post_id is valid
+
+    :param post_id: The id of channel post comment
+    """
+    with Session() as conn:
+        post = conn.query(ChannelPost).filter_by(post_id=post_id).one_or_none()
+        if post:
+            conn.delete(post)
+            try_to_commit(conn)
+
+
 def comment_to_channel_post(uid, post_id, text):
     """
     Create a comment to a post in the channel
@@ -1426,6 +1564,20 @@ def comment_to_channel_post(uid, post_id, text):
         if VERBOSE:
             print(f"Comment to post {post_id} by user {uid} is created")
         return post_comment.post_comment_id
+
+
+def remove_channel_post_comment(post_comment_id: int):
+    """
+    Remove a channel post comment, if the post_id is valid
+
+    :param post_comment_id: The id of channel post comment
+    """
+    with Session() as conn:
+        channel_post_comment = conn.query(PostComment).\
+                filter_by(post_comment_id=post_comment_id).one_or_none()
+        if channel_post_comment:
+            conn.delete(channel_post_comment)
+            try_to_commit(conn)
 
 
 def vote_channel_post(uid, post_id, upvote=True):
