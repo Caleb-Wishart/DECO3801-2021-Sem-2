@@ -1132,18 +1132,28 @@ def reply_to_resource_comment(uid, resource_comment_id, reply):
             print(f"user {uid} replied to resource comment {resource_comment_id}")
 
 
-def remove_resource_comment_reply(resource_comment_id: int, created_at):
+def remove_resource_comment_reply(resource_comment_id: int, created_at=None):
     """
     Remove a resource comment reply. If any matches for
      (resource_comment_id, created_at)
 
+     If created_at is None, simply delete all comment replies that link to a
+     resource comment.
+
      * Since resource comment reply does not have a unique identifier,
      this operation may be non-deterministic
+
+     :param resource_comment_id: The resource comment the replies related to
+     :param created_at: The datetime when replies to be deleted was created
     """
     with Session() as conn:
-        resource_comment_reply = conn.query(ResourceCommentReply).\
-                filter_by(resource_comment_id=resource_comment_id,
-                          created_at=created_at).one_or_none()
+        if created_at:
+            resource_comment_reply = conn.query(ResourceCommentReply).\
+                    filter_by(resource_comment_id=resource_comment_id,
+                              created_at=created_at).one_or_none()
+        else:
+            resource_comment_reply = conn.query(ResourceCommentReply). \
+                filter_by(resource_comment_id=resource_comment_id).one_or_none()
         if resource_comment_reply:
             conn.delete(resource_comment_reply)
             try_to_commit(conn)

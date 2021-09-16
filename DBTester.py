@@ -314,12 +314,30 @@ Session = sessionmaker(engine)
 # change name, admin_uid, subject, grade, description for cid =
 # tags_id: delete 4, 6, 8; add id 5, 7
 # change visibility to PUBLIC
-modify_channel(cid=3, name="test name", admin_uid=5, subject=Subject.ANCIENT_HISTORY,
-               grade=Grade.YEAR_12, description="test description",
-               tags_id=[4, 5, 6, 7, 8], visibility=ChannelVisibility.PUBLIC)
+# modify_channel(cid=3, name="test name", admin_uid=5, subject=Subject.ANCIENT_HISTORY,
+#                grade=Grade.YEAR_12, description="test description",
+#                tags_id=[4, 5, 6, 7, 8], visibility=ChannelVisibility.PUBLIC)
+#
+# # cid = 4
+# # personnel delete uid = 2, add uid 1, 4, 9
+# modify_channel(cid=4, ids_to_add_to_personnel=[1, 4, 9],
+#                ids_to_delete_from_personnel=[2])
 
-# cid = 4
-# personnel delete uid = 2, add uid 1, 4, 9
-modify_channel(cid=4, ids_to_add_to_personnel=[1, 4, 9],
-               ids_to_delete_from_personnel=[2])
 
+# test remove_resource_comment_reply(), remove_resource_comment(),
+# remove_channel_post(), remove_channel_post_comment
+
+# test for channel post hierarchy: remove post_id =1, check
+# existence of post comment
+remove_channel_post(post_id=1)
+
+# remove post comment = 10
+remove_channel_post_comment(post_comment_id=10)
+
+# test for resource comment reply = 20 removal
+remove_resource_comment_reply(resource_comment_id=20)
+
+# test for resource comment hierarchy:
+# remove post_comment_id = 1, expected 2 records removed from
+# resource_comment_reply table
+remove_resource_comment(resource_comment_id=1)
