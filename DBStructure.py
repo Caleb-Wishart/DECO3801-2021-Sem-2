@@ -38,7 +38,7 @@ STANDARD_STRING_LENGTH = 300
 DBUSERNAME = "postgres"  # change this field to your first name (all lowercase), "call me by your name"
 
 DBPASSWORD = "admin"
-DBDATABASE = "project"  # DBUSERNAME
+DBDATABASE = "project"
 DBPATH = f"postgresql://{DBUSERNAME}:{DBPASSWORD}@localhost/{DBDATABASE}"
 
 
@@ -92,6 +92,8 @@ class Subject(enum.Enum):
     GERMAN = 22
     JAPANESE = 23
     OTHER = 24
+    # reserved placeholder for modify_channel
+    NULL = 100
 
 
 class Grade(enum.Enum):
@@ -112,6 +114,8 @@ class Grade(enum.Enum):
     YEAR_11 = 11
     YEAR_12 = 12
     TERTIARY = 13
+    # reserved placeholder for modify_channel
+    NULL = 100
 
 
 class ChannelVisibility(enum.Enum):
