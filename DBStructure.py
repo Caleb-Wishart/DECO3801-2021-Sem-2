@@ -184,6 +184,9 @@ class User(Base):
     # username
     username = Column(String(STANDARD_STRING_LENGTH), nullable=False)
 
+    # check if user is authenticated
+    authenticated = Column(Boolean, default=False, nullable=False)
+
     # link to avatar image
     avatar_link = Column(String(STANDARD_STRING_LENGTH), nullable=True, default=None)
 

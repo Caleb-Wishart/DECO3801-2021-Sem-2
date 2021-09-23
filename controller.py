@@ -1,5 +1,6 @@
 import pytz
 from flask import Flask, request, render_template, redirect, url_for, abort, flash, Response, jsonify
+from flask_login import login_required, current_user
 import json
 # If in branch use the following
 # from .DBFunc import *
@@ -191,29 +192,23 @@ def about():
     return render_template('about.html', title='About Us', name="About Us")
 
 
-@app.route('/create')
-@app.route('/create/<type>')
-def create(type=None):
-    """The user create a resource or channel
-
-    If type is not resource or channel redirect to home
-
-    If type == None then prompt the user to select which create type they want
-    and redirect to that page
-
+@app.route('/create/channel')
+@login_required
+def create_channel():
+    """The user create a channel
 
     Create Channel
     Allows the user to give a title, desc., tags
-
-    Create resource
-    Allows the user to give a title, desc., tags, upload content, link to similar
     """
     return render_template('base.html', title='Post')
+    # todo
 
-@app.route('/forum')
-@app.route('/forum/<fName>/<tName>')
-def forum(fName=None, tName=None):
-    """The user view a forum page
+
+@app.route('/channel')
+@app.route('/channel/<cName>/<tName>')
+@login_required
+def channel(cName=None, tName=None):
+    """The user view a channel page
 
     The home forum page (fName == None, tName == None) shows the list of forums
     Allows user to create a channel etc.
