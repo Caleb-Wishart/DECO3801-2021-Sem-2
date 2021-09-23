@@ -1,7 +1,22 @@
 {% extends 'base.html' %}
 
 {% block style %}
-{#  <style></style> #}
+  <style>
+      .banner-image {
+          position: relative;
+          display: block;
+          border-radius: 100px;
+      }
+
+      .profile-image {
+          left: 5%;
+          top: 78%;
+          position: absolute;
+          margin-top: -25px;
+          margin-left: -25px;
+          border-radius: 500px;
+      }
+  </style>
 {% endblock %}
 
 {% block script %}
@@ -11,16 +26,25 @@
 {% block content %}
 <div class="container">
     <!-- Profile Image/Background -->
-    <div class="row p-3">
-        <div class="col d-flex justify-content-md-between">
-            <div class="card">
-                <div class="card-body overflow-auto" style="max-height: 350px;">
-                    <img src="#" class="img-fluid" alt="User Profile Banner">
-                    <img src="#" class="img-thumbnail" alt="User Profile Pic">
-                </div>
+{#    <div class="row p-3">#}
+{#        <div class="banner-visible-area" style="padding: 0">#}
+{#            <div class="card">#}
+{#                <div class="card-body overflow-auto" style="max-height: 350px;">#}
+{#                    <img src="#" class="img-fluid" alt="User Profile Banner">#}
+{#                    <img src="#" class="img-thumbnail" alt="User Profile Pic">#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+    <div class="row text-center" style="">
+        <div class="banner-visible-area" style="margin-top:10px;">
+            <div class='card'>
+                <img src="#" height="250" class='banner-image'>
+                <img src="#" width="50px" height="50px" class='profile-image'>
             </div>
         </div>
     </div>
+
 
     <!-- Rest of page -->
     <div class="row p-3">
@@ -67,7 +91,8 @@
             <div class="card">
                 <div class="row pe-5">
                     <!-- Resource Headings -->
-                    <p class="h3">My Resources</p>
+                    <button type="button" class="btn btn-danger"
+                                    style="border-radius: 500px">My Resources</button>
                 </div>
                 <div class="row pe-5">
                     <!-- Resource Headings -->
