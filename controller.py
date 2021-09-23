@@ -49,7 +49,7 @@ def home():
         }
     ]
 
-    return render_template('home.html', title='Home', name=name, data=data)
+    return render_template('home.html', title='Home', name=name, data=data, notifications = ["A", "B", "C", "D"])
 
 
 @app.route('/resource')

@@ -25,31 +25,32 @@
             <div class="col">
                 <!-- Recommended -->
                 <p>Recommended</p>
+                    {% for dic in data %}
+                      <div class="col-4 p-2">
+                         <div class="card shadow-sm">
+                             <img class="bd-placeholder-img card-img-top" src="{{dic['img']}}" , alt="Logo" ,
+                    width="150" , height="150">
+                                <div class="card-body">
+                                    <p class="card-text">{{dic['title']}}</p>
+                                </div>
+                            </div>
+                        </div>
+	            {% endfor %}
             </div>
             <div class="col">
 		<!-- Notifications -->
-		<!-- <p>Notifications</p> 
 		<div class="dropdown">
-		    <button type="button" class="btn btn-primary">
-		        Notifications <span class="badge bg-secondary">69420 <!-- number of notifications go here --> </span>
+		    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+		        Notifications <span class="badge bg-danger">69420 <!-- number of notifications go here --> </span>
 		    </button>
-		     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-		     <li><a class="dropdown-item" href="#">Action</a></li>
-		     <li><a class="dropdown-item" href="#">Another action</a></li>
-		     <li><a class="dropdown-item" href="#">Something else here</a></li>
-		     </ul>
-		</div> -->
-		<div class="dropdown">
-			  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-				      Dropdown button
-				        </button>
-					  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-						      <li><a class="dropdown-item" href="#">Action</a></li>
-						          <li><a class="dropdown-item" href="#">Another action</a></li>
-							      <li><a class="dropdown-item" href="#">Something else here</a></li>
-							        </ul>
-		</div>
+		    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+			    {% for notification in notifications %}
+			        <li><a class="dropdown-item" href="#" {# probs want a link here to the actual resource :) #} >{{ notification }}</a></li>
+			    {% endfor %} 
+		    </ul>	      
+	        </div>
             </div>
         </div>  
     </div>
 {% endblock %}
+
