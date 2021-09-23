@@ -26,6 +26,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import create_engine
 import pytz
+from flask_login import UserMixin
 
 
 # length of a standard string, use TEXT if longer than that
@@ -201,6 +202,9 @@ class User(Base):
 
     # user bio
     bio = Column(Text, default=None, nullable=True)
+
+    # user authentication
+    authenticated = Column(Boolean, nullable=False, default=False)
 
     def __str__(self):
         return f"User table:\n" \
