@@ -3,6 +3,12 @@
 
 {% block style %}
     <style>
+
+    body {
+
+        height:100vh;
+        font-family: Roboto, sans-serif;
+    }
     .square {
         height: 500px;
         width: 500px;
@@ -14,7 +20,60 @@
     }
 
     textarea { height : auto; 
-        width : auto;};
+        width : auto;
+
+    }
+
+    .c-form-container, .c-form {
+        width: 36em;
+        height: 3em;
+    }
+
+    .c-form-container {
+        position: relative;
+        font-weight: 700;
+    }
+
+    .c-form {
+        border-radius: 6.25em;
+        position: absolute;
+        background-color: #FFFFFF;
+        border-width: 1em;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 0.4em;
+        box-sizing: border-box;
+        box-shadow: 0 0.125em 0.3125em rgba(#000000, 0.3);
+        display: flex;
+        justify-content: center;
+    }
+    .c-form-input {
+        font: inherit;
+        border: 0;
+        outline: 0;
+        border-radius: 5em;
+        box-sizing: border-box;
+        color: #5b0b6f;
+        height: 100%;
+        width: 100%;
+        padding: 0 0.714em;
+    }
+    .c-form-button {
+        font: inherit;
+        border: 0;
+        outline: 0;
+        border-radius: 5em;
+        box-sizing: border-box;
+        color: inherit;
+        padding: 0;
+        height: 100%;
+        width: 5.5em;
+        background-color: #f673ff;
+            
+    }    
+
+	
+
     </style>
 {% endblock %}
 
@@ -32,5 +91,19 @@
         <input type = "submit" value = "submit">
     </form>
    <br><br><br>
+
+    <div class="c-form-container" >
+        <div class="c-form" >
+            <input class="c-form-input" placeholder="Email" type="email">
+            <button class="c-form-button" type="button">
+                <span style="color: #f0a3fd;">Search</span> 
+            </button>
+        </div>
+    </div>
+    
+
+    <br>
+    <br>
+    <br>
 {% endblock %}
 

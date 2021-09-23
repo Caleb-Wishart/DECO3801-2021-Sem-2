@@ -140,7 +140,8 @@ def register():
 
     Other user fields are configured in profile()
     """
-    return render_template('base.html', title='Register')
+    
+    return render_template('register.html', title='Register')
 
 
 @app.route('/login')
