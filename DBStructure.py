@@ -37,7 +37,7 @@ STANDARD_STRING_LENGTH = 300
 DBUSERNAME = "jason"  # change this field to your first name (all lowercase), "call me by your name"
 
 DBPASSWORD = "admin"
-DBDATABASE = "jasont"
+DBDATABASE = "jason"
 DBPATH = f"postgresql://{DBUSERNAME}:{DBPASSWORD}@localhost/{DBDATABASE}"
 
 
