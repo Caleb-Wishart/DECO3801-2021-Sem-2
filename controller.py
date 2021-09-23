@@ -205,7 +205,7 @@ def create_channel():
 
 
 @app.route('/channel')
-@app.route('/channel/<cid>/<post_id>')
+@app.route('/channel/<cid>/post/<post_id>')
 @app.route("/channel/<cid>")
 @login_required
 def channel(cid=None, post_id=None):
@@ -229,6 +229,7 @@ def channel(cid=None, post_id=None):
 
 
 @app.route("/channel/comment/<post_id>")
+@login_required
 def comment_channel_post(post_id):
     """
     Use this to add a comment to a post
