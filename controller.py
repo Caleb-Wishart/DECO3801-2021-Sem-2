@@ -2,15 +2,15 @@ import pytz
 from flask import Flask, request, render_template, redirect, url_for, abort, flash, Response, jsonify
 from flask_login import login_required, current_user
 import json
+import random
 # If in branch use the following
-# from .DBFunc import *
+from .DBFunc import *
 # If in main use the following
-from DBFunc import *
+# from DBFunc import *
 
 app = Flask(__name__)
 # NOTE: added for flush() usage
 app.secret_key = "admin"
-
 
 @app.route('/')
 def index():
@@ -68,12 +68,21 @@ def resource(uid=None, rid=None):
         redirect(url_for('resource'))  # base resource page
     if uid is None or rid is None:
         return render_template('resource.html',
+<<<<<<< HEAD
+            title='Resources',
+            subject=[e.name.lower() for e in Subject],
+            grade=[e.name.lower() for e in Grade],
+            tag=get_tags().keys(),
+            resources=find_resources())
+    # indifivual resource page
+=======
                                title='Resources',
                                subject=[enum_to_website_output(e) for e in Subject],
                                grade=[enum_to_website_output(e) for e in Grade],
                                tag=get_tags().keys(),
                                resources=find_resources())
     # individual resource page
+>>>>>>> origin/main
     user, res = get_user_and_resource_instance(uid=uid, rid=rid)
     if not user or not res:
         # invalid user or resource, pop 404
@@ -250,3 +259,21 @@ def page_not_found(error):
 def page_not_found(error):
     """Page shown with a HTML 404 status"""
     return render_template('errors/error_404.html'), 404
+
+@app.context_processor
+def subject_processor():
+    def enum_to_website_output(item: str) -> str:
+        return item.replace('_', ' ', 1).title()
+    return dict(enum_to_website_output=enum_to_website_output)
+
+@app.context_processor
+def colour_processor():
+    def strToColour(item: str) -> str:
+        random.seed(item + "123")
+        # return f"#{str(hex(random.randint(0, 0xFFFFFF)))[2:].zfill(6)}"
+        return f"#{str(hex(random.randint(0, 0xFFFFFF)))[2:].zfill(6)}"
+    return dict(strToColour=strToColour)
+
+@app.context_processor
+def tags():
+    return dict(subject_tags=[e.name.lower() for e in Subject] + [e.name.lower() for e in Grade])

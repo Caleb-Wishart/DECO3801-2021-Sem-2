@@ -209,12 +209,31 @@ class User(Base):
     # user bio
     bio = Column(Text, default=None, nullable=True)
 
+    # user authentication
+    authenticated = Column(Boolean, nullable=False, default=False)
+
     def __str__(self):
         return f"User table:\n" \
                f"uid = {self.uid}, username = {self.username}, created at {self.created_at},\n" \
                f"sha256 password = {self.hash_password}," \
                f"honor rating = {self.user_rating}, email = {self.email}," \
                f"profile background link = {self.profile_background_link}\nbio = {self.bio}"
+
+    def is_active(self):
+        """True, as all users are active."""
+        return True
+
+    def get_id(self):
+        """Return the email address to satisfy Flask-Login's requirements."""
+        return self.email
+
+    def is_authenticated(self):
+        """Return True if the user is authenticated."""
+        return self.authenticated
+
+    def is_anonymous(self):
+        """False, as anonymous users aren't supported."""
+        return False
 
 
 class UserSession(Base):

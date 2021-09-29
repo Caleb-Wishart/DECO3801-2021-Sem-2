@@ -33,6 +33,16 @@
             background-image: radial-gradient(rgb(254, 239, 255), rgb(246, 244, 255), rgb(254, 239, 255));
             background-color: rgb(254, 239, 255);
         }
+
+        {% for item in subject_tags %}
+        .btn-{{item}}{
+            color: #fff;
+            background-color: {{strToColour(item)}};
+            border-color: {{strToColour(item)}};
+            border-radius: 40%;
+        }
+        {% endfor %}
+
     </style>
     <!-- Additional web page style sheets -->
     {% block style %}{% endblock %}
