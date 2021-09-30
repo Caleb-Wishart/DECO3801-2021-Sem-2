@@ -217,14 +217,15 @@
                 <div class="card">
                     <p class="h4" style = "margin-top: 1rem!important;">Tags</p>
                     <!-- Search for Tags -->
-                    <select class="mdb-select md-form" searchable="Search here..">
-                        <option value="" disabled selected>Choose your country</option>
-                        <option value="1">USA</option>
-                        <option value="2">Germany</option>
-                        <option value="3">France</option>
-                        <option value="3">Poland</option>
-                        <option value="3">Japan</option>
-                    </select>
+                    
+                        <input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Type to search...">
+                        <datalist id="datalistOptions">
+                          <option value="San Francisco">
+                          <option value="New York">
+                          <option value="Seattle">
+                          <option value="Los Angeles">
+                          <option value="Chicago">
+                        </datalist>
                     {#<div class="col d-flex justify-content-md-between">
                         <div class="input-group shadow-sm">
                             <input type="search" name="title" class="form-control" placeholder="Search Tags"
