@@ -227,10 +227,15 @@
                         </datalist>
 
 
-                <div class="row">
+                <div class="row-3">
                         <div class = "h4"> Applied Tags</div>
+                        {%  i = 0 %}
                         {% for item in subject %}
+                            {% if i > 5 %}
+                                {% endfor %}
+                            {% endif %}
                         <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">{{ item }}</span>
+                        {%  i += 1 %}
                         {% endfor %}
                     </div>
 
