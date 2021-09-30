@@ -118,28 +118,26 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row p-3">
-        <!-- Search Bar -->
-        <div class="col d-flex justify-content-md-between" style = "padding-right: 100px; padding-left: 100px">
-            <div class="input-group shadow-sm">
-                <input type="search" name="title" class="form-control" placeholder="Search Channels"
-                    id="search_content">
-            </div>
-        </div>
-    </div>
-</div>
-
+    
       <div class="shadow row-fluid" style = "padding: 0rem!important; border: 1px solid #212529; background-color: #FFFFFF">
          <div class = "container">
             <div class="row p-2 bg-white rounded">
                 <dt class="row">
-                    <dt class="col-sm-3" style = "padding-left: 8rem!important; font-size: larger">Channel Home</dt>
-                        <dd class="row-3" style = "padding-left: 8rem!important; font-size: small">
+                    <dt class="col-sm-3" style = "font-size: larger">Channel Home</dt>
+                        <dd class="row-3" style = "font-size: small">
                             <p>Ask any questions you have in the relevant channels below. To see private channels you have access to, click private channels</p>
                         </dd>
                 </dt>
 
+            </div>
+             <div class="row p-3">
+        <!-- Search Bar -->
+                <div class="col d-flex justify-content-md-between" style = "padding-right: 100px; padding-left: 100px">
+                    <div class="input-group shadow-sm">
+                        <input type="search" name="title" class="form-control" placeholder="Search Channels"
+                        id="search_content">
+                    </div>
+                </div>
             </div>
          </div>
     </div>
