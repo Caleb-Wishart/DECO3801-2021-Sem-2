@@ -215,7 +215,14 @@
             <!-- Subject selection -->
             <div class="row pe-5">
                 <div class="card">
-                    <p class="h4" style = "margin-top: 1rem!important;">Subject</p>
+                    <p class="h4" style = "margin-top: 1rem!important;">Tags</p>
+                    <div class="col d-flex justify-content-md-between" style = "padding-right: 100px; padding-left: 100px">
+                        <div class="input-group shadow-sm">
+                            <input type="search" name="title" class="form-control" placeholder="Search Channels"
+                            id="search_content">
+                        </div>
+                    </div>
+
                     <div class="card">
                         {% for item in subject %}
                         <div class="form-check">
