@@ -58,7 +58,7 @@
         background-color: #ffd6e1;
     }
     .bg-primary {
-        background-color: #ff8fab;
+        background-color: #ff8fab!important;
     }
 
 </style>
@@ -142,7 +142,7 @@
 {% endblock %}
 
 {% block content %}
-
+<!-- Banner -->
       <div class="shadow row-fluid" style = "padding: 0rem!important; background-color: #FFFFFF">
          <div class = "container" style="padding-top: 0.25rem!important;">
             <div class="row p-2 bg-white rounded" style = "padding-bottom: 0rem!important">
@@ -260,7 +260,7 @@
             </div>
         </div>
         <div class="col d-flex justify-content-md-between">
-            <!-- Resources top level -->
+            <!-- Channel top level -->
             <div class="card flex-fill">
 
             <!-- FIXME Change UID 1 to logged in user -->
@@ -268,18 +268,22 @@
                     <div class="card shadow-sm">
 
                         <div class="row">
+                            <!-- Thumbnail for a channel -->
                             <div class="col-2" style="width: 12%">
                                 <img class="rounded-circle img-fluid" src="{{url_for('static', filename='img/placeholder.png')}}" ,
                                 alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
                             </div>
                             <div class="col-8" style="margin-top: 5px!important; margin-bottom: 5px!important;">
+                                <!-- Title -->
                                 <div class = "row">
                                     <div class="fw-bold" style="padding: 0rem!important; font-size: large">
                                         Primary School Mathematics
                                     </div>
                                 </div>
+                                <!-- Description on a channel -->
                                 <div class = "row" style = "font-size: small">
                                     All posts welcome about Primary School Level Mathematics</div>
+                                <!-- Tags on a channel -->
                                 <div class = "row" style = "padding-top: 0.5rem!important;">
                                     <span class="badge rounded-pill bg-primary" style="width: auto; margin-right: 0.25rem!important;">Mathematics</span>
                                     <span class="badge rounded-pill bg-primary" style="width: auto; margin-right: 0.25rem!important;">Primary Education</span>
@@ -287,11 +291,14 @@
 
                             </div>
                             <div class = "col-2"style="margin-top: 5px!important; margin-bottom: 5px!important;">
+                                <!-- Most recent author -->
                                 <div class="fw-bold" style=" font-size: medium">
                                         Geoffry Matrin
                                     </div>
+                                <!-- Time -->
                                 <div class = "fw-normal" style = "font-size: small"> Replied 13 minutes ago</div>
                                 <div class = "row d-flex align-items-center">
+                                    <!-- Number of posts a channel -->
                                     <div class = "col-3">
                                         <img class="rounded img-fluid" src="{{url_for('static', filename='img/placeholder.png')}}" ,
                                     alt="Logo", width="40", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
@@ -322,7 +329,9 @@
                                 </div>
                                 <div class = "row" style = "font-size: small">
                                     All posts welcome about School Security Systems</div>
-                                <div class = "row"> Tags</div>
+                                <div class = "row" style = "padding-top: 0.5rem!important;">
+                                    <span class="badge rounded-pill bg-primary" style="width: auto; margin-right: 0.25rem!important;">General</span>
+                                </div>
 
                             </div>
                             <div class = "col-2"style="margin-top: 5px!important; margin-bottom: 5px!important;">
