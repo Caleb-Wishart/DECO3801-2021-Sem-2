@@ -232,7 +232,9 @@
                         <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">{{ subject[0] }}</span>
                         <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">{{ subject[1] }}</span>
                         <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">{{ grade[0] }}</span>
-                        <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">{{ tag[0] }}</span>
+                        {% for item in tag %}
+                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">{{ item }}</span>
+                        {% endfor %}
                     </div>
 
                     {#<div class="col d-flex justify-content-md-between">
