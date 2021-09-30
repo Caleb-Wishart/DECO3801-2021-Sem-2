@@ -218,12 +218,20 @@
                     <p class="h4" style = "margin-top: 1rem!important;">Tags</p>
                     <!-- Search for Tags -->
 
-                        <input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Type to search...">
+                        <input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Search Tags...">
                         <datalist id="datalistOptions">
                             {% for item in subject %}
                           <option value="{{item}}">
                             {% endfor %}
                         </datalist>
+
+
+                <div class="card">
+                        {% for item in subject %}
+                        <span class="badge rounded-pill bg-primary" style="width: auto; margin-right: 0.25rem!important;">{{ item }}</span>
+                        {% endfor %}
+                    </div>
+
                     {#<div class="col d-flex justify-content-md-between">
                         <div class="input-group shadow-sm">
                             <input type="search" name="title" class="form-control" placeholder="Search Tags"
