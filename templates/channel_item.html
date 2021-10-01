@@ -219,11 +219,15 @@
                 <div class="card">
                     <dt class="h4" style = "margin-top: 1rem!important; margin-bottom: 0.5rem!important;">Trending Posts</dt>
                     <!-- Just some trending posts -->
+                        {% for i in range(1,6) %}
+                            <div class = "row" style="margin:auto"> {{ i }}. Name of the trending post...
+                            </div>
+                        {% endfor %}
 
                 <div class="row-3">
                         <dt class = "h4"> Top Contributors</dt>
                         {% for i in range(1,6) %}
-                            <div class = "row"> {{ i }}. Name of the trending post
+                            <div class = "row" style="margin:auto"> {{ i }}. Name of the top contributors...
                             </div>
                         {% endfor %}
                     <!-- Just some top contributors -->
