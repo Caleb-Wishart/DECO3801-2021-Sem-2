@@ -217,42 +217,16 @@
             <!-- Subject selection -->
             <div class="row pe-5">
                 <div class="card">
-                    <p class="h4" style = "margin-top: 1rem!important; margin-bottom: 0.5rem!important;">Tags</p>
-                    <!-- Search for Tags -->
-
-                        <input class="form-control" style = "margin-bottom: 0.5rem!important; margin-top: 0.3rem!important;"
-                               list="datalistOptions" id="exampleDataList" placeholder="Search Tags...">
-                        <datalist id="datalistOptions">
-                            {% for item in subject %}
-                          <option value="{{item}}">
-                            {% endfor %}
-                        {% for item in grade %}
-                          <option value="{{item}}">
-                            {% endfor %}
-                        {% for item in tag %}
-                          <option value="{{item}}">
-                            {% endfor %}
-                        </datalist>
-
+                    <p class="h4" style = "margin-top: 1rem!important; margin-bottom: 0.5rem!important;">Trending Posts</p>
+                    <!-- Just some trending posts -->
 
                 <div class="row-3">
-                        <div class = "h4"> Applied Tags</div>
-                        <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">{{ subject[0] }}</span>
-                        <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">{{ subject[1] }}</span>
-                        <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">{{ grade[0] }}</span>
-                        {% for item in tag %}
-                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">{{ item }}</span>
-                        {% endfor %}
+                        <div class = "h4"> Top Contributors</div>
+                    <!-- Just some top contributors -->
+
                     </div>
 
-                <div class = "row-3">
-                    <a class="btn btn-secondary d-md-block" style = "width: 100%; margin-top: 1rem!important;
-                    margin-bottom: 1rem!important;" aria-haspopup="true" aria-expanded="false">
-                <dd class="text-center font-weight-bold">Clear all tags</dd>
 
-            </a>
-
-                </div>
 
                     {#<div class="col d-flex justify-content-md-between">
                         <div class="input-group shadow-sm">
@@ -298,7 +272,7 @@
                                 <!-- Description on a channel -->
                                 <div class = "row" style = "font-size: small">
                                     Its really gets me out of the mood when...</div>
-                                <!-- Tags on a channel -->
+                                <!-- Upvotes and downvotes with author name and post time -->
                                 <div class = "row" style = "padding-top: 0.25rem!important;">
                                     <span class="badge rounded-pill bg-primary" style="width: auto; margin-right: 0.25rem!important;">Mathematics</span>
                                     <span class="badge rounded-pill bg-primary" style="width: auto; margin-right: 0.25rem!important;">Primary Education</span>
