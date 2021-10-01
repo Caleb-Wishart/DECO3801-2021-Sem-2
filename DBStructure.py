@@ -26,6 +26,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import create_engine
 import pytz
+from flask_login import UserMixin
 
 
 # length of a standard string, use TEXT if longer than that
