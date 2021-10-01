@@ -68,21 +68,12 @@ def resource(uid=None, rid=None):
         redirect(url_for('resource'))  # base resource page
     if uid is None or rid is None:
         return render_template('resource.html',
-<<<<<<< HEAD
-            title='Resources',
-            subject=[e.name.lower() for e in Subject],
-            grade=[e.name.lower() for e in Grade],
-            tag=get_tags().keys(),
-            resources=find_resources())
-    # indifivual resource page
-=======
                                title='Resources',
                                subject=[enum_to_website_output(e) for e in Subject],
                                grade=[enum_to_website_output(e) for e in Grade],
                                tag=get_tags().keys(),
                                resources=find_resources())
     # individual resource page
->>>>>>> origin/main
     user, res = get_user_and_resource_instance(uid=uid, rid=rid)
     if not user or not res:
         # invalid user or resource, pop 404
