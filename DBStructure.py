@@ -210,8 +210,9 @@ class User(Base):
                f"uid = {self.uid}, username = {self.username}, created at {self.created_at},\n" \
                f"sha256 password = {self.hash_password}," \
                f"honor rating = {self.user_rating}, email = {self.email}," \
-               f"profile background link = {self.profile_background_link}\nbio = {self.bio}"
+               f"avatar link = {self.avatar_link}\nbio = {self.bio}"
 
+    @property
     def is_active(self):
         """True, as all users are active."""
         return True
@@ -220,10 +221,12 @@ class User(Base):
         """Return the email address to satisfy Flask-Login's requirements."""
         return self.email
 
+    @property
     def is_authenticated(self):
         """Return True if the user is authenticated."""
         return self.authenticated
 
+    @property
     def is_anonymous(self):
         """False, as anonymous users aren't supported."""
         return False

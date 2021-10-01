@@ -158,7 +158,6 @@ def add_user(username, password, email, teaching_areas: dict = {},
             print(f"User {username} created")
         return user.uid
 
-
 def get_user(email):
     """
     Retrieve the User with the unique email as the key
@@ -178,6 +177,17 @@ def get_user(email):
         warnings.warn(f"No user has email {email}")
         return ErrorCode.INVALID_USER
 
+
+def user_auth(email,login=True):
+    with Session() as conn:
+        user = get_user(email)
+        if user == ErrorCode.INVALID_USER:
+            return
+        user.authenticated = login
+        conn.add(user)
+        if not try_to_commit(conn):
+            warnings.warn(f"failed to commit updated user")
+            return ErrorCode.COMMIT_ERROR
 
 # def is_user_session_expired(uid: int):
 #     """
