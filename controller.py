@@ -1,5 +1,6 @@
 import pytz
 from flask import Flask, request, render_template, redirect, url_for, abort, flash, Response, jsonify
+from flask_login import login_required, current_user
 import json
 import random
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
@@ -264,7 +265,7 @@ def settings():
 
 @app.route('/about')
 def about():
-    """A bried page descibing what the website is about"""
+    """A brief page describing what the website is about"""
     return render_template('about.html', title='About Us', name="About Us")
 
 @app.route('/create')
@@ -277,35 +278,46 @@ def create(type=None):
     If type == None then prompt the user to select which create type they want
     and redirect to that page
 
-
     Create Channel
     Allows the user to give a title, desc., tags
-
-    Create resource
-    Allows the user to give a title, desc., tags, upload content, link to similar
     """
     return render_template('base.html', title='Post')
+    # todo
 
-@app.route('/forum')
-@app.route('/forum/<fName>/<tName>')
-def forum(fName=None, tName=None):
-    """The user view a forum page
 
-    The home forum page (fName == None, tName == None) shows the list of forums
+@app.route('/channel')
+@app.route('/channel/<cid>/post/<post_id>')
+@app.route("/channel/<cid>")
+@login_required
+def channel(cid=None, post_id=None):
+    """The user view a channel page
+
+    The home channel page (cid == None, post_id == None) shows the list of forums
     Allows user to create a channel etc.
 
-    The forum/fName page shows the threads in that forum
-    Allows users to add threads to the forum
+    The channel/cid page shows the posts in that channel
+    Allows users to add posts to the channel
 
-    The forum/fName/tName shows the thread on that forum.
-    Allows users to add comments to the forum post
+    The channel/cid/post_id shows a post on that channel.
+    Allows users to add comments and replies to comments to the forum post
 
-    The forum/fName/tName?<id> shows the comment on that forum page or the top
-    of page if not valid.
 
-    If fName is not valid name redirect to home forum page
-    If tName is not valid redirect to forum page
+    If cid is not valid name redirect to home channel page
+    If post_id is not valid redirect to channel page
     """
+    # todo
+    return render_template('base.html', title='Channel')
+
+
+@app.route("/channel/comment/<post_id>")
+@login_required
+def comment_channel_post(post_id):
+    """
+    Use this to add a comment to a post
+
+    If post_id is not valid then redirect to post page
+    """
+    # todo
     return render_template('base.html', title='Post')
 
 @app.route('/debug')

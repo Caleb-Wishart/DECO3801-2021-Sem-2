@@ -170,7 +170,7 @@ src0 = add_resource(title="CS50 at Harvard - The Most Rewarding Class I Have Tak
                                 "president, who is having an animated discussion with an "
                                 "undergraduate. "
                                 " Is this a party? A film festival? No. This is CS50.",
-                    grade=Grade.TERTIARY, creaters_id=sample(users_id, k=random.randint(1, 10)))
+                    grade=Grade.TERTIARY, creaters_id=sample(users_id, k=1))
 
 """
 Embed link:
@@ -183,7 +183,7 @@ src1 = add_resource(title="Grade 2 Math 1.1, Understanding Addition",
                     resource_link="https://www.youtube.com/embed/kztICk78ZcE",
                     difficulty=ResourceDifficulty.MODERATE,
                     grade=Grade.YEAR_2,
-                    creaters_id=sample(users_id, k=random.randint(1, len(users_id))),
+                    creaters_id=sample(users_id, k=1),
                     tags_id=[tags["Math Tutorial"], tags["1-min tutorial"]],
                     subject=Subject.MATHS_A,
                     description="How to do basic addition and the parts of"
@@ -201,7 +201,7 @@ src2 = add_resource(title="3rd Grade Math 8.6, Relate Fractions and Whole Number
                     resource_link="https://www.youtube.com/embed/efnA7byI8sg",
                     difficulty=ResourceDifficulty.SPECIALIST,
                     grade=Grade.YEAR_3,
-                    creaters_id=sample(users_id, k=random.randint(1, 10)),
+                    creaters_id=sample(users_id, k=1),
                     tags_id=[tags["Math Tutorial"]],
                     subject=Subject.MATHS_B,
                     description="A fraction can represent an amount less than one"
@@ -220,7 +220,7 @@ Embed link:
 src3 = add_resource(title="Drama Lesson Activities, Grade 4-6: Creative Play",
                     resource_link="https://www.youtube.com/embed/u8VEuS-32JM",
                     difficulty=ResourceDifficulty.EASY,
-                    creaters_id=sample(users_id, k=random.randint(1, 10)),
+                    creaters_id=sample(users_id, k=1),
                     tags_id=[tags["Drama activities"]], grade=Grade.YEAR_6,
                     subject=Subject.DRAMA,
                     description="A variety of creative drama games are explored. These games"
@@ -234,7 +234,7 @@ src3 = add_resource(title="Drama Lesson Activities, Grade 4-6: Creative Play",
 src4 = add_resource(title="Grade 12 QLD Math C U10 worksheet",
                     resource_link="static/resource/MQC-12.zip",
                     difficulty=ResourceDifficulty.SPECIALIST,
-                    creaters_id=sample(users_id, k=random.randint(1, 10)),
+                    creaters_id=sample(users_id, k=1),
                     tags_id=[tags["Math practice sheet"]],
                     grade=Grade.YEAR_12, subject=Subject.MATHS_C,
                     description="Some worksheets directly copied from MCQ website.")
@@ -249,7 +249,7 @@ Embed link:
 src5 = add_resource(title="4th Grade Math Input-Output Tables",
                     resource_link="https://www.youtube.com/embed/1IbkUY9vZcU",
                     difficulty=ResourceDifficulty.EASY,
-                    creaters_id=sample(users_id, k=random.randint(1, 10)),
+                    creaters_id=sample(users_id, k=1),
                     tags_id=[tags["Math Tutorial"]],
                     grade=Grade.YEAR_4, subject=Subject.MATHS_A,
                     description="Learn how to find unknown quantities in the "
@@ -329,7 +329,7 @@ for i in range(6, 11):
     file_name = resource_titles[i - OFFSET].replace(' ', '_') + ".png"
     avatar.save(file_path, file_name)
     file_path += f"/{file_name}"
-    creaters = sample(users_id, k=random.randint(1, len(users_id)))
+    creaters = sample(users_id, k=1)
     compliment = list(set(users_id) - set(creaters))
     # creater must included in personnel
     personnel = creaters + sample(compliment, k=random.randint(0, min(3, len(compliment))))
