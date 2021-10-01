@@ -212,6 +212,7 @@ def create(type=None):
 
 @app.route('/channel')
 @app.route('/channel/<fName>/<tName>')
+@app.route('/channel/<fName>')
 def channel(fName=None, tName=None):
     """The user view a forum page
 
@@ -230,7 +231,7 @@ def channel(fName=None, tName=None):
     If fName is not valid name redirect to home forum page
     If tName is not valid redirect to forum page
     """
-    if fName is not None and tName is None:
+    if (fName is not None and tName is None):
         return render_template('channel.html',
                                title='Channels',
                                subject=[enum_to_website_output(e) for e in Subject],
