@@ -148,9 +148,9 @@
             <div class="row p-2 bg-white rounded" style = "padding-bottom: 0rem!important">
                 <!-- Title and description -->
                 <dt class="row">
-                    <dt class="col-sm-15" style = "font-size: x-large; padding-bottom: 0.25rem!important;">School System Security Issues</dt>
+                    <dt class="col-sm-15" style = "font-size: x-large; padding-bottom: 0.25rem!important;">School System Security Issues (Channel Title)</dt>
                         <dd class="row-3" style = "font-size: small">
-                            <p>This forum discusses problems in school security... (Description)</p>
+                            <p>This forum discusses problems in school security... (Channel Description)</p>
                         </dd>
                 </dt>
 
@@ -185,10 +185,9 @@
                 </div>
         </div>
 
-        <!-- Resources selection -->
+        <!-- Heading Section -->
         <div class="col d-flex justify-content-md-between">
             <!-- Title that says Posts -->
-
                 <div class="h3" style = "margin-right:auto; margin-top: auto">Posts
 
                 </div>
@@ -200,6 +199,7 @@
                             id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                             Newest
                         </button>
+                         <!-- Dropdown menu -->
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                             <a class="dropdown-item" href="#">Newest </a>
                             <a class="dropdown-item" href="#">Upvotes</a>
@@ -211,45 +211,25 @@
         </div>
     </div>
 
-    <!-- Tags Section -->
+    <!-- Left Hand Side Section -->
     <div class="row p-3">
         <div class="col-3">
-            <!-- Subject selection -->
             <div class="row pe-5">
                 <div class="card">
-                    <dt class="h4" style = "margin-top: 1rem!important; margin-bottom: 0.5rem!important;">Trending Posts</dt>
+                    <dt style = "margin-top: 1rem!important; margin-bottom: 1rem!important; font-size: x-large"> <u> Trending Posts </u></dt>
                     <!-- Just some trending posts -->
                         {% for i in range(1,6) %}
                             <div class = "row" style="margin:auto; margin-bottom: 0.5rem!important;"> {{ i }}. Name of the trending post...
                             </div>
                         {% endfor %}
-                        <dt class = "h4" style = "margin-top: 1rem!important; margin-bottom: 0.5rem!important;"> Top Contributors</dt>
+                    <!-- Just some top contributors -->
+                    <dt style = "margin-top: 1rem!important; margin-bottom: 1rem!important; font-size: x-large"> <u> Top Contributors </u></dt>
                         {% for i in range(1,6) %}
                             <div class = "row" style="margin:auto; margin-bottom: 0.5rem!important;"> {{ i }}. Name of the top contributors...
                             </div>
                         {% endfor %}
-                    <!-- Just some top contributors -->
 
 
-
-
-                    {#<div class="col d-flex justify-content-md-between">
-                        <div class="input-group shadow-sm">
-                            <input type="search" name="title" class="form-control" placeholder="Search Tags"
-                            id="search_content">
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        {% for item in subject %}
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="check{{item}}" checked>
-                            <label class="form-check-label" for="flexCheckDefault">
-                                {{item}}
-                            </label>
-                        </div>
-                        {% endfor %}
-                    </div>#}
                 </div>
             </div>
         </div>
@@ -283,12 +263,12 @@
 
                                     <div class = "col-1" style="padding-left: 0rem!important"> 4
 
-                                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/up.png')}}" ,
-                                    alt="Logo", width="17", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
+                                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/upvotegrey.png')}}" ,
+                                    alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
                                     </div>
                                     <div class = "col-1" style = "padding-left: 0rem!important;"> 2
-                                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/down.png')}}" ,
-                                    alt="Logo", width="17", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
+                                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.png')}}" ,
+                                    alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
                                     </div>
                                     <div class = "col" style = "padding-left: 0rem!important; font-size: small; margin-top: 0.2rem!important;">
                                         Ashley Gibbons - Posted 28-08-21
@@ -310,7 +290,7 @@
                                 <div class = "row d-flex align-items-center">
                                     <!-- Number of posts a channel -->
                                     <div class = "col-3">
-                                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/placeholder.png')}}" ,
+                                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/commentIcon.PNG')}}" ,
                                     alt="Logo", width="40", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
                                     </div>
                                     <div class = "col" style = "padding: 0rem">
@@ -346,11 +326,11 @@
                                     <div class = "col-1" style="padding-left: 0rem!important"> 4
 
                                         <img class="rounded img-fluid" src="{{url_for('static', filename='img/UpvotePink.PNG')}}" ,
-                                    alt="Logo", width="17", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
+                                    alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
                                     </div>
                                     <div class = "col-1" style = "padding-left: 0rem!important;"> 2
                                         <img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotegrey.PNG')}}" ,
-                                    alt="Logo", width="17", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
+                                    alt="Logo", width="22", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
                                     </div>
                                     <div class = "col" style = "padding-left: 0rem!important; font-size: small; margin-top: 0.2rem!important;">
                                         Ashley Gibbons - Posted 22-08-21
