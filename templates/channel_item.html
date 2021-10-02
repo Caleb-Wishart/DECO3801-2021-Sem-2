@@ -215,11 +215,19 @@
          <div class = "container" style="padding-top: 0.25rem!important;">
             <div class="row p-2 bg-white rounded" style = "padding-bottom: 0rem!important">
                 <!-- Title and description -->
-                <dt class="row">
-                    <dt class="col-sm-15" style = "font-size: x-large; padding-bottom: 0.25rem!important;">School System Security Issues (Channel Title)</dt>
-                        <dd class="row-3" style = "font-size: small">
-                            <p>This forum discusses problems in school security... (Channel Description)</p>
-                        </dd>
+                <div class="row">
+                    <dt class="col-sm-9" style = "font-size: x-large; padding-bottom: 0.25rem!important;">School System Security Issues (Channel Title)</dt>
+                    <div class="col">
+                        <div class = "row pe-5">
+                         <a href="{{url_for('create')}}" class="btn btn-primary d-md-block" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
+                            <dd class="text-center font-weight-bold">Create New Post</dd>
+
+                        </a>
+                        </div>
+                    </div>
+                    <dd class="row-3" style = "font-size: small">
+                        <p>This forum discusses problems in school security... (Channel Description)</p>
+                    </dd>
                 </dt>
 
             </div>
@@ -250,7 +258,7 @@
                 <dd class="text-center font-weight-bold">Create New Post</dd>
 
             </a>
-                </div>
+            </div>
         </div>
 
         <!-- Heading Section -->
