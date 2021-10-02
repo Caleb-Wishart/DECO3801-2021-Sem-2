@@ -67,7 +67,7 @@
 {% block script %}
 <script type="text/template" id="resource_card">
      <% _.each(data,  function(res) { %>
-        <!-- Resource -->
+<!-- Resource Card, Take this out once you implement all the channel stuff -->
         <div class="col-4 p-2">
             <!-- FIXME Change UID 1 to logged in user -->
             <a class="text-dark card shadow-sm" href="{{url_for('resource')}}/1/<%= res.rid %>">
@@ -92,6 +92,74 @@
         </div>
     <% }); %>
 </script>
+
+<script type="text/template" id="post_card">
+    <% _.each(data,  function(res) { %>
+    <!-- Singular Channel Card -->
+    <div class="card shadow-sm">
+        <div class="row">
+            <!-- Profile Picture of Author -->
+            <div class="col-2" style="width: 12%">
+                <img class="rounded-circle img-fluid" src="{{url_for('static', filename='avatar/ashley_gibbon.png')}}" ,
+                     alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
+            </div>
+            <div class="col-8" style="margin-top: 5px!important; margin-bottom: 5px!important;">
+                <!-- Title -->
+                <div class = "row">
+                    <div class="fw-bold" style="padding: 0rem!important; font-size: large">
+                        <%= res.title %>
+                    </div>
+                </div>
+                <!-- Start of the post content -->
+                <div class = "row">
+                    <span style="white-space: nowrap; font-size: small; text-overflow:ellipsis; overflow: hidden; padding: 0; max-width: 600px;"><%= res.init_text %></span>
+                </div>
+                <!-- Upvotes and downvotes and bottom information -->
+                <div class = "row" style = "padding-top: 0.25rem!important;">
+                    <!-- Upvotes -->
+                    <div class = "col-1" style="padding-left: 0rem!important"> <%= res.upvote_count %>
+                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/upvotegrey.PNG')}}" ,
+                             alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
+                    </div>
+
+                    <!-- Downvotes -->
+                    <div class = "col-1" style = "padding-left: 0rem!important;"> <%= res.downvote_count %>
+                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.PNG')}}" ,
+                             alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
+                    </div>
+                    <!-- Bottom information -->
+                    <div class = "col" style = "padding-left: 0rem!important; font-size: small; margin-top: 0.2rem!important;">
+                        (Creator Name) - <%= res.created_at %>
+                    </div>
+                </div>
+
+            </div>
+            <!-- Information on RHS -->
+            <div class = "col-2"style="margin-top: 5px!important; margin-bottom: 5px!important;">
+                <!-- Most recent comment author -->
+                <div class="fw-bold" style=" font-size: medium">
+                    (Comment Author)
+                </div>
+                <!-- Time -->
+                <div class = "fw-normal" style = "font-size: small"> Replied (time since comment) ago</div>
+                <div class = "row d-flex align-items-center">
+                    <!-- Number of comments on a post -->
+                    <div class = "col-3">
+                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/commentIcon.PNG')}}" ,
+                                    alt="Logo", width="40", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
+                    </div>
+                    <div class = "col" style = "padding: 0rem">
+                        <div class = "fw-normal" style = "font-size: small; margin-top: 2.5px!important;"> (# comments) Comments</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <% }); %>
+</script>
+
 <script>
     // DROPDOWN
     $(function () {
@@ -259,29 +327,28 @@
                                     <span style="white-space: nowrap; font-size: small; text-overflow:ellipsis; overflow: hidden; padding: 0; max-width: 600px;">It really gets me in the mood when I watch funny cat videos on the internet with my class, but they
                                         seem to stop caring and decide to watch netflix instead</span>
                                 </div>
-                                <!-- Upvotes and downvotes -->
+                                <!-- Upvotes and downvotes and bottom information -->
                                 <div class = "row" style = "padding-top: 0.25rem!important;">
 
-
+                                    <!-- Upvotes -->
                                     <div class = "col-1" style="padding-left: 0rem!important"> 4
-
                                         <img class="rounded img-fluid" src="{{url_for('static', filename='img/upvotegrey.PNG')}}" ,
-                                    alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
+                                        alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
                                     </div>
+
+                                    <!-- Downvotes -->
                                     <div class = "col-1" style = "padding-left: 0rem!important;"> 2
                                         <img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.PNG')}}" ,
                                     alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
                                     </div>
+                                    <!-- Bottom information -->
                                     <div class = "col" style = "padding-left: 0rem!important; font-size: small; margin-top: 0.2rem!important;">
                                         Ashley Gibbons - Posted 28-08-21
                                     </div>
-
-
-
-
                                 </div>
 
                             </div>
+                            <!-- Information on RHS -->
                             <div class = "col-2"style="margin-top: 5px!important; margin-bottom: 5px!important;">
                                 <!-- Most recent author -->
                                 <div class="fw-bold" style=" font-size: medium">
@@ -290,7 +357,7 @@
                                 <!-- Time -->
                                 <div class = "fw-normal" style = "font-size: small"> Replied 13 minutes ago</div>
                                 <div class = "row d-flex align-items-center">
-                                    <!-- Number of posts a channel -->
+                                    <!-- Number of comments on a post -->
                                     <div class = "col-3">
                                         <img class="rounded img-fluid" src="{{url_for('static', filename='img/commentIcon.PNG')}}" ,
                                     alt="Logo", width="40", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
@@ -299,7 +366,6 @@
                                          <div class = "fw-normal" style = "font-size: small; margin-top: 2.5px!important;"> 150 Comments</div>
                                     </div>
                                 </div>
-
 
                             </div>
 
