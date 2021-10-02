@@ -229,15 +229,18 @@
                 <!-- Title and description -->
                 <div class="row">
                     <dt class="col-sm-9" style = "font-size: x-large; padding-bottom: 0.25rem!important;">School System Security Issues (Channel Title)</dt>
+
+                     <!-- NOTE: IF THE USER IS NOT THE ADMIN, THIS SECTION OF HTML IS DELETED -->
                     <div class="col-3">
-                        <div class = "row-3" style="margin-bottom: 1rem!important;">
+                        <div class = "row-3" >
                          <a href="{{url_for('create')}}" class="btn btn-primary d-md-block" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
                             <dd class="text-center font-weight-bold">Edit Channel Setting</dd>
 
                         </a>
                         </div>
                     </div>
-                    <dd class="row-3" style = "font-size: small; margin-bottom: 0rem!important;">
+                     <!-- NOTE: END OF THE SECTION THAT NEEDS TO BE DELETED IF THEY ARE NOT ADMIN  -->
+                    <dd class="row-3" style = "font-size: small; margin-bottom: 0rem!important; margin-top: 1rem!important;">
                         <p>This forum discusses problems in school security... (Channel Description)
                         This forum discusses problems in school security... (Channel Description)
                             This forum discusses problems in school security... (Channel Description)
