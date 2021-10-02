@@ -100,7 +100,75 @@
     <% }); %>
 </script>
 
+    <!-- Template for a channel card -->
+<script type="text/template" id="channel_card">
+    <% _.each(data,  function(res) { %>
+        <!-- Create the channel card with a shadow -->
+        <div class="card shadow-sm">=
+            <div class="row">
+                <!-- Thumbnail for a channel. CHANGE THE url_for TO THE CORRECT LOCATION FOR ACTUAL IMPLEMENTATION -->
+                <div class="col-2" style="width: 12%">
+                    <img class="rounded-circle img-fluid" src="{{url_for('static', filename='img/placeholder.png')}}" ,
+                         alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
+                </div>
 
+                <div class="col-8" style="margin-top: 5px!important; margin-bottom: 5px!important;">
+                    <!-- Title -->
+                    <div class = "row">
+                        <div class="fw-bold" style="padding: 0rem!important; font-size: large">
+                            <%= res.name %>
+                        </div>
+                    </div>
+                    <!-- Description on a channel. This should have it so that it automatically truncates the text to fit in the card-->
+                    <div class = "row">
+                        <span style="white-space: nowrap; font-size: small; text-overflow:ellipsis; overflow: hidden; padding: 0; max-width: 600px;"><%= res.description %></span>
+                    </div>
+                    <!-- Tags on a channel. NOTE: I don't how to create a template for each tag   -->
+                    <div class = "row" style = "padding-top: 0.25rem!important;">
+                        <span class="badge rounded-pill bg-primary" style="width: auto;
+                                   margin-right: 0.25rem!important; margin-bottom: 0.25rem!important;">(Insert tag name )</span>
+
+                    </div>
+                </div>
+
+                <div class = "col-2"style="margin-top: 5px!important; margin-bottom: 5px!important;">
+                    <!-- Most recent author -->
+                    <div class="fw-bold" style=" font-size: medium">
+                        (Recent Author Name)
+                    </div>
+                    <!-- Time -->
+                    <div class = "fw-normal" style = "font-size: small"> Replied (time of last post) ago</div>
+                    <div class = "row d-flex align-items-center">
+                        <!-- Number of posts a channel -->
+                        <div class = "col-3">
+                            <!-- Image of the post icon -->
+                            <img class="rounded img-fluid" src="{{url_for('static', filename='img/postIcon.PNG')}}" ,
+                                    alt="Logo", width="40", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
+                        </div>
+                        <div class = "col" style = "padding: 0rem">
+                            <!-- Number of posts in the channel-->
+                            <div class = "fw-normal" style = "font-size: small; margin-top: 2.5px!important;"> (# of) Posts</div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    <% }); %>
+</script>
+
+    <!-- Template for a tag with a close button for the tag filtering section -->
+<script type="text/template" id="tag_filter">
+    <% _.each(data,  function(res) { %>
+        <!-- The single tag which is a badge with the tag name inside-->
+        <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;"> <%= res.tag_name %>
+            <!-- The X button at the end of the tag so that you can delete it -->
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </span>
+    <% }); %>
+</script>
 
 
 <script>
@@ -166,7 +234,7 @@
 
             </div>
              <div class="row p-3" style = "padding-top: 0rem!important">
-        <!-- Search Bar -->
+        <!-- Top Search Bar -->
                 <div class="col d-flex justify-content-md-between" style = "padding-right: 100px; padding-left: 100px">
                     <div class="input-group shadow-sm">
                         <input type="search" name="title" class="form-control" placeholder="Search Channels"
@@ -191,7 +259,7 @@
                 </div>
         </div>
 
-        <!-- Resources selection -->
+        <!-- Swapping between Public and Private Channels and Sorting -->
         <div class="col d-flex justify-content-md-between">
             <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
                 <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
@@ -227,7 +295,7 @@
             <div class="row pe-5">
                 <div class="card">
                     <p class="h4" style = "margin-top: 1rem!important; margin-bottom: 0.5rem!important;">Tags</p>
-                    <!-- Search for Tags -->
+                    <!-- Search for Tags (Naive Bootstrap) -->
 
                         <input class="form-control" style = "margin-bottom: 0.5rem!important; margin-top: 0.3rem!important;"
                                list="datalistOptions" id="exampleDataList" placeholder="Search Tags...">
@@ -243,7 +311,7 @@
                             {% endfor %}
                         </datalist>
 
-
+                <!-- Applied Tags -->
                 <div class="row-3">
                         <div class = "h4"> Applied Tags</div>
                         {% for item in tag %}
@@ -252,7 +320,7 @@
                             </span>
                         {% endfor %}
                     </div>
-
+                <!-- Clear all tags option -->
                 <div class = "row-3">
                     <a class="btn btn-secondary d-md-block" style = "width: 100%; margin-top: 1rem!important;
                     margin-bottom: 1rem!important;" aria-haspopup="true" aria-expanded="false">
@@ -262,23 +330,6 @@
 
                 </div>
 
-                    {#<div class="col d-flex justify-content-md-between">
-                        <div class="input-group shadow-sm">
-                            <input type="search" name="title" class="form-control" placeholder="Search Tags"
-                            id="search_content">
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        {% for item in subject %}
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="check{{item}}" checked>
-                            <label class="form-check-label" for="flexCheckDefault">
-                                {{item}}
-                            </label>
-                        </div>
-                        {% endfor %}
-                    </div>#}
                 </div>
             </div>
         </div>
@@ -305,8 +356,8 @@
                                 </div>
                                 <!-- Description on a channel -->
                                 <div class = "row">
-                                    <span style="white-space: nowrap; text-overflow:ellipsis; overflow: hidden; padding: 0; max-width: 600px;">All posts welcome about primary school mathematics.</span>
-                                    </div>
+                                    <span style="white-space: nowrap; font-size: small; text-overflow:ellipsis; overflow: hidden; padding: 0; max-width: 600px;">All posts welcome about primary school mathematics.</span>
+                                </div>
                                 <!-- Tags on a channel -->
                                 <div class = "row" style = "padding-top: 0.25rem!important;">
                                     <span class="badge rounded-pill bg-primary" style="width: auto;
