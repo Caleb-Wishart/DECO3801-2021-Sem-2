@@ -140,6 +140,22 @@
             How do I stop kids from Using Netflix in my class? (Title of the post)
         </div>
 
+        <div class="row">
+                    <dt class="col-sm-9" style = "font-size: x-large; margin-top:2rem!important;">
+                         How do I stop kids from Using Netflix in my class? (Title of the post)
+                    </dt>
+
+                     <!-- NOTE: IF THE USER IS NOT THE ADMIN, THIS SECTION OF HTML IS DELETED -->
+                    <div class="col-3">
+                        <div class = "row-3" >
+                         <a href="{{url_for('create')}}" class="btn btn-primary d-md-block" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
+                            <dd class="text-center font-weight-bold">Edit Channel Setting</dd>
+
+                        </a>
+                        </div>
+                    </div>
+        </div>
+
         <div class="col d-flex justify-content-md-between">
 
             <!-- FIXME Change UID 1 to logged in user -->
@@ -159,7 +175,7 @@
                             <div class="col" style="margin-top: 5px!important; margin-bottom: 5px!important; margin-right: 2rem!important;">
                                 <!-- Title -->
                                 <div class = "row">
-                                    <div class="fw-bold" style="padding: 0rem!important; font-size: large">
+                                    <div class="fw-bold" style="padding: 0rem!important; font-size: large; margin-bottom: 1rem!important;">
                                         Ashley Gibbons (Author) - Posted on 28-08-21 (Date)
                                     </div>
                                 </div>
@@ -216,19 +232,7 @@
 
 
                         </div>
-                        <div class = "row" style = "padding-top: 0.25rem!important;">
-                    <!-- Upvotes -->
-                            <div class = "col align-self-end" style="padding-left: 0rem!important"> <%= res.upvote_count %>
-                                <img class="rounded img-fluid" src="{{url_for('static', filename='img/upvotegrey.PNG')}}" ,
-                                     alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
-                            </div>
 
-                            <!-- Downvotes -->
-                            <div class = "col align-self-end" style = "padding-left: 0rem!important;"> <%= res.downvote_count %>
-                                <img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.PNG')}}" ,
-                                     alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
-                            </div>
-                        </div>
                         <hr style="width:88%; margin-right: 60px; margin-left: 120px">
 
                     </div>
