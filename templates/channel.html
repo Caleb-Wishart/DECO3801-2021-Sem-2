@@ -242,13 +242,10 @@
 
                 <div class="row-3">
                         <div class = "h4"> Applied Tags</div>
-                        <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">{{ subject[0] }}</span>
-                        <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">{{ subject[1] }}</span>
-                        <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">{{ grade[0] }}</span>
                         {% for item in tag %}
-                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">{{ item }}</span>
+                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">{{ item }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-
+                            </span>
                         {% endfor %}
                     </div>
 
