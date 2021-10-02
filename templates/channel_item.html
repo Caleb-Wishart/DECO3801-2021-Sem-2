@@ -94,9 +94,11 @@
     <% }); %>
 </script>
 
+
+    <!-- Singular Card which represents a post -->
 <script type="text/template" id="post_card">
     <% _.each(data,  function(res) { %>
-    <!-- Singular Channel Card -->
+    <!-- Singular Card which represents a post -->
     <div class="card shadow-sm">
         <div class="row">
             <!-- Profile Picture of Author -->
@@ -160,6 +162,15 @@
     </div>
     <% }); %>
 </script>
+
+    <!-- Template for a tag inside of the banner -->
+<script type="text/template" id="tag_in_banner">
+    <% _.each(data,  function(res) { %>
+        <span class="badge rounded-pill bg-primary" style="width: auto;
+                                    margin-right: 1rem!important; margin-left: 1rem!important;"> <%= res.tag_name %> </span>
+    <% }); %>
+</script>
+
 
 <script>
     // DROPDOWN
