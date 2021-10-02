@@ -231,13 +231,20 @@ def channel(fName=None, tName=None):
     If fName is not valid name redirect to home forum page
     If tName is not valid redirect to forum page
     """
+    if fName is not None and tName is not None:
+        return render_template('post.html',
+                               title='Posts'
+                               )
+
     if (fName is not None and tName is None):
         return render_template('channel_item.html',
-                               title='Channels',
+                               title='Single Channel',
                                subject=[enum_to_website_output(e) for e in Subject],
                                grade=[enum_to_website_output(e) for e in Grade],
                                tag=get_tags().keys(),
                                resources=find_resources())
+
+
     if fName is None or tName is None:
         return render_template('channel.html',
                                title='Channels',
