@@ -72,83 +72,96 @@
 
 {% block script %}
 
-    <!-- Template for a channel card -->
-<script type="text/template" id="channel_card">
+     <!-- Template for a initial post card (Not the intiial post)-->
+<script type="text/template" id="init_post_card">
     <% _.each(data,  function(res) { %>
-        <!-- Create the channel card with a shadow -->
-        <div class="card shadow-sm">=
-            <div class="row">
-                <!-- Thumbnail for a channel. CHANGE THE url_for TO THE CORRECT LOCATION FOR ACTUAL IMPLEMENTATION -->
-                <div class="col-2" style="width: 12%">
-                    <img class="rounded-circle img-fluid" src="{{url_for('static', filename='img/placeholder.png')}}" ,
-                         alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
-                </div>
+        <div class="row">
+            <!-- Profile picture-->
+            <div class="col-2" style="width: 10%">
+                <img class="rounded-circle img-fluid" src="{{url_for('static', filename='avatar/ashley_gibbon.png')}}" ,
+                     alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
+            </div>
 
-                <div class="col-8" style="margin-top: 5px!important; margin-bottom: 5px!important;">
-                    <!-- Title -->
-                    <div class = "row">
-                        <div class="fw-bold" style="padding: 0rem!important; font-size: large">
-                            <%= res.name %>
-                        </div>
-                    </div>
-                    <!-- Description on a channel. This should have it so that it automatically truncates the text to fit in the card-->
-                    <div class = "row">
-                        <span style="white-space: nowrap; font-size: small; text-overflow:ellipsis; overflow: hidden; padding: 0; max-width: 600px;"><%= res.description %></span>
-                    </div>
-                    <!-- Tags on a channel. NOTE: I don't how to create a template for each tag   -->
-                    <div class = "row" style = "padding-top: 0.25rem!important;">
-                        <span class="badge rounded-pill bg-primary" style="width: auto;
-                                   margin-right: 0.25rem!important; margin-bottom: 0.25rem!important;">(Insert tag name )</span>
-
+            <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important; margin-right: 2rem!important;">
+                <!-- Author name and time -->
+                <div class = "row">
+                    <div class="fw-bold" style="padding: 0rem!important; font-size: large; margin-bottom: 1rem!important;">
+                        (Author Name) - <%= res.created_at %>
                     </div>
                 </div>
-
-                <div class = "col-2"style="margin-top: 5px!important; margin-bottom: 5px!important;">
-                    <!-- Most recent author -->
-                    <div class="fw-bold" style=" font-size: medium">
-                        (Recent Author Name)
-                    </div>
-                    <!-- Time -->
-                    <div class = "fw-normal" style = "font-size: small"> Replied (time of last post) ago</div>
-                    <div class = "row d-flex align-items-center">
-                        <!-- Number of posts a channel -->
-                        <div class = "col-3">
-                            <!-- Image of the post icon -->
-                            <img class="rounded img-fluid" src="{{url_for('static', filename='img/postIcon.PNG')}}" ,
-                                    alt="Logo", width="40", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
-                        </div>
-                        <div class = "col" style = "padding: 0rem">
-                            <!-- Number of posts in the channel-->
-                            <div class = "fw-normal" style = "font-size: small; margin-top: 2.5px!important;"> (# of) Posts</div>
-                        </div>
-
-                    </div>
-
+                        <!-- Description on a channel -->
+                <div class = "row">
+                    <span style="font-size: small; padding-left: 0; text-align: justify">
+                        <%= res.init_text %>  <!-- THIS IS THE ONLY LINE THAT IS DIFFERENT TO A NORMAL COMMENT-->
+                    </span>
                 </div>
-
             </div>
         </div>
+
+                <div class="d-flex flex-row-reverse"style = "margin-right: 2rem!important; margin-top: 0.25rem!important;">
+                    <img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.PNG')}}" ,
+                             alt="Logo", width="25", style="margin:2px!important; margin-left:0.5rem!important; margin-right: 2px!important;"> <%= res.upvote_count %>
+                    <img class="rounded img-fluid" src="{{url_for('static', filename='img/UpvotePink.PNG')}}" ,
+                             alt="Logo", width="25", style="margin:2px!important; margin-left:0.5rem!important; margin-right: 1rem!important;"> <%= res.downvote_count %>
+                </div>
+
+                <hr style="width:97%; margin-right: 60px; margin-left: 15px; margin-bottom: 0rem!important;">
     <% }); %>
 </script>
+
+    <!-- Template for a comment card (Not the intiial post)-->
+<script type="text/template" id="comment_card">
+    <% _.each(data,  function(res) { %>
+        <div class="row">
+            <!-- Profile picture-->
+            <div class="col-2" style="width: 10%">
+                <img class="rounded-circle img-fluid" src="{{url_for('static', filename='avatar/ashley_gibbon.png')}}" ,
+                     alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
+            </div>
+
+            <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important; margin-right: 2rem!important;">
+                <!-- Author name and time -->
+                <div class = "row">
+                    <div class="fw-bold" style="padding: 0rem!important; font-size: large; margin-bottom: 1rem!important;">
+                        (Author Name) - <%= res.created_at %>
+                    </div>
+                </div>
+                        <!-- Description on a channel -->
+                <div class = "row">
+                    <span style="font-size: small; padding-left: 0; text-align: justify">
+                        <%= res.text %>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+                <div class="d-flex flex-row-reverse"style = "margin-right: 2rem!important; margin-top: 0.25rem!important;">
+                    <img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.PNG')}}" ,
+                             alt="Logo", width="25", style="margin:2px!important; margin-left:0.5rem!important; margin-right: 2px!important;"> <%= res.upvote_count %>
+                    <img class="rounded img-fluid" src="{{url_for('static', filename='img/UpvotePink.PNG')}}" ,
+                             alt="Logo", width="25", style="margin:2px!important; margin-left:0.5rem!important; margin-right: 1rem!important;"> <%= res.downvote_count %>
+                </div>
+
+                <hr style="width:97%; margin-right: 60px; margin-left: 15px; margin-bottom: 0rem!important;">
+    <% }); %>
+</script>
+
+
+
 {% endblock %}
 
 {% block content %}
 
 <div class="container">
-
-
-
         <div class="row">
                     <dt class="col-sm-9" style = "font-size: x-large; margin-top:2rem!important;">
                          How do I stop kids from Using Netflix in my class? (Title of the post)
                     </dt>
-
                      <!-- NOTE: IF THE USER IS NOT THE ADMIN, THIS SECTION OF HTML IS DELETED -->
                     <div class="col-3" style="margin-top:2rem!important;">
                         <div class = "d-flex flex-row-reverse" >
                          <a href="{{url_for('create')}}" class="btn btn-primary d-md-block" style = "width: 60%" aria-haspopup="true" aria-expanded="false">
                             <dd class="text-center font-weight-bold">Edit Post</dd>
-
                         </a>
                         </div>
                     </div>
@@ -311,11 +324,7 @@
 
 
                     </div>
-
-
-
-
-
+            
         </div>
     </div>
 </div>
