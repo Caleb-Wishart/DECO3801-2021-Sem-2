@@ -151,6 +151,10 @@
                             <div class="col-2" style="width: 10%">
                                 <img class="rounded-circle img-fluid" src="{{url_for('static', filename='avatar/ashley_gibbon.png')}}" ,
                                 alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
+                                <img class="rounded img-fluid" src="{{url_for('static', filename='img/upvotegrey.PNG')}}" ,
+                                     alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
+                                <img class="rounded img-fluid" src="{{url_for('static', filename='img/upvotegrey.PNG')}}" ,
+                                     alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
                             </div>
                             <div class="col" style="margin-top: 5px!important; margin-bottom: 5px!important; margin-right: 2rem!important;">
                                 <!-- Title -->
@@ -161,7 +165,7 @@
                                 </div>
                                 <!-- Description on a channel -->
                                 <div class = "row">
-                                    <span style="font-size: small; padding-left: 0">According to all known laws of aviation,
+                                    <span style="font-size: small; padding-left: 0; text-align: justify">According to all known laws of aviation,
                                         there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground.
                                         The bee, of course, flies anyway because bees don't care what humans think is impossible.
                                         Yellow, black. Yellow, black. Yellow, black. Yellow, black. Ooh, black and yellow! Let's shake it up a little.
@@ -214,13 +218,13 @@
                         </div>
                         <div class = "row" style = "padding-top: 0.25rem!important;">
                     <!-- Upvotes -->
-                            <div class = "col-1" style="padding-left: 0rem!important"> <%= res.upvote_count %>
+                            <div class = "col align-self-end" style="padding-left: 0rem!important"> <%= res.upvote_count %>
                                 <img class="rounded img-fluid" src="{{url_for('static', filename='img/upvotegrey.PNG')}}" ,
                                      alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
                             </div>
 
                             <!-- Downvotes -->
-                            <div class = "col-1" style = "padding-left: 0rem!important;"> <%= res.downvote_count %>
+                            <div class = "col align-self-end" style = "padding-left: 0rem!important;"> <%= res.downvote_count %>
                                 <img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.PNG')}}" ,
                                      alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
                             </div>
