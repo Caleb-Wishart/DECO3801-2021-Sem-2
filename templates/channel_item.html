@@ -163,13 +163,13 @@
     <% }); %>
 </script>
 
-    <!-- Template for a tag inside of the banner -->
+{#    <!-- Template for a tag inside of the banner -->
 <script type="text/template" id="tag_in_banner">
     <% _.each(data,  function(res) { %>
         <span class="badge rounded-pill bg-primary" style="width: auto;
                                     margin-right: 1rem!important; margin-left: 1rem!important;"> <%= res.tag_name %> </span>
     <% }); %>
-</script>
+</script>#}
 
 
 <script>
@@ -259,7 +259,7 @@
                             <img class="rounded img-fluid" src="{{url_for('static', filename='img/placeholder.png')}}" ,
                                  alt="Logo", width="20", style="margin:2px!important; margin-left:16px!important; margin-right: 4px!important;">
                             Visibility: (Public / Private)
-
+{#
                             <!-- Channel Tags  -->
                             <span class="badge rounded-pill bg-primary" style="width: auto;
                                     margin-right: 1rem!important; margin-left: 1rem!important;">General</span>
@@ -268,7 +268,7 @@
                             <span class="badge rounded-pill bg-primary" style="width: auto;
                                     margin-right: 1rem!important; margin-left: 1rem!important;">General</span>
                             <span class="badge rounded-pill bg-primary" style="width: auto;
-                                    margin-right: 1rem!important; margin-left: 1rem!important;">General</span>
+                                    margin-right: 1rem!important; margin-left: 1rem!important;">General</span>#}
 
 
                     </div>
