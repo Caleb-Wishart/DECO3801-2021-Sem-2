@@ -99,7 +99,7 @@
 <script type="text/template" id="post_card">
     <% _.each(data,  function(res) { %>
     <!-- Singular Card which represents a post -->
-    <div class="card shadow-sm">
+    <div class="card shadow-sm" style="margin: 0.8rem!important;">
         <div class="row">
             <!-- Profile Picture of Author -->
             <div class="col-2" style="width: 12%">
@@ -260,9 +260,6 @@
                                  alt="Logo", width="20", style="margin:2px!important; margin-left:16px!important; margin-right: 4px!important;">
                             Visibility: (Public / Private)
 
-                            <img class="rounded img-fluid" src="{{url_for('static', filename='img/placeholder.png')}}" ,
-                                     alt="Logo", width="20", style="margin:2px!important; margin-left:16px!important; margin-right: 4px!important;">
-                                Number of Posts: (#)
                             <!-- Channel Tags  -->
                             <span class="badge rounded-pill bg-primary" style="width: auto;
                                     margin-right: 1rem!important; margin-left: 1rem!important;">General</span>
@@ -363,7 +360,7 @@
 
             <!-- FIXME Change UID 1 to logged in user -->
                 <!-- Singular Channel Card -->
-                    <div class="card shadow-sm">
+                    <div class="card shadow-sm" style="margin: 0.8rem!important;">
 
                         <div class="row">
                             <!-- Thumbnail for a channel -->
@@ -428,7 +425,7 @@
                         </div>
                     </div>
                     <!-- Another Channel Card -->
-                    <div class="card shadow-sm">
+                    <div class="card shadow-sm" style="margin: 0.8rem!important;">
 
                         <div class="row">
                             <div class="col-2" style="width: 12%">
