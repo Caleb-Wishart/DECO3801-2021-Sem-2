@@ -330,11 +330,12 @@
         <div class="d-flex flex-start w-100" style = "margin-top: 2rem!important">
               <img
                             class="rounded-circle shadow-1-strong me-3"
-                            src="https://mdbootstrap.com/img/Photos/Avatars/img%20(21).jpg"
+                            src="{{url_for('static', filename='img/default_profile.png')}}"
                             alt="avatar"
                             width="65"
                             height="65"
                           />
+             <label class="form-label" for="textAreaExample">Message</label>
               <div class="form-outline w-100">
                 <textarea
                   class="form-control"
@@ -342,7 +343,6 @@
                   rows="4"
                   style="background: #fff;"
                 ></textarea>
-                <label class="form-label" for="textAreaExample">Message</label>
               </div>
             </div>
             <div class="float-end mt-2 pt-1">
