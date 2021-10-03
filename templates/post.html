@@ -151,6 +151,9 @@
 {% endblock %}
 
 {% block content %}
+    function onButtonClick() {
+        document.getElementById('textInput'.className="card shadow")
+    }
 
 <div class="container">
         <div class="row">
@@ -326,10 +329,15 @@
                     </div>
 
         </div>
-        <div class="d-flex flex-row-reverse"style = "margin-right: 2rem!important; margin-top: 0.25rem!important;">
-            <a href="{{url_for('create')}}" class="btn btn-primary d-md-block" style = "width: 60%" aria-haspopup="true" aria-expanded="false">
-                            <dd class="text-center font-weight-bold">Edit Post</dd>
+        <div class="d-flex flex-row-reverse"style = "margin-right: 2rem!important; margin-top: 1rem!important">
+            <a href="{{url_for('create')}}" class="btn btn-primary d-md-block" style = "width: 10%" aria-haspopup="true" aria-expanded="false"
+            onclick="onButtonClick()" >
+                            <dd class="text-center font-weight-bold">Reply</dd>
                         </a>
+        </div>
+
+        <div class = "hide" style = "display: none" id = "textInput">
+
         </div>
 
 
