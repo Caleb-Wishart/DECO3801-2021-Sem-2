@@ -71,8 +71,7 @@
 {% endblock %}
 
 {% block script %}
-
-     <!-- Template for a initial post card (Not the intiial post)-->
+     <!-- Template for a initial post card (The initial post)-->
 <script type="text/template" id="init_post_card">
     <% _.each(data,  function(res) { %>
         <div class="row">
@@ -154,6 +153,7 @@
 
 
 <div class="container">
+<!-- Question and top section -->
         <div class="row">
                     <dt class="col-sm-9" style = "font-size: x-large; margin-top:2rem!important;">
                          How do I stop kids from Using Netflix in my class? (Title of the post)
@@ -250,6 +250,7 @@
                             </div>
 
                             <hr style="width:97%; margin-right: 60px; margin-left: 15px; margin-bottom: 0rem!important;">
+
                         <!-- Single Comment-->
                         <div class="row">
                                 <!-- Thumbnail for a channel -->
@@ -286,7 +287,8 @@
 
                             <hr style="width:97%; margin-right: 60px; margin-left: 15px; margin-bottom: 0rem!important;">
 
-                            <!-- Another comment  -->
+
+                        <!-- Another comment  -->
                             <div class="row">
                                 <!-- Thumbnail for a channel -->
                                 <div class="col-2" style="width: 10%">
@@ -326,6 +328,7 @@
 
                     </div>
 
+            <!-- Reply Box -->
         </div>
         <div class="d-flex flex-start w-100" style = "margin-top: 2rem!important">
               <img
@@ -345,7 +348,9 @@
                 ></textarea>
 
             <div class="float-end mt-2 pt-1">
+                <!-- Button to leave a comment. NEEDS TO BE IMPLEMENTED-->
               <button type="button" class="btn btn-primary btn-sm" style="margin-right: 1rem!important;">Post Comment</button>
+                <!-- NEEDS TO BE IMPLEMENTED, clears the form / comment box-->
               <button type="Button" class="btn btn-outline-primary btn-sm">Cancel</button>
             </div>
           </div>
