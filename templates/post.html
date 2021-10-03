@@ -151,9 +151,7 @@
 {% endblock %}
 
 {% block content %}
-    function onButtonClick() {
-        document.getElementById('textInput'.className="card shadow")
-    }
+
 
 <div class="container">
         <div class="row">
@@ -329,16 +327,29 @@
                     </div>
 
         </div>
-        <div class="d-flex flex-row-reverse"style = "margin-right: 2rem!important; margin-top: 1rem!important">
-            <a href="{{url_for('create')}}" class="btn btn-primary d-md-block" style = "width: 10%" aria-haspopup="true" aria-expanded="false"
-            onclick="onButtonClick()" >
-                            <dd class="text-center font-weight-bold">Reply</dd>
-                        </a>
-        </div>
-
-        <div class = "hide" style = "display: none" id = "textInput">
-
-        </div>
+        <div class="d-flex flex-start w-100">
+              <img
+                class="rounded-circle shadow-1-strong me-3"
+                src="https://mdbootstrap.com/img/Photos/Avatars/img%20(19).jpg"
+                alt="avatar"
+                width="40"
+                height="40"
+              />
+              <div class="form-outline w-100">
+                <textarea
+                  class="form-control"
+                  id="textAreaExample"
+                  rows="4"
+                  style="background: #fff;"
+                ></textarea>
+                <label class="form-label" for="textAreaExample">Message</label>
+              </div>
+            </div>
+            <div class="float-end mt-2 pt-1">
+              <button type="button" class="btn btn-primary btn-sm">Post comment</button>
+              <button type="button" class="btn btn-outline-primary btn-sm">Cancel</button>
+            </div>
+          </div>
 
 
     </div>
