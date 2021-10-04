@@ -30,9 +30,11 @@ VERBOSE = True
 DEBUG_MODE = True
 
 # link to default user profile background
-DEFAULT_PROFILE_BACKGROUND_LINK = "static/profile_background/default_background.jpg"
+DEFAULT_PROFILE_BACKGROUND_LINK = "profile_background/default_background.jpg"
 # link to default user avatar
-DEFAULT_USER_AVATAR_LINK = "static/avatar/ashley_gibbon.png"
+DEFAULT_USER_AVATAR_LINK = "avatar/ashley_gibbon.png"
+# link to default channel avatar
+DEFAULT_CHANNEL_AVATAR_LINK = "channel_avatar/logo_icon.png"
 
 
 class ErrorCode(enum.Enum):
@@ -1258,7 +1260,7 @@ def get_resource_comment_replies(resource_comment_instance_list: list) -> dict:
 
 def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subject = None,
                    grade: Grade = None, description=None, tags_id: list = None,
-                   personnel_id: list = None):
+                   personnel_id: list = None, avatar_link: str = DEFAULT_CHANNEL_AVATAR_LINK):
     """
     Create a channel
 
@@ -1271,6 +1273,7 @@ def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subj
     :param tags_id: The id of tags of this channel
     :param personnel_id: If visibility is not Public, then this personnel
                          is used to define users with access to this channel
+    :param avatar_link: The link to channel avatar
     :return the id of the new channel on success.
             ErrorCode.INVALID_USER if admin_uid does not exist.
             ErrorCode.USER_SESSION_EXPIRED if current session is expired
@@ -1295,7 +1298,8 @@ def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subj
 
         # phase 1: create instance
         channel = Channel(name=name, visibility=visibility, admin_uid=admin_uid,
-                          subject=subject, grade=grade, description=description)
+                          subject=subject, grade=grade, description=description,
+                          avatar_link=avatar_link)
         conn.add(channel)
         if not try_to_commit(conn):
             warnings.warn(f"channel {name} cannot be created")

@@ -19,6 +19,8 @@
     }
 
 
+
+
         body {
             /* Adds a Hex honeycomb background */
             /* background-image: url(
@@ -62,6 +64,10 @@
         background-color: #ff8fab!important;
     }
 
+     a {
+        color: #000000;
+    }
+
 </style>
 {% endblock %}
 
@@ -72,10 +78,12 @@
     <% _.each(data,  function(res) { %>
     <!-- Singular Card which represents a post -->
     <div class="card shadow-sm" style="margin: 0.8rem; margin-bottom: 0rem!important;">
-        <a class="row" href="{{ url_for('view_channel_post', cid=channel.cid, post_id='<% res.post_id %>') }}">
+{#            href="{{ url_for('view_channel_post', cid=channel.cid, post_id=post_id)}}"#}
+        <!-- primitive way to redirect to view_channel_post -->
+        <a class="row"  href="/channel/{{ channel.cid }}/post/<%=res.post_id%>">
             <!-- Profile Picture of Author -->
             <div class="col-2" style="width: 12%">
-                <img class="rounded-circle img-fluid" src="<%= res.poster_avatar_link %>"
+                <img class="rounded-circle img-fluid" src="{{ url_for('static', filename='')}}/<%= res.poster_avatar_link%>"
                      alt="Logo" width="65" style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
             </div>
             <div class="col-8" style="margin-top: 5px!important; margin-bottom: 5px!important;">
@@ -93,7 +101,7 @@
                 <div class = "row" style = "padding-top: 0.25rem!important;">
                     <!-- Upvotes -->
                     <div class = "col-1" style="padding-left: 0rem!important"> <%= res.upvote_count %>
-                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/upvotegrey.PNG')}}" ,
+                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/UpvotePink.PNG')}}" ,
                              alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
                     </div>
 
@@ -355,9 +363,9 @@
             </div>
         </div>
 
-    <!--
     <div class="col d-flex justify-content-md-between">
-            <div class="card flex-fill">
+            <div class="card flex-fill" id = "result">
+    <!--
 
                     <div class="card shadow-sm" style="margin: 0.8rem; margin-bottom: 0rem!important;">
 
@@ -470,10 +478,10 @@
 
                         </div>
                     </div>
+    -->
 
             </div>
 
-    -->
 
 
     </div>

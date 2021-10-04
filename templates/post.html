@@ -65,6 +65,10 @@
         height: 0.5rem;
     }
 
+     a {
+        color: #000000;
+    }
+
 
 
 </style>
@@ -102,29 +106,30 @@
 
 
      <!-- Template for a initial post card (The initial post)-->
-<div>
-        <div class="row">
-            <!-- Profile picture-->
-            <div class="col-2" style="width: 10%">
-                <img class="rounded-circle img-fluid" src="{{url_for('static', filename='avatar/ashley_gibbon.png')}}" ,
-                     alt="Logo" width="65" style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
-            </div>
+<div class="col d-flex justif-content-md-between">
+    <div class="card flex-fill shadow-sm" style = "margin-top: 2rem!important;">
+                <div class="row">
+                    <!-- Profile picture-->
+                    <div class="col-2" style="width: 10%">
+                        <img class="rounded-circle img-fluid" src="{{url_for('static', filename=post_info['author_avatar_link'])}}" ,
+                             alt="Logo" width="65" style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
+                    </div>
 
-            <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important; margin-right: 2rem!important;">
-                <!-- Author name and time -->
-                <div class = "row">
-                    <div class="fw-bold" style="padding: 0rem!important; font-size: large; margin-bottom: 1rem!important;">
-                        {{ post_info["username"] }} - Posted on {{ post_info["created_at"] }}
+                    <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important; margin-right: 2rem!important;">
+                        <!-- Author name and time -->
+                        <div class = "row">
+                            <div class="fw-bold" style="padding: 0rem!important; font-size: large; margin-bottom: 1rem!important;">
+                                {{ post_info["username"] }} - Posted on {{ post_info["created_at"] }}
+                            </div>
+                        </div>
+                                <!-- Description on a channel -->
+                        <div class = "row">
+                            <span style="font-size: small; padding-left: 0; text-align: justify">
+                                {{ post_info["init_text"] }}  <!-- THIS IS THE ONLY LINE THAT IS DIFFERENT TO A NORMAL COMMENT-->
+                            </span>
+                        </div>
                     </div>
                 </div>
-                        <!-- Description on a channel -->
-                <div class = "row">
-                    <span style="font-size: small; padding-left: 0; text-align: justify">
-                        {{ post_info["init_text"] }}  <!-- THIS IS THE ONLY LINE THAT IS DIFFERENT TO A NORMAL COMMENT-->
-                    </span>
-                </div>
-            </div>
-        </div>
 
                 <div class="d-flex flex-row-reverse"style = "margin-right: 2rem!important; margin-top: 0.25rem!important;">
                     <img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.PNG')}}" ,
@@ -134,15 +139,15 @@
                 </div>
 
                 <hr style="width:97%; margin-right: 60px; margin-left: 15px; margin-bottom: 0rem!important;">
-</div>
+
 
     <!-- Template for a comment card (Not the initial post)-->
-<div>
+
     {% for comment in comments_info %}
         <div class="row">
             <!-- Profile picture-->
             <div class="col-2" style="width: 10%">
-                <img class="rounded-circle img-fluid" src="{{url_for('static', filename='avatar/ashley_gibbon.png')}}" ,
+                <img class="rounded-circle img-fluid" src="{{url_for('static', filename=comment["commenter_avatar_link"])}}" ,
                      alt="Logo" width="65" style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
             </div>
 
@@ -172,15 +177,8 @@
                 <hr style="width:97%; margin-right: 60px; margin-left: 15px; margin-bottom: 0rem!important;">
     {% endfor %}
 </div>
-
-
-
-
-
-
-
+</div>
             <!-- Reply Box -->
-        </div>
         <div class="d-flex flex-start w-100" style = "margin-top: 2rem!important">
               <img
                             class="rounded-circle shadow-1-strong me-3"
@@ -190,7 +188,7 @@
                             height="50"
                           />
 
-            <form id="comment_form" action="{{ url_for('add_new_post_comment', cid=channel.cid, post_id=post_info['post_id']) }}" method="post">
+            <form class = "form-outline w-100" id="comment_form" action="{{ url_for('add_new_post_comment', cid=channel.cid, post_id=post_info['post_id']) }}" method="post">
                 <div class="form-outline w-100">
                     <textarea
                       class="form-control"

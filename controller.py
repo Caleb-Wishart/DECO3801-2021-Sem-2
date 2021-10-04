@@ -334,7 +334,7 @@ def view_channel(cid=None):
         return render_template("channel_item.html", channel=channel, admin=admin,
                                user=current_user, is_admin=current_user.uid == channel.admin_uid,
                                visibility=visibility, top_posts=top_posts,
-                               top_contributors=top_contributors)
+                               top_contributors=top_contributors, title=f"Channel #{channel.cid}")
 
     # NOTE: here assume for every subject, grade, tags and channel name entered,
     # a POST request is sent to find the matched channels
@@ -372,7 +372,7 @@ def view_channel(cid=None):
     #                                      grade=grade, subject=subject,
     #                                      channel_name=name, tag_ids=tags_id)
 
-    return render_template("channel.html", user=current_user)
+    return render_template("channel.html", user=current_user, title="Channel Home")
 
 
 @app.route("/search/channel/<cid>/post")
@@ -424,7 +424,7 @@ def search_channel_post(cid=None):
         # shuffle output to fake trending
         random.shuffle(out)
 
-    print(out)
+    # print(out)
     return jsonify(out)
 
 

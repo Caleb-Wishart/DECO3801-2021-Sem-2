@@ -614,13 +614,16 @@ class Channel(Base):
     # description of the channel
     description = Column(Text, nullable=True)
 
+    # link to avatar of the channel
+    avatar_link = Column(Text, nullable=False)
+
     admin = relationship("User", foreign_keys=[admin_uid],
                          backref=backref("channel", cascade="all, delete"))
 
     def __str__(self):
         text = f"Channel table:\n" \
                f"channel name = {self.name}, admin id = {self.admin_uid},\n" \
-               f"cid = {self.cid}, " \
+               f"cid = {self.cid}, avatar_link = {self.avatar_link}, "\
                f"visibility = {self.visibility.name}, "
         if self.subject:
             text += f"subject={self.subject.name}, "
@@ -643,7 +646,8 @@ class Channel(Base):
             "description": self.description,
             'created_at':
                 self.created_at.astimezone(
-                    pytz.timezone("Australia/Brisbane")).strftime("%d/%m/%Y, %H:%M:%S")
+                    pytz.timezone("Australia/Brisbane")).strftime("%d/%m/%Y, %H:%M:%S"),
+            "avatar_link": self.avatar_link
         }
 
 

@@ -64,6 +64,9 @@
         width: 0.5rem;
         height: 0.5rem;
     }
+    a {
+        color: #000000;
+    }
 
 
 
@@ -72,45 +75,15 @@
 
 {% block script %}
 
-<!-- Resource Card, Take this out once you implement all the channel stuff -->
-<!--
-<script type="text/template" id="resource_card">
-
-     <% _.each(data,  function(res) { %>
-        <div class="col-4 p-2">
-            <a class="text-dark card shadow-sm" href="{{url_for('resource')}}/1/<%= res.rid %>">
-                <img class="bd-placeholder-img card-img-top" src="{{url_for('static', filename='img/placeholder.png')}}" ,
-                    alt="Logo" , width="150" , height="150">
-                <div class="card-body">
-                    <p class="card-text">
-                        <%= res.title %>
-                    </p>
-                    <div class="d-flex">
-                        <p class="card-text px-1">
-                            <%= res.upvote_count %>
-                        </p>
-                        <img src="{{url_for('static', filename='img/up.png')}}" , alt="Down" , width="20" , height="20">
-                        <p class="card-text px-1">
-                            <%= res.downvote_count %>
-                        </p>
-                        <img src="{{url_for('static', filename='img/down.png')}}" , alt="Down" , width="20" , height="20">
-                    </div>
-                </div>
-            </a>
-        </div>
-    <% }); %>
-</script>
--->
-
     <!-- Template for a channel card -->
 <script type="text/template" id="channel_card">
     <% _.each(data,  function(res) { %>
         <!-- Create the channel card with a shadow -->
-        <div class="card shadow-sm" style="margin: 0.8rem; margin-bottom: 0rem!important;">
+        <div class="card shadow-sm" style="margin: 0.8rem; margin-bottom: 0rem!important; color: black">
             <a class="row" href="{{url_for('view_channel')}}/<%= res.cid %>">
                 <!-- Thumbnail for a channel. CHANGE THE url_for TO THE CORRECT LOCATION FOR ACTUAL IMPLEMENTATION -->
                 <div class="col-2" style="width: 12%">
-                    <img class="rounded-circle img-fluid" src="{{url_for('static', filename='img/placeholder.png')}}" ,
+                    <img class="rounded-circle img-fluid" src="{{url_for('static', filename="")}}/<%=res.avatar_link%>" ,
                          alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
                 </div>
 
@@ -369,7 +342,7 @@
                 <!-- dropdown for sort_by -->
                 <div class="dropdown px-3">
                     <select class="btn btn-primary dropdown-toggle" style="min-width: 100px; height: 90%" id="sort_order"  name="sort_order">
-                        <option class="dropdown-item" value="newest">Newest </option>
+                        <option class="dropdown-item" value="newest"> Created </option>
                         <option class="dropdown-item" value="trending">Trending</option>
                     </select>
                 </div>
@@ -425,9 +398,9 @@
         </div>
         <div class="col d-flex justify-content-md-between">
             <!-- Channel top level -->
-            <div class="card flex-fill">
-                <div class="card shadow-sm" style="margin: 0.8rem; margin-bottom: 0rem!important;" id="result">
-                </div>
+            <div class="card flex-fill" id="result" style="color: black">
+{#                <div class="card shadow-sm" style="margin: 0.8rem; margin-bottom: 0rem!important;" id="result">#}
+{#                </div>#}
 
                 <!-- Singular Channel Card -->
                     <!--
