@@ -1,14 +1,15 @@
 ###############################################################################
-# This script is used to import dummy resources/users/forum comments to our website
+# This script is used to import dummy resources/users/channel comments to our website
 #
 # created by Jason Aug 26, 2021
 ###############################################################################
 import random
 
 from DBFunc import *
-from random import choice, sample
+from random import choice, sample, randint
 from faker import Faker
 import pagan
+import warnings
 
 engine = create_engine(DBPATH)
 
@@ -59,8 +60,9 @@ def add_pseudo_channel_post_and_replies(cid: int, accessors_id: list):
     For a cid given, make a channel post and a post comment. Random votes
     on this post and comment by users in accessors_id
     """
-    # print(f"channel {cid} with personnel {accessors_id}")
-    channel_post = post_on_channel(uid=choice(accessors_id), title=choice(random_texts),
+    poster_uid = choice(accessors_id)
+    # warnings.warn(f"channel {cid} with personnel {accessors_id}, selected poster {poster_uid}")
+    channel_post = post_on_channel(uid=poster_uid, title=choice(random_texts),
                                    cid=cid, text=" ".join(sample(random_texts,
                                                                  k=random.randint(1, 10))))
     for voter in get_random_voters(accessors_id):
@@ -68,7 +70,7 @@ def add_pseudo_channel_post_and_replies(cid: int, accessors_id: list):
 
     repliers = sample(accessors_id, min(2, len(accessors_id)))
     for replier in repliers:
-        post_reply = comment_to_channel_post(uid=replier,
+        post_reply = comment_on_channel_post(uid=replier,
                                              post_id=channel_post,
                                              text=" ".join(sample(random_texts,
                                                                   k=random.randint(1, 10))))
@@ -77,8 +79,8 @@ def add_pseudo_channel_post_and_replies(cid: int, accessors_id: list):
                                       upvote=bool(random.getrandbits(1)))
 
 
-subject_list = [e for e in Subject]
-grade_list = [e for e in Grade]
+subject_list = [e for e in Subject if e != Subject.NULL]
+grade_list = [e for e in Grade if e != Grade.NULL]
 
 
 def get_random_teaching_areas() -> dict:
