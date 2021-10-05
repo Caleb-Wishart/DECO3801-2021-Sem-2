@@ -83,9 +83,14 @@
 <div class="container">
         <!-- Title Section -->
         <div class="row">
+                    <!-- If we are creating a post  -->
                     <dt class="col-sm-9" style = "font-size: x-large; margin-top:2rem!important; margin-bottom: 2rem!important;">
                          Create Post
                     </dt>
+                    <!-- If we are editing a post  -->
+                    {#<dt class="col-sm-9" style = "font-size: x-large; margin-top:2rem!important; margin-bottom: 2rem!important;">
+                         Edit Post
+                    </dt>#}
 
         </div>
 
@@ -94,17 +99,20 @@
                     <div class = "card flex-fill shadow-sm">
                                     <!-- Indicates what channel the post is being posted to-->
                                     <div class = "mb-3" style="margin: 1rem!important;">
-                                        <label for="channelControl" class="form-label" style="font-size: larger">Create a new post in the following channel</label>
+                                        <!-- If we are creating a post  -->
+                                        <label for="channelControl" class="form-label" style="font-size: larger">Create a new post in the channel:</label>
+                                        <!-- If we are editting a post  -->
+                                        {#<label for="channelControl" class="form-label" style="font-size: larger">Editting a post in the channel:</label>#}
                                         <input class="form-control" type="text" id = "channelControl" placeholder="(Jason insert Channel Name)" aria-label="Disabled input Channel Name" disabled>
                                     </div>
                                     <!-- Title of the post-->
                                     <div class="mb-3" style="margin: 1rem!important;">
-                                          <label for="Titleform" class="form-label" style="font-weight: bold; font-size: larger">Title</label>
+                                          <label for="Titleform" class="form-label" style="font-weight: bold; font-size: larger">Title:</label>
                                           <input type="email" class="form-control" id="Titleform" placeholder="Enter a title for your post">
                                     </div>
                                     <!-- Body of the post-->
                                   <div class="mb-3" style="margin: 1rem!important;">
-                                          <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Body</label>
+                                          <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Body:</label>
                                           <textarea class="form-control" id="Bodyform" rows="7" placeholder="Description"></textarea>
                                   </div>
 
