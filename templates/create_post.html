@@ -71,6 +71,7 @@
 {% endblock %}
 
 {% block content %}
+    <!-- Handles making the user confirm they want to leave this page as all unsaved changes will be lost-->
     <body onbeforeunload = "return leavePageFunction()">
         <script>
             function leavePageFunction() {
@@ -80,7 +81,7 @@
     </body>
 
 <div class="container">
-<!-- Question and top section -->
+        <!-- Title Section -->
         <div class="row">
                     <dt class="col-sm-9" style = "font-size: x-large; margin-top:2rem!important; margin-bottom: 2rem!important;">
                          Create Post
@@ -89,22 +90,19 @@
         </div>
 
         <div class="col d-flex justify-content-md-between">
-
-            <!-- FIXME Change UID 1 to logged in user -->
-                <!-- First card to indicate the original post-->
              <form class = "form-outline flex-fill">
                     <div class = "card flex-fill shadow-sm">
-
-
+                                    <!-- Indicates what channel the post is being posted to-->
                                     <div class = "mb-3" style="margin: 1rem!important;">
                                         <label for="channelControl" class="form-label" style="font-size: larger">Create a new post in the following channel</label>
                                         <input class="form-control" type="text" id = "channelControl" placeholder="(Jason insert Channel Name)" aria-label="Disabled input Channel Name" disabled>
                                     </div>
-
+                                    <!-- Title of the post-->
                                     <div class="mb-3" style="margin: 1rem!important;">
                                           <label for="Titleform" class="form-label" style="font-weight: bold; font-size: larger">Title</label>
                                           <input type="email" class="form-control" id="Titleform" placeholder="Enter a title for your post">
                                     </div>
+                                    <!-- Body of the post-->
                                   <div class="mb-3" style="margin: 1rem!important;">
                                           <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Body</label>
                                           <textarea class="form-control" id="Bodyform" rows="7" placeholder="Description"></textarea>
@@ -113,10 +111,15 @@
 
                     </div>
                     <div class="float-end mt-2 pt-1" style="margin-top: 1rem!important;">
-                        <!-- Button to leave a comment. NEEDS TO BE IMPLEMENTED-->
-                      <button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;">Post Comment</button>
-                        <!-- NEEDS TO BE IMPLEMENTED, clears the form / comment box-->
+                         <!-- IF WE ARE CREATING A POST, USE THE FOLLOWING BUTTONS-->
+                        <!-- Button to upload the post-->
+                      <button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;">Upload Post</button>
+                        <!-- Button to clear the title and body of the post-->
                         <button type="Button" class="btn btn-outline-primary btn">Discard Draft</button>
+                         <!-- IF WE ARE CREATING EDITTING A POST, USE THE FOLLOWING BUTTONS-->
+                        {#<button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;">Save Changes</button>
+                        <button type="Button" class="btn btn-outline-primary btn">Discard Changes</button>#}
+
                     </div>
                  </form>
 
