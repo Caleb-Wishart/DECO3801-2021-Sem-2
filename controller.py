@@ -208,6 +208,9 @@ def create(type=None):
     Create resource
     Allows the user to give a title, desc., tags, upload content, link to similar
     """
+
+    if type == "post":
+        return render_template("create_post.html", title= "Create Post")
     return render_template('base.html', title='Post')
 
 @app.route('/channel')
