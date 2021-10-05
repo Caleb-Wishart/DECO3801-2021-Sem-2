@@ -69,8 +69,10 @@
 
 </style>
 
-    
-    {% script %}
+
+
+{% endblock %}
+ {% script %}
         <script>
 var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
 var popoverList = popoverTriggerList.map(function(popoverTriggerEl) {
@@ -78,7 +80,6 @@ var popoverList = popoverTriggerList.map(function(popoverTriggerEl) {
 })
     </script>
     {% endblock %}
-{% endblock %}
 
 {% block content %}
     <!-- Handles making the user confirm they want to leave this page as all unsaved changes will be lost-->
