@@ -66,6 +66,39 @@
     }
 
 
+    .tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  top: -5px;
+  left: 110%;
+}
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent black transparent transparent;
+}
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
 
 </style>
 {% endblock %}
@@ -98,19 +131,20 @@
              <form class = "form-outline flex-fill">
                     <div class = "card flex-fill shadow-sm">
                                     <!-- Description-->
-                                    <div class = "mb-3" style="margin: 1rem!important;">
-                                        <label for="channelControl" class="form-label" style="font-size: larger">Create a new post in the channel:</label>
+                                    <div class = "mb-3" style="margin: 1rem; margin-bottom: 0.5rem!important;">
+                                        <label for="channelControl" class="form-label">Create a resource to share with the community of educators </label>
 
                                     </div>
                                     <!-- Title of the post-->
                                     <div class="mb-3" style="margin: 1rem!important;">
-                                          <label for="Titleform" class="form-label" style="font-weight: bold; font-size: larger">Title:</label>
-                                        <textarea type="email" class="form-control" id="Titleform" placeholder="Enter a title for your post"></textarea>
+                                          <label for="Titleform" class="form-label tooltip" style="font-weight: bold; font-size: larger">Title (required)</label>
+                                        <span class = "tooltiptext"> Testing text</span>
+                                        <textarea type="email" class="form-control" id="Titleform" placeholder="Title of your resource"></textarea>
                                     </div>
                                     <!-- Body of the post-->
                                   <div class="mb-3" style="margin: 1rem!important;">
-                                          <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Body:</label>
-                                          <textarea class="form-control" id="Bodyform" rows="7" placeholder="Description"></textarea>
+                                          <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Description</label>
+                                          <textarea class="form-control" id="Bodyform" rows="7" placeholder="Brief overview about your resource"></textarea>
                                   </div>
 
 
