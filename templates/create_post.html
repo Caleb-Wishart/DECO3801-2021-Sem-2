@@ -109,7 +109,7 @@
                             height="50"
                           />
 
-            <form class = "form-outline w-100" id="comment_form" action="{{ url_for('add_new_post_comment', cid=channel.cid, post_id=post_info['post_id']) }}" method="post">
+            <form class = "form-outline w-100">
                 <div class="form-outline w-100">
                     <textarea
                       class="form-control"
@@ -127,15 +127,7 @@
                 <!-- Button to leave a comment. NEEDS TO BE IMPLEMENTED-->
                     <input type="submit" form="comment_form" value="Post Comment" class="btn btn-primary btn-sm" style="margin-right: 1rem!important;"></input>
                 <!-- NEEDS TO BE IMPLEMENTED, clears the form / comment box-->
-                  <button type="Button" class="btn btn-outline-primary btn-sm" onclick="javascript:eraseText()">Clear</button>
 
-
-                    <script>
-                    // use this to clear text in textarea when Clear button is clicked
-                    function eraseText() {
-                        document.getElementById("comment_input").value = "";
-                    }
-                    </script>
                     </div>
                 </div>
             </form>
