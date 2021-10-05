@@ -93,16 +93,22 @@
             <!-- FIXME Change UID 1 to logged in user -->
                 <!-- First card to indicate the original post-->
                     <div class="card flex-fill shadow-sm" style="margin-top: 2rem!important;">
-                              <form class = "form-outline w-100">
+                              <form class = "form-control">
+
+                                    <div class = "mb-3">
+                                        <label for="channelControl" class="form-label">Create a new post in the following channel</label>
+                                        <input class="form-control" type="text" id = "channelControl" placeholder="Disabled input" aria-label="Disabled input example" disabled>
+                                    </div>
+
                                     <div class="mb-3">
-                                          <label for="exampleFormControlInput1" class="form-label">Email address</label>
+                                          <label for="exampleFormControlInput1" class="form-label">Title</label>
                                           <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com">
                                         </div>
                                         <div class="mb-3">
-                                          <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label>
+                                          <label for="exampleFormControlTextarea1" class="form-label">Body</label>
                                           <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
                                         </div>
-                         </form>
+                            </form>
 
 
                             <hr style="width:97%; margin-right: 60px; margin-left: 15px; margin-bottom: 0rem!important;">
