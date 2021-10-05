@@ -213,7 +213,11 @@ def create(type=None):
         return render_template("create_post.html", title= "Create Post")
 
     if type == "resource":
-        return render_template("create_resource.html", title = "Create Resource")
+        return render_template("create_resource.html",
+                               title = "Create Resource",
+                               subject=[enum_to_website_output(e) for e in Subject],
+                               grade=[enum_to_website_output(e) for e in Grade],
+                               tag=get_tags().keys())
 
 
 

@@ -227,16 +227,31 @@
                                               <div class="row">
                                                   <input class="form-control" style = "margin-bottom: 0.5rem!important; margin-top: 0.3rem!important;"
                                list="datalistOptions" id="exampleDataList" placeholder="Search Subjects...">
+                                                  <datalist id="datalistOptions">
+                                                        {% for item in subject %}
+                                                      <option value="{{item}}">
+                                                        {% endfor %}
+                                                  </datalist>
                                               </div>
                                               <!-- Year Level-->
                                               <div class="row">
                                                   <input class="form-control" style = "margin-bottom: 0.5rem!important; margin-top: 0.3rem!important;"
                                list="datalistOptions" id="exampleDataList" placeholder="Search Year Levels...">
+                                                  <datalist id="datalistOptions">
+                                                {% for item in grade %}
+                                                  <option value="{{item}}">
+                                                    {% endfor %}
+                                                </datalist>
                                               </div>
                                               <!-- Tags-->
                                               <div class="row">
                                                   <input class="form-control" style = "margin-bottom: 0.5rem!important; margin-top: 0.3rem!important;"
                                list="datalistOptions" id="exampleDataList" placeholder="Search Tags...">
+                                                  <datalist id="datalistOptions">
+                                                    {% for item in tag %}
+                                                      <option value="{{item}}">
+                                                        {% endfor %}
+                                                    </datalist>
                                               </div>
                                           </div>
                                       </div>
