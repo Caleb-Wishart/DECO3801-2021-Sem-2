@@ -71,9 +71,9 @@
 {% endblock %}
 
 {% block content %}
-    <body onbeforeunload = "return myFunction()">
+    <body onbeforeunload = "return leavePageFunction()">
         <script>
-            function myFunction() {
+            function leavePageFunction() {
                 return "Testing something"
             }
         </script>
@@ -85,14 +85,7 @@
                     <dt class="col-sm-9" style = "font-size: xx-large; margin-top:2rem!important;">
                          Create Post
                     </dt>
-                     <!-- NOTE: IF THE USER IS NOT THE ADMIN, THIS SECTION OF HTML IS DELETED -->
-                    <div class="col-3" style="margin-top:2rem!important;">
-                        <div class = "d-flex flex-row-reverse" >
-                         <a href="{{url_for('create')}}" class="btn btn-primary d-md-block" style = "width: 60%" aria-haspopup="true" aria-expanded="false">
-                            <dd class="text-center font-weight-bold">Edit Post</dd>
-                        </a>
-                        </div>
-                    </div>
+
         </div>
 
         <div class="col d-flex justify-content-md-between">
@@ -110,28 +103,43 @@
         <div class="d-flex flex-start w-100" style = "margin-top: 2rem!important">
               <img
                             class="rounded-circle shadow-1-strong me-3"
-                            src="{{url_for('static', filename='img/default_profile.png')}}"
+                            src="{{url_for('static', filename='avatar/default_profile.png')}}"
                             alt="avatar"
                             width="50"
                             height="50"
                           />
-              <div class="form-outline w-100">
-                <textarea
-                  class="form-control"
-                  id="textAreaExample"
-                  rows="4"
-                  style="background: #fff;"
-                  placeholder = "Leave a comment"
-                ></textarea>
 
-            <div class="float-end mt-2 pt-1">
+            <form class = "form-outline w-100" id="comment_form" action="{{ url_for('add_new_post_comment', cid=channel.cid, post_id=post_info['post_id']) }}" method="post">
+                <div class="form-outline w-100">
+                    <textarea
+                      class="form-control"
+                      id="comment_input"
+                      rows="4"
+                      style="background: #fff;"
+                      placeholder = "Leave a comment"
+                      form="comment_form"
+                      name="comment_text"
+                    ></textarea>
+
+                    <div class="float-end mt-2 pt-1">
+
+
                 <!-- Button to leave a comment. NEEDS TO BE IMPLEMENTED-->
-              <button type="button" class="btn btn-primary btn-sm" style="margin-right: 1rem!important;">Post Comment</button>
+                    <input type="submit" form="comment_form" value="Post Comment" class="btn btn-primary btn-sm" style="margin-right: 1rem!important;"></input>
                 <!-- NEEDS TO BE IMPLEMENTED, clears the form / comment box-->
-              <button type="Button" class="btn btn-outline-primary btn-sm">Cancel</button>
-            </div>
+                  <button type="Button" class="btn btn-outline-primary btn-sm" onclick="javascript:eraseText()">Clear</button>
+
+
+                    <script>
+                    // use this to clear text in textarea when Clear button is clicked
+                    function eraseText() {
+                        document.getElementById("comment_input").value = "";
+                    }
+                    </script>
+                    </div>
+                </div>
+            </form>
           </div>
-        </div>
 
     </div>
 </div>
