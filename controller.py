@@ -211,6 +211,12 @@ def create(type=None):
 
     if type == "post":
         return render_template("create_post.html", title= "Create Post")
+
+    if type == "resource":
+        return render_template("create_resource.html", title = "Create Resource")
+
+
+
     return render_template('base.html', title='Post')
 
 @app.route('/channel')
