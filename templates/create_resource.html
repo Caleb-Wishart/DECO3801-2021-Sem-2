@@ -225,25 +225,30 @@
                                           <div class="card flex-fill" id="resourceUpload">
                                               <!-- Subject-->
                                               <div class="row">
-                                                    Select Subject:
-                                                  <input class="form-control" style = "margin: 0.5rem; margin-left: 25rem!important; width: 50%"
-                               list="datalistOptions" id="exampleDataList" placeholder="Search Subjects...">
-                                                  <datalist id="datalistOptions">
-                                                        {% for item in subject %}
-                                                      <option value="{{item}}">
-                                                        {% endfor %}
-                                                  </datalist>
-                                              </div>
-                                              <!-- Year Level-->
-                                              <div class="row">
-                                               Select Grade:
-                                                  <input class="form-control" style = "margin: 0.5rem; margin-left: 25rem!important;width: 50%"
-                               list="datalistOptions2" id="exampleDataList2" placeholder="Search Year Levels...">
-                                                  <datalist id="datalistOptions2">
-                                                {% for item in grade %}
-                                                  <option value="{{item}}">
-                                                    {% endfor %}
-                                                </datalist>
+                                                    <div class = "col-3">
+                                                        Select Subject:
+                                                    </div>
+                                                  <div class = "float-end mt-2 pt-1">
+                                                                          <input class="form-control" style = "margin: 0.5rem; margin-left: 25rem!important; width: 50%"
+                                                   list="datalistOptions" id="exampleDataList" placeholder="Search Subjects...">
+                                                                      <datalist id="datalistOptions">
+                                                                            {% for item in subject %}
+                                                                          <option value="{{item}}">
+                                                                            {% endfor %}
+                                                                      </datalist>
+                                                                  </div>
+                                                                  <!-- Year Level-->
+                                                                  <div class="row">
+                                                                   Select Grade:
+                                                                      <input class="form-control" style = "margin: 0.5rem; margin-left: 25rem!important;width: 50%"
+                                                   list="datalistOptions2" id="exampleDataList2" placeholder="Search Year Levels...">
+                                                                      <datalist id="datalistOptions2">
+                                                                    {% for item in grade %}
+                                                                      <option value="{{item}}">
+                                                                        {% endfor %}
+                                                                    </datalist>
+                                                  </div>
+
                                               </div>
                                               <!-- Tags-->
                                               <div class="row">
