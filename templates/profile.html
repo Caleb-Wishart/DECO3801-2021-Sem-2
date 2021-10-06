@@ -151,20 +151,22 @@
         <div class="col">
             <div class="card">
                 <div class="card-body">
-                <!-- Resource/Channel Headings -->
-                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                    <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked="">
-                    <label class="btn btn-outline-primary shadow" for="btnradio2">My Resources</label>
+                    <div row="pe-5">
+                        <!-- Resource/Channel Headings -->
+                        <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                            <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked="">
+                            <label class="btn btn-outline-primary shadow" for="btnradio2">My Resources</label>
 
-                    <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
-                    <label class="btn btn-outline-primary shadow" for="btnradio2">My Channels</label>
+                            <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+                            <label class="btn btn-outline-primary shadow" for="btnradio2">My Channels</label>
 
-                    <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
-                    <label class="btn btn-outline-primary shadow" for="btnradio3">Upvoted Resources</label>
+                            <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
+                            <label class="btn btn-outline-primary shadow" for="btnradio3">Upvoted Resources</label>
 
-                    <input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off">
-                    <label class="btn btn-outline-primary shadow" for="btnradio4">Private Resources</label>
-                </div>
+                            <input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off">
+                            <label class="btn btn-outline-primary shadow" for="btnradio4">Private Resources</label>
+                        </div>
+                    </div>
             </div>
                 <!-- Search Bar -->
                 <div class="row pe-5">
@@ -196,14 +198,18 @@
                         <div class="col d-flex justify-content-md-between">
                             <!-- Resources top level -->
                             <div class="card flex-fill">
-                                <div class="col pe-5">
-                                    {# thumbnail pls #}
-                                </div>
-                                <div class="col pe-5">
-                                    <p>Title: resource title pls</p>
-                                    <p>Access: private vs public pls</p>
-                                    <p>Date Created: creation date pls</p>
-                                    <p>Upvotes: num upvotes pls</p>
+                                <div class="row">
+                                    <div class="col-2" style="padding-top:3px; padding-right:20px">
+                                        {# thumbnail pls #}
+                                        <img src="https://via.placeholder.com/150" width="150px"
+                                             height="150px" style="padding: inherit">
+                                    </div>
+                                    <div class="col">
+                                        <p>Title: resource title pls</p>
+                                        <p>Access: private vs public pls</p>
+                                        <p>Date Created: creation date pls</p>
+                                        <p>Upvotes: num upvotes pls</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
