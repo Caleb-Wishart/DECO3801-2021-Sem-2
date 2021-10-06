@@ -238,6 +238,20 @@ class User(Base):
         """False, as anonymous users aren't supported."""
         return False
 
+    @property
+    def serialize(self):
+        """Return object data in serialisable format """
+        return {
+            "uid" : self.uid,
+            "username" : self.username,
+            "authenticated" : self.authenticated,
+            "avatar_link" : self.avatar_link,
+            "profile_background_link" : self.profile_background_link,
+            "created_at" : self.created_at,
+            "email" : self.email,
+            "bio" : self.bio
+        }
+
 
 class UserSession(Base):
     """
@@ -481,6 +495,17 @@ class ResourceComment(Base):
                f"rid = {self.rid},\ncreated at = {self.created_at}\n" \
                f"comment = {self.comment}"
 
+    @property
+    def serialize(self):
+        """Return object data in serialisable format """
+        return {
+            "rid": self.rid,
+            "uid": self.uid,
+            "comment": self.comment,
+            "created_at": dump_datetime(self.created_at),
+            "resource_comment_id": self.resource_comment_id
+        }
+
 
 class ResourceCommentReply(Base):
     """
@@ -515,6 +540,16 @@ class ResourceCommentReply(Base):
                f"resource_comment_id = {self.resource_comment_id}, " \
                f"replier id = {self.uid}, created_at = {self.created_at}\n" \
                f"reply = {self.reply}"
+
+    @property
+    def serialize(self):
+        """Return object data in serialisable format """
+        return {
+            "resource_comment_id" : self.resource_comment_id,
+            "reply" : self.reply,
+            "created_at" : self.created_at,
+            "uid" : self.uid
+        }
 
 
 class PrivateResourcePersonnel(Base):

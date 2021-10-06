@@ -83,7 +83,7 @@
                     class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
                     <div class="d-flex">
                         <p class="h5 pe-4 pt-3 text-dark"> {{current_user.username}}</p>
-                        <img src="{{current_user.avatar_link}}" , alt="profile" , width="50" ,
+                        <img src="{{url_for('static',filename=current_user.avatar_link)}}" , alt="profile" , width="50" ,
                         height="50">
                     </div>
                 </a>

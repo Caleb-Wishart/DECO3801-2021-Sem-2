@@ -178,7 +178,7 @@ def register():
 # -----{ PAGES.RESOURCE }------------------------------------------------------
 
 @app.route('/resource')
-@app.route('/resource/<int:rid>', methods=["GET", "POST"])
+@app.route('/resource/<int:rid>')
 def resource(rid=None):
     """Page for a resource
 
@@ -206,43 +206,27 @@ def resource(rid=None):
     if not is_resource_public(rid=rid) and (user is None or not user_has_access_to_resource(uid=uid, rid=rid)):
         abort(403,description=f"You ({current_user.username}) do not have permission to access the resource : {res.title}" + "\nIf you think this is incorrect contact the resource owner")
 
-    # User has requested a page with HTML GET
-    if request.method == "GET":
-        # show resource detail
+    # convert utc time to AEST
+    created_at = res.created_at.astimezone(pytz.timezone("Australia/Brisbane"))
 
-        # convert to human readable form
-        subject = enum_to_website_output(res.subject)
-        grade = enum_to_website_output(res.grade)
-        difficulty = enum_to_website_output(res.difficulty)
-
-        # convert utc time to AEST
-        created_at = res.created_at.astimezone(pytz.timezone("Australia/Brisbane"))
-
-        # get a list of resource_comment objects
-        resource_comment_list = get_resource_comments(rid=rid)
-        # get a dict of resource_comment instance -> resource_comment_replies instances to that comment
-        resource_comment_replies_list = get_resource_comment_replies(resource_comment_list)
-        resource_tags = get_resource_tags(res.rid)
-        return render_template("resource_item.html", rid=rid, uid=uid,
-                               res=res, difficulty=difficulty, subject=subject, grade=grade,resource_tags=resource_tags)
-    # User has requested a page with HTML GET
-    elif request.method == "POST":
-        # FIXME: here assume upvote and downvote are two separate buttons like Quora
-        # example see https://predictivehacks.com/?all-tips=how-to-add-action-buttons-in-flask
-        # update do upvote/downvote
-        up, down = request.form.get("upvote"), request.form.get("downvote")
-        vote_res = vote_resource(uid=uid, rid=rid, upvote=up is not None)
-        if vote_res == ErrorCode.SAME_VOTE_TWICE:
-            # the user voted the same vote twice
-            # todo: here I do flash message, you can modify it
-            flash("Oh please don't vote the same thing twice, will ya?","info")
-
-        # reach here a vote is made or vote is invalid, now refresh resource page
-        return redirect(url_for("resource", uid=uid, rid=rid))
-    return render_template('base.html', title='Register')
+    # render the template
+    kwargs = {
+        "title": res.title,
+        "rid" : rid,
+        "uid" : uid,
+        "res" : res,
+        "difficulty" : enum_to_website_output(res.difficulty),
+        "subject" : enum_to_website_output(res.subject),
+        "grade" : enum_to_website_output(res.grade),
+        "resource_tags" : get_resource_tags(res.rid),
+        "authors" : get_resource_author(res.rid),
+        "banner" : get_resource_thumbnail(rid)
+    }
+    return render_template("resource_item.html", **kwargs)
 
 
-@app.route('/resourceAJAX')
+
+@app.route('/AJAX/resourceAJAX')
 def resourceAJAX():
     """The endpoint for the AJAX search for resources using a get request
     returns it in json format
@@ -250,7 +234,8 @@ def resourceAJAX():
     title = request.args.get('title') if 'title' in request.args else None
     subject = request.args.get('subject').upper() if 'subject' in request.args else None
     year = request.args.get('year').upper() if 'year' in request.args else None
-    tags = str(request.args.getlist('tags[]')) if 'tags[]' in request.args else None
+    tags = request.args.getlist('tags[]') if 'tags[]' in request.args else None
+    tags = list(filter(lambda x: x != '',tags)) if tags is not None else None
     try:
         subject = Subject[subject]
     except KeyError:
@@ -263,6 +248,64 @@ def resourceAJAX():
         title = None
     return jsonify([dict(i.serialize,tags=get_resource_tags(i.rid)) for i in find_resources(title=title,subject=subject,grade=year,tags=tags)])
 
+@app.route('/AJAX/resourceVote')
+def resourceVote():
+    """The endpoint for the AJAX search for resources voting a get request
+    returns it in json format
+    """
+    rid = request.args.get('rid') if 'rid' in request.args else None
+    up = request.args.get('up') if 'up' in request.args else None
+    down = request.args.get('down').upper() if 'down' in request.args else None
+    if rid is None:
+        return jsonify({
+            'up': "?",
+            'down': "?"
+        })
+    if up is None or down is None:
+        return jsonify({
+            'up': "?",
+            'down': "?"
+        })
+    vote_res = vote_resource(uid=current_user.uid, rid=rid, upvote=up == '1')
+    _ , res = get_user_and_resource_instance(-1,rid)
+    if res is None:
+        return jsonify({
+            'up': "?",
+            'down': "?"
+        })
+    return jsonify({
+        'up': res.upvote_count,
+        'down': res.downvote_count
+    })
+
+@app.route('/AJAX/resourceComment')
+def resourceComment():
+    """The endpoint for the AJAX search for resource comments a get request
+    returns it in json format
+    """
+    rid = request.args.get('rid') if 'rid' in request.args else None
+    if rid is None:
+        return jsonify([])
+    # individual resource page
+    _, res = get_user_and_resource_instance(uid=-1, rid=rid)
+    comms = get_resource_comments(res.rid)
+    comments = []
+    for comment in comms:
+        replies = get_resource_comment_replies([comment])
+        rep = []
+        if comment in replies:
+            for reply in replies[comment]:
+                rep.append({
+                "reply" : reply.serialize,
+                "author" : get_user_and_resource_instance(reply.uid,-1)[0].serialize
+                })
+
+        comments.append({
+            "comment" : comment.serialize,
+            "replies" : rep,
+            "author" :  get_user_and_resource_instance(comment.uid,-1)[0].serialize
+        })
+    return jsonify(comments)
 
 @app.route('/resource/new', methods=['GET', 'POST'])
 def resource_new():
@@ -389,7 +432,7 @@ def debug():
     """A debugging page
     not to be used in production
     """
-    return render_template('debug.html', title='DEBUG',variable=None)
+    return render_template('debug.html', title='DEBUG',variable=f"rid {4} has comments: {get_resource_comments(4)[0].comment}" )
 
 
 # -----{ ERRORS }--------------------------------------------------------------
@@ -402,7 +445,8 @@ def handle_exception(e):
 
     # non-HTTP exceptions default to 500
     if DEBUG:
-        return render_template("errors/error_generic.html", e=InternalServerError(),fail=e), 500
+        warnings.warn(e)
+        return render_template("errors/error_generic.html", e=InternalServerError(),fail=str(e)), 500
     return render_template("errors/error_generic.html", e=InternalServerError()), 500
 
 

@@ -659,7 +659,7 @@ def modify_resource(rid: int, title=None, resource_link=None,
                     thumbnail = ResourceThumbnail(rid=rid, thumbnail_link=i)
                     conn.add(thumbnail)
 
-        # commit before making changes to resource access permission
+        # commit before making changes to resource access
         conn.add(resource)
 
         # test: here fake unique constraint violation
@@ -716,6 +716,11 @@ def modify_resource(rid: int, title=None, resource_link=None,
             return ErrorCode.COMMIT_ERROR
 
 
+def get_resource_thumbnail(rid):
+    with Session() as conn:
+        res = conn.query(ResourceThumbnail).filter_by(rid=rid).one_or_none()
+        return res if res is not None else ErrorCode.INVALID_RESOURCE
+
 def user_has_access_to_resource(uid, rid):
     """
     Check if a user has access to a private resource
@@ -744,6 +749,27 @@ def user_has_access_to_resource(uid, rid):
         return conn.query(PrivateResourcePersonnel).filter_by(uid=uid, rid=rid). \
                    one_or_none() is not None
 
+def get_resource_author(rid):
+    with Session() as conn:
+        uids = [t[0] for t in conn.query(ResourceCreater.uid).filter_by(rid=rid).all()]
+        authors = []
+        for uid in uids:
+            authors.append(conn.query(User).filter_by(uid=uid).one_or_none())
+        return list(filter(lambda x: x is not None,authors))
+
+def get_resource_tags(rid):
+    """
+    Load and returns a list of resource tags names for a resource
+
+    :param rid: The resource id
+    :return a list of all resource tags instances to this resource, if any
+    """
+    with Session() as conn:
+        tag_ids = [t[0] for t in conn.query(ResourceTagRecord.tag_id).filter_by(rid=rid)]
+        res = []
+        for i in tag_ids:
+            res.append(conn.query(Tag.tag_name).filter_by(tag_id=i).one_or_none())
+        return [r[0] for r in res if r != None]
 
 def find_resources(title_type="like", title=None,
                    created_type="after", created=EPOCH,
@@ -848,11 +874,11 @@ def find_resources(title_type="like", title=None,
         else:
             result = filter(lambda res: user_has_access_to_resource(user.uid, res.rid), resources.all())
 
-        # TODO here
-        # for tag in tags:
-        #     result = filter(lambda x: x, result)
+        for tag in tags:
+            warnings.warn(f"Searching for tag {tag}")
+            result = filter(lambda res: tag in get_resource_tags(res.rid), result)
 
-    return result
+    return list(result)
 
 
 def find_channels(title_type="like", channel_name=None,
@@ -998,7 +1024,7 @@ def vote_resource(uid, rid, upvote=True):
             warnings.warn(f"user {uid} vote resource {rid} failed")
             return ErrorCode.COMMIT_ERROR
         if VERBOSE:
-            print(f"Vote info {msg} for resource {rid}, user {uid} upvoted = {upvote}")
+            warnings.warn(f"Vote info {msg} for resource {rid}, user {uid} upvoted = {upvote}")
 
 
 def get_user_and_resource_instance(uid, rid):
@@ -1735,18 +1761,3 @@ def vote_channel_post_comment(uid, post_comment_id, upvote=True):
             return ErrorCode.COMMIT_ERROR
         if VERBOSE:
             print(f"User {uid} voted post {post_comment_id}, is_upvote = {upvote}")
-
-
-def get_resource_tags(rid):
-    """
-    Load and returns a list of resource tags names for a resource
-
-    :param rid: The resource id
-    :return a list of all resource tags instances to this resource, if any
-    """
-    with Session() as conn:
-        tag_ids = [t[0] for t in conn.query(ResourceTagRecord.tag_id).filter_by(rid=rid)]
-        res = []
-        for i in tag_ids:
-            res.append(conn.query(Tag.tag_name).filter_by(tag_id=i).one_or_none())
-        return [r[0] for r in res if r != None]

@@ -11,6 +11,93 @@
 </style>
 {% endblock %}
 
+{% block script %}
+
+<script type="text/template" id="comment_card">
+     <% _.each(data,  function(comm) { %>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-1" align="center">
+                        <img class="avatar" src="{{url_for('static',filename='')}}/<%= comm.author.avatar_link %>" , alt="Profile Icon">
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <p class="h6"><strong><%= comm.author.username %></strong></p>
+                        </div>
+                        <div class="row">
+                            <p><small> <%= comm.comment.comment %></small></p>
+                        </div>
+                    </div>
+                </div>
+                <% _.each(comm.replies,  function(reply) { %>
+                <div class="row">
+                    <div class="col-1" style="border-right: 1px dashed #333;">
+                    </div>
+                    <div class="col-1" align="center">
+                        <img class="avatar" src="{{url_for('static',filename='')}}<%= reply.author.avatar_link %>" , alt="Profile Icon">
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <p class="h6"><strong><%= reply.author.username %></strong></p>
+                        </div>
+                        <div class="row">
+                            <p><small><%= reply.reply.reply %></small></p>
+                        </div>
+                    </div>
+                </div>
+                <% }); %>
+            </div>
+            <% }); %>
+</script>
+
+<script>
+    // Voting
+    function upvote() {
+        voteAJAX(1,0);
+    }
+    function downvote() {
+        voteAJAX(0,1);
+    }
+
+    function voteAJAX(up,down) {
+        $.ajax(
+            {
+                type: "GET",
+                url: "{{url_for('resourceVote')}}",
+                data: { "rid": {{rid}} , "up": up, "down": down},
+                success: function (response) {
+                    $("#upvoteCount").text(response['up']); // set new results
+                    $("#downvoteCount").text(response['down']); // set new results
+                }
+            }
+        )
+    }
+    function commentAJAX() {
+        $.ajax(
+            {
+                type: "GET",
+                url: "{{url_for('resourceComment')}}",
+                data: { "rid": {{rid}}},
+                success: function (response) {
+                    console.log(response);
+                    $("#result").empty(); // remove current results
+                    var resource_card = _.template($("#comment_card").html());
+                    $("#result").html(resource_card({ data: response })); // set new results
+                    if (response.length == 0) {
+                        $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
+                    }
+
+                }
+            }
+        )
+    }
+    // Seed Document
+    $(document).ready(function () {
+        commentAJAX();
+    });
+</script>
+{% endblock %}
+
 
 {% block content %}
 <div class="container">
@@ -18,15 +105,21 @@
         <!-- Resource Thumbnail -->
         <div class="col d-flex">
             <div class="card">
-                <img src="{{url_for('static', filename='img/placeholder.png')}}" , alt="Logo" , width="900" ,
+                <img src="{{url_for('static', filename=banner.thumbnail_link)}}" , alt="Resource image" , width="900" ,
                     height="200">
             </div>
         </div>
-        <div class="col-3">
+        <div class="col-3" align="center">
             <div class="card">
-                <a class="btn btn-info">&#10730; View Resource</a>
-                <p><small>Redirects to resource item<br> (TODO RESOURCE TYPE)</small></p>
-                <br>
+                <a class="btn btn-info"
+                {% if res.resource_link.startswith('resource/') %}
+                    href="{{url_for('static', filename=res.resource_link)}}"
+                {% else %}
+                    href="{{res.resource_link}}"
+                {% endif %}
+
+                >&#10730; View Resource</a>
+                <hr>
                 {# No longer used
                 <button class="btn btn-info">&#9998; Annotate</button>
                 <br> #}
@@ -48,10 +141,10 @@
             <p class="h3 card-title">{{res.title}}</p>
             <div class="d-flex">
                 <p><strong>Rating&nbsp;&nbsp;</strong></p>
-                <img src="{{url_for('static', filename='img/up.png')}}" , alt="Down" , width="20" , height="20">
-                <p class="card-text px-1">&nbsp;{{res.upvote_count}}&nbsp;&nbsp;</p>
-                <img src="{{url_for('static', filename='img/down.png')}}" , alt="Down" , width="20" , height="20">
-                <p class="card-text px-1">&nbsp;{{res.downvote_count}}</p>
+                <img onclick="upvote()" src="{{url_for('static', filename='img/up.png')}}" , alt="Down" , width="20" , height="20">
+                <p class="card-text px-3" id="upvoteCount">{{res.upvote_count}}</p>
+                <img onclick="downvote()" src="{{url_for('static', filename='img/down.png')}}" , alt="Down" , width="20" , height="20">
+                <p class="card-text px-3" id="downvoteCount">{{res.downvote_count}}</p>
             </div>
             <p><strong>Visibility:&nbsp;</strong>
                 {% if res.is_public %}
@@ -60,6 +153,7 @@
                     Private
                 {% endif %}
             </p>
+            <div class="row">
             <p><strong>Tags:&nbsp;&nbsp;</strong>
                 {% for tag in resource_tags %}
                 <span class="badge rounded-pill bg-other-tag">
@@ -70,6 +164,7 @@
                     No additional tags
                 {% endif %}
             </p>
+            </div>
         </div>
     </div>
     <div class="row p-3">
@@ -79,40 +174,28 @@
                 <p>{{res.description}}</p>
                 <hr class="px-3">
             </div>
-            <p class="h3 card-title">Author</p>
+            <p class="h4 card-title">Author</p>
             <div class="row">
+                {% for author in authors %}
                 <div class="col-1" align="center">
-                    <img class="avatar" src="{{url_for('static', filename='img/placeholder.png')}}" , alt="Logo">
+                    <img class="avatar" src="{{url_for('static',filename=author.avatar_link)}}" , alt="Profile Icon">
                 </div>
-                <div class="col">
+                <div class="col-2">
                     <div class="row">
-                        <p class="h6">[Author Name]</p>
+                        <p class="h6"><strong>{{author.username}}</strong></p>
                     </div>
                     <div class="row">
-                <p><small>[Author Bio]</small></p>
-
+                        <p><small>{{author.email}}</small></p>
                     </div>
-
-            </div>
+                </div>
+                {% endfor %}
         </div>
     </div>
     <div class="row p-3">
         <div class="card shadow" style="border-radius: 15px">
-            <p class="card-title">Comments</p>
-            <p>[Comments go here]</p>
-            {% for comm in comment %}
-            <div class="card-body">
-                <div class="row p-3">
-                    <div class="col d-flex">
-                        <img class="avatar" src="{{url_for('static', filename='img/placeholder.png')}}" , alt="Logo">
-                    </div>
-                    <div class="col">
-                        <p class="h5">[Author Name]</p>
-                        <p>[Comment content]</p>
-                    </div>
-                </div>
+            <p class="h4 card-title">Comments</p>
+            <div id="result">
             </div>
-            {% endfor %}
         </div>
     </div>
 </div>
