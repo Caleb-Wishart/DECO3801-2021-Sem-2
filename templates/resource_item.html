@@ -24,45 +24,80 @@
         </div>
         <div class="col-3">
             <div class="card">
-                <button class="btn btn-info">&#10730; Download</button>
-                <p><small>Redirects to download page<br>PDF (Approx 2MB)</small></p>
+                <a class="btn btn-info">&#10730; View Resource</a>
+                <p><small>Redirects to resource item<br> (TODO RESOURCE TYPE)</small></p>
                 <br>
+                {# No longer used
                 <button class="btn btn-info">&#9998; Annotate</button>
-                <br>
-                <p><strong>Subject: </strong>{{subject}}</p>
-                <p><strong>Year Level: </strong>{{grade}}</p>
+                <br> #}
+                <p><strong>Subject: </strong>
+                    <span class="badge rounded-pill bg-subject-tag">
+                            {{subject}}
+                    </span>
+                </p>
+                <p><strong>Year Level: </strong>
+                    <span class="badge rounded-pill bg-year-tag">
+                            {{grade}}
+                    </span>
+                </p>
             </div>
         </div>
     </div>
     <div class="row p-3">
-        <p class="h3">{{res.title}}</p>
-        <div class="d-flex">
-            <p><strong>Rating: </strong></p>
-            <p class="card-text px-1">{{res.upvote_count}}</p>
-            <img src="{{url_for('static', filename='img/up.png')}}" , alt="Down" , width="20" , height="20">
-            <p class="card-text px-1">{{res.downvote_count}}</p>
-            <img src="{{url_for('static', filename='img/down.png')}}" , alt="Down" , width="20" , height="20">
+        <div class="card shadow" style="border-radius: 15px">
+            <p class="h3 card-title">{{res.title}}</p>
+            <div class="d-flex">
+                <p><strong>Rating&nbsp;&nbsp;</strong></p>
+                <img src="{{url_for('static', filename='img/up.png')}}" , alt="Down" , width="20" , height="20">
+                <p class="card-text px-1">&nbsp;{{res.upvote_count}}&nbsp;&nbsp;</p>
+                <img src="{{url_for('static', filename='img/down.png')}}" , alt="Down" , width="20" , height="20">
+                <p class="card-text px-1">&nbsp;{{res.downvote_count}}</p>
+            </div>
+            <p><strong>Visibility:&nbsp;</strong>
+                {% if res.is_public %}
+                    Public
+                {% else %}
+                    Private
+                {% endif %}
+            </p>
+            <p><strong>Tags:&nbsp;&nbsp;</strong>
+                {% for tag in resource_tags %}
+                <span class="badge rounded-pill bg-other-tag">
+                    {{tag}}
+                </span>
+                {% endfor %}
+                {% if resource_tags | length == 0 %}
+                    No additional tags
+                {% endif %}
+            </p>
         </div>
-        <p><strong>Public: </strong>{{res.is_public}}</p>
-        <p><strong>Tags: </strong>[Tags go here]</p>
     </div>
     <div class="row p-3">
-        <div class="card">
-            <p class="card-title">Description</p>
+        <div class="card shadow" style="border-radius: 15px">
+            <p class="h4 card-title">Description</p>
             <div class="card-body">
                 <p>{{res.description}}</p>
                 <hr class="px-3">
             </div>
-            <p class="card-title">Author</p>
-            <div class="card-body">
-                <img class="avatar" src="{{url_for('static', filename='img/placeholder.png')}}" , alt="Logo">
-                <p class="h6">[Author Name]</p>
+            <p class="h3 card-title">Author</p>
+            <div class="row">
+                <div class="col-1" align="center">
+                    <img class="avatar" src="{{url_for('static', filename='img/placeholder.png')}}" , alt="Logo">
+                </div>
+                <div class="col">
+                    <div class="row">
+                        <p class="h6">[Author Name]</p>
+                    </div>
+                    <div class="row">
                 <p><small>[Author Bio]</small></p>
+
+                    </div>
+
             </div>
         </div>
     </div>
     <div class="row p-3">
-        <div class="card">
+        <div class="card shadow" style="border-radius: 15px">
             <p class="card-title">Comments</p>
             <p>[Comments go here]</p>
             {% for comm in comment %}

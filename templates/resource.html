@@ -25,8 +25,7 @@
      <% _.each(data,  function(res) { %>
         <!-- Resource -->
         <div class="col-4 p-2">
-            <!-- FIXME Change UID 1 to logged in user -->
-            <a class="text-dark card shadow-sm" href="{{url_for('resource')}}/1/<%= res.rid %>">
+            <a class="text-dark card shadow-sm" href="{{url_for('resource')}}/<%= res.rid %>">
                 <img class="bd-placeholder-img card-img-top" src="{{url_for('static', filename='img/placeholder.png')}}" ,
                     alt="Logo" , width="150" , height="150">
                 <div class="card-body">
@@ -43,12 +42,121 @@
                         </p>
                         <img src="{{url_for('static', filename='img/down.png')}}" , alt="Down" , width="20" , height="20">
                     </div>
+                    <div class="d-flex">
+                        <span class="badge rounded-pill bg-year-tag">
+                            <%= res.grade %>
+                        </span>
+                        <span class="badge rounded-pill bg-subject-tag">
+                            <%= res.subject %>
+                        </span>
+                        <% _.each(res.tags,  function(tag) { %>
+                        <span class="badge rounded-pill bg-other-tag">
+                            <%= tag %>
+                        </span>
+                         <% }); %>
+                    </div>
                 </div>
             </a>
         </div>
     <% }); %>
 </script>
 <script>
+    // Tags button
+    function tagChecked(checkboxElem) {
+        id = checkboxElem.id + '____s';
+        other = document.getElementById(id)
+        tagId = checkboxElem.name + '_selected';
+        otherTag = document.querySelector('[title='+tagId+']')
+        myTagId = checkboxElem.name + '_search';
+        myTag = document.querySelector('[title='+myTagId+']')
+        if (checkboxElem.checked) {
+            other.checked = false;
+            otherTag.hidden = false;
+            myTag.hidden = true;
+            doAJAX();
+        } else {
+            other.checked = true;
+            otherTag.hidden = true;
+            myTag.hidden = false;
+        }
+    }
+    function tagCheckedSelected(checkboxElem) {
+        id = checkboxElem.id.replace('____s', '');
+        other = document.getElementById(id)
+        tagId = checkboxElem.name + '_search';
+        otherTag = document.querySelector('[title='+tagId+']')
+        myTagId = checkboxElem.name + '_selected';
+        myTag = document.querySelector('[title='+myTagId+']')
+        if (checkboxElem.checked) {
+            other.checked = false;
+            var search_term = $('input[name=tags]').val().toLowerCase();
+            if (otherTag.title.toLowerCase().indexOf(search_term) > -1) {
+                otherTag.hidden = false;
+            } else {
+                otherTag.hidden = true;
+            }
+            if (search_term == '') {
+                otherTag.hidden = true;
+            }
+            myTag.hidden = true;
+            doAJAX();
+        } else {
+            other.checked = true;
+            otherTag.hidden = true;
+            myTag.hidden = false;
+        }
+    }
+    // Reset Tags
+    $(document).on("click", "#resetTags", function(e) {
+        var spanBoxes = document.getElementsByClassName('tagSearchSpan');
+        var search_term = $('input[name=tags]').val().toLowerCase();
+        for (var i = 0; i < spanBoxes.length; i++) {
+            box = spanBoxes[i];
+            if (box.title.toLowerCase().indexOf(search_term) > -1) {
+                box.hidden = false;
+            } else {
+                box.hidden = true;
+            }
+            if (search_term == '') {
+                box.hidden = true;
+            }
+        }
+        var spanFoundBoxes = document.getElementsByClassName('tagFoundSpan');
+        for (var i = 0; i < spanFoundBoxes.length; i++) {
+            box = spanFoundBoxes[i];
+            box.hidden = true;
+            box.getElementsByTagName('input')[0].checked = false
+            id = box.getElementsByTagName('input')[0].id.replace('____s', '');
+            document.getElementById(id).checked = false
+        }
+        doAJAX();
+    });
+    // Tags search
+    $(document).on("keyup", "#search_tags", function (e) {
+        var search_term = $('input[name=tags]').val().toLowerCase();
+        var spanBoxes = document.getElementsByClassName('tagSearchSpan');
+        for (var i = 0; i < spanBoxes.length; i++) {
+            box = spanBoxes[i];
+            if (search_term == '') {
+                box.hidden = true;
+            } else if (box.title.toLowerCase().indexOf(search_term) > -1) {
+                tagId = box.title.replace('_search', '_selected');
+                try {
+                    otherTag = document.querySelector('[title='+tagId+']')
+                    if(otherTag.hidden){
+                        box.hidden = false;
+                    }else{
+                        box.hidden = true;
+                    }
+                } catch (err) {
+                    box.hidden = true;
+                }
+            } else {
+                box.hidden = true;
+            }
+        }
+    });
+
     // DROPDOWN
     $(function () {
 
@@ -59,19 +167,37 @@
         });
 
     });
-    // AJAX
-    $(document).on("keyup", "#search_content", function (e) {
+    function doAJAX() {
         var search_term = $('input[name=title]').val();
+        var spanFoundBoxes = document.getElementsByClassName('tagFoundSpan');
+        var subject = '';
+        for (var i = 0; i < spanFoundBoxes.length; i++) {
+            box = spanFoundBoxes[i];
+            if(!box.hidden && box.className.split(/\s+/).includes('bg-subject-tag')){
+                subject = box.title.replace('_selected', '');
+            }
+        }
+        var year = '';
+        for (var j = 0; j < spanFoundBoxes.length; j++) {
+            box = spanFoundBoxes[j];
+            if(!box.hidden && box.className.split(/\s+/).includes('bg-year-tag')){
+                year = box.title.replace('_selected', '');
+            }
+        }
+        var tags = [''];
+        o = Object.values(spanFoundBoxes).filter(span => !span.hidden).filter(span => span.className.includes('bg-other-tag')).map(x => x.title.replace('_selected', ''));
+        if (o.length > 0){
+            tags = o;
+        }
         $.ajax(
             {
                 type: "GET",
-                url: "{{url_for('search')}}",
-                data: { "title": search_term },
+                url: "{{url_for('resourceAJAX')}}",
+                data: { "title": search_term , "subject": subject, "year": year, "tags": tags},
                 success: function (response) {
                     $("#result").empty(); // remove current results
                     var resource_card = _.template($("#resource_card").html());
                     $("#result").html(resource_card({ data: response })); // set new results
-                    console.log(response);
                     if (response.length == 0) {
                         $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
                     }
@@ -79,21 +205,26 @@
                 }
             }
         )
-    });
-    // Seed AJAX
+    }
+
+    // AJAX
+    $(document).on("keyup", "#search_content", doAJAX);
+    // Seed Document
     $(document).ready(function () {
-        $.ajax(
-            {
-                type: "GET",
-                url: "{{url_for('search')}}",
-                data: { "title": "" },
-                success: function (response) {
-                    $("#result").empty(); // remove current results
-                    var resource_card = _.template($("#resource_card").html());
-                    $("#result").html(resource_card({ data: response })); // set new results
-                }
+        doAJAX();
+        var search_term = $('input[name=tags]').val().toLowerCase();
+        var spanBoxes = document.getElementsByClassName('tagSearchSpan');
+        for (var i = 0; i < spanBoxes.length; i++) {
+            box = spanBoxes[i];
+            if (box.title.toLowerCase().indexOf(search_term) > -1) {
+                box.hidden = false;
+            } else {
+                box.hidden = true;
             }
-        )
+            if (search_term == '') {
+                box.hidden = true;
+            }
+        }
     });
 </script>
 {% endblock %}
@@ -132,58 +263,80 @@
                     </div>
                 </div>
             </div>
-            <a href="{{url_for('create')}}" class="btn btn-primary" aria-haspopup="true" aria-expanded="false">
+            <a href="{{url_for('resource_new')}}" class="btn btn-primary" aria-haspopup="true" aria-expanded="false">
                 Create Resource
             </a>
         </div>
     </div>
     <div class="row p-3">
         <div class="col-3">
-            <!-- Subject selection -->
+            <!-- Tags selection -->
             <div class="row pe-5">
                 <div class="card">
-                    <p class="h4">Subject</p>
-                    <div class="card-body overflow-auto" style="max-height: 350px;">
-                        {% for item in subject %}
-                        <div class="form-check">
-                            <input class="form-check-input btn-{{item}}" type="checkbox" value="" id="check{{item}}">
-                            <label class="form-check-label px-2" for="flexCheckDefault">
-                                {{enum_to_website_output(item)}}
-                            </label>
-                        </div>
+                    <p class="h4" style="margin-top: 1rem!important; margin-bottom: 0.5rem!important;">Tags</p>
+                    <!-- Search for Tags -->
+                    <div class="input-group">
+                        <input type="search" name="tags" class="form-control" placeholder="&#128270; Search Tags..."
+                            id="search_tags">
+                    </div>
+                    <div class="row-3" id="found_tags">
+                    <hr>
+                    <p class="h6" style="margin-top: 1rem!important; margin-bottom: 0.5rem!important;">Subjects</p>
+                        {% for item in subjects %}
+                        <span class="badge rounded-pill bg-subject-tag tagSearchSpan" title="{{item}}_search" hidden>
+                            <input type="checkbox" hidden id="{{item}}_input" name="{{item}}" value="{{item}}"
+                                onchange="tagChecked(this)">
+                            <label for="{{item}}_input" id="{{item}}_label">{{item}}</label>
+                        </span>
+                        {% endfor %}
+                    <p class="h6" style="margin-top: 1rem!important; margin-bottom: 0.5rem!important;">Grade</p>
+                        {% for item in grades %}
+                        <span class="badge rounded-pill bg-year-tag tagSearchSpan" title="{{item}}_search" hidden>
+                            <input type="checkbox" hidden id="{{item}}_input" name="{{item}}" value="{{item}}"
+                                onchange="tagChecked(this)">
+                            <label for="{{item}}_input" id="{{item}}_label">{{item}}</label>
+                        </span>
+                        {% endfor %}
+                    <p class="h6" style="margin-top: 1rem!important; margin-bottom: 0.5rem!important;">Tags</p>
+                        {% for item in tags %}
+                        <span class="badge rounded-pill bg-other-tag tagSearchSpan" title="{{item}}_search" hidden>
+                            <input type="checkbox" hidden id="{{item}}_input" name="{{item}}" value="{{item}}"
+                                onchange="tagChecked(this)">
+                            <label for="{{item}}_input" id="{{item}}_label">{{item}}</label>
+                        </span>
+                        {% endfor %}
+                    <hr>
+                    </div>
+                    <!-- Selected Tags -->
+                    <div class="row-3">
+                        <div class="h4">Applied Tags</div>
+                        {% for item in subjects %}
+                        <span class="badge rounded-pill bg-subject-tag tagFoundSpan" title="{{item}}_selected" hidden>
+                            <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
+                                onchange="tagCheckedSelected(this)">
+                            <label for="{{item}}_input____s" id="{{item}}_label____s">{{item}}</label>
+                        </span>
+                        {% endfor %}
+                        {% for item in grades %}
+                        <span class="badge rounded-pill bg-year-tag tagFoundSpan" title="{{item}}_selected" hidden>
+                            <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
+                                onchange="tagCheckedSelected(this)">
+                            <label for="{{item}}_input____s" id="{{item}}_label____s">{{item}}</label>
+                        </span>
+                        {% endfor %}
+                        {% for item in tags %}
+                        <span class="badge rounded-pill bg-other-tag tagFoundSpan" title="{{item}}_selected" hidden>
+                            <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
+                                onchange="tagCheckedSelected(this)">
+                            <label for="{{item}}_input____s" id="{{item}}_label____s">{{item}}</label>
+                        </span>
                         {% endfor %}
                     </div>
-                </div>
-            </div>
-            <!-- Year selection -->
-            <div class="row pe-5 py-3">
-                <div class="card overflow-auto">
-                    <p class="h4">Year</p>
-                    <div class="card-body overflow-auto" style="max-height: 350px;">
-                        {% for item in grade %}
-                        <div class="form-check">
-                            <input class="form-check-input btn-{{item}}" type="checkbox" value="" id="check{{item}}">
-                            <label class="form-check-label" for="flexCheckDefault">
-                                {{enum_to_website_output(item)}}
-                            </label>
+                    <div class="row-3">
+                        <div class="btn btn-secondary d-md-block" style="width: 100%; margin-top: 1rem!important;
+                        margin-bottom: 1rem!important;" aria-haspopup="true" aria-expanded="false" id="resetTags">
+                            <dd class="text-center font-weight-bold">Clear all tags</dd>
                         </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-            <!-- Other Tag selection -->
-            <div class="row pe-5">
-                <div class="card overflow-auto">
-                    <p class="h4">Other</p>
-                    <div class="card-body overflow-auto" style="max-height: 200px;">
-                        {% for item in tag %}
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="check{{item}}">
-                            <label class="form-check-label" for="flexCheckDefault">
-                                {{item}}
-                            </label>
-                        </div>
-                        {% endfor %}
                     </div>
                 </div>
             </div>

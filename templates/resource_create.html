@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<div class="container">
+    <form method="POST" action="{{url_for('resource_new')}}" enctype = "multipart/form-data">
+        {{ form.csrf_token }}
+        {{ form.title.label }} {{ form.title() }}
+        <br>
+        {{ form.description.label }} {{ form.description() }}
+        <br>
+        {{ form.files.label }} {{ form.files() }}
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+</div>
+{% endblock %}

@@ -3,17 +3,22 @@ from flask import Flask, request, render_template, redirect, url_for, abort, fla
 from flask_login import login_required, current_user
 import json
 import random
-from flask_login import LoginManager, login_required, login_user, logout_user, current_user
+import warnings
+import os
+from flask_login import LoginManager, login_required, login_user, logout_user, current_user, AnonymousUserMixin
 from werkzeug.security import check_password_hash
+from werkzeug.utils import secure_filename
+from werkzeug.exceptions import HTTPException, InternalServerError
 from re import search as re_search
 # If in branch use the following
 from .DBFunc import *
-from .forms import LoginForm, RegisterForm
+from .forms import LoginForm, RegisterForm, ResourceForm
 # If in main use the following
 # from DBFunc import *
-# from forms import LoginForm
+# from forms import LoginForm, RegisterForm, ResourceForm
 
 # -----{ INIT }----------------------------------------------------------------
+DEBUG = True
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -25,7 +30,26 @@ login_manager.login_message_category = "error"
 # NOTE: added for flush() usage
 app.secret_key = "admin"
 
+# File upload
+app.config['UPLOAD_FOLDER'] = 'static/files/'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 # 16 MB
+app.config['MAX_CONTENT_PATH'] = 50 # 50 chars long
 # -----{ LOGIN }---------------------------------------------------------------
+
+class Anonymous(AnonymousUserMixin):
+    def __init__(self):
+        self.uid = -1
+        self.username = "Guest User"
+
+    def __str__(self):
+        return f"Anonymous User: uid = {self.uid}"
+
+    def __repr__(self):
+        return __str__(self)
+
+login_manager.anonymous_user = Anonymous
+
+
 @login_manager.user_loader
 def load_user(user_id):
     """
@@ -154,39 +178,35 @@ def register():
 # -----{ PAGES.RESOURCE }------------------------------------------------------
 
 @app.route('/resource')
-@app.route('/resource/<int:uid>/<int:rid>', methods=["GET", "POST"])
-def resource(uid=None, rid=None):
+@app.route('/resource/<int:rid>', methods=["GET", "POST"])
+def resource(rid=None):
     """Page for a resource
+
+    If no resource ID is set then the home page is shown
+    If a resource ID is set then that resource page is shown
 
     Shows information based on the resource type and content
 
-    :param uid: The user id
     :param rid: The resource id
-    If resource or user is invalid then redirect to 404 page
+
+    If the currently logged in user does not have access to the resource then
+    they are given a 403
+    If the resource does not exist then they are given a 404
     """
-    if (uid is None and rid is not None) or (uid is not None and rid is None):
-        redirect(url_for('resource'))  # base resource page
-    if uid is None or rid is None:
-        return render_template('resource.html',
-            title='Resources',
-            subject=[e.name.lower() for e in Subject],
-            grade=[e.name.lower() for e in Grade],
-            tag=get_tags().keys(),
-            resources=find_resources())
+    # Base resource page
+    if rid is None:
+        return render_template('resource.html', title='Resources')
+    uid = current_user.uid
     # individual resource page
     user, res = get_user_and_resource_instance(uid=uid, rid=rid)
-    if not user or not res:
-        # invalid user or resource, pop 404
-        abort(404, description="Invalid user or resource id")
-        # return redirect(url_for('home'))
-    # elif is_user_session_expired(uid=uid):
-    #     # user instance is expired, go back to login
-    #     return redirect(url_for("login"))
-    elif not is_resource_public(rid=rid) and not user_has_access_to_resource(uid=uid, rid=rid):
-        # resource is private and user does not have access
-        # todo: possibly a link to no access reminder page?
-        abort(404, description=f"User {uid} does not have access to resource {rid}")
+    # resource does not exist
+    if res is None:
+        abort(404,description="The requested resource does not exist")
+    # user has access to resource
+    if not is_resource_public(rid=rid) and (user is None or not user_has_access_to_resource(uid=uid, rid=rid)):
+        abort(403,description=f"You ({current_user.username}) do not have permission to access the resource : {res.title}" + "\nIf you think this is incorrect contact the resource owner")
 
+    # User has requested a page with HTML GET
     if request.method == "GET":
         # show resource detail
 
@@ -202,10 +222,10 @@ def resource(uid=None, rid=None):
         resource_comment_list = get_resource_comments(rid=rid)
         # get a dict of resource_comment instance -> resource_comment_replies instances to that comment
         resource_comment_replies_list = get_resource_comment_replies(resource_comment_list)
-
-        # FIXME: modify "base.html" webpage to resource page
+        resource_tags = get_resource_tags(res.rid)
         return render_template("resource_item.html", rid=rid, uid=uid,
-                               res=res, difficulty=difficulty, subject=subject, grade=grade)
+                               res=res, difficulty=difficulty, subject=subject, grade=grade,resource_tags=resource_tags)
+    # User has requested a page with HTML GET
     elif request.method == "POST":
         # FIXME: here assume upvote and downvote are two separate buttons like Quora
         # example see https://predictivehacks.com/?all-tips=how-to-add-action-buttons-in-flask
@@ -222,12 +242,42 @@ def resource(uid=None, rid=None):
     return render_template('base.html', title='Register')
 
 
-@app.route('/search')
-def search():
-    title = request.args.get('title')
-    return jsonify([i.serialize for i in find_resources(title=title)])
-    # return Response(json.dumps([i.serialize for i in find_resources(title=title)]),  mimetype='application/json')
+@app.route('/resourceAJAX')
+def resourceAJAX():
+    """The endpoint for the AJAX search for resources using a get request
+    returns it in json format
+    """
+    title = request.args.get('title') if 'title' in request.args else None
+    subject = request.args.get('subject').upper() if 'subject' in request.args else None
+    year = request.args.get('year').upper() if 'year' in request.args else None
+    tags = str(request.args.getlist('tags[]')) if 'tags[]' in request.args else None
+    try:
+        subject = Subject[subject]
+    except KeyError:
+        subject = None
+    try:
+        year = Grade[year]
+    except KeyError:
+        year = None
+    if title == '':
+        title = None
+    return jsonify([dict(i.serialize,tags=get_resource_tags(i.rid)) for i in find_resources(title=title,subject=subject,grade=year,tags=tags)])
 
+
+@app.route('/resource/new', methods=['GET', 'POST'])
+def resource_new():
+    """The user creates a new resource
+    """
+    form = ResourceForm()
+    if form.validate_on_submit():
+        if form.files.data:
+            f = request.files[form.files.name]
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename)))
+            flash("File was uploaded",'info')
+    return render_template('resource_create.html', title='New Resource',form=form)
+    # todo
+
+# -----{ PAGES.PROFILE }-------------------------------------------------------
 
 @app.route('/profile')
 @login_required
@@ -262,51 +312,62 @@ def settings():
     """
     return render_template('base.html', title='Login')
 
+# -----{ PAGES.GENERIC }-------------------------------------------------------
 
 @app.route('/about')
 def about():
     """A brief page describing what the website is about"""
     return render_template('about.html', title='About Us', name="About Us")
 
+# -----{ PAGES.CHANNELS }-------------------------------------------------------
+
 @app.route('/create')
 @app.route('/create/<type>')
 def create(type=None):
     """The user create a resource or channel
-
     If type is not resource or channel redirect to home
-
     If type == None then prompt the user to select which create type they want
     and redirect to that page
-
     Create Channel
     Allows the user to give a title, desc., tags
+    Create resource
+    Allows the user to give a title, desc., tags, upload content, link to similar
     """
     return render_template('base.html', title='Post')
-    # todo
-
 
 @app.route('/channel')
-@app.route('/channel/<cid>/post/<post_id>')
-@app.route("/channel/<cid>")
-@login_required
-def channel(cid=None, post_id=None):
-    """The user view a channel page
-
-    The home channel page (cid == None, post_id == None) shows the list of forums
+@app.route('/channel/<fName>/<tName>')
+@app.route('/channel/<fName>')
+def channel(fName=None, tName=None):
+    """The user view a forum page
+    The home forum page (fName == None, tName == None) shows the list of forums
     Allows user to create a channel etc.
-
-    The channel/cid page shows the posts in that channel
-    Allows users to add posts to the channel
-
-    The channel/cid/post_id shows a post on that channel.
-    Allows users to add comments and replies to comments to the forum post
-
-
-    If cid is not valid name redirect to home channel page
-    If post_id is not valid redirect to channel page
+    The forum/fName page shows the threads in that forum
+    Allows users to add threads to the forum
+    The forum/fName/tName shows the thread on that forum.
+    Allows users to add comments to the forum post
+    The forum/fName/tName?<id> shows the comment on that forum page or the top
+    of page if not valid.
+    If fName is not valid name redirect to home forum page
+    If tName is not valid redirect to forum page
     """
-    # todo
-    return render_template('base.html', title='Channel')
+    if (fName is not None and tName is None):
+        return render_template('channel_item.html',
+                               title='Channels',
+                               subject=[enum_to_website_output(e) for e in Subject],
+                               grade=[enum_to_website_output(e) for e in Grade],
+                               tag=get_tags().keys(),
+                               resources=find_resources())
+    if fName is None or tName is None:
+        return render_template('channel.html',
+                               title='Channels',
+                               subject=[enum_to_website_output(e) for e in Subject],
+                               grade=[enum_to_website_output(e) for e in Grade],
+                               tag=get_tags().keys(),
+                               resources=find_resources())
+
+
+    return render_template('channel.html', title='Post')
 
 
 @app.route("/channel/comment/<post_id>")
@@ -320,6 +381,9 @@ def comment_channel_post(post_id):
     # todo
     return render_template('base.html', title='Post')
 
+
+# -----{ PAGES.DEBUG }---------------------------------------------------------
+
 @app.route('/debug')
 def debug():
     """A debugging page
@@ -330,16 +394,17 @@ def debug():
 
 # -----{ ERRORS }--------------------------------------------------------------
 
-@app.errorhandler(403)
-def page_not_found(error):
-    """Page shown with a HTML 403 status"""
-    return render_template('errors/error_403.html'), 403
+@app.errorhandler(Exception)
+def handle_exception(e):
+    # pass through HTTP errors
+    if isinstance(e, HTTPException):
+        return render_template("errors/error_generic.html", e=e), e.code
 
+    # non-HTTP exceptions default to 500
+    if DEBUG:
+        return render_template("errors/error_generic.html", e=InternalServerError(),fail=e), 500
+    return render_template("errors/error_generic.html", e=InternalServerError()), 500
 
-@app.errorhandler(404)
-def page_not_found(error):
-    """Page shown with a HTML 404 status"""
-    return render_template('errors/error_404.html'), 404
 
 # -----{ PROCESSORS }----------------------------------------------------------
 
@@ -350,16 +415,17 @@ def subject_processor():
     return dict(enum_to_website_output=enum_to_website_output)
 
 @app.context_processor
-def colour_processor():
-    def strToColour(item: str) -> str:
-        random.seed(item + "123")
-        return f"#{str(hex(random.randint(0, 0xFFFFFF)))[2:].zfill(6)}"
-    return dict(strToColour=strToColour)
-
-@app.context_processor
-def tags():
-    return dict(subject_tags=[e.name.lower() for e in Subject] + [e.name.lower() for e in Grade])
-
-@app.context_processor
 def defaults():
-    return dict(current_user=current_user)
+    """Provides the default context processors
+
+    Returns:
+        dict: Variables for JINJA context
+            current_user: the user the is currently logged in or the Anonymous user
+            subject : A list of all subjects with their names
+            grade : A list of all grades with their names
+            tag : A list of all tags with their names
+    """
+    return dict(current_user=current_user,
+                subjects=[e.name.lower() for e in Subject],
+                grades=[e.name.lower() for e in Grade],
+                tags=[e.replace(' ','_').replace('-','_') for e in get_tags().keys()])

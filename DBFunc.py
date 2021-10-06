@@ -17,11 +17,11 @@ from werkzeug.security import generate_password_hash
 # use this in branch
 from .DBStructure import *
 # use this in main
-from DBStructure import *
+# from DBStructure import *
 
 
 # define if you want method output messages for debugging
-VERBOSE = True
+VERBOSE = False
 
 # this controls how DB response in case of sql commit error:
 # if DEBUG_MODE is on, when error in commit happens, simply raise error and exit program
@@ -303,7 +303,6 @@ def get_user(email):
         if user:
             if VERBOSE:
                 warnings.warn(f"email {email} is registered by user uid = {user.uid}")
-
             return user
         warnings.warn(f"No user has email {email}")
         return ErrorCode.INVALID_USER
@@ -313,7 +312,7 @@ def user_auth(email,login=True):
     with Session() as conn:
         user = get_user(email)
         if user == ErrorCode.INVALID_USER:
-            return
+            return ErrorCode.INVALID_USER
         user.authenticated = login
         conn.add(user)
         if not try_to_commit(conn):
@@ -748,7 +747,7 @@ def user_has_access_to_resource(uid, rid):
 
 def find_resources(title_type="like", title=None,
                    created_type="after", created=EPOCH,
-                   difficulty=None, subject=None,
+                   difficulty=None, subject=None, tags=None,
                    vote_type="more", votes=None,
                    grade=None, email=None, sort_by="natural"
                    ):
@@ -775,6 +774,9 @@ def find_resources(title_type="like", title=None,
         :param subject      : The subject of the resource.
             Valid values are Subject enum values.
             Defaults to None.
+        :param tags      : The tags of the resource.
+            Valid values are a list.
+            Defaults to None.
         :param vote_type    : SQL search restriction for the votes.
             Valid values are ["more","less"]. Refers to specified amount
             Defaults to "more".
@@ -798,6 +800,8 @@ def find_resources(title_type="like", title=None,
         vote_type = "more"
     if sort_by not in ["Natural", "newest", "upvotes"]:
         sort_by = "natural"
+    if tags is None:
+        tags = []
 
     with Session() as conn:
         # get User if exists
@@ -843,6 +847,10 @@ def find_resources(title_type="like", title=None,
             result = resources.all()
         else:
             result = filter(lambda res: user_has_access_to_resource(user.uid, res.rid), resources.all())
+
+        # TODO here
+        # for tag in tags:
+        #     result = filter(lambda x: x, result)
 
     return result
 
@@ -1727,3 +1735,18 @@ def vote_channel_post_comment(uid, post_comment_id, upvote=True):
             return ErrorCode.COMMIT_ERROR
         if VERBOSE:
             print(f"User {uid} voted post {post_comment_id}, is_upvote = {upvote}")
+
+
+def get_resource_tags(rid):
+    """
+    Load and returns a list of resource tags names for a resource
+
+    :param rid: The resource id
+    :return a list of all resource tags instances to this resource, if any
+    """
+    with Session() as conn:
+        tag_ids = [t[0] for t in conn.query(ResourceTagRecord.tag_id).filter_by(rid=rid)]
+        res = []
+        for i in tag_ids:
+            res.append(conn.query(Tag.tag_name).filter_by(tag_id=i).one_or_none())
+        return [r[0] for r in res if r != None]
