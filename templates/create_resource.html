@@ -228,7 +228,7 @@
                                                     <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
                                                         Select Subject:
                                                     </div>
-                                                  <div class = "col-6">
+                                                  <div class = "col-7">
                                                                           <input class="form-control" style = "margin-top:0.5rem!important;"
                                                    list="datalistOptions" id="exampleDataList" placeholder="Search Subjects...">
                                                                       <datalist id="datalistOptions">
@@ -243,10 +243,10 @@
                                                     <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
                                                         Select Grade:
                                                     </div>
-                                                  <div class = "col-6">
+                                                  <div class = "col-7">
                                                                           <input class="form-control" style = "margin-top:0.5rem!important;"
-                                                   list="datalistOptions" id="exampleDataList" placeholder="Search Subjects...">
-                                                                      <datalist id="datalistOptions">
+                                                   list="datalistOptions2" id="exampleDataList2" placeholder="Search Grades...">
+                                                                      <datalist id="datalistOptions2">
                                                                             {% for item in grade %}
                                                                           <option value="{{item}}">
                                                                             {% endfor %}
@@ -258,10 +258,10 @@
                                                     <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
                                                         Select Tags:
                                                     </div>
-                                                  <div class = "col-6">
+                                                  <div class = "col-7">
                                                                           <input class="form-control" style = "margin-top:0.5rem!important;"
-                                                   list="datalistOptions" id="exampleDataList" placeholder="Search Subjects...">
-                                                                      <datalist id="datalistOptions">
+                                                   list="datalistOptions3" id="exampleDataList3" placeholder="Search Tags...">
+                                                                      <datalist id="datalistOptions3">
                                                                             {% for item in tag %}
                                                                           <option value="{{item}}">
                                                                             {% endfor %}
@@ -269,8 +269,10 @@
                                                   </div>
                                               </div>
                                                 <!-- Put the applied tags here-->
-                                                <div class = "row" style = "padding-top: 0.25rem!important;">
-                                                    <span class="badge rounded-pill bg-primary" style="width: auto;
+                                                <div class = "row" style = "margin-top: 1rem!important; margin-bottom: 1rem!important;">
+
+                                                    <div class = "col-7">
+                                                        <span class="badge rounded-pill bg-primary" style="width: auto;
                                                     margin-right: 0.25rem!important; margin-bottom: 0.25rem!important;">Mathematics</span>
                                                     <span class="badge rounded-pill bg-primary" style="width: auto;
                                                     margin-right: 0.25rem!important; margin-bottom: 0.25rem!important;">Primary Education</span>
@@ -286,6 +288,8 @@
                                                     margin-right: 0.25rem!important; margin-bottom: 0.25rem!important;">Primary Education</span>
                                                      <span class="badge rounded-pill bg-primary" style="width: auto;
                                                     margin-right: 0.25rem!important; margin-bottom: 0.25rem!important;">Primary Education</span>
+                                                  </div>
+
                                                  </div>
 
                                           </div>
