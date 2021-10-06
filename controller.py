@@ -177,7 +177,7 @@ def login():
     Gives feedback on fail, redirects to referring page on success
      (through post data), if not refered then home page
     """
-    return render_template('base.html', title='Login')
+    return render_template('login.html', title='Login')
 
 
 @app.route('/profile')
