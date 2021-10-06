@@ -126,20 +126,20 @@ users_id = [e for e in range(1, 11)]
 
 # add tag
 add_tag("CS")
-add_tag("Math Tutorial")
-add_tag("Drama activities")
-add_tag("Math practice sheet")
-add_tag("1-min tutorial")
+add_tag("Math_Tutorial")
+add_tag("Drama_activities")
+add_tag("Math_practice_sheet")
+add_tag("1_min_tutorial")
 add_tag("brainstorming")
-add_tag('distance teaching')
-add_tag("metric math")
+add_tag('distance_teaching')
+add_tag("metric_math")
 
 # used to test unique violation rollback
 # with Session() as conn:
 #     for i in conn.query(Tag).all():
 #         print(i.tag_name)
 # # trigger unique constraint
-# add_tag("metric math")
+# add_tag("metric_math")
 # with Session() as conn:
 #     for i in conn.query(Tag).all():
 #         print(i.tag_name)
@@ -184,7 +184,7 @@ src1 = add_resource(title="Grade 2 Math 1.1, Understanding Addition",
                     difficulty=ResourceDifficulty.MODERATE,
                     grade=Grade.YEAR_2,
                     creaters_id=sample(users_id, k=random.randint(1, len(users_id))),
-                    tags_id=[tags["Math Tutorial"], tags["1-min tutorial"]],
+                    tags_id=[tags["Math_Tutorial"], tags["1_min_tutorial"]],
                     subject=Subject.MATHS_A,
                     description="How to do basic addition and the parts of"
                                 " an addition sentence. Using counters to add. Page"
@@ -193,7 +193,7 @@ src1 = add_resource(title="Grade 2 Math 1.1, Understanding Addition",
 """
 Embed link:
 <iframe width="560" height="315" src="https://www.youtube.com/embed/efnA7byI8sg"
- title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; 
+ title="YouTube video player" frameborder="0" allow="accelerometer; autoplay;
  clipboard-write; encrypted-media; gyroscope; picture-in-picture"
   allowfullscreen></iframe>
 """
@@ -202,7 +202,7 @@ src2 = add_resource(title="3rd Grade Math 8.6, Relate Fractions and Whole Number
                     difficulty=ResourceDifficulty.SPECIALIST,
                     grade=Grade.YEAR_3,
                     creaters_id=sample(users_id, k=random.randint(1, 10)),
-                    tags_id=[tags["Math Tutorial"]],
+                    tags_id=[tags["Math_Tutorial"]],
                     subject=Subject.MATHS_B,
                     description="A fraction can represent an amount less than one"
                                 " whole, one whole, or more than one whole. When a "
@@ -221,7 +221,7 @@ src3 = add_resource(title="Drama Lesson Activities, Grade 4-6: Creative Play",
                     resource_link="https://www.youtube.com/embed/u8VEuS-32JM",
                     difficulty=ResourceDifficulty.EASY,
                     creaters_id=sample(users_id, k=random.randint(1, 10)),
-                    tags_id=[tags["Drama activities"]], grade=Grade.YEAR_6,
+                    tags_id=[tags["Drama_activities"]], grade=Grade.YEAR_6,
                     subject=Subject.DRAMA,
                     description="A variety of creative drama games are explored. These games"
                                 " teach basic skills such as problem solving, communication,"
@@ -235,14 +235,14 @@ src4 = add_resource(title="Grade 12 QLD Math C U10 worksheet",
                     resource_link="static/resource/MQC-12.zip",
                     difficulty=ResourceDifficulty.SPECIALIST,
                     creaters_id=sample(users_id, k=random.randint(1, 10)),
-                    tags_id=[tags["Math practice sheet"]],
+                    tags_id=[tags["Math_practice_sheet"]],
                     grade=Grade.YEAR_12, subject=Subject.MATHS_C,
                     description="Some worksheets directly copied from MCQ website.")
 
 """
 Embed link:
 <iframe width="560" height="315" src="https://www.youtube.com/embed/1IbkUY9vZcU"
- title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; 
+ title="YouTube video player" frameborder="0" allow="accelerometer; autoplay;
  clipboard-write; encrypted-media; gyroscope; picture-in-picture"
   allowfullscreen></iframe>
 """
@@ -250,7 +250,7 @@ src5 = add_resource(title="4th Grade Math Input-Output Tables",
                     resource_link="https://www.youtube.com/embed/1IbkUY9vZcU",
                     difficulty=ResourceDifficulty.EASY,
                     creaters_id=sample(users_id, k=random.randint(1, 10)),
-                    tags_id=[tags["Math Tutorial"]],
+                    tags_id=[tags["Math_Tutorial"]],
                     grade=Grade.YEAR_4, subject=Subject.MATHS_A,
                     description="Learn how to find unknown quantities in the "
                                 "position or value of numbers as they relate to rule"
@@ -315,11 +315,11 @@ descriptions = ["Learn Chinese w/ ChineseFor.Us Beginner Chinese Lesson 1: Self-
                 "\n●The Calculus of motion",
                 "Factor the following quadratic expressions."]
 
-resource_tags = [[tags["1-min tutorial"], tags['distance teaching']],
-                 [tags["Math practice sheet"], tags["brainstorming"]],
-                 [tags["Math Tutorial"]],
-                 [tags["Math Tutorial"], tags["metric math"]],
-                 [tags["Math practice sheet"]]]
+resource_tags = [[tags["1_min_tutorial"], tags['distance_teaching']],
+                 [tags["Math_practice_sheet"], tags["brainstorming"]],
+                 [tags["Math_Tutorial"]],
+                 [tags["Math_Tutorial"], tags["metric_math"]],
+                 [tags["Math_practice_sheet"]]]
 
 OFFSET = 6
 for i in range(6, 11):
