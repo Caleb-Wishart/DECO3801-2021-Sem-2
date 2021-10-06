@@ -78,7 +78,20 @@
 
 {% endblock %}
 
+{% block script %}
+<script>
+    // DROPDOWN
+    $(function () {
 
+        $(".dropdown-menu a").click(function () {
+
+            $("#dropdownMenuButton1").text($(this).text());
+            $("#dropdownMenuButton1").val($(this).text());
+        });
+
+    });
+</script>
+{% endblock %}
 
 
 {% block content %}
@@ -319,7 +332,7 @@
                                                     <div class="dropdown px-3" style="margin: 1rem!important;">
                                                         <button class="btn btn-primary dropdown-toggle" style="min-width: 100px; height: 90%" type="button"
                                                             id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            Newest
+                                                            Public
                                                         </button>
                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                             <a class="dropdown-item" href="#">Public </a>
