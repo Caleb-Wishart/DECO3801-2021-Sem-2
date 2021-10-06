@@ -9,9 +9,9 @@
       }
 
       .profile-image {
-          left: 5%;
+/*          left: 5%;
           top: 78%;
-          position: absolute;
+          position: absolute;*/
           margin-top: -25px;
           margin-left: -25px;
           border-radius: 500px;
@@ -38,19 +38,33 @@
 {#    </div>#}
     <div class="row text-center" style="">
         <div class="banner-visible-area" style="margin-top:10px;">
-            <div class="col-3">
-                <div class='card'>
-                    <img src="#" height="250" class='banner-image'>
-                    <img src="#" width="50px" height="50px" class='profile-image'>
+            <div class='card'>
+                <img src="#" height="250" class='banner-image'>
+                <div class="row pe-5"></div>
+                <div class="row pe-5">
+                    <div class="col-2">
+                        <img src="#" width="50px" height="50px" class='profile-image'>
+                    </div>
+                    <div class="col-8">
+                        <p class="h3" style="text-align: left">NAME PLEASE</p>
+                        <p class="h4" style="text-align: left">[Teacher Type, e.g. Year 4]
+                            Teacher at [Location]</p>
+                    </div>
+                    <div class="col">
+                        <div class="row" style="padding: 5px;">
+                            <button type="button" class="btn btn-info"
+                                    style="border-radius: 500px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+  <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/>
+</svg> Edit Studio</button>
+                        </div>
+                        <div class="row" style="padding: 5px;">
+                            <button type="button" class="btn btn-info"
+                                    style="border-radius: 500px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear-fill" viewBox="0 0 16 16">
+  <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
+</svg>  Account Settings</button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-3">
-                <p class="h1">NAME PLEASE</p>
-                <p class="h3">[Teacher Type, e.g. Year 4] Teacher at [Location]</p>
-            </div>
-            <div class="col-3">
-                <button type="button" class="btn btn-info"
-                                        style="border-radius: 500px">[settings icon]  Account Settings</button>
             </div>
         </div>
     </div>
@@ -76,7 +90,29 @@
                 <div class="card">
                     <p class="h4">Educator Rating</p>
                     <div class="card-body overflow-auto" style="max-height: 350px;">
-                        STARS HERE PLS (totalNumStars/5)
+                        <!-- These ones for filled stars -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
+  <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+</svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
+  <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+</svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-fill" viewBox="0 0 16 16">
+  <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+</svg>
+                        <!-- This one for half-filled star -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-half" viewBox="0 0 16 16">
+  <path d="M5.354 5.119 7.538.792A.516.516 0 0 1 8 .5c.183 0 .366.097.465.292l2.184 4.327 4.898.696A.537.537 0 0 1 16 6.32a.548.548 0 0 1-.17.445l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256a.52.52 0 0 1-.146.05c-.342.06-.668-.254-.6-.642l.83-4.73L.173 6.765a.55.55 0 0 1-.172-.403.58.58 0 0 1 .085-.302.513.513 0 0 1 .37-.245l4.898-.696zM8 12.027a.5.5 0 0 1 .232.056l3.686 1.894-.694-3.957a.565.565 0 0 1 .162-.505l2.907-2.77-4.052-.576a.525.525 0 0 1-.393-.288L8.001 2.223 8 2.226v9.8z"/>
+</svg>
+                        <!-- This one for unfilled star -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                             fill="currentColor" class="bi bi-star"
+                             viewBox="0 0 16 16"><path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
+</svg>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star"></span>
+                        <span class="fa fa-star"></span> (totalNumStars/5) - PLEASE CUSTOMISE FOR USER'S NUM_STARS
 
                         <a href="#">How is this calculated?</a>
                         <!-- An overlay for that pls, here's some text to add in there:
@@ -94,7 +130,15 @@
                     <p class="h4">Tags</p>
                     <div class="card-body overflow-auto" style="max-height: 350px;">
                         {# for TAG in TAGS #}
-                           TAGS PLEASE
+                            <div class = "col-7">
+                                <span class="badge rounded-pill bg-primary"
+                                      style="width: auto;
+                                      margin: 0.25rem!important;"> Applied tags go here
+                                    <button type="button"
+                                            class="btn-close" data-bs-dismiss="alert"
+                                            aria-label="Close"></button>
+                                </span>
+                            </div>
                          {# endfor #}
                     </div>
                 </div>
