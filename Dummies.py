@@ -99,7 +99,7 @@ def get_random_teaching_areas() -> dict:
 # test user 1
 teaching_areas = {Subject.MATHS_A: [True], Subject.CHEMISTRY: [True], Subject.ENGLISH: [True]}
 uid0 = add_user(username="Ashley Gibbons", password="123456", email="a.gibbsons@uq.edu.au",
-                avatar_link="static/avatar/ashley_gibbons.png",
+                avatar_link="avatar/ashley_gibbons.png",
                 bio="Hi! My name is Ashley and I love children! "
                     "Especially teaching them! I have worked at Somerset College for"
                     " 4 years and honestly I wanna leave. But I am stuck while I pay for"
@@ -111,7 +111,7 @@ uid0 = add_user(username="Ashley Gibbons", password="123456", email="a.gibbsons@
 for i in range(1, 10):
     name = random_person.name()
     avatar = pagan.Avatar(name, pagan.MD5)
-    file_path = "static/avatar"
+    file_path = "avatar"
     avatar.save(file_path, f"{i}.png")
     file_path += f"/{i}.png"
     globals()[f"uid{i}"] = add_user(username=name, password="123456",
@@ -152,7 +152,7 @@ print("\n")
 # single pdf file
 src0 = add_resource(title="CS50 at Harvard - The Most Rewarding Class I Have Taken"
                           " . . . Ever!",
-                    resource_link="static/resource/CS50_at_Harvard_The_Most_Rewarding"
+                    resource_link="resource/CS50_at_Harvard_The_Most_Rewarding"
                                   "_Class_I_Have_Taken_Ever.pdf",
                     difficulty=ResourceDifficulty.EASY, subject=Subject.IT,
                     tags_id=[tags["CS"], tags["brainstorming"]],
@@ -232,7 +232,7 @@ src3 = add_resource(title="Drama Lesson Activities, Grade 4-6: Creative Play",
 
 # compressed file of multiple pdfs
 src4 = add_resource(title="Grade 12 QLD Math C U10 worksheet",
-                    resource_link="static/resource/MQC-12.zip",
+                    resource_link="resource/MQC-12.zip",
                     difficulty=ResourceDifficulty.SPECIALIST,
                     creaters_id=sample(users_id, k=random.randint(1, 10)),
                     tags_id=[tags["Math_practice_sheet"]],
@@ -283,7 +283,7 @@ resource_links = ["Learn_Chinese_for_Beginners_Beginner_Chinese_Lesson_1_Self-"
                   "Grade_12_Calculus_An_Introduction_to_Calculus_and_Overview_"
                   "of_Key_Concepts_NSC_DBE_Maths_NTE.mp4",
                   "Algebra.Factorization.Factoring_Quadratic_Expressions_-_(B).US.pdf"]
-resource_links = ["static/resource/" + e for e in resource_links]
+resource_links = ["resource/" + e for e in resource_links]
 grades = [Grade.TERTIARY, Grade.YEAR_12, Grade.YEAR_12, Grade.YEAR_12, Grade.YEAR_12]
 subjects = [Subject.CHINESE, Subject.MATHS_C, Subject.MATHS_C, Subject.MATHS_C,
             Subject.MATHS_C]
@@ -325,7 +325,7 @@ OFFSET = 6
 for i in range(6, 11):
     name = random_person.name()
     avatar = pagan.Avatar(name, pagan.MD5)
-    file_path = "static/thumbnail"
+    file_path = "thumbnail"
     file_name = resource_titles[i - OFFSET].replace(' ', '_') + ".png"
     avatar.save(file_path, file_name)
     file_path += f"/{file_name}"
