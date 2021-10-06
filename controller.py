@@ -182,7 +182,7 @@ def settings():
         Avatar.
         Interests
     """
-    return render_template('base.html', title='Login')
+    return render_template('settings.html', title='Login')
 
 
 @app.route('/about')
