@@ -130,7 +130,7 @@ def search():
     # return Response(json.dumps([i.serialize for i in find_resources(title=title)]),  mimetype='application/json')
 
 
-@app.route('/register')
+@app.route('/register', methods=["GET"])
 def register():
     """Page for a user to register for an account
 
@@ -140,8 +140,32 @@ def register():
 
     Other user fields are configured in profile()
     """
-    
+    #emailInvalid, passwordDifferent, passwordInvalid = false, false, false
+    """
+    if (request.method == "GET"):
+        emailInvalid = request.args.get("emailValid")
+        passwordInvalid = request.args.get("passwordInvalid")
+        passwordDifferent = request.args.get("passwordDifferent")
+    """
     return render_template('register.html', title='Register')
+
+@app.route('/register/create',  methods=["POST"])
+def create_account():
+    if request.method == "POST":
+        data = request.form
+        
+        email = data.get('email')
+        password = data.get('password')
+        confirmpassword = data.get('confirmpassword')
+
+        #check if email is not used and valid
+
+        #check if that the password is complex enough
+
+        #check if the two passwords are the same
+        if not(password == confirmpassword):
+            #they are not the same 
+            redirect(url_for())
 
 
 @app.route('/login')

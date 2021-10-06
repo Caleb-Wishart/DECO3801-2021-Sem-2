@@ -17,13 +17,6 @@ from werkzeug.security import generate_password_hash
 # use this in branch
 from .DBStructure import *
 # use this in main
-<<<<<<< HEAD
-# from DBStructure import *
-from werkzeug.security import generate_password_hash
-import warnings
-=======
-from DBStructure import *
->>>>>>> main
 
 # define if you want method output messages for debugging
 VERBOSE = True
