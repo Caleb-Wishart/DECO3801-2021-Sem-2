@@ -26,43 +26,35 @@
 {% block content %}
 <div class="container">
     <!-- Profile Image/Background -->
-{#    <div class="row p-3">#}
-{#        <div class="banner-visible-area" style="padding: 0">#}
-{#            <div class="card">#}
-{#                <div class="card-body overflow-auto" style="max-height: 350px;">#}
-{#                    <img src="#" class="img-fluid" alt="User Profile Banner">#}
-{#                    <img src="#" class="img-thumbnail" alt="User Profile Pic">#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
     <div class="row text-center" style="">
         <div class="banner-visible-area" style="margin-top:10px;">
             <div class="card">
-                <img src="https://via.placeholder.com/820x312" height="250" class='banner-image'>
+                <img src="https://via.placeholder.com/820x312" class="banner-image" height="250">
                 <div class="row pe-5">
                     <div class="col-2">
                         <img src="data:image/png;base64,
                         iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAe1BMVEXu7u4AAAD8
                         /Pzt7e3q6urn5+f////k5OTy8vL5+fn19fWnp6f6+vqxsbHZ2dnJycnR0dGfn5
-                        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" width="120px" height="120px" class='profile-image'>
+                        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" class="profile-image" width="120px" height="120px">
                     </div>
                     <div class="col-8">
                         <p class="h3" style="text-align: left">NAME PLEASE</p>
                         <p class="h4" style="text-align: left">[Teacher Type, e.g. Year 4]
                             Teacher at [Location]</p>
+
+                    <div class="card-body overflow-auto" style="max-height: 350px; text-align: left; margin: 1rem 0 0 0; padding: 0">
+                        <p class="h6">USER BIO FROM DB PLS :)</p>
+                    </div>
                     </div>
                     <div class="col">
-                        <div class="row" style="padding: 5px;">
-                            <button type="button" class="btn btn-info"
-                                    style="border-radius: 500px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
-  <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/>
+                        <div class="row" style="padding: 5px; margin-top: 0.5rem">
+                            <button type="button" class="btn btn-info" style="border-radius: 500px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+  <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"></path>
 </svg> Edit Studio</button>
                         </div>
-                        <div class="row" style="padding: 5px;">
-                            <button type="button" class="btn btn-info"
-                                    style="border-radius: 500px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear-fill" viewBox="0 0 16 16">
-  <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
+                        <div class="row" style="padding: 5px; margin-top: 0.5rem">
+                            <button type="button" class="btn btn-info" style="border-radius: 500px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear-fill" viewBox="0 0 16 16">
+  <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"></path>
 </svg>  Account Settings</button>
                         </div>
                     </div>
@@ -77,39 +69,30 @@
 
         <!-- Left Sidebar -->
         <div class="col-3">
-            <!-- Bio -->
-            <div class="row pe-5">
-                <div class="card">
-                    <p class="h4">Bio</p>
-                    <div class="card-body overflow-auto" style="max-height: 350px;">
-                        <p class="lead">USER BIO FROM DB PLS :)</p>
-                    </div>
-                </div>
-            </div>
+
+
 
             <!-- Educator Rating -->
-            <div class="row pe-5">
+            <div class="row pe-5" style="margin-bottom: 1rem">
                 <div class="card">
-                    <p class="h4">Educator Rating</p>
+                    <p class="h4" style="margin-top: 0.5rem">Educator Rating</p>
                     <div class="card-body overflow-auto" style="max-height: 350px;">
                         <!-- These ones for filled stars -->
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-fill" style="color: orange" viewBox="0 0 16 16">
-  <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+  <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"></path>
 </svg>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-fill" style="color: orange" viewBox="0 0 16 16">
-  <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+  <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"></path>
 </svg>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-fill" style="color: orange" viewBox="0 0 16 16">
-  <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+  <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"></path>
 </svg>
                         <!-- This one for half-filled star -->
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star-half" style="color: orange" viewBox="0 0 16 16">
-  <path d="M5.354 5.119 7.538.792A.516.516 0 0 1 8 .5c.183 0 .366.097.465.292l2.184 4.327 4.898.696A.537.537 0 0 1 16 6.32a.548.548 0 0 1-.17.445l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256a.52.52 0 0 1-.146.05c-.342.06-.668-.254-.6-.642l.83-4.73L.173 6.765a.55.55 0 0 1-.172-.403.58.58 0 0 1 .085-.302.513.513 0 0 1 .37-.245l4.898-.696zM8 12.027a.5.5 0 0 1 .232.056l3.686 1.894-.694-3.957a.565.565 0 0 1 .162-.505l2.907-2.77-4.052-.576a.525.525 0 0 1-.393-.288L8.001 2.223 8 2.226v9.8z"/>
+  <path d="M5.354 5.119 7.538.792A.516.516 0 0 1 8 .5c.183 0 .366.097.465.292l2.184 4.327 4.898.696A.537.537 0 0 1 16 6.32a.548.548 0 0 1-.17.445l-3.523 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256a.52.52 0 0 1-.146.05c-.342.06-.668-.254-.6-.642l.83-4.73L.173 6.765a.55.55 0 0 1-.172-.403.58.58 0 0 1 .085-.302.513.513 0 0 1 .37-.245l4.898-.696zM8 12.027a.5.5 0 0 1 .232.056l3.686 1.894-.694-3.957a.565.565 0 0 1 .162-.505l2.907-2.77-4.052-.576a.525.525 0 0 1-.393-.288L8.001 2.223 8 2.226v9.8z"></path>
 </svg>
                         <!-- This one for unfilled star -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                             fill="currentColor" class="bi bi-star"
-                             style="color: orange" viewBox="0 0 16 16"><path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star" style="color: orange" viewBox="0 0 16 16"><path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"></path>
 </svg>
                         <span class="fa fa-star checked"></span>
                         <span class="fa fa-star checked"></span>
@@ -129,19 +112,16 @@
             <!-- Tags -->
             <div class="row pe-5">
                 <div class="card">
-                    <p class="h4">Tags</p>
+                    <p class="h4" style="margin-top: 0.5rem">Tags</p>
                     <div class="card-body overflow-auto" style="max-height: 350px;">
-                        {# for TAG in TAGS #}
-                            <div class = "col-7">
-                                <span class="badge rounded-pill bg-primary"
-                                      style="width: auto;
+
+                            <div class="col-7">
+                                <span class="badge rounded-pill bg-primary" style="width: auto;
                                       margin: 0.25rem!important;"> Applied tags go here
-                                    <button type="button"
-                                            class="btn-close" data-bs-dismiss="alert"
-                                            aria-label="Close"></button>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </span>
                             </div>
-                         {# endfor #}
+
                     </div>
                 </div>
             </div>
@@ -154,8 +134,7 @@
                     <div class="row">
                         <!-- Resource/Channel Headings -->
                         <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                            <input type="radio" class="btn-check" name="btnradio" id="btnradio1"
-                                   autocomplete="off" checked="">
+                            <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked="">
                             <label class="btn btn-outline-primary shadow" for="btnradio1">My
                                 Resources</label>
 
@@ -174,8 +153,7 @@
                 <div class="row">
                     <div class="col d-flex justify-content-md-between">
                         <div class="input-group" style="padding: inherit;">
-                            <input type="search" name="title" class="form-control" placeholder="&#128270; Search"
-                                id="search_content">
+                            <input type="search" name="title" class="form-control" placeholder="🔎 Search" id="search_content">
                         </div>
                     </div>
                 </div>
@@ -184,27 +162,25 @@
                     <p class="h5" style="margin:auto; padding: 15px; display: inline-block">Sort
                         by</p>
                     <div class="dropdown px-3" style="display: inline-block; padding: 10px">
-                        <button class="btn btn-primary dropdown-toggle" style="min-width: 100px; height: 90%" type="button"
-                            id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="btn btn-primary dropdown-toggle" style="min-width: 100px; height: 90%" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                             Newest
                         </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="">
                             <a class="dropdown-item" href="#">Newest</a>
                             <a class="dropdown-item" href="#">Upvotes</a>
                         </div>
                     </div>
                 </div>
                 <!-- Items -->
-                {# for item in items #}
+
                     <div class="row pe-5">
                         <div class="col d-flex justify-content-md-between">
                             <!-- Resources top level -->
                             <div class="card flex-fill" style="margin: 15px 0 15px 15px">
                                 <div class="row">
                                     <div class="col-2" style="padding-top:3px; padding-right:20px">
-                                        {# thumbnail pls #}
-                                        <img src="https://via.placeholder.com/150" width="150px"
-                                             height="150px" style="padding: inherit">
+
+                                        <img src="https://via.placeholder.com/150" style="padding: inherit" width="150px" height="150px">
                                     </div>
                                     <div class="col">
                                         <p>Title: resource title pls</p>
@@ -216,7 +192,7 @@
                             </div>
                         </div>
                     </div>
-                {# endfor #}
+
             </div>
         </div>
     </div>
