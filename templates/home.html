@@ -1,24 +1,53 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    {% if name %}
-        <h1>Hello {{ name }}!</h1>
-    {% else %}
-        <h1>Hello, World!</h1>
-    {% endif %}
     <div class="container">
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-    {% for dic in data %}
-        <div class="col-4 p-2">
-            <div class="card shadow-sm">
-                <img class="bd-placeholder-img card-img-top" src="{{dic['img']}}" , alt="Logo" ,
-                    width="150" , height="150">
-                <div class="card-body">
-                    <p class="card-text">{{dic['title']}}</p>
+        <div class="row">
+            <div class="column">
+                <!-- empty column for alignment -->
+            </div>
+            <div class="column">
+                <!-- Search Bar -->
+                <div class="col d-flex justify-content-md-between">
+                    <div class="input-group">
+                        <input type="search" name="title" class="form-control" placeholder="&#128270; Search"
+                            id="search_content" style="margin-top: 50px;margin-bottom: 20px;">
+                    </div>
                 </div>
             </div>
+            <div class="column">
+                <!-- empty column for alignment -->
+            </div>
         </div>
-    {% endfor %}
     </div>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <!-- Recommended -->
+                <p>Recommended</p>
+                    {% for dic in data %}
+                      <div class="col-4 p-2">
+                         <div class="card shadow-sm">
+                             <img class="bd-placeholder-img card-img-top" src="{{dic['img']}}" , alt="Logo" ,
+                    width="150" , height="150">
+                                <div class="card-body">
+                                    <p class="card-text">{{dic['title']}}</p>
+                                </div>
+                            </div>
+                        </div>
+	            {% endfor %}
+            </div>
+            <div class="col">
+		<!-- Notifications -->
+		<div class="dropdown">
+		    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+		        Notifications <span class="badge bg-danger">69420 <!-- number of notifications go here --> </span>
+		    </button>
+		    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+			        <li><a class="dropdown-item" href="#" {# probs want a link here to the actual resource :) #} >BruhBruhBruh</a></li>
+		    </ul>
+	        </div>
+            </div>
+        </div>
     </div>
 {% endblock %}
