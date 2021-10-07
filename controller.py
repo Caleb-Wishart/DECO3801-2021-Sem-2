@@ -140,31 +140,24 @@ def register():
 
     Other user fields are configured in profile()
     """
-    #emailInvalid, passwordDifferent, passwordInvalid = false, false, false
-    """
-    if (request.method == "GET"):
-        emailInvalid = request.args.get("emailValid")
-        passwordInvalid = request.args.get("passwordInvalid")
-        passwordDifferent = request.args.get("passwordDifferent")
-    """
     return render_template('register.html', title='Register')
 
-@app.route('/register/create',  methods=["POST"])
-def create_account():
+@app.route('/register/details',  methods=["POST"])
+def register_details():
     #Do backend stuff maybe?
 
     #Extra details page
-    redirect(url_for('home'))
+    return render_template('registerdetails.html', title='Register')
 
 @app.route('/register/finalise', methods=["POST"])
 def finalise_account():
     #do stuff
 
     #all backend stuff on this function
-    redirect(url_for('home'))
+    return redirect(url_for('home'))
 
 
-@app.route('/login')
+@app.route('/login', methods=["GET","POST"])
 def login():
     """Login page for a user to authenticate
 
@@ -173,6 +166,9 @@ def login():
     Gives feedback on fail, redirects to referring page on success
      (through post data), if not refered then home page
     """
+    if request.method=="POST":
+        #Dostuff like make sure login details are correct
+        return redirect(url_for("home"))
     return render_template('login.html', title='Login')
 
 
