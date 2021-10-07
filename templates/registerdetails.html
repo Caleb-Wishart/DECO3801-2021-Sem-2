@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block style %}
+<style>
+    .c-form {
+        /* width: 30em; */
+        /*width: 30%;*/
+        height: 2.5em;
+        
+        border-radius: 6.25em;
+        /*position: absolute;*/
+        background-color: #FFFFFF;
+        border-width: 1em;
+        padding: 0.4em;
+        box-sizing: border-box;
+        /*display: flex;*/
+        /*justify-content: end;*/
+        align-items: center;
+    }
+    .c-form-input {
+        font: inherit;
+        border: 0;
+        outline: 0;
+        border-radius: 5em;
+        box-sizing: border-box;
+        color: #000000;
+        height: 100%;
+        width: 100%;
+        padding: 0 0.714em;
+    }
+</style>
+{% endblock %}
+
+{% block navbar %}
+{% endblock %}
+
+{% block content %}
+<div class='container'>
+    
+    <form method="POST" action="{{ url_for('finalise_account') }}">
+        <!-- buttons -->
+        <div class="row p-3">
+            <div class="col-6 d-flex justify-content-end p-3">
+                <input type="submit" value="Submit" class="btn btn-primary">
+            </div>
+            <div class="col-6 d-flex justify-content-start p-3">
+                <a href="{{ url_for('home') }}" class="btn btn-primary">Cancel</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
