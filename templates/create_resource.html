@@ -156,6 +156,7 @@
                                                      <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
                                                      <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
                                             </svg>
+
                                         </label>
                                       <textarea class="form-control" id="Bodyform" rows="7" placeholder="Description (required)"></textarea>
                                   </div>
@@ -173,16 +174,15 @@
                                                          <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
                                                 </svg>
                                             </label>
+
                                           <div class="card flex-fill" id="resourceUpload">
                                               <div class="row">
                                                   <div class = "col-10">
                                                       <dd class="font-weight-bold" style="margin: 1rem!important;">Caleb File Name Here</dd>
                                                   </div>
                                                     <div class="col-2" style="margin-top: 0rem!important;">
-                                                    <!-- IF WE ARE CREATING A POST, USE THE FOLLOWING BUTTONS-->
                                                         <!-- Button to upload the post-->
                                                       <button type="button" class="btn btn-primary btn" style="margin: 1rem; margin-left: 4rem!important;">Upload File</button>
-                                                        <!-- Button to clear the title and body of the post-->
                                                     </div>
 
 
@@ -209,9 +209,8 @@
                                                   </div>
                                                     <div class="col-3" style="margin-top: 0rem!important;">
                                                     <!-- IF WE ARE CREATING A POST, USE THE FOLLOWING BUTTONS-->
-                                                        <!-- Button to upload the post-->
+                                                        <!-- Button to upload the thumbnail-->
                                                       <button type="button" class="btn btn-primary btn" style="margin: 1rem; margin-left: 7.5rem!important;">Upload Thumbnail</button>
-                                                        <!-- Button to clear the title and body of the post-->
                                                     </div>
 
 
@@ -314,7 +313,7 @@
                                           </div>
                                       </div>
 
-                                    <!-- Privacy setttings-->
+                                    <!-- Privacy settings-->
                                     <div class="mb-3" style="margin: 1rem!important;">
                                             <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Privacy</label>
                                           <!-- Help documentation-->
@@ -349,6 +348,7 @@
                                                         <input type="search" name="title" class="form-control" placeholder="Enter emails of accounts you wish to access your resource"
                                                          id="search_content" style="width: 95%">
                                                     </div>
+                                                  <!-- List of all the users -->
                                                   <ul class="list-group" style="margin-left: 2rem!important; margin-bottom: 2rem!important; padding-right: 100px!important">
                                                       <div class = "overflow-auto" style="max-height: 208px">
                                                       <li class="list-group-item">IhateDecoPleaseSaveMeFigmaGod@yourmum.com
@@ -383,12 +383,12 @@
 
                     </div>
                     <div class="float-end mt-2 pt-1" style="margin-top: 1rem!important;">
-                         <!-- IF WE ARE CREATING A POST, USE THE FOLLOWING BUTTONS-->
+                         <!-- IF WE ARE CREATING A RESOURCE, USE THE FOLLOWING BUTTONS-->
                         <!-- Button to upload the post-->
                       <button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;">Upload Resource</button>
                         <!-- Button to clear the title and body of the post-->
                         <button type="Button" class="btn btn-outline-primary btn">Discard Draft</button>
-                         <!-- IF WE ARE CREATING EDITTING A POST, USE THE FOLLOWING BUTTONS-->
+                         <!-- IF WE ARE CREATING EDITTING A RESOURCE, USE THE FOLLOWING BUTTONS-->
                         {#<button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;">Save Changes</button>
                         <button type="Button" class="btn btn-outline-primary btn">Discard Changes</button>#}
 
@@ -398,6 +398,7 @@
         </div>
 
     </div>
+    <!--This handles the popover for the help documentation-->
     <script>
         var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
         var popoverList = popoverTriggerList.map(function(popoverTriggerEl) {
