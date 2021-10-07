@@ -138,7 +138,32 @@ def register():
 
     Other user fields are configured in profile()
     """
+<<<<<<< HEAD
     return render_template('base.html', title='Register')
+=======
+    #emailInvalid, passwordDifferent, passwordInvalid = false, false, false
+    """
+    if (request.method == "GET"):
+        emailInvalid = request.args.get("emailValid")
+        passwordInvalid = request.args.get("passwordInvalid")
+        passwordDifferent = request.args.get("passwordDifferent")
+    """
+    return render_template('register.html', title='Register')
+
+@app.route('/register/create',  methods=["POST"])
+def create_account():
+    #Do backend stuff maybe?
+
+    #Extra details page
+    redirect(url_for('home'))
+
+@app.route('/register/finalise', methods=["POST"])
+def finalise_account():
+    #do stuff
+
+    #all backend stuff on this function
+    redirect(url_for('home'))
+>>>>>>> eec7564... About page can have code in each FAQ. FAQ's are provided by controller.py
 
 
 @app.route('/login')
@@ -187,8 +212,16 @@ def settings():
 
 @app.route('/about')
 def about():
-    """A bried page descibing what the website is about"""
-    return render_template('about.html', title='About Us', name="About Us")
+    """A brief page descibing what the website is about"""
+    #FAQs can contain html code to run on page
+    faqs = [
+        ["How do I save this page","Saving has been a super useful mechanic in many different areas of software for years. It is most commonly done by using the shortcut <kbd>Ctrl + S</kbd>, and our page is no exception."],
+        ["Can you talk like a computer?","Yeah Sure <br> <samp> Beep Boop Beep Beep Boop </samp>"],
+        ["What is Lorem Ipsum?","Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."],
+        ["Can I type maths?", "Yes, yes you can. You can find <var>x</var> as much as you like."],
+        ["Can I do my own HTML markup?", "Only in some <code>&lt;input&gt;</code> areas"]
+    ]
+    return render_template('about.html', title='About Us', name="About Us", faqs=faqs, num=len(faqs))
 
 
 @app.route('/create')
