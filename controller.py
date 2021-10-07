@@ -49,7 +49,7 @@ def home():
         }
     ]
 
-    return render_template('home.html', title='Home', name=name, data=data, notifications = ["A", "B", "C", "D"])
+    return render_template('home.html', title='Home', name=name, data=data, notifications = ["A", "B", "C", "D"], number_notifications=100)
 
 
 @app.route('/resource')
@@ -183,6 +183,61 @@ def settings():
         Interests
     """
     return render_template('base.html', title='Login')
+
+@app.route('/profile/edit_studio')
+def edit_studio():
+    """Centralised location where users can view the content
+        they control on the website.
+    """
+    resources = [
+        {
+            'title': "Example 1",
+            'img': url_for('static', filename='img/placeholder.png'),
+            'date_created': "1/2/3",
+            'privacy_status': 'Private',
+            'view_count': '100',
+            'num_comments': '3',
+            'likes_dislikes': '3000:1',
+            'description': "this is an example description"
+        }, {
+            'title': "Example 2",
+            'img': url_for('static', filename='img/placeholder.png'),
+            'date_created': "1/2/3",
+            'privacy_status': 'Private',
+            'view_count': '100',
+            'num_comments': '3',
+            'likes_dislikes': '3000:1',
+            'description': "this is an example description"
+        }, {
+            'title': "Example 3",
+            'img': url_for('static', filename='img/placeholder.png'),
+            'date_created': "11/22/33 12:12:12",
+            'privacy_status': 'Private',
+            'view_count': '100',
+            'num_comments': '3',
+            'likes_dislikes': '3000:1',
+            'description': "this is an example description"
+        }, {
+            'title': "Example 4",
+            'img': url_for('static', filename='img/placeholder.png'),
+            'date_created': "1/2/3",
+            'privacy_status': 'Private',
+            'view_count': '100',
+            'num_comments': '3',
+            'likes_dislikes': '3000:1',
+            'description': "this is an example description"
+        }, {
+            'title': "Example 5",
+            'img': url_for('static', filename='img/placeholder.png'),
+            'date_created': "1/2/3",
+            'privacy_status': 'Private',
+            'view_count': '100',
+            'num_comments': '3',
+            'likes_dislikes': '3000:1',
+            'description': "this is an example description"
+        }
+    ]
+    return render_template('edit_studio.html', title='Editing Studio', resources=resources)
 
 
 @app.route('/about')
