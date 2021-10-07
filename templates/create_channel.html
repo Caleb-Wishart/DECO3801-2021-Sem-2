@@ -183,8 +183,6 @@
                                                         <!-- Button to upload the thumbnail-->
                                                       <button type="button" class="btn btn-primary btn" style="margin: 1rem; margin-left: 7.5rem!important;">Upload Thumbnail</button>
                                                     </div>
-
-
                                                 </div>
                                           </div>
                                       </div>
@@ -194,8 +192,6 @@
                                             <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Subject, Year Level and Tags</label>
                                           <!-- Help documentation-->
                                             <label title="Specify the target year level and subject of your resource. This helps users refine their search of resources to find ones which suit their context and needs.&nbsp<br>&nbsp;&nbsp<br>&nbsp;
-
-
                                                           Select additional tags to further categorise your resource. If your resource is appropriate for multiple year levels or subjects,
                                                           we recommend selecting all the appropriate tags and select the most relevant subject and year level."
                                                    data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html = "true">
@@ -212,13 +208,13 @@
                                                         Select Subject:
                                                     </div>
                                                   <div class = "col-7">
-                                                                          <input class="form-control" style = "margin-top:0.5rem!important;"
-                                                   list="datalistOptions" id="exampleDataList" placeholder="Search Subjects...">
-                                                                      <datalist id="datalistOptions">
-                                                                            {% for item in subject %}
-                                                                          <option value="{{item}}">
-                                                                            {% endfor %}
-                                                                      </datalist>
+                                                      <input class="form-control" style = "margin-top:0.5rem!important;"
+                                                        list="datalistOptions" id="exampleDataList" placeholder="Search Subjects...">
+                                                      <datalist id="datalistOptions">
+                                                          {% for item in subject %}
+                                                              <option value="{{item}}">
+                                                          {% endfor %}
+                                                      </datalist>
                                                   </div>
                                               </div>
                                               <!-- Year Level-->
@@ -227,13 +223,13 @@
                                                         Select Grade:
                                                     </div>
                                                   <div class = "col-7">
-                                                                          <input class="form-control" style = "margin-top:0.5rem!important;"
-                                                   list="datalistOptions2" id="exampleDataList2" placeholder="Search Grades...">
-                                                                      <datalist id="datalistOptions2">
-                                                                            {% for item in grade %}
-                                                                          <option value="{{item}}">
-                                                                            {% endfor %}
-                                                                      </datalist>
+                                                      <input class="form-control" style = "margin-top:0.5rem!important;"
+                                                        list="datalistOptions2" id="exampleDataList2" placeholder="Search Grades...">
+                                                        <datalist id="datalistOptions2">
+                                                            {% for item in grade %}
+                                                                <option value="{{item}}">
+                                                            {% endfor %}
+                                                        </datalist>
                                                   </div>
                                               </div>
                                               <!-- Tags-->
@@ -242,13 +238,13 @@
                                                         Select Tags:
                                                     </div>
                                                   <div class = "col-7">
-                                                                          <input class="form-control" style = "margin-top:0.5rem!important;"
-                                                   list="datalistOptions3" id="exampleDataList3" placeholder="Search Tags...">
-                                                                      <datalist id="datalistOptions3">
-                                                                            {% for item in tag %}
-                                                                          <option value="{{item}}">
-                                                                            {% endfor %}
-                                                                      </datalist>
+                                                      <input class="form-control" style = "margin-top:0.5rem!important;"
+                                                        list="datalistOptions3" id="exampleDataList3" placeholder="Search Tags...">
+                                                      <datalist id="datalistOptions3">
+                                                          {% for item in tag %}
+                                                              <option value="{{item}}">
+                                                          {% endfor %}
+                                                      </datalist>
                                                   </div>
                                               </div>
                                                 <!-- Put the applied tags here-->
