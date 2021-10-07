@@ -2,52 +2,282 @@
 
 {% block style %}
 <style>
-    .c-form {
-        /* width: 30em; */
-        /*width: 30%;*/
-        height: 2.5em;
-        
-        border-radius: 6.25em;
-        /*position: absolute;*/
-        background-color: #FFFFFF;
-        border-width: 1em;
-        padding: 0.4em;
-        box-sizing: border-box;
-        /*display: flex;*/
-        /*justify-content: end;*/
-        align-items: center;
+    a:link {
+        text-decoration: none;
     }
-    .c-form-input {
-        font: inherit;
-        border: 0;
-        outline: 0;
-        border-radius: 5em;
-        box-sizing: border-box;
-        color: #000000;
-        height: 100%;
-        width: 100%;
-        padding: 0 0.714em;
+
+    a:visited {
+        text-decoration: none;
     }
+
+    a:hover {
+        text-decoration: none;
+    }
+
+    a:active {
+        text-decoration: none;
+    }
+
+
+        body {
+            /* Adds a Hex honeycomb background */
+            /* background-image: url(
+        {{url_for('static', filename='img/hex_back.png')}} ),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
+            background-color: #ffe5ec;
+
+            background-image: radial-gradient(rgb(255, 242, 245), rgb(255, 242, 245), rgb(255, 242, 245));
+        {#background-color: rgb(245, 245, 255);#}
+        }
+    .btn-primary {
+        background-color: #ff8fab;
+        color: white;
+        border-color: #ff8fab;
+    }
+    .btn-primary:hover {
+        color:white;
+        background-color: #3a78ef;
+    }
+
+    .btn-outline-primary {
+        background-color: rgb(255, 255, 255);
+        color:#000000;
+        border-color: white;
+    }
+
+    .btn-outline-primary:hover {
+        color:white;
+        background-color: #3a78ef;
+    }
+
+    .btn-check:checked+.btn-outline-primary {
+        color: white;
+        background-color:  #ff8fab;
+        border-color:   #ff8fab;
+    }
+    .bg-white {
+        background-color: #ffd6e1;
+    }
+    .bg-primary {
+        background-color: #ff8fab!important;
+    }
+    .btn-close {
+        width: 0.5rem;
+        height: 0.5rem;
+    }
+
+    .popover {
+        max-width: 400px;
+        whtie-space: pre-line;
+    }
+
+
+
 </style>
+{% endblock %}
+
+{% block script %}
+<script>
+    // DROPDOWN
+    $(function () {
+
+        $(".dropdown-menu a").click(function () {
+
+            $("#dropdownMenuButton1").text($(this).text());
+            $("#dropdownMenuButton1").val($(this).text());
+        });
+
+    });
+</script>
 {% endblock %}
 
 {% block navbar %}
 {% endblock %}
 
 {% block content %}
-<div class='container'>
-    
-    <form method="POST" action="{{ url_for('finalise_account') }}">
-        <!-- buttons -->
-        <div class="row p-3">
-            <div class="col-6 d-flex justify-content-end p-3">
-                <input type="submit" value="Submit" class="btn btn-primary">
-            </div>
-            <div class="col-6 d-flex justify-content-start p-3">
-                <a href="{{ url_for('finalise_account') }}" class="btn btn-primary">Cancel</a>
-            </div>
-        </div>
-    </form>
-</div>
+    <!-- Handles making the user confirm they want to leave this page as all unsaved changes will be lost-->
+    <body onbeforeunload = "return leavePageFunction()">
+        <script>
+            function leavePageFunction() {
+                return "Testing something"
+            }
+        </script>
 
+    </body>
+
+
+
+<div class="container" style="margin-bottom: 3rem!important;">
+        <!-- Title Section -->
+        <div class="row">
+                    <!-- If we are creating a resource  -->
+                    <dt class="col-sm-9" style = "font-size: x-large; margin-top:2rem!important; margin-bottom: 2rem!important;">
+                        Register Details
+                    </dt>
+        </div>
+
+        <div class="col d-flex justify-content-md-between">
+             <form class = "form-outline flex-fill">
+                    <div class = "card flex-fill shadow-sm">
+                                    <!-- Input Your Name-->
+                                    <div class="mb-3" style="margin: 1rem!important;">
+                                          <label for="Titleform" class="form-label" style="font-weight: bold; font-size: larger">Username</label>
+                                        <!-- Help documentation -->
+                                             <label title="What username would you like to be use to login on this website. <br>&nbsp;&nbsp<br>&nbsp;This is publicly visible."
+                                                     data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html="true">
+                                                 <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
+                                                     <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                     <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                                                 </svg>
+
+                                             </label>
+
+                                        <input type="text" class="form-control" id="Usernameform" placeholder="Username (required)">
+
+                                    </div>
+
+                                
+                                    <!-- Resource file upload-->
+                                    <div class="mb-3" style="margin: 1rem!important;">
+                                            <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">File Upload</label>
+                                          <!-- Help documentation-->
+                                            <label title="Upload a single file which contains your resource in any format you want.&nbsp<br>&nbsp;&nbsp<br>&nbsp;If you wish to submit multiple
+                                                          files under a single resource, we recommend zipping together the resources and describing the files instead in the description"
+                                                   data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html = "true">
+
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
+                                                         <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                         <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                                                </svg>
+                                            </label>
+
+                                          <div class="card flex-fill" id="resourceUpload">
+                                              <div class="row">
+                                                  <div class = "col-10">
+                                                      <dd class="font-weight-bold" style="margin: 1rem!important;">Caleb File Name Here</dd>
+                                                  </div>
+                                                    <div class="col-2" style="margin-top: 0rem!important;">
+                                                        <!-- Button to upload the post-->
+                                                      <button type="button" class="btn btn-primary btn" style="margin: 1rem; margin-left: 4rem!important;">Upload File</button>
+                                                    </div>
+
+
+                                                </div>
+                                          </div>
+                                      </div>
+
+                                    <!-- Tags-->
+                                    <div class="mb-3" style="margin: 1rem!important;">
+                                            <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Subject, Year Level and Tags</label>
+                                          <!-- Help documentation-->
+                                            <label title="Specify the target year level and subject of your resource. This helps users refine their search of resources to find ones which suit their context and needs.&nbsp<br>&nbsp;&nbsp<br>&nbsp;
+
+
+                                                          Select additional tags to further categorise your resource. If your resource is appropriate for multiple year levels or subjects,
+                                                          we recommend selecting all the appropriate tags and select the most relevant subject and year level."
+                                                   data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html = "true">
+
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
+                                                         <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                         <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                                                </svg>
+                                            </label>
+                                          <div class="card flex-fill" id="resourceUpload">
+                                              <!-- Subject-->
+                                              <div class="row" style="margin-top: 1rem!important;">
+                                                    <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
+                                                        Select Subject:
+                                                    </div>
+                                                  <div class = "col-7">
+                                                                          <input class="form-control" style = "margin-top:0.5rem!important;"
+                                                   list="datalistOptions" id="exampleDataList" placeholder="Search Subjects...">
+                                                                      <datalist id="datalistOptions">
+                                                                            {% for item in subject %}
+                                                                          <option value="{{item}}">
+                                                                            {% endfor %}
+                                                                      </datalist>
+                                                  </div>
+                                              </div>
+                                              <!-- Year Level-->
+                                              <div class="row" style="margin-top: 1rem!important;">
+                                                    <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
+                                                        Select Grade:
+                                                    </div>
+                                                  <div class = "col-7">
+                                                                          <input class="form-control" style = "margin-top:0.5rem!important;"
+                                                   list="datalistOptions2" id="exampleDataList2" placeholder="Search Grades...">
+                                                                      <datalist id="datalistOptions2">
+                                                                            {% for item in grade %}
+                                                                          <option value="{{item}}">
+                                                                            {% endfor %}
+                                                                      </datalist>
+                                                  </div>
+                                              </div>
+                                              <!-- Tags-->
+                                              <div class="row" style="margin-top: 1rem!important;">
+                                                    <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
+                                                        Select Tags:
+                                                    </div>
+                                                  <div class = "col-7">
+                                                                          <input class="form-control" style = "margin-top:0.5rem!important;"
+                                                   list="datalistOptions3" id="exampleDataList3" placeholder="Search Tags...">
+                                                                      <datalist id="datalistOptions3">
+                                                                            {% for item in tag %}
+                                                                          <option value="{{item}}">
+                                                                            {% endfor %}
+                                                                      </datalist>
+                                                  </div>
+                                              </div>
+                                                <!-- Put the applied tags here-->
+                                                <div class = "row" style = "margin-top: 1.5rem!important; margin-bottom: 1rem!important;">
+                                                    <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
+                                                        Applied Tags:
+                                                    </div>
+
+                                                    <div class = "col-7">
+                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;"> Applied tags go here
+                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                            </span>
+                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
+                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                             </span>
+                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
+                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                            </span>
+                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
+                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                             </span>
+                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
+                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                            </span>
+                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
+                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                             </span>
+
+                                                  </div>
+
+                                                 </div>
+
+                                          </div>
+                                      </div>
+
+                    </div>
+                    <div class="float-end mt-2 pt-1" style="margin-top: 1rem!important;">
+                        <!-- Button to Confirm details and create Account-->
+                      <button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;">Create Account</button>
+                        <!-- Button to cancel account creation-->
+                        <button type="Button" class="btn btn-outline-primary btn">Cancel</button>
+                    </div>
+                 </form>
+
+        </div>
+
+    </div>
+
+    <!--This handles the popover for the help documentation-->
+    <script>
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+        var popoverList = popoverTriggerList.map(function(popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl)
+        })
+    </script>
 {% endblock %}
