@@ -1,61 +1,39 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container">
-    <div class="container">
-        <div class="row">
-            <div class="column">
-                <!-- empty column for alignment -->
-            </div>
-            <div class="column">
-                <!-- Search Bar -->
-                <div class="col d-flex justify-content-md-between">
-                    <div class="input-group">
-                        <input type="search" name="title" class="form-control" placeholder="&#128270; Search"
-                            id="search_content" style="margin-top: 50px;margin-bottom: 20px;">
-                    </div>
-                </div>
-            </div>
-            <div class="column">
-                <!-- empty column for alignment -->
-            </div>
-        </div>
-    </div>
-    <div class="container">
-        <div class="row">
-	    <h1> Edit Studio <h1>
+    <div class="row">
+		<h1> Edit Studio </h1>
 	</div>
-        <div class="row">
+	<div class="row">
 		<div class="card flex-fill">
-        <div class="row">
-            <div class="column">
-                <!-- empty column for alignment -->
-            </div>
-            <div class="column">
-                <!-- Search Bar -->
-                <div class="col d-flex justify-content-md-between">
-                    <div class="input-group">
-                        <input type="search" name="title" class="form-control" placeholder="&#128270; Search"
-                            id="search_content" style="margin-top: 50px;margin-bottom: 20px;">
-                    </div>
-                </div>
-            </div>
-            <div class="column">
-                <!-- empty column for alignment -->
-            </div>
+    		<div class="row">
+        		<div class="column">
+            		<!-- empty column for alignment -->
+        		</div>
+        		<div class="column">
+            		<!-- Search Bar -->
+        			<div class="col d-flex justify-content-md-between">
+                	<div class="input-group">
+                    	<input type="search" name="title" class="form-control" placeholder="&#128270; Search" id="search_content" style="margin-top: 50px;margin-bottom: 20px;">
+            		</div>
+            	</div>
+        		<div class="column">
+            		<!-- empty column for alignment -->
+				</div>
 			<!-- <h5 class="card-title"> Resources </h5>-->
-			<div class="row">
-				<div class="col d-flex justify-content-md-between" style="margin-top: 2rem!important; margin-bottom: 1rem!important; margin-left: 10px">
-				            <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-						                    <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
-											                       <label class="btn btn-outline-primary shadow" for="btnradio1" style = "margin-right: 1rem!important">Public Channels</label>
+		<div class="row">
+			<div class="col d-flex justify-content-md-between" style="margin-top: 2rem!important; margin-bottom: 1rem!important; margin-left: 10px">
+			            <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+					                    <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+										                       <label class="btn btn-outline-primary shadow" for="btnradio1" style = "margin-right: 1rem!important">Public Channels</label>
 
-													                       <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
-															                       <label class="btn btn-outline-primary shadow" for="btnradio2">My Channels</label>
+												                       <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+														                       <label class="btn btn-outline-primary shadow" for="btnradio2">My Channels</label>
 
 
-																	                   </div>
-																			               <div class="d-flex">
-																					                       <p class="h5" style = "margin:auto">Sort by</p>
+																                   </div>
+																		               <div class="d-flex">
+																				                       <p class="h5" style = "margin:auto">Sort by</p>
 																							                       <div class="dropdown px-3">
 																										                           <button class="btn btn-primary dropdown-toggle" style="min-width: 100px; height: 90%" type="button"
 																													                           id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -77,17 +55,17 @@
 			    </div>
 			    <!--<div class="col-2">
 			    </div>-->
-			    <div class="col">
+			    <div class="col" style="padding-left: 2.5rem!important; max-width:15%">
 				    <p>Date Created</p>
 			    </div>
-			    <div class="col">
+			    <div class="col" style="max-width: 12%;">
 				    <p>Privacy Status</p>
 			    </div>
-			    <div class="col">
+			    <div class="col" style="padding-left: 0; max-width: 10%">
 				    <p>Comments</p>
 			    </div>
-			    <div class="col">
-				    <p>likes:dislikes</p>
+			    <div class="col" style="padding-left: 0;">
+				    <p>Upvotes:Downvotes</p>
 			    </div>
 		    <div class="card-body">
 		    {% for resource in resources %}
@@ -117,7 +95,7 @@
 				    <!-- number of comments  -->
 				    <p> {{resource['num_comments']}}</p>
 			    </div>
-			    <div class="col">
+			    <div class="col" style="padding-left: 0;">
 				    <!-- likes to dislikes -->
 				    <p> {{resource['likes_dislikes']}}</p>
 			    </div>
