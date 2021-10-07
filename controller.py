@@ -151,21 +151,17 @@ def register():
 
 @app.route('/register/create',  methods=["POST"])
 def create_account():
-    if request.method == "POST":
-        data = request.form
-        
-        email = data.get('email')
-        password = data.get('password')
-        confirmpassword = data.get('confirmpassword')
+    #Do backend stuff maybe?
 
-        #check if email is not used and valid
+    #Extra details page
+    redirect(url_for('home'))
 
-        #check if that the password is complex enough
+@app.route('/register/finalise', methods=["POST"])
+def finalise_account():
+    #do stuff
 
-        #check if the two passwords are the same
-        if not(password == confirmpassword):
-            #they are not the same 
-            redirect(url_for())
+    #all backend stuff on this function
+    redirect(url_for('home'))
 
 
 @app.route('/login')
@@ -215,11 +211,13 @@ def settings():
 @app.route('/about')
 def about():
     """A brief page descibing what the website is about"""
+    #FAQs can contain html code to run on page
     faqs = [
-        ["Question 1","Hello world"],
-        ["Lorem Ipsum","Blah Blah Blah"],
+        ["How do I save this page","Saving has been a super useful mechanic in many different areas of software for years. It is most commonly done by using the shortcut <kbd>Ctrl + S</kbd>, and our page is no exception."],
+        ["Can you talk like a computer?","Yeah Sure <br> <samp> Beep Boop Beep Beep Boop </samp>"],
         ["What is Lorem Ipsum?","Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."],
-        ["What is Doctrina?", "We are a teaching website for teachers by teachers"]
+        ["Can I type maths?", "Yes, yes you can. You can find <var>x</var> as much as you like."],
+        ["Can I do my own HTML markup?", "Only in some <code>&lt;input&gt;</code> areas"]
     ]
     return render_template('about.html', title='About Us', name="About Us", faqs=faqs, num=len(faqs))
 
