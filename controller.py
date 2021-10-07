@@ -138,9 +138,6 @@ def register():
 
     Other user fields are configured in profile()
     """
-<<<<<<< HEAD
-    return render_template('base.html', title='Register')
-=======
     #emailInvalid, passwordDifferent, passwordInvalid = false, false, false
     """
     if (request.method == "GET"):
@@ -163,7 +160,6 @@ def finalise_account():
 
     #all backend stuff on this function
     redirect(url_for('home'))
->>>>>>> eec7564... About page can have code in each FAQ. FAQ's are provided by controller.py
 
 
 @app.route('/login')
