@@ -218,6 +218,12 @@ def create(type=None):
                                subject=[enum_to_website_output(e) for e in Subject],
                                grade=[enum_to_website_output(e) for e in Grade],
                                tag=get_tags().keys())
+    if type == "channel":
+        return render_template("create_channel.html",
+                               title="Create Resource",
+                               subject=[enum_to_website_output(e) for e in Subject],
+                               grade=[enum_to_website_output(e) for e in Grade],
+                               tag=get_tags().keys())
 
 
 
