@@ -104,7 +104,7 @@
                                     <div class="col-1" style="padding-right: 1rem!important;">
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                     </div>
-                                    <hr style="margin-top: 0.5rem!important; margin-bottom: 0.5rem!important;">
+
                                     </div>
                                 </a>
                             </li>
@@ -116,10 +116,10 @@
                                         Tim Roberts has replied to your post Netflix and Chill
                                     </span>
                                         </div>
-                                    <div class="col-1" style="padding-right: 1rem!important;">
+                                    <div class="col-1" style="margin-right: 1rem!important;">
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                     </div>
-                                    <hr style="margin-top: 0.5rem!important; margin-bottom: 0.5rem!important;">
+
                                     </div>
                                 </a>
                             </li>
@@ -131,10 +131,10 @@
                                         Dude Dude has replied to your post Netflix and Chill
                                     </span>
                                         </div>
-                                    <div class="col-1" style="padding-right: 1rem!important;">
+                                    <div class="col-1" style="margin-right: 1rem!important;">
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                     </div>
-                                    <hr style="margin-top: 0.5rem!important; margin-bottom: 0.5rem!important;">
+
                                     </div>
                                 </a>
                             </li>
@@ -146,11 +146,18 @@
                                         John Cena has replied to your post WWE is a bad influence
                                     </span>
                                         </div>
-                                    <div class="col-1" style="padding-right: 1rem!important;">
+                                    <div class="col-1" style="margin-right: 1rem!important;">
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                     </div>
-                                    <hr style="margin-top: 0.5rem!important; margin-bottom: 0.5rem!important;">
+
                                     </div>
+                                </a>
+                            </li>
+                            
+                            <li><a class="dropdown-item">
+                                    <a href="{{url_for('create')}}" class="btn btn-primary d-md-block shadow" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
+                                         <dd class="text-center font-weight-bold">Clear All</dd>
+                                    </a>
                                 </a>
                             </li>
 
@@ -168,9 +175,9 @@
                 </div>
                 <div class="row">
                     <div class="d-flex justify-content-center">
-                         <div href="{{url_for('create')}}" class="btn btn-primary d-md-block shadow" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
+                         <a href="{{url_for('create')}}" class="btn btn-primary d-md-block shadow" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
                             <dd class="text-center font-weight-bold">Create New Resource</dd>
-                         </div>
+                         </a>
                     </div>
                 </div>
 
