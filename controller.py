@@ -30,26 +30,8 @@ def home():
         user = json.loads(userjson)
         name = user['user']
 
-    data = [
-        {
-            'title': "Example 1",
-            'img': url_for('static', filename='img/placeholder.png')
-        }, {
-            'title': "Example 2",
-            'img': url_for('static', filename='img/placeholder.png')
-        }, {
-            'title': "Example 3",
-            'img': url_for('static', filename='img/placeholder.png')
-        }, {
-            'title': "Example 4",
-            'img': url_for('static', filename='img/placeholder.png')
-        }, {
-            'title': "Example 5",
-            'img': url_for('static', filename='img/placeholder.png')
-        }
-    ]
 
-    return render_template('home.html', title='Home', name=name, data=data)
+    return render_template('home.html', title='Home', name=name)
 
 
 @app.route('/resource')
