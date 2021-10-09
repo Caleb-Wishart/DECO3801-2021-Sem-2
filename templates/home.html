@@ -92,19 +92,31 @@
                                 <img class="bd-placeholder-img card-img-top" src="{{url_for('static', filename='img/placeholder.png')}}" ,
                                      alt="Logo" style="width:95%; max-height: 150px; margin:10px">
 
-                               <div class="d-flex">
+                               <div class="d-flex" style="margin-left: 10px; margin-right: 10px">
                                    <p class="card-text px-1">
                                         Views: 5000
                                     </p>
                                     <p class="card-text px-1">
                                         5
                                     </p>
-                                    <img src="{{url_for('static', filename='img/up.png')}}" , alt="Down" , width="20" , height="20">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="pink" class="bi bi-arrow-up-circle-fill" style="margin-bottom: 3px" xviewBox="0 0 16 16">
+                                            <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
+                                    </svg>
                                     <p class="card-text px-1">
                                         2
                                     </p>
-                                    <img src="{{url_for('static', filename='img/down.png')}}" , alt="Down" , width="20" , height="20">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="pink" class="bi bi-arrow-up-circle-fill" style="margin-bottom: 3px" xviewBox="0 0 16 16">
+                                        <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
+                                    </svg>
                                 </div>
+
+                                <dt class="h6">
+                                    Subject: General
+                                </dt>
+                                <dt class="h6">
+                                    Year Level: General
+                                </dt>
+
                             </div>
 
                             <!-- Right Col-->
