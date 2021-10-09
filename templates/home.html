@@ -101,12 +101,26 @@
                     <dt> Contribute to the Commnuity</dt>
                     <p>
                         At Doctrina we aim to foster collaboration and resource sharing in a community of educators.
-                        Contribute any teaching resources or documents to other users by Creating A Resource
+                        Contribute any teaching resources or documents to other users by Creating A Resource.
                     </p>
                 </div>
                 <div class="row">
                     <div class="d-flex justify-content-center">
-                         <div href="{{url_for('create')}}" class="btn btn-primary d-md-block shadow" style = "width: 60%" aria-haspopup="true" aria-expanded="false">
+                         <div href="{{url_for('create/resource')}}" class="btn btn-primary d-md-block shadow" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
+                            <dd class="text-center font-weight-bold">Create New Resource</dd>
+                         </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <p>
+                        At Doctrina we aim to foster collaboration and resource sharing in a community of educators.
+                        Create new communities to discuss teaching topics with other users by Creating A Channel.
+                    </p>
+                </div>
+                <div class="row">
+                    <div class="d-flex justify-content-center">
+                         <div href="{{url_for('create/channel')}}" class="btn btn-primary d-md-block shadow" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
                             <dd class="text-center font-weight-bold">Create New Channel</dd>
                          </div>
                     </div>
