@@ -69,6 +69,177 @@
 
 </style>
 {% endblock %}
+<script type="text/template" id="resource_home_card">
+    <% _.each(data,  function(res) { %>
+        <!-- Resource Home Card-->
+        <div class="row">
+            <div class="card flex-fill" style="margin-right: 4.5rem!important; margin-left: 12px!important; margin-bottom: 1rem!important;">
+                <!-- Top section-->
+                <div class="row">
+                    <!-- Top section Left Col-->
+                    <div class="col">
+                        <!-- Thumbnail-->
+                        <img class="bd-placeholder-img card-img-top" src="{{url_for('static', filename='img/placeholder.png')}}" ,
+                             alt="Logo" style="width:95%; max-height: 150px; margin:10px">
+
+                    </div>
+
+                    <!-- Top Section Right Col-->
+                    <div class="col" style="margin-top: 10px">
+                         <!-- Title-->
+                        <dt class="h5">
+                            61 Tips and Tricks for New Teachers
+                        </dt>
+                        <!-- Author-->
+                        <dt class="h6" style="display:inline">
+                            Created By Geoffry Martin
+                        </dt>
+                        <img class="rounded-circle img-fluid" src="{{url_for('static', filename='avatar/ashley_gibbon.png')}}" ,
+                             alt="Logo", width="25" style="display:inline">
+                        <!-- Description-->
+                        <div class = "row">
+                            <span style="line-height: 1.5em; max-height: 6em; overflow: hidden; font-size: small;
+                            text-overflow:ellipsis;max-width: 400px; margin-top: 1rem!important;">
+                                In this guide we will be giving teachers some tipcs and tricks on controlling the classroom and teaching
+                            effectively so they can make the most out of their time with their students in a day. Overflow should
+                            be working so that only 4 lines show.  Overflow should
+                            be working so that only 4 lines show so this shouldn't show</span>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- Bottom Section-->
+                <div class="row">
+                    <div class="col">
+                        <div class="d-flex" style="margin-left: 10px; margin-right: 10px">
+                            <!--Views-->
+                           <p class="card-text px-1" style="margin-bottom: 0.5rem!important">
+                                Views: 5000
+                            </p>
+                            <!-- Upvotes and Downvotes-->
+                            <p class="card-text px-1" style="margin-bottom: 0.5rem!important">
+                                5
+                            </p>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="pink" class="bi bi-arrow-up-circle-fill" style="margin-top: 4px" xviewBox="0 0 16 16">
+                                    <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
+                            </svg>
+                            <p class="card-text px-1" style="margin-bottom: 0.5rem!important">
+                                2
+                            </p>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="pink" class="bi bi-arrow-up-circle-fill" style="margin-top: 4px" xviewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
+                            </svg>
+                        </div>
+                        <!-- Subject and Grade-->
+                        <dt class="h6 px-1" style="margin-left: 10px">
+                            Subject: General
+                        </dt>
+                        <dt class="h6 px-1" style="margin-left: 10px">
+                            Year Level: General
+                        </dt>
+                    </div>
+                    <!-- Bottom Section right col-->
+                    <div class="col">
+                        <dt class="h6">
+                            Tags
+                        </dt>
+                            <!-- Tags -->
+                            <span class="badge rounded-pill bg-primary" style="width: auto;
+                           margin-right: 0.25rem!important; margin-bottom: 0.25rem!important;">(Insert tag name )</span>
+                            <span class="badge rounded-pill bg-primary" style="width: auto;
+                           margin-right: 0.25rem!important; margin-bottom: 0.25rem!important;">(Insert tag name )</span>
+                            <span class="badge rounded-pill bg-primary" style="width: auto;
+                           margin-right: 0.25rem!important; margin-bottom: 0.25rem!important;">(Insert tag name )</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    <% }); %>
+</script>
+
+<script type="text/template" id="channel_home_card">
+    <% _.each(data,  function(res) { %>
+        <!-- Channel Home Card-->
+
+        <div class="row">
+            <div class="card flex-fill" style="margin-right: 4.5rem!important; margin-left: 12px!important; margin-bottom: 1rem!important;">
+                <!-- Top section-->
+                <div class="row">
+                    <!-- Top section Left Col-->
+                    <div class="col">
+                        <!-- Thumbnail-->
+                        <img class="bd-placeholder-img card-img-top" src="{{url_for('static', filename='img/placeholder.png')}}" ,
+                             alt="Logo" style="width:95%; max-height: 150px; margin:10px">
+
+
+                    </div>
+
+                    <!-- Top section Right Col-->
+                    <div class="col" style="margin-top: 10px">
+                         <!-- Title-->
+                        <dt class="h5">
+                            Primary School Mathematics
+                        </dt>
+                        <!-- Creator-->
+                        <dt class="h6" style="display:inline">
+                            Created By Ashley Gibbons
+                        </dt>
+                        <img class="rounded-circle img-fluid" src="{{url_for('static', filename='avatar/ashley_gibbon.png')}}" ,
+                             alt="Logo", width="25" style="display:inline">
+                        <!-- Description-->
+                        <div class = "row">
+                            <span style="line-height: 1.5em; max-height: 6em; overflow: hidden; font-size: small;
+                            text-overflow:ellipsis;max-width: 400px; margin-top: 1rem!important;">
+                                All posts welcome about primary school mathematics.</span>
+                        </div>
+
+
+                    </div>
+                </div>
+                <!-- Bottom section-->
+                <div class="row">
+                    <!-- Bottom section left col-->
+                    <div class="col">
+                         <div class="d-flex" style="margin-left: 10px; margin-right: 10px">
+                             <!-- Number of posts-->
+                           <p class="card-text px-1" style="margin-bottom: 0.5rem!important">
+                                Number of Posts: 120
+                            </p>
+                        </div>
+                        <!-- Subject and year level if given-->
+                        <dt class="h6 px-1" style="margin-left: 10px">
+                            Subject: Null
+                        </dt>
+                        <dt class="h6 px-1" style="margin-left: 10px">
+                            Year Level: Null
+                        </dt>
+
+                    </div>
+                    <!-- Bottom section right col-->
+                    <div class="col">
+                        <dt class="h6">
+                            Tags
+                        </dt>
+                        <!-- Tags right col-->
+                            <span class="badge rounded-pill bg-primary" style="width: auto;
+                           margin-right: 0.25rem!important; margin-bottom: 0.25rem!important;">Primary Education</span>
+                            <span class="badge rounded-pill bg-primary" style="width: auto;
+                           margin-right: 0.25rem!important; margin-bottom: 0.25rem!important;">Mathematics</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    <% }); %>
+</script>
+
+
+
+
+
+
 {% block content %}
 
     <div class="container" style="padding: 50px">
@@ -82,7 +253,7 @@
                 <div class="h5" style="margin-bottom: 1rem!important;"> Recommended Content</div>
 
 
-                <!-- Single card on the home screen-->
+                <!-- Single card on the home screen!!!!!!!!!!!!!!!!!!!!! DELETE FROM HERE DOWN-->
                 <!-- Resource Card-->
                 <div class="row">
                     <div class="card flex-fill" style="margin-right: 4.5rem!important; margin-left: 12px!important; margin-bottom: 1rem!important;">
@@ -161,6 +332,7 @@
                     </div>
 
                 </div>
+                <!-- Single card on the home screen!!!!!!!!!!!!!!!!!!!!! DELETE FROM HERE DOWN-->
                 <!-- Channel Card-->
                 <div class="row">
                     <div class="card flex-fill" style="margin-right: 4.5rem!important; margin-left: 12px!important; margin-bottom: 1rem!important;">
@@ -227,6 +399,7 @@
                     </div>
 
                 </div>
+                <!-- Single card on the home screen!!!!!!!!!!!!!!!!!!!!! DELETE FROM HERE DOWN-->
                 <div class="row">
                     <div class="card flex-fill" style="margin-right: 4.5rem!important; margin-left: 12px!important; margin-bottom: 1rem!important;">
                         <div class="row">
@@ -304,6 +477,7 @@
                     </div>
 
                 </div>
+                <!-- Single card on the home screen!!!!!!!!!!!!!!!!!!!!! DELETE FROM HERE DOWN-->
                 <div class="row">
                     <div class="card flex-fill" style="margin-right: 4.5rem!important; margin-left: 12px!important; margin-bottom: 1rem!important;">
                         <div class="row">
@@ -383,7 +557,7 @@
                 </div>
             </div>
 
-            <!-- Right hand Column of Home Page-->
+            <!-- Right hand Column of Home Page DONT DELETE BELOW HERE-->
             <div class="col-3">
                  <!-- Notifications-->
                 <div class="row">
