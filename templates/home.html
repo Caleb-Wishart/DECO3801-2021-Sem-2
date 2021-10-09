@@ -86,6 +86,7 @@
 
             <!-- Right hand Column of Home Page-->
             <div class="col-3">
+                 <!-- Notifications-->
                 <div class="row">
                     <div class="dropdown float-end">
                         <button class="btn btn-primary dropdown-toggle float-end" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -93,9 +94,11 @@
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                             <li><a class="dropdown-item" href="#" {# probs want a link here to the actual resource :) #} >BruhBruhBruh</a></li>
+                            <a class = "dropdown-item card flex-fill"> Tester </a>
                         </ul>
                     </div>
 	            </div>
+                <!-- Contribute to Community-->
                 <hr style="margin-top: 2rem!important; margin-bottom: 1rem!important;">
                 <div class="row">
                     <dt style="margin-bottom: 0.5rem!important;"> Contribute to the Commnuity</dt>
@@ -120,12 +123,13 @@
                 </div>
                 <div class="row">
                     <div class="d-flex justify-content-center">
-                         <div href="{{url_for('create')}}" class="btn btn-primary d-md-block shadow" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
+                         <a href="{{url_for('create')}}" class="btn btn-primary d-md-block shadow" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
                             <dd class="text-center font-weight-bold">Create New Channel</dd>
-                         </div>
+                         </a>
                     </div>
                 </div>
                 <hr style="margin-top: 2rem!important; margin-bottom: 1rem!important;">
+                <!-- Your Tags-->
                 <div class="row">
                     <dt style="margin-bottom: 0.5rem!important;"> Your Tags</dt>
                 </div>
