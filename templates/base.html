@@ -3,17 +3,18 @@
 
 <head>
     <title>{{title}}</title>
-    <!-- Title icon -->
-    <link rel="icon" href="{{url_for('static', filename='img/logo_icon.png')}}" type="image/icon type">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <!-- Title icon -->
+    <link rel="icon" href="{{url_for('static', filename='img/logo_icon.png')}}" type="image/icon type">
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
     <!-- JQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <!-- Underscore JS -->
@@ -34,14 +35,21 @@
             background-color: rgb(254, 239, 255);
         }
 
-        {% for item in subject_tags %}
-        .btn-{{item}}{
-            color: #fff;
-            background-color: {{strToColour(item)}};
-            border-color: {{strToColour(item)}};
-            border-radius: 40%;
+
+        .bg-subject-tag {
+            background-color: #ff8fab !important;
+            width: auto; margin: 0.25rem!important;
         }
-        {% endfor %}
+
+        .bg-year-tag {
+            background-color: #ff6cdf !important;
+            width: auto; margin: 0.25rem!important;
+        }
+
+        .bg-other-tag {
+            background-color: #ff8fec !important;
+            width: auto; margin: 0.25rem!important;
+        }
 
     </style>
     <!-- Additional web page style sheets -->
@@ -60,30 +68,65 @@
                     class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
                     <img src="{{url_for('static', filename='img/logo.png')}}" , alt="Logo" , width="150" , height="45">
                 </a>
-
                 <!-- Links for the web page -->
                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0" style = "margin-right: auto!important; margin-left: auto!important">
                     <li><a href="{{url_for('resource')}}" class="h4 nav-link px-4 pt-3 text-dark" style = "padding-left: 7rem!important; padding-right: 7rem!important;
                     margin-left: auto; margin-right: auto; font-size: 1.2rem">Resources</a></li>
-                    <li><a href="{{url_for('view_channel')}}" class="h4 nav-link px-4 pt-3 text-dark" style = "padding-left: 7rem!important; padding-right: 7rem!important;
+                    <li><a href="{{url_for('channel')}}" class="h4 nav-link px-4 pt-3 text-dark" style = "padding-left: 7rem!important; padding-right: 7rem!important;
                     margin-left: auto; margin-right: auto; font-size: 1.2rem">Channels</a></li>
                     <li><a href="{{url_for('about')}}" class="h4 nav-link px-4 pt-3 text-dark" style = "padding-left: 7rem!important; padding-right: 7rem!important;
                     margin-left: auto; margin-right: auto; font-size: 1.2rem">Contact Us</a></li>
-
-
                 </ul>
-
-                <!-- Changle default profile to the logged in user with sessions -->
-                <!-- Changle link to profile or login if not logged in -->
+                <!-- Profile -->
+                {% if current_user.is_authenticated %}
                 <a class="navbar-brand" style = "margin-right: auto!important; margin-left: auto!important;" href="{{url_for('profile')}}"
                     class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-                    <img src="{{url_for('static', filename='img/default_profile.png')}}" , alt="profile" , width="30" ,
-                        height="30">
+                    <div class="d-flex">
+                        <p class="h5 pe-4 pt-3 text-dark"> {{current_user.username}}</p>
+                        <img src="{{url_for('static',filename=current_user.avatar_link)}}" , alt="profile" , width="50" ,
+                        height="50">
+                    </div>
                 </a>
+                {% else %}
+                <a class="navbar-brand" style = "margin-right: auto!important; margin-left: auto!important;" href="{{url_for('login')}}"
+                    class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+                    <div class="d-flex">
+                        <p class="h5 pe-4 pt-3 text-dark"> Login </p>
+                        <img src="{{url_for('static', filename='img/default_profile.png')}}" , alt="profile" , width="50" ,
+                            height="50">
+                    </div>
+                </a>
+                {% endif %}
             </div>
         </div>
     </header>
-
+    <!-- Alerts -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="d-flex justify-content-center">
+            {% for category, message in messages %}
+            {% if category == "error" %}
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {% elif category == "info" %}
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+            {% else %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {% endif %}
+                <div>
+                    {% if category == "error" %}
+                        <i class="bi bi-exclamation-triangle"></i>
+                    {% elif category == "info" %}
+                        <i class="bi bi-info-circle"></i>
+                    {% else %}
+                    {% endif %}
+                     {{ message }}
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    {% endwith %}
     <!-- Web Page content -->
     {% block content %}{% endblock %}
 </body>

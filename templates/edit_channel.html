@@ -110,19 +110,15 @@
 <div class="container" style="margin-bottom: 3rem!important;  padding-left: 200px; padding-right: 200px">
         <!-- Title Section -->
         <div class="row">
-                    <!-- If we are creating a resource  -->
+                    <!-- If we are editing a channel  -->
                     <dt class="col-sm-9" style = "font-size: x-large; margin-top:2rem!important; margin-bottom: 2rem!important;">
-                         Create Channel
-                    </dt>
-                    <!-- If we are editing a resource  -->
-                    {#<dt class="col-sm-9" style = "font-size: x-large; margin-top:2rem!important; margin-bottom: 2rem!important;">
                          Edit Channel
-                    </dt>#}
+                    </dt>
 
         </div>
 
         <div class="col d-flex justify-content-md-between">
-             <form name="create_form" id="create_form" class = "form-outline flex-fill" action="{{ url_for('create_or_modify_channel') }}" onsubmit="return validate_form();" method="post" enctype="multipart/form-data">
+             <form name="create_form" id="create_form" class = "form-outline flex-fill" action="{{ url_for('create_or_modify_channel', cid=channel.cid) }}" onsubmit="return validate_form();" method="post" enctype="multipart/form-data">
                     <div class = "card flex-fill shadow-sm">
                                     <!-- Title of the resource-->
                                     <div class="mb-3" style="margin: 1rem!important;">
@@ -139,11 +135,11 @@
 
                                              </label>
 
-                                        <textarea class="form-control required" id="Titleform" name="channel_title" placeholder="Title of your channel (required)"></textarea>
+                                        <textarea class="form-control required" id="Titleform" name="channel_title" placeholder="Title of your channel (required)">{{ channel.name }}</textarea>
 
                                     </div>
 
-                                    <!-- Description of the resource-->
+                                    <!-- Description of the channel-->
                                   <div class="mb-3" style="margin: 1rem!important;">
                                         <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Body</label>
                                       <!-- Help documentation-->
@@ -158,7 +154,7 @@
                                             </svg>
 
                                         </label>
-                                      <textarea class="form-control required" name="channel_description" id="Bodyform" rows="7" placeholder="Description (required)"></textarea>
+                                      <textarea class="form-control required" name="channel_description" id="Bodyform" rows="7" placeholder="Description (required)">{{ channel.description }}</textarea>
                                   </div>
 
                                     <!-- Thumbnail file upload-->
@@ -209,6 +205,7 @@
                                                     </div>
                                                   <div class = "col-7">
                                                       <input name="subject" class="form-control" style = "margin-top:0.5rem!important;"
+                                                              {% if current_subject != "None" %} value="{{ current_subject }}" {% endif %}
                                                         list="datalistOptions" id="exampleDataList" placeholder="Search Subjects...">
                                                       <datalist id="datalistOptions">
                                                           {% for item in subjects %}
@@ -224,6 +221,7 @@
                                                     </div>
                                                   <div class = "col-7">
                                                       <input name="grade" class="form-control" style = "margin-top:0.5rem!important;"
+                                                             {% if current_grade != "None" %} value="{{ current_grade }}" {% endif %}
                                                         list="datalistOptions2" id="exampleDataList2" placeholder="Search Grades...">
                                                         <datalist id="datalistOptions2">
                                                             {% for item in grades %}
@@ -301,7 +299,7 @@
                                                         <select class="btn btn-primary dropdown-toggle" name="visibility_choice" onchange="showDiv(this)" style="min-width: 100px; height: 100%"
                                                              id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                                             {% for visibility in visibility_options %}
-                                                                {% if visibility == "Public" %}
+                                                                {% if visibility == current_visibility %}
                                                                     <option selected class="dropdown-item" value="{{ visibility }}" >{{ visibility }}</option>
                                                                 {% else %}
                                                                     <option class="dropdown-item" value="{{ visibility }}" >{{ visibility }}</option>
@@ -320,6 +318,13 @@
                                                       document.getElementById('hidden_div').style.display = "none";
                                                   }
                                               }
+
+                                              // call this when the page is ready, in case visibility is not Public and personnel is not loaded
+                                              document.addEventListener("readystatechange", event => {
+                                                  if (event.target.readyState === "complete") {
+                                                      showDiv(document.getElementById("dropdownMenuButton1"));
+                                                  }
+                                              });
                                           </script>
 
                                           <!-- Display this div only when visibility is not PUBLIC -->
@@ -354,6 +359,7 @@
                                                           var new_user = document.createElement("li");
                                                           new_user.setAttribute("class", "list-group-item");
                                                           new_user.textContent = email;
+
                                                           // create a hidden label that stores users' email
                                                           var user_email = document.createElement("input");
                                                           user_email.setAttribute("type", "hidden");
@@ -377,9 +383,16 @@
 
                                                   <ul class="list-group" id="personnel" style="margin-left: 2rem!important; margin-bottom: 2rem!important; padding-right: 100px!important">
                                                       <div class = "overflow-auto" style="max-height: 208px">
-{#                                                      <li class="list-group-item">IhateDecoPleaseSaveMeFigmaGod@yourmum.com#}
-{#                                                          <button type="button" class="btn-close float-end" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close"></button>#}
-{#                                                      </li>#}
+                                                        <!-- load existing personnel -->
+                                                          {% for email in personnel_emails %}
+                                                          <li class="list-group-item"> {{ email }}
+                                                              <button type="button" class="btn-close float-end" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close"
+                                                              onclick="parentNode.parentNode.removeChild(parentNode)"></button>
+
+                                                            <!-- invisible input, used to return each email to controller -->
+                                                           <input type="hidden" name="personnel_ids" value="{{ email }}"/>
+                                                          </li>
+                                                          {% endfor %}
 {#                                                      <li class="list-group-item">PleaseGiveMeAccessToResource@yourmum.com#}
 {#                                                            <button type="button" class="btn-close float-end" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close"></button>#}
 {#                                                      </li>#}
@@ -414,13 +427,12 @@
                     <div class="float-end mt-2 pt-1" style="margin-top: 1rem!important;">
                          <!-- IF WE ARE CREATING A RESOURCE, USE THE FOLLOWING BUTTONS-->
                         <!-- Button to upload the post-->
-                      <input type="submit" name="submit" value="Upload Resource" form="create_form" class="btn btn-primary btn" style="margin-right: 1rem!important;"/>
-                        <!-- Button to clear the title and body of the post-->
-                        <button type="Button" class="btn btn-outline-primary btn" onclick="go_to_channel_home_page()">Discard Draft</button>
+{#                      <input type="submit" name="submit" value="Upload Resource" form="create_form" class="btn btn-primary btn" style="margin-right: 1rem!important;"/>#}
+{#                        <!-- Button to clear the title and body of the post-->#}
+{#                        <button type="Button" class="btn btn-outline-primary btn" onclick="go_to_channel_home_page()">Discard Draft</button>#}
                          <!-- IF WE ARE CREATING EDITTING A RESOURCE, USE THE FOLLOWING BUTTONS-->
-                        {#<button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;">Save Changes</button>
-                        <button type="Button" class="btn btn-outline-primary btn">Discard Changes</button>#}
-
+                        <input type="submit" class="btn btn-primary btn" name="submit" value="Save Changes" style="margin-right: 1rem!important;"/>
+                        <button type="Button" class="btn btn-outline-primary btn" onclick="go_to_current_channel_page()">Discard Changes</button>
                     </div>
                  </form>
 
@@ -450,10 +462,10 @@
     }
     </script>
 
-    <!-- Redirect to channel home page (used for discard draft) -->
+    <!-- Redirect to current channel (used for discard draft) -->
     <script type="text/javascript">
-        function go_to_channel_home_page() {
-            window.location.href="{{ url_for('view_channel') }}";
+        function go_to_current_channel_page() {
+            window.location.href="{{ url_for('view_channel', cid=channel.cid) }}";
         }
     </script>
 {% endblock %}

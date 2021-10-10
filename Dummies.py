@@ -9,7 +9,6 @@ from DBFunc import *
 from random import choice, sample, randint
 from faker import Faker
 import pagan
-import warnings
 
 engine = create_engine(DBPATH)
 
@@ -373,6 +372,11 @@ for i in range(0, 5):
 for i in range(0, 5):
     if visibility[i] != ChannelVisibility.PUBLIC:
         personnel = sample(users_id, k=random.randint(1, len(users_id)))
+
+        # add user 1 to channel 2 deliberately
+        if i == 2:
+            personnel.append(1)
+
         # get rid of duplicate admin_id, if selected by random
         personnel = list(set(personnel))
     else:

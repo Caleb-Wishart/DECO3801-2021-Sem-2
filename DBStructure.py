@@ -19,6 +19,7 @@
 #############################################################################
 import datetime
 import enum
+import warnings
 
 from sqlalchemy import Column, ForeignKey, Integer, String, \
     Text, DateTime, Numeric, Boolean, Enum
@@ -42,7 +43,6 @@ DBPATH = f"postgresql://{DBUSERNAME}:{DBPASSWORD}@localhost/{DBDATABASE}"
 # Option 2: Feel lazy to sign in to cli? No worries, you can play these using sqlite
 # on your local device
 # uncomment DBPATH below to overwrite the above PATH config
-# todo
 # DBPATH = "sqlite:///Doctrina.db"
 
 
@@ -161,7 +161,7 @@ def website_input_to_enum(readable_string: str, enum_class: enum.EnumMeta):
         return enum_class[value]
     except KeyError:
         # no such enum variable
-        print(f"value {readable_string} not found in enum class {enum_class}")
+        warnings.warn(f"value {readable_string} not found in enum class {enum_class}")
         return None
 
 
@@ -169,7 +169,8 @@ def dump_datetime(value):
     """Deserialize datetime object into string form for JSON processing."""
     if value is None:
         return None
-    return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")]
+    return value.astimezone(
+        pytz.timezone("Australia/Brisbane")).strftime("%d/%m/%Y, %H:%M:%S")
 
 
 Base = declarative_base()
@@ -237,23 +238,6 @@ class User(Base):
     def is_anonymous(self):
         """False, as anonymous users aren't supported."""
         return False
-
-
-class UserSession(Base):
-    """
-    A concept of a user login session
-    """
-    __tablename__ = "user_session"
-
-    # user id
-    uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
-
-    # last action request time
-    last_action_time = Column(DateTime(timezone=True), default=datetime.datetime.now(
-        tz=pytz.timezone("Australia/Brisbane")), nullable=False)
-
-    user = relationship("User", foreign_keys=[uid],
-                        backref=backref("user_session", cascade="all, delete"))
 
 
 class UserTeachingAreas(Base):
@@ -644,9 +628,7 @@ class Channel(Base):
             "name": self.name,
             "admin_uid": self.admin_uid,
             "description": self.description,
-            'created_at':
-                self.created_at.astimezone(
-                    pytz.timezone("Australia/Brisbane")).strftime("%d/%m/%Y, %H:%M:%S"),
+            'created_at': dump_datetime(self.created_at),
             "avatar_link": self.avatar_link
         }
 
@@ -747,9 +729,7 @@ class ChannelPost(Base):
             "upvote_count": self.upvote_count,
             "downvote_count": self.downvote_count,
             'init_text': self.init_text,
-            "created_at":
-                self.created_at.astimezone(
-                    pytz.timezone("Australia/Brisbane")).strftime("%d/%m/%Y, %H:%M:%S")
+            "created_at": dump_datetime(self.created_at)
         }
 
 
@@ -824,9 +804,7 @@ class PostComment(Base):
         return {
             "post_comment_id": self.post_comment_id,
             "post_id": self.post_id,
-            "created_at":
-                self.created_at.astimezone(
-                    pytz.timezone("Australia/Brisbane")).strftime("%d/%m/%Y, %H:%M:%S"),
+            "created_at": dump_datetime(self.created_at),
             "uid": self.uid,
             "upvote_count": self.upvote_count,
             "downvote_count": self.downvote_count,

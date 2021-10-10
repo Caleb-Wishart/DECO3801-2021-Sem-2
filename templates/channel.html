@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base_old.html' %}
 
 {% block style %}
 <style>
@@ -180,12 +180,13 @@
                 url: "{{url_for('search_channel')}}",
                 data: { "name": search_term,
                         "is_public": is_public,
-                        "sort_by_date": sort_by_date},
+                        "sort_by_date": sort_by_date,
+                        "uid": "{{ user.uid }}"},
                 success: function (response) {
                     $("#result").empty(); // remove current results
                     var channel_card = _.template($("#channel_card").html());
                     $("#result").html(channel_card({ data: response })); // set new results
-                    if (response.length == 0) {
+                    if (response.length === 0) {
                         $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
                     }
 
@@ -205,12 +206,13 @@
                 url: "{{url_for('search_channel')}}",
                 data: { "name": search_term,
                         "is_public": is_public,
-                        "sort_by_date": sort_by_date},
+                        "sort_by_date": sort_by_date,
+                        "uid": "{{ user.uid }}"},
                 success: function (response) {
                     $("#result").empty(); // remove current results
                     var channel_card = _.template($("#channel_card").html());
                     $("#result").html(channel_card({ data: response })); // set new results
-                    if (response.length == 0) {
+                    if (response.length === 0) {
                         $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
                     }
                 }
@@ -229,12 +231,13 @@
                 url: "{{url_for('search_channel')}}",
                 data: { "name": search_term,
                         "is_public": is_public,
-                        "sort_by_date": sort_by_date},
+                        "sort_by_date": sort_by_date,
+                        "uid": "{{ user.uid }}"},
                 success: function (response) {
                     $("#result").empty(); // remove current results
                     var channel_card = _.template($("#channel_card").html());
                     $("#result").html(channel_card({ data: response })); // set new results
-                    if (response.length == 0) {
+                    if (response.length === 0) {
                         $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
                     }
                 }
@@ -246,7 +249,6 @@
     $(document).on("change", "#sort_order", function (e) {
         // currently only filter by channel name
         search_term = $('input[name=name]').val();
-        is_public = false
         sort_by_date = $("#sort_order").find(":selected").text()
         $.ajax(
             {
@@ -254,12 +256,13 @@
                 url: "{{url_for('search_channel')}}",
                 data: { "name": search_term,
                         "is_public": is_public,
-                        "sort_by_date": sort_by_date},
+                        "sort_by_date": sort_by_date,
+                        "uid": "{{ user.uid }}"},
                 success: function (response) {
                     $("#result").empty(); // remove current results
                     var channel_card = _.template($("#channel_card").html());
                     $("#result").html(channel_card({ data: response })); // set new results
-                    if (response.length == 0) {
+                    if (response.length === 0) {
                         $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
                     }
                 }
@@ -275,7 +278,8 @@
                 url: "{{url_for('search_channel')}}",
                 data: { "name": search_term,
                         "is_public": is_public,
-                        "sort_by_date": sort_by_date},
+                        "sort_by_date": sort_by_date,
+                        "uid": "{{ user.uid }}"},
                 success: function (response) {
                     $("#result").empty(); // remove current results
                     var channel_card = _.template($("#channel_card").html());
@@ -319,7 +323,7 @@
         <!-- Create new Channel section -->
         <div class="col-3">
             <div class = "row pe-5">
-            <a href="{{url_for('create_channel')}}" class="btn btn-primary d-md-block shadow" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
+            <a href="{{url_for('create_or_modify_channel')}}" class="btn btn-primary d-md-block shadow" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
                 <dd class="text-center font-weight-bold">Create New Channel</dd>
 
             </a>

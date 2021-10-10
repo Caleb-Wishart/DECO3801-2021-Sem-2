@@ -7,7 +7,6 @@
 # Created by Jason Aug 20, 2021
 ##################################################################
 import traceback
-import warnings
 
 import sqlalchemy.exc
 from sqlalchemy import or_
@@ -32,7 +31,7 @@ DEBUG_MODE = True
 # link to default user profile background
 DEFAULT_PROFILE_BACKGROUND_LINK = "profile_background/default_background.jpg"
 # link to default user avatar
-DEFAULT_USER_AVATAR_LINK = "avatar/ashley_gibbon.png"
+DEFAULT_USER_AVATAR_LINK = "avatar/ashley_gibbons.png"
 # link to default channel avatar
 DEFAULT_CHANNEL_AVATAR_LINK = "channel_avatar/logo_icon.png"
 
@@ -54,8 +53,6 @@ class ErrorCode(enum.Enum):
     INVALID_CHANNEL = 5
     # post id/info incorrect
     INVALID_POST = 6
-    # user session expired
-    USER_SESSION_EXPIRED = 7
     # commit failure
     COMMIT_ERROR = 8
     # email exists in DB
@@ -75,10 +72,6 @@ Session = sessionmaker(engine)
 
 # starting timestamp of UTC
 EPOCH = datetime.datetime.utcfromtimestamp(0)
-
-
-# maximum time length for session without new action -- set as 30min
-# USER_SESSION_EXPIRE_INTERVAL = datetime.timedelta(weeks=10)
 
 
 def try_to_commit(trans):
@@ -146,10 +139,6 @@ def add_user(username, password, email, teaching_areas: dict = None,
         # phase 2: find id of new user -- using email,
         # then update teaching_areas table
         user = conn.query(User).filter_by(email=email).one()
-
-        # user_session = UserSession(uid=user.uid)
-        # conn.add(user_session)
-        # conn.commit()
 
         if teaching_areas:
             modify_user_teaching_areas(uid=user.uid, conn=conn, teaching_areas=teaching_areas,
@@ -310,51 +299,6 @@ def get_user(email):
             return user
         warnings.warn(f"No user has email {email}")
         return ErrorCode.INVALID_USER
-
-
-# def is_user_session_expired(uid: int):
-#     """
-#     Check if a user session is expired
-#
-#     :param uid: The user id to check
-#     :return True if the session is expired, False otherwise
-#     """
-#     with Session() as conn:
-#         user_session = conn.query(UserSession).filter_by(uid=uid).one_or_none()
-#         # NOTE: tz = pytz.timezone("Australia/Brisbane") does not work in sqlite
-#         current = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
-#         # print(f"current time = {current},last_action_time = {user_session.last_action_time}")
-#         return current - user_session.last_action_time > USER_SESSION_EXPIRE_INTERVAL
-
-
-# def renew_user_session(uid: int):
-#     """
-#     Create a new session instance in Session table, if not exists;
-#     otherwise, update last_action_time to current datetime
-#
-#     Call this when user sign in or a function requires uid and is_user_session_expired()
-#     is false
-#
-#     :param uid: effective user id
-#     :return on success, None is returned.
-#             If uid does not exist, it returns ErrorCode.INVALID_USER
-#     """
-#     with Session() as conn:
-#         user = conn.query(User).filter_by(uid=uid).one_or_none()
-#         if not user:
-#             print(f"user {uid} does not exists")
-#             return ErrorCode.INVALID_USER
-#
-#         user_session = conn.query(UserSession).filter_by(uid=uid).one_or_none()
-#         if not user_session:
-#             user_session = UserSession(uid=uid)
-#         else:
-#             user_session.last_action_time = datetime.datetime.now(
-#                 tz=pytz.timezone("Australia/Brisbane"))
-#         conn.add(user_session)
-#         conn.commit()
-#         if verbose:
-#             print(f"user {uid} last action time updated")
 
 
 def add_tag(tag_name, tag_description=None):
@@ -532,7 +476,6 @@ def modify_resource_personnel(rid, uid, modification: Modification):
     :return void on success.
             ErrorCode.INVALID_USER/-RESOURCE if uid/rid is incorrect
             ErrorCode.INCORRECT_PERSONNEL if mode is delete and personnel info not exist
-            ErrorCode.USER_SESSION_EXPIRED when user session is expired
     """
     user, resource = get_user_and_resource_instance(uid=uid, rid=rid)
     if not user:
@@ -541,12 +484,6 @@ def modify_resource_personnel(rid, uid, modification: Modification):
     elif not resource:
         warnings.warn("rid is invalid")
         return ErrorCode.INVALID_RESOURCE
-
-    # check user session and renew
-    # if is_user_session_expired(uid):
-    #     print("User session expired")
-    #     return ErrorCode.USER_SESSION_EXPIRED
-    # renew_user_session(uid)
 
     with Session() as conn:
         if modification == Modification.MODIFY_DELETE:
@@ -731,7 +668,6 @@ def user_has_access_to_resource(uid, rid):
     :param uid: The user to be checked
     :return True/False on success.
             ErrorCode.INVALID_USER/-RESOURCE if uid/rid is incorrect
-            ErrorCode.USER_SESSION_EXPIRED if user session is expired
     """
     user, resource = get_user_and_resource_instance(uid=uid, rid=rid)
     if not user:
@@ -744,12 +680,6 @@ def user_has_access_to_resource(uid, rid):
         # NOTE: Here changed error to True since all users have access to
         # public channels
         return True
-
-    # check user session and renew
-    # if is_user_session_expired(uid):
-    #     print("User session expired")
-    #     return ErrorCode.USER_SESSION_EXPIRED
-    # renew_user_session(uid)
 
     with Session() as conn:
         return conn.query(PrivateResourcePersonnel).filter_by(uid=uid, rid=rid). \
@@ -1001,12 +931,11 @@ def vote_resource(uid, rid, upvote=True):
             ErrorCode.INVALID_RESOURCE/_USER if rid/uid is invalid.
             ErrorCode.SAME_VOTE_TWICE if current user gave same vote to this
             resource before.
-            ErrorCode.USER_SESSION_EXPIRED if current session is expired
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     msg = "created"
 
-    res = check_user_and_resource_validity_and_renew_user_session(uid=uid, rid=rid)
+    res = check_user_and_resource_validity(uid=uid, rid=rid)
     if isinstance(res, ErrorCode):
         return res
 
@@ -1076,10 +1005,9 @@ def user_viewed_resource(uid, rid):
     :param rid: The id of resource viewed
     :return void on Success.
             ErrorCode.INVALID_RESOURCE/_USER if rid/uid is invalid.
-            ErrorCode.USER_SESSION_EXPIRED if user session is expired
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
-    res = check_user_and_resource_validity_and_renew_user_session(uid=uid, rid=rid)
+    res = check_user_and_resource_validity(uid=uid, rid=rid)
     if isinstance(res, ErrorCode):
         return res
 
@@ -1092,15 +1020,14 @@ def user_viewed_resource(uid, rid):
     print(f"user {uid} viewed resource {rid}") if VERBOSE else None
 
 
-def check_user_and_resource_validity_and_renew_user_session(uid, rid):
+def check_user_and_resource_validity(uid, rid):
     """
-    Check uid and rid's validity and renew the user session for current user
+    Check uid and rid's validity
 
     :param uid: The user id to check
     :param rid: The resource id to check
     :return If valid, user, resource instances are returned and user session is updated.
             ErrorCode.INVALID_RESOURCE/_USER if rid/uid is invalid.
-            ErrorCode.USER_SESSION_EXPIRED is current session is expired
     """
     user, resource = get_user_and_resource_instance(uid, rid)
     if not resource:
@@ -1109,13 +1036,6 @@ def check_user_and_resource_validity_and_renew_user_session(uid, rid):
     elif not user:
         warnings.warn("uid is invalid")
         return ErrorCode.INVALID_USER
-
-    # check user session and renew
-    # if is_user_session_expired(uid):
-    #     print("User session expired")
-    #     return ErrorCode.USER_SESSION_EXPIRED
-    # renew_user_session(uid)
-
     return user, resource
 
 
@@ -1128,10 +1048,9 @@ def comment_to_resource(uid, rid, comment):
     :param comment: The comment to that resource
     :return The id of the new resource comment on success.
             ErrorCode.INVALID_RESOURCE/_USER if rid/uid is invalid.
-            ErrorCode.USER_SESSION_EXPIRED is current session is expired
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
-    res = check_user_and_resource_validity_and_renew_user_session(uid=uid, rid=rid)
+    res = check_user_and_resource_validity(uid=uid, rid=rid)
     if isinstance(res, ErrorCode):
         return res
 
@@ -1171,7 +1090,6 @@ def reply_to_resource_comment(uid, resource_comment_id, reply):
     :param reply: The reply text
     :return void on Success.
             ErrorCode.INVALID_RESOURCE/_USER if rid/uid is invalid.
-            ErrorCode.USER_SESSION_EXPIRED is user session is expired
     """
     with Session() as conn:
         user = conn.query(User).filter_by(uid=uid).one_or_none()
@@ -1183,12 +1101,6 @@ def reply_to_resource_comment(uid, resource_comment_id, reply):
         elif not user:
             warnings.warn("uid is invalid")
             return ErrorCode.INVALID_USER
-
-        # check user session and renew
-        # if is_user_session_expired(uid):
-        #     print("User session expired")
-        #     return ErrorCode.USER_SESSION_EXPIRED
-        # renew_user_session(uid)
 
         reply_to_comment = ResourceCommentReply(resource_comment_id=resource_comment_id,
                                                 reply=reply, uid=uid)
@@ -1276,7 +1188,6 @@ def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subj
     :param avatar_link: The link to channel avatar
     :return the id of the new channel on success.
             ErrorCode.INVALID_USER if admin_uid does not exist.
-            ErrorCode.USER_SESSION_EXPIRED if current session is expired
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     if personnel_id is None:
@@ -1284,17 +1195,14 @@ def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subj
     if tags_id is None:
         tags_id = []
 
+    if not avatar_link:
+        avatar_link = DEFAULT_CHANNEL_AVATAR_LINK
+
     with Session() as conn:
         admin = conn.query(User).filter_by(uid=admin_uid).one_or_none()
         if not admin:
             warnings.warn("Admin id is invalid")
             return ErrorCode.INVALID_USER
-
-        # check user session and renew
-        # if is_user_session_expired(admin_uid):
-        #     print("User session expired")
-        #     return ErrorCode.USER_SESSION_EXPIRED
-        # renew_user_session(admin_uid)
 
         # phase 1: create instance
         channel = Channel(name=name, visibility=visibility, admin_uid=admin_uid,
@@ -1406,8 +1314,7 @@ def modify_channel_personnel(uid, cid, modification: Modification):
 def modify_channel(cid: int, name=None, visibility: ChannelVisibility = None,
                    admin_uid=None, subject: Subject = Subject.NULL,
                    grade: Grade = Grade.NULL, description="NULL", tags_id: list = None,
-                   ids_to_delete_from_personnel: list = None,
-                   ids_to_add_to_personnel: list = None):
+                   personnel_ids: list = None, avatar_link: str = None):
     """
         This method is used to modify the information of a channel
 
@@ -1425,11 +1332,11 @@ def modify_channel(cid: int, name=None, visibility: ChannelVisibility = None,
         :param grade: The new grade tag. By default, Grade.NULL does not change
                         the grade tag; None clears original grade tag
         :param admin_uid: The new admin of this channel
-        :param ids_to_delete_from_personnel: The private personnel ids to be removed
-        :param ids_to_add_to_personnel: The private personnel ids to be added
+        :param personnel_ids: The new personnel ids. This will overwrite the original personnel
         :param tags_id: The tag ids to be removed/added
         :param description: The new description of the channel. By default, "NULL" does
                             not change description contents; None clears original description
+        :param avatar_link: The link to the avatar of a Channel
         :return on success, void is returned.
                 ErrorCode.INVALID_CHANNEL if cid is invalid
                 ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
@@ -1439,6 +1346,8 @@ def modify_channel(cid: int, name=None, visibility: ChannelVisibility = None,
         if not channel:
             warnings.warn("Invalid cid")
             return ErrorCode.INVALID_CHANNEL
+        if avatar_link:
+            channel.avatar_link = avatar_link
         if name:
             channel.name = name
         if admin_uid:
@@ -1462,15 +1371,14 @@ def modify_channel(cid: int, name=None, visibility: ChannelVisibility = None,
                 tag = ChannelTagRecord(cid=cid, tag_id=i)
                 conn.add(tag)
 
-        if visibility:
-            if visibility == ChannelVisibility.PUBLIC and \
-                    channel.visibility != ChannelVisibility.PUBLIC:
+        if visibility and visibility != channel.visibility:
+            if visibility == ChannelVisibility.PUBLIC:
                 # originally private, now public
                 channel.visibility = visibility
                 conn.query(ChannelPersonnel).filter_by(cid=cid).delete()
-            elif visibility != ChannelVisibility.PUBLIC and \
-                    channel.visibility == ChannelVisibility.PUBLIC:
+            elif visibility != ChannelVisibility.PUBLIC:
                 # originally public, now private
+                channel.visibility = visibility
                 # admin must be in the channel personnel
                 modify_channel_personnel(uid=admin_uid, cid=cid,
                                          modification=Modification.MODIFY_ADD)
@@ -1482,17 +1390,27 @@ def modify_channel(cid: int, name=None, visibility: ChannelVisibility = None,
 
         # now deal with ids add/delete to/from personnel
         channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
-        if channel.visibility != ChannelVisibility.PUBLIC:
-            if ids_to_add_to_personnel:
-                for i in ids_to_add_to_personnel:
-                    personnel = ChannelPersonnel(cid=cid, uid=i)
-                    conn.add(personnel)
-            if ids_to_delete_from_personnel:
-                for i in ids_to_delete_from_personnel:
-                    personnel = conn.query(ChannelPersonnel). \
-                        filter_by(cid=cid, uid=i).one_or_none()
-                    if personnel:
-                        conn.delete(personnel)
+        # new visibility
+        if channel.visibility != ChannelVisibility.PUBLIC and personnel_ids:
+            old_personnel = conn.query(ChannelPersonnel).filter_by(cid=cid).all()
+            for i in old_personnel:
+                if admin_uid != i.uid:
+                    # admin newly added above, no need to delete that
+                    modify_channel_personnel(uid=i.uid, cid=cid, modification=Modification.MODIFY_DELETE)
+
+            for i in personnel_ids:
+                modify_channel_personnel(uid=i, cid=cid, modification=Modification.MODIFY_ADD)
+
+            # if ids_to_add_to_personnel:
+            #     for i in ids_to_add_to_personnel:
+            #         personnel = ChannelPersonnel(cid=cid, uid=i)
+            #         conn.add(personnel)
+            # if ids_to_delete_from_personnel:
+            #     for i in ids_to_delete_from_personnel:
+            #         personnel = conn.query(ChannelPersonnel). \
+            #             filter_by(cid=cid, uid=i).one_or_none()
+            #         if personnel:
+            #             conn.delete(personnel)
         if not try_to_commit(conn):
             warnings.warn("Error committing")
             return ErrorCode.COMMIT_ERROR
@@ -1505,25 +1423,17 @@ def user_has_access_to_channel(uid, cid):
     :param uid: The id of user to check
     :param cid: The id of channel to check
     :return True/False on success.
-            ErrorCode.INVALID_USER/-CHANNEL if uid/rid is incorrect
     """
     with Session() as conn:
         res = get_user_and_channel_instance(uid=uid, cid=cid)
         if isinstance(res, ErrorCode):
-            return res
+            # invalid user or channel instance, return False directly
+            return False
         channel = res[1]
         if channel.visibility == ChannelVisibility.PUBLIC:
-            # warnings.warn("Channel is public")
-            # return ErrorCode.INVALID_CHANNEL
             # NOTE: Here changed error to True since all users have access to
             # public channels
             return True
-
-        # check user session and renew
-        # if is_user_session_expired(uid):
-        #     print("User session expired")
-        #     return ErrorCode.USER_SESSION_EXPIRED
-        # renew_user_session(uid)
 
         personnel = conn.query(ChannelPersonnel).filter_by(uid=uid, cid=cid). \
             one_or_none()
@@ -1545,7 +1455,6 @@ def post_on_channel(uid, title, text, channel_name=None, cid=None):
             ErrorCode.INVALID_CHANNEL if channel_name or cid is invalid
             ErrorCode.INVALID_USER if uid is invalid
             ErrorCode.INCORRECT_PERSONNEL if user has permission to visit
-            ErrorCode.USER_SESSION_EXPIRED if user session is expired
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     if not channel_name and not cid:
@@ -1555,12 +1464,6 @@ def post_on_channel(uid, title, text, channel_name=None, cid=None):
         if not conn.query(User).filter_by(uid=uid).one_or_none():
             warnings.warn("invalid uid")
             return ErrorCode.INVALID_USER
-
-        # check user session and renew
-        # if is_user_session_expired(uid):
-        #     print("User session expired")
-        #     return ErrorCode.USER_SESSION_EXPIRED
-        # renew_user_session(uid)
 
         if cid:
             channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
@@ -1643,7 +1546,6 @@ def comment_on_channel_post(uid, post_id, text):
     :return The post_comment_id on success.
             ErrorCode.INVALID_USER if uid is invalid
             ErrorCode.INVALID_POST if post_id is invalid
-            ErrorCode.USER_SESSSION_EXPIRED if current session is expired
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     with Session() as conn:
@@ -1653,12 +1555,6 @@ def comment_on_channel_post(uid, post_id, text):
         elif not conn.query(ChannelPost).filter_by(post_id=post_id).one_or_none():
             warnings.warn("post_id is invalid")
             return ErrorCode.INVALID_POST
-
-        # check user session and renew
-        # if is_user_session_expired(uid):
-        #     print("User session expired")
-        #     return ErrorCode.USER_SESSION_EXPIRED
-        # renew_user_session(uid)
 
         created_at = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
         post_comment = PostComment(post_id=post_id, uid=uid, created_at=created_at,
@@ -1701,7 +1597,6 @@ def vote_channel_post(uid, post_id, upvote=True):
             ErrorCode.INVALID_POST if post_id is invalid
             ErrorCode.SAME_VOTE_TWICE if current user gave same vote to this
             post before.
-            ErrorCode.USER_SESSION_EXPIRED if current user is expired
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     with Session() as conn:
@@ -1713,12 +1608,6 @@ def vote_channel_post(uid, post_id, upvote=True):
         elif not post:
             warnings.warn("post id is invalid")
             return ErrorCode.INVALID_POST
-
-        # check user session and renew
-        # if is_user_session_expired(uid):
-        #     print("User session expired")
-        #     return ErrorCode.USER_SESSION_EXPIRED
-        # renew_user_session(uid)
 
         # try to find if there is an entry in vote_info
         vote = conn.query(ChannelPostVoteInfo).filter_by(uid=uid, post_id=post_id).one_or_none()
@@ -1767,7 +1656,6 @@ def vote_channel_post_comment(uid, post_comment_id, upvote=True):
             ErrorCode.INVALID_POST if post_id is invalid
             ErrorCode.SAME_VOTE_TWICE if current user gave same vote to this
             post comment before.
-            ErrorCode.USER_SESSION_EXPIRED if user session is expired
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     with Session() as conn:
