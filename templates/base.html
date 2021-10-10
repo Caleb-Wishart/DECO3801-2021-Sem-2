@@ -30,8 +30,13 @@
             /* Adds a Hex honeycomb background */
             /* background-image: url({{url_for('static', filename='img/hex_back.png')}}),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
             background-color: #FFFFFF;
-            background-image: radial-gradient(rgb(254, 239, 255), rgb(246, 244, 255), rgb(254, 239, 255));
+            background-image: radial-gradient(rgb(244, 255, 239), rgb(244, 255, 239), rgb(244, 255, 239));
             background-color: rgb(254, 239, 255);
+
+
+            {#background-color: #FFFFFF;
+            background-image: radial-gradient(rgb(254, 239, 255), rgb(246, 244, 255), rgb(254, 239, 255));
+            background-color: rgb(254, 239, 255);#}
         }
     </style>
     <!-- Additional web page style sheets -->
@@ -57,15 +62,21 @@
             /* Adds a Hex honeycomb background */
             /* background-image: url(
         {{url_for('static', filename='img/hex_back.png')}} ),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
-            background-color: #ffe5ec;
-            background-image: radial-gradient(rgb(255, 242, 245), rgb(255, 242, 245), rgb(255, 242, 245));
+            {#background-color: #ffe5ec;#}
+            {#background-image: radial-gradient(rgb(255, 242, 245), rgb(255, 242, 245), rgb(255, 242, 245));#}
+            background-color: #e8ffe5;
+            background-image: radial-gradient(rgb(244, 255, 239), rgb(244, 255, 239), rgb(244, 255, 239));
             {# background-image: radial-gradient(rgb(255, 229, 236), rgb(255, 229, 236),rgb(255, 229, 236)); #}
         {#background-color: rgb(245, 245, 255);#}
         }
     .btn-primary {
-        background-color: #ff8fab;
+        {#background-color: #ff8fab;
         color: white;
-        border-color: #ff8fab;
+        border-color: #ff8fab;#}
+
+        background-color: #2bb436;
+        color: white;
+        border-color: #2bb436;
     }
     .btn-primary:hover {
         color:white;
@@ -84,15 +95,21 @@
     }
 
     .btn-check:checked+.btn-outline-primary {
-        color: white;
+        {#color: white;
         background-color:  #ff8fab;
-        border-color:   #ff8fab;
+        border-color:   #ff8fab;#}
+
+        background-color: #2bb436;
+        color: white;
+        border-color: #2bb436;
     }
     .bg-white {
         background-color: #ffd6e1;
     }
     .bg-primary {
-        background-color: #ff8fab!important;
+        {#background-color: #ff8fab!important;#}
+        background-color: #2bb436!important;
+
     }
     .btn-close {
         width: 0.5rem;
@@ -111,9 +128,6 @@
         height: 50px;
         border-radius: 50%;
     }
-
-
-
 
 
 </style>
