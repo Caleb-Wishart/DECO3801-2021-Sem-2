@@ -99,8 +99,8 @@ def login():
             user = get_user(email)
             if user != ErrorCode.INVALID_USER and check_password_hash(user.hash_password, form.password.data):
                 user_auth(user.email,True)
-                login_user(user, remember=True)
-                if request.args.get("next"):
+                login_user(user, remember=False)
+                if 'next' in request.args:
                     return redirect(request.args.get("next"))
                 return redirect(url_for('home'))
         flash('That username or password was incorrect',"error")
@@ -168,7 +168,7 @@ def register():
                 if res != ErrorCode.COMMIT_ERROR:
                     user = get_user(email)
                     user_auth(user.email,True)
-                    login_user(user, remember=True)
+                    login_user(user, remember=False)
                     # return redirect(url_for('home'))
                 flash('Something went wrong, please try again',"error")
         else:
@@ -220,11 +220,24 @@ def resource(rid=None):
         "grade" : enum_to_website_output(res.grade),
         "resource_tags" : get_resource_tags(res.rid),
         "authors" : get_resource_author(res.rid),
-        "banner" : get_resource_thumbnail(rid)
+        "banner" : get_resource_thumbnail(rid) if get_resource_thumbnail(rid) != ErrorCode.INVALID_RESOURCE else {'thumbnail_link' : 'img/placeholder.png'}
     }
     return render_template("resource_item.html", **kwargs)
 
+@app.route('/resource/new', methods=['GET', 'POST'])
+def resource_new():
+    """The user creates a new resource
+    """
+    form = ResourceForm()
+    if form.validate_on_submit():
+        if form.files.data:
+            f = request.files[form.files.name]
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename)))
+            flash("File was uploaded",'info')
+    return render_template('resource_create.html', title='New Resource',form=form)
+    # todo
 
+# -----{ PAGES.RESOURCE.AJAX }-------------------------------------------------
 
 @app.route('/AJAX/resourceAJAX')
 def resourceAJAX():
@@ -236,6 +249,7 @@ def resourceAJAX():
     year = request.args.get('year').upper() if 'year' in request.args else None
     tags = request.args.getlist('tags[]') if 'tags[]' in request.args else None
     tags = list(filter(lambda x: x != '',tags)) if tags is not None else None
+    sort = request.args.get('sort') if 'sort' in request.args else "natural"
     try:
         subject = Subject[subject]
     except KeyError:
@@ -246,7 +260,7 @@ def resourceAJAX():
         year = None
     if title == '':
         title = None
-    return jsonify([dict(i.serialize,tags=get_resource_tags(i.rid)) for i in find_resources(title=title,subject=subject,grade=year,tags=tags)])
+    return jsonify([dict(i.serialize,tags=get_resource_tags(i.rid),banner=get_resource_thumbnail(i.rid).serialize if get_resource_thumbnail(i.rid) != ErrorCode.INVALID_RESOURCE else {'thumbnail_link' : 'img/placeholder.png'}) for i in find_resources(title=title,subject=subject,grade=year,tags=tags,sort_by=sort)])
 
 @app.route('/AJAX/resourceVote')
 def resourceVote():
@@ -257,22 +271,13 @@ def resourceVote():
     up = request.args.get('up') if 'up' in request.args else None
     down = request.args.get('down').upper() if 'down' in request.args else None
     if rid is None:
-        return jsonify({
-            'up': "?",
-            'down': "?"
-        })
+        abort(404)
     if up is None or down is None:
-        return jsonify({
-            'up': "?",
-            'down': "?"
-        })
+        abort(404)
     vote_res = vote_resource(uid=current_user.uid, rid=rid, upvote=up == '1')
     _ , res = get_user_and_resource_instance(-1,rid)
     if res is None:
-        return jsonify({
-            'up': "?",
-            'down': "?"
-        })
+        abort(404)
     return jsonify({
         'up': res.upvote_count,
         'down': res.downvote_count
@@ -285,7 +290,27 @@ def resourceComment():
     """
     rid = request.args.get('rid') if 'rid' in request.args else None
     if rid is None:
-        return jsonify([])
+        abort(404)
+    postType = request.args.get('type') if 'type' in request.args else None
+    if postType is not None:
+        text = request.args.get('text') if 'text' in request.args else None
+        # quit if bad data
+        if text is None:
+            abort(404)
+        if postType == 'comment':
+            res = comment_to_resource(current_user.uid,rid,text)
+            if isinstance(res, ErrorCode):
+                abort(404)
+        elif postType == 'reply':
+            cid = request.args.get('cid') if 'cid' in request.args else None
+            if cid is None:
+                abort(404)
+            res = reply_to_resource_comment(current_user.uid,cid,text)
+            if isinstance(res, ErrorCode):
+                abort(404)
+        else:
+            abort(404)
+
     # individual resource page
     _, res = get_user_and_resource_instance(uid=-1, rid=rid)
     comms = get_resource_comments(res.rid)
@@ -302,23 +327,12 @@ def resourceComment():
 
         comments.append({
             "comment" : comment.serialize,
+            "resource_comment_id" : comment.resource_comment_id,
             "replies" : rep,
             "author" :  get_user_and_resource_instance(comment.uid,-1)[0].serialize
         })
-    return jsonify(comments)
+    return jsonify(comments[::-1])
 
-@app.route('/resource/new', methods=['GET', 'POST'])
-def resource_new():
-    """The user creates a new resource
-    """
-    form = ResourceForm()
-    if form.validate_on_submit():
-        if form.files.data:
-            f = request.files[form.files.name]
-            f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename)))
-            flash("File was uploaded",'info')
-    return render_template('resource_create.html', title='New Resource',form=form)
-    # todo
 
 # -----{ PAGES.PROFILE }-------------------------------------------------------
 
@@ -432,7 +446,10 @@ def debug():
     """A debugging page
     not to be used in production
     """
-    return render_template('debug.html', title='DEBUG',variable=f"rid {4} has comments: {get_resource_comments(4)[0].comment}" )
+    error = request.args.get('error') if 'error' in request.args else None
+    if error is not None:
+        abort(int(error))
+    return render_template('debug.html', title='DEBUG',variable=f"{request.url}" )
 
 
 # -----{ ERRORS }--------------------------------------------------------------

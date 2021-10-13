@@ -51,6 +51,43 @@
             width: auto; margin: 0.25rem!important;
         }
 
+         .btn-primary {
+        background-color: #ff8fab;
+        color: white;
+        border-color: #ff8fab;
+    }
+    .btn-primary:hover {
+        color:white;
+        background-color: #3a78ef;
+    }
+
+    .btn-outline-primary {
+        background-color: rgb(255, 255, 255);
+        color:#000000;
+        border-color: white;
+    }
+
+    .btn-outline-primary:hover {
+        color:white;
+        background-color: #3a78ef;
+    }
+
+    .btn-check:checked+.btn-outline-primary {
+        color: white;
+        background-color:  #ff8fab;
+        border-color:   #ff8fab;
+    }
+    .bg-white {
+        background-color: #ffd6e1;
+    }
+    .bg-primary {
+        background-color: #ff8fab!important;
+    }
+    .btn-close {
+        width: 0.5rem;
+        height: 0.5rem;
+    }
+
     </style>
     <!-- Additional web page style sheets -->
     {% block style %}{% endblock %}
@@ -88,7 +125,7 @@
                     </div>
                 </a>
                 {% else %}
-                <a class="navbar-brand" style = "margin-right: auto!important; margin-left: auto!important;" href="{{url_for('login')}}"
+                <a class="navbar-brand" style = "margin-right: auto!important; margin-left: auto!important;" href="{{url_for('login')}}?next={{request.url}}"
                     class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
                     <div class="d-flex">
                         <p class="h5 pe-4 pt-3 text-dark"> Login </p>

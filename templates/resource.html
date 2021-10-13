@@ -26,7 +26,7 @@
         <!-- Resource -->
         <div class="col-4 p-2">
             <a class="text-dark card shadow-sm" href="{{url_for('resource')}}/<%= res.rid %>">
-                <img class="bd-placeholder-img card-img-top" src="{{url_for('static', filename='img/placeholder.png')}}" ,
+                <img class="bd-placeholder-img card-img-top" src="{{url_for('static', filename='')}}/<%= res.banner.thumbnail_link %>" ,
                     alt="Logo" , width="150" , height="150">
                 <div class="card-body">
                     <p class="card-text">
@@ -157,6 +157,11 @@
         }
     });
 
+    // Sort search
+     $(document).on("change", "#sort_order", function (e) {
+        doAJAX();
+    });
+
     // DROPDOWN
     $(function () {
 
@@ -171,6 +176,7 @@
         var search_term = $('input[name=title]').val();
         var spanFoundBoxes = document.getElementsByClassName('tagFoundSpan');
         var subject = '';
+        var sort_by_date = $("#sort_order").find(":selected").val()
         for (var i = 0; i < spanFoundBoxes.length; i++) {
             box = spanFoundBoxes[i];
             if(!box.hidden && box.className.split(/\s+/).includes('bg-subject-tag')){
@@ -193,7 +199,7 @@
             {
                 type: "GET",
                 url: "{{url_for('resourceAJAX')}}",
-                data: { "title": search_term , "subject": subject, "year": year, "tags": tags},
+                data: { "title": search_term , "subject": subject, "year": year, "tags": tags, "sort" : sort_by_date},
                 success: function (response) {
                     $("#result").empty(); // remove current results
                     var resource_card = _.template($("#resource_card").html());
@@ -252,15 +258,13 @@
             <p class="h3">Trending Resources</p>
             <div class="d-flex">
                 <p class="h3">Sort by</p>
+                <!-- dropdown for sort_by -->
                 <div class="dropdown px-3">
-                    <button class="btn btn-secondary dropdown-toggle" style="min-width: 100px;" type="button"
-                        id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                        Newest
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" href="#">Newest </a>
-                        <a class="dropdown-item" href="#">Upvotes</a>
-                    </div>
+                    <select class="btn btn-primary dropdown-toggle" style="min-width: 100px; height: 90%" id="sort_order"  name="sort_order">
+                        <option class="dropdown-item" value="newest">Created</option>
+                        <option class="dropdown-item" value="upvotes">Votes</option>
+                        <option class="dropdown-item" value="trending">Trending</option>
+                    </select>
                 </div>
             </div>
             <a href="{{url_for('resource_new')}}" class="btn btn-primary" aria-haspopup="true" aria-expanded="false">

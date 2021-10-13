@@ -413,6 +413,14 @@ class ResourceThumbnail(Base):
         return f"ResourceThumbnail table:\n" \
                f"rid = {self.rid}, thumbnail link = {self.thumbnail_link}"
 
+    @property
+    def serialize(self):
+        """Return object data in serialisable format """
+        return {
+            "rid": self.rid,
+            "thumbnail_link": self.thumbnail_link
+        }
+
 
 class ResourceVoteInfo(Base):
     """

@@ -13,10 +13,36 @@
 
 {% block script %}
 
+<script type="text/template" id="commentreply">
+    <div class="row" id="commentReply">
+        <!-- New Comment Reply -->
+        <div class="col-1" style="border-right: 1px dashed #333;">
+        </div>
+        <div class="col-1" align="center">
+            <img class="avatar" src="{{url_for('static',filename=current_user.avatar_link)}}" , alt="Profile Icon">
+        </div>
+        <div class="col">
+            <div class="row">
+                <p class="h6"><strong>{{current_user.username}}</strong></p>
+            </div>
+            <div class="row">
+                <textarea name="reply_text" class="form-control" id="reply_input" rows="4" style="background: rgb(255, 255, 255) none repeat scroll 0% 0%; height: 16px;" placeholder="Leave a comment"></textarea>
+                <div class = "d-flex justify-content-end">
+                    <input type="submit" form="comment_form" value="Post Comment" class="btn btn-primary btn-sm" style="margin-right: 1rem!important;" onclick='sendReply(<%= cid %>)'></input>
+                    <button type="Button" class="btn btn-outline-primary btn-sm" onclick='document.getElementById("reply_input").value = "";'>Clear</button>
+                    <button type="Button" class="btn btn-outline-primary btn-sm" onclick='$( "#commentReply" ).remove();'>Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
 <script type="text/template" id="comment_card">
      <% _.each(data,  function(comm) { %>
-            <div class="card-body">
-                <div class="row">
+            <!-- Resource Comment -->
+            <div class="card-body" name="comment">
+                <div class="row" style="background-color:  #eeeeee ;">
+                    <hr>
                     <div class="col-1" align="center">
                         <img class="avatar" src="{{url_for('static',filename='')}}/<%= comm.author.avatar_link %>" , alt="Profile Icon">
                     </div>
@@ -25,11 +51,22 @@
                             <p class="h6"><strong><%= comm.author.username %></strong></p>
                         </div>
                         <div class="row">
-                            <p><small> <%= comm.comment.comment %></small></p>
+                            <div class="d-flex justify-content-between">
+                                <p><small> <%= comm.comment.comment %></small></p>
+                                <div>
+                                    {% if current_user.is_authenticated %}
+                                    <button class="badge rounded-pill bg-other-tag float-end" onclick='addReply(this,<%= comm.resource_comment_id %>)'>Reply</button>
+                                    {% endif %}
+                                    <% if (comm.author.username == username) { %>
+                                        <button class="badge rounded-pill bg-year-tag float-end" onclick='this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.innerHTML = "";'>Delete</button>
+                                    <% } %>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <% _.each(comm.replies,  function(reply) { %>
+                <!-- Comment Reply -->
                 <div class="row">
                     <div class="col-1" style="border-right: 1px dashed #333;">
                     </div>
@@ -41,7 +78,14 @@
                             <p class="h6"><strong><%= reply.author.username %></strong></p>
                         </div>
                         <div class="row">
-                            <p><small><%= reply.reply.reply %></small></p>
+                            <div class="d-flex justify-content-between">
+                                <p><small><%= reply.reply.reply %></small></p>
+                                <div>
+                                    <% if (reply.author.username == username) { %>
+                                        <button class="badge rounded-pill bg-year-tag float-end" onclick='this.parentNode.parentNode.parentNode.parentNode.parentNode.innerHTML = "";'>Delete</button>
+                                    <% } %>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -72,6 +116,61 @@
             }
         )
     }
+    function addReply(node,cid){
+        if ( $( "#commentReply" ).length ) {
+            $( "#commentReply" ).remove();
+        }
+
+        var reply = _.template($("#commentreply").html());
+        $(node).parents().filter(function() {
+            return this.getAttribute("name") == "comment";
+        })[0].innerHTML += reply({ cid: cid });
+        document.getElementById("comment_input").value = "";
+        document.getElementById("commentReply").scrollIntoView();
+    }
+    function sendReply(cid){
+        $.ajax(
+            {
+                type: "GET",
+                url: "{{url_for('resourceComment')}}",
+                data: { "rid": {{rid}}, "type": "reply", "text": $('textarea[name=reply_text]').val().toLowerCase(), "cid": cid},
+                success: function (response) {
+                    updateResponse(response);
+                }
+            }
+        )
+        if ( $( "#commentReply" ).length ) {
+            $( "#commentReply" ).remove();
+        }
+    }
+    // add a comment to a resource
+    function addComment(){
+        $("#newComment").attr("hidden",true) ;
+        $.ajax(
+            {
+                type: "GET",
+                url: "{{url_for('resourceComment')}}",
+                data: { "rid": {{rid}}, "type": "comment", "text": $('textarea[name=comment_text]').val().toLowerCase()},
+                success: function (response) {
+                    updateResponse(response);
+                }
+            }
+        )
+        document.getElementById("comment_input").value = "";
+    }
+
+    // update with the response
+    function updateResponse(response){
+        console.log(response);
+        $("#result").empty(); // remove current results
+        var resource_card = _.template($("#comment_card").html());
+        $("#result").html(resource_card({ data: response, username: "{{current_user.username}}" })); // set new results
+        if (response.length == 0) {
+            $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
+        }
+    }
+
+    // get the resource comments
     function commentAJAX() {
         $.ajax(
             {
@@ -79,13 +178,7 @@
                 url: "{{url_for('resourceComment')}}",
                 data: { "rid": {{rid}}},
                 success: function (response) {
-                    console.log(response);
-                    $("#result").empty(); // remove current results
-                    var resource_card = _.template($("#comment_card").html());
-                    $("#result").html(resource_card({ data: response })); // set new results
-                    if (response.length == 0) {
-                        $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
-                    }
+                    updateResponse(response);
 
                 }
             }
@@ -193,7 +286,34 @@
     </div>
     <div class="row p-3">
         <div class="card shadow" style="border-radius: 15px">
-            <p class="h4 card-title">Comments</p>
+            <div class="d-flex justify-content-between">
+                <p class="h4 card-title">Comments</p>
+                {% if current_user.is_authenticated %}
+                <button class="badge rounded-pill bg-other-tag float-end" onclick='$("#newComment").attr("hidden",$("#newComment").is(":hidden") ? false : true) ;'>Post a comment</button>
+                {% endif %}
+            </div>
+            {% if current_user.is_authenticated %}
+            <div class="card-body" id="newComment" hidden>
+                <div class="row" style="background-color: #fcebff;">
+                    <hr>
+                    <div class="col-1" align="center">
+                        <img class="avatar" src="{{url_for('static',filename=current_user.avatar_link)}}" , alt="Profile Icon">
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <p class="h6"><strong>{{current_user.username}}</strong></p>
+                        </div>
+                        <div class="row">
+                            <textarea name="comment_text" class="form-control" id="comment_input" rows="4" style="background: rgb(255, 255, 255) none repeat scroll 0% 0%; height: 16px;" placeholder="Leave a comment"></textarea>
+                            <div class = "d-flex justify-content-end">
+                                <input type="submit" form="comment_form" value="Post Comment" class="btn btn-primary btn-sm" style="margin-right: 1rem!important;" onclick='addComment()'></input>
+                                <button type="Button" class="btn btn-outline-primary btn-sm" onclick='document.getElementById("comment_input").value = "";'>Clear</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
             <div id="result">
             </div>
         </div>

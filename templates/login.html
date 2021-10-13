@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container">
-    <form method="POST" action="{{url_for('login')}}">
+    <form method="POST" action="{{url_for('login')}}{% if request.args.get('next') %}?next={{request.args.get('next')}}{% endif %}">
         {{ form.csrf_token }}
         {{ form.email.label }} {{ form.email() }}
         {{ form.password.label }} {{ form.password() }}

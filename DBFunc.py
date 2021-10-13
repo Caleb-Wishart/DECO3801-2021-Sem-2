@@ -13,7 +13,7 @@ import sqlalchemy.exc
 from sqlalchemy import or_
 from sqlalchemy.orm import sessionmaker
 from werkzeug.security import generate_password_hash
-
+import random
 # use this in branch
 from .DBStructure import *
 # use this in main
@@ -814,7 +814,7 @@ def find_resources(title_type="like", title=None,
         :param email         : The logged in users email
             Defaults to None.
         :param sort_by         : The sort by parameter
-            Valid values are ["natural","newest","upvotes"].
+            Valid values are ["natural","newest","upvotes","trending"].
             Defaults to "natural".
     """
     # Args Checking
@@ -824,7 +824,7 @@ def find_resources(title_type="like", title=None,
         created_type = "after"
     if vote_type not in ["more", "less"]:
         vote_type = "more"
-    if sort_by not in ["Natural", "newest", "upvotes"]:
+    if sort_by not in ["Natural", "newest", "upvotes", "trending"]:
         sort_by = "natural"
     if tags is None:
         tags = []
@@ -866,7 +866,7 @@ def find_resources(title_type="like", title=None,
             if sort_by == "newest":
                 resources = resources.order_by(Resource.created_at)
             elif sort_by == "upvotes":
-                resources = resources.order_by(Resource.upvote_count)
+                resources = resources.order_by(Resource.upvote_count.desc())
 
         if user is None:
             resources = resources.filter_by(is_public=True)
@@ -877,8 +877,11 @@ def find_resources(title_type="like", title=None,
         for tag in tags:
             warnings.warn(f"Searching for tag {tag}")
             result = filter(lambda res: tag in get_resource_tags(res.rid), result)
-
-    return list(result)
+        result = list(result)
+        if sort_by == "trending":
+            # trending mode: fake a trend by shuffle
+            random.shuffle(result)
+    return result
 
 
 def find_channels(title_type="like", channel_name=None,
