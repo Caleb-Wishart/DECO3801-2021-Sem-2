@@ -192,6 +192,7 @@
     function editButtonFunc() {
         $("#editButton").attr("hidden",true) ;
         $("#saveButton").attr("hidden",false) ;
+        $("#editing").attr("hidden",false) ;
 
         $("#resTitle").attr("contenteditable",true) ;
         $("#resDesc").attr("contenteditable",true) ;
@@ -204,6 +205,7 @@
     function saveButtonFunc() {
         $("#editButton").attr("hidden",false) ;
         $("#saveButton").attr("hidden",true) ;
+        $("#editing").attr("hidden",true) ;
 
         $("#resTitle").attr("contenteditable",false) ;
         $("#resDesc").attr("contenteditable",false) ;
@@ -217,6 +219,9 @@
 
 {% block content %}
 <div class="container">
+    <div class="row p-3" id="editing" hidden>
+        <div class="d-flex justify-content-center h3 bg-warning p-1"> You are editing this page </div>
+    </div>
     <div class="row p-3">
         <!-- Resource Thumbnail -->
         <div class="col d-flex">
