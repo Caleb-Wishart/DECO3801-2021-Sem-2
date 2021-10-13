@@ -188,6 +188,29 @@
     $(document).ready(function () {
         commentAJAX();
     });
+
+    function editButtonFunc() {
+        $("#editButton").attr("hidden",true) ;
+        $("#saveButton").attr("hidden",false) ;
+
+        $("#resTitle").attr("contenteditable",true) ;
+        $("#resDesc").attr("contenteditable",true) ;
+
+        $("#resTitle").css("background-color","rgb(254, 239, 255)") ;
+        $("#resDesc").css("background-color","rgb(254, 239, 255)") ;
+        $("#abcEdit").css("background-color","rgb(254, 239, 255)") ;
+    }
+
+    function saveButtonFunc() {
+        $("#editButton").attr("hidden",false) ;
+        $("#saveButton").attr("hidden",true) ;
+
+        $("#resTitle").attr("contenteditable",false) ;
+        $("#resDesc").attr("contenteditable",false) ;
+        $("#resTitle").css("background-color",'') ;
+        $("#resDesc").css("background-color",'') ;
+        $("#abcEdit").css("background-color",'') ;
+    }
 </script>
 {% endblock %}
 
@@ -226,12 +249,24 @@
                             {{grade}}
                     </span>
                 </p>
+                {% for author in authors %}
+                    {% if (author.username == current_user.username) %}
+                    <p id="abcEdit"><strong>Edit Page: </strong>
+                        <button class="badge rounded-pill bg-other-tag" id="editButton" onclick="editButtonFunc()">
+                                Edit Page
+                        </button>
+                        <button class="badge rounded-pill bg-other-tag" id="saveButton" onclick='saveButtonFunc()' hidden>
+                                Save
+                        </button>
+                    </p>
+                    {% endif %}
+                {% endfor %}
             </div>
         </div>
     </div>
     <div class="row p-3">
         <div class="card shadow" style="border-radius: 15px">
-            <p class="h3 card-title">{{res.title}}</p>
+            <p class="h3 card-title" id="resTitle">{{res.title}}</p>
             <div class="d-flex">
                 <p><strong>Rating&nbsp;&nbsp;</strong></p>
                 <img onclick="upvote()" src="{{url_for('static', filename='img/up.png')}}" , alt="Down" , width="20" , height="20">
@@ -264,7 +299,7 @@
         <div class="card shadow" style="border-radius: 15px">
             <p class="h4 card-title">Description</p>
             <div class="card-body">
-                <p>{{res.description}}</p>
+                <p id="resDesc">{{res.description}}</p>
                 <hr class="px-3">
             </div>
             <p class="h4 card-title">Author</p>
