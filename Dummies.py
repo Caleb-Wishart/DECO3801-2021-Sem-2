@@ -113,7 +113,7 @@ for i in range(1, 10):
     name = random_person.name()
     avatar = pagan.Avatar(name, pagan.MD5)
     file_path = "avatar"
-    avatar.save(file_path, f"{i}.png")
+    avatar.save("static/" + file_path, f"{i}.png")
     file_path += f"/{i}.png"
     globals()[f"uid{i}"] = add_user(username=name, password="123456",
                                     email=random_person.email(),
@@ -312,7 +312,7 @@ for i in range(6, 11):
     avatar = pagan.Avatar(name, pagan.MD5)
     file_path = "thumbnail"
     file_name = resource_titles[i - OFFSET].replace(' ', '_') + ".png"
-    avatar.save(file_path, file_name)
+    avatar.save("static/" + file_path, file_name)
     file_path += f"/{file_name}"
     creaters = sample(users_id, k=1)
     compliment = list(set(users_id) - set(creaters))
