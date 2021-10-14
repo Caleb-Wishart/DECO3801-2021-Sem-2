@@ -170,7 +170,7 @@ src0 = add_resource(title="CS50 at Harvard - The Most Rewarding Class I Have Tak
                                 "president, who is having an animated discussion with an "
                                 "undergraduate. "
                                 " Is this a party? A film festival? No. This is CS50.",
-                    grade=Grade.TERTIARY, creaters_id=sample(users_id, k=random.randint(1, 10)))
+                    grade=Grade.TERTIARY, creaters_id=sample(users_id, k=1))
 
 """
 Embed link:
@@ -329,7 +329,7 @@ for i in range(6, 11):
     file_name = resource_titles[i - OFFSET].replace(' ', '_') + ".png"
     avatar.save(file_path, file_name)
     file_path += f"/{file_name}"
-    creaters = sample(users_id, k=random.randint(1, len(users_id)))
+    creaters = sample(users_id, k=1)
     compliment = list(set(users_id) - set(creaters))
     # creater must included in personnel
     personnel = creaters + sample(compliment, k=random.randint(0, min(3, len(compliment))))
