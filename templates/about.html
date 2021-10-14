@@ -13,7 +13,7 @@
 
 {% block content %}
 
-<div class='container mt-5 p-4 pe-5 white-round-box shadow'>
+<div class='container my-5 p-4 pe-5 white-round-box shadow'>
 
     <!-- Loops through FAQs -->
     {% for i in range(0,num) %}
@@ -22,7 +22,7 @@
                 <p class="h3">{{faqs[i][0] | safe }}</p>
             </div>
             <div class="col justify-content-start d-flex">
-                <p class="ms-4">{{ faqs[i][1] |safe }}</p>
+                <p class="ms-4">{{ faqs[i][1] | safe }}</p>
             </div>
         </div>
 
