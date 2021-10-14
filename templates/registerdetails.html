@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+    {% extends 'base.html' %}
 
 {% block style %}
 <style>
@@ -67,7 +67,7 @@
 
     .popover {
         max-width: 400px;
-        whtie-space: pre-line;
+        white-space: pre-line;
     }
 
 
@@ -109,7 +109,6 @@
 <div class="container" style="margin-bottom: 3rem!important;">
         <!-- Title Section -->
         <div class="row">
-                    <!-- If we are creating a resource  -->
                     <dt class="col-sm-9" style = "font-size: x-large; margin-top:2rem!important; margin-bottom: 2rem!important;">
                         Register Details
                     </dt>
@@ -135,13 +134,89 @@
 
                                     </div>
 
-                                
-                                    <!-- Resource file upload-->
+                                    <!-- Teaching Areas -->
                                     <div class="mb-3" style="margin: 1rem!important;">
-                                            <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">File Upload</label>
+                                        <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Subject, Year Level and Tags</label>
+                                        <!-- Help documentation-->
+                                        <label title="What year levels and subjects do you teach?&nbsp<br>&nbsp;&nbsp<br>&nbsp;
+                                                This is publicly visible"
+                                                data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html = "true">
+
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
+                                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                        <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                                            </svg>
+                                        </label>
+                                        <div class="card flex-fill" id="resourceUpload">
+                                            <!-- Subject-->
+                                            <div class="row" style="margin-top: 1rem!important;">
+                                                <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
+                                                    Select Subject:
+                                                </div>
+                                                <div class = "col-7">
+                                                                        <input class="form-control" style = "margin-top:0.5rem!important;"
+                                                list="datalistOptions" id="exampleDataList" placeholder="Search Subjects...">
+                                                                    <datalist id="datalistOptions">
+                                                                        {% for item in subject %}
+                                                                        <option value="{{item}}">
+                                                                        {% endfor %}
+                                                                    </datalist>
+                                                </div>
+                                            </div>
+                                            <!-- Year Level-->
+                                            <div class="row" style="margin-top: 1rem!important;">
+                                                <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
+                                                    Select Grade:
+                                                </div>
+                                                <div class = "col-7">
+                                                                        <input class="form-control" style = "margin-top:0.5rem!important;"
+                                                list="datalistOptions2" id="exampleDataList2" placeholder="Search Grades...">
+                                                                    <datalist id="datalistOptions2">
+                                                                        {% for item in grade %}
+                                                                        <option value="{{item}}">
+                                                                        {% endfor %}
+                                                                    </datalist>
+                                                </div>
+                                            </div>
+                                            <!-- Put the applied tags here-->
+                                            <div class = "row" style = "margin-top: 1.5rem!important; margin-bottom: 1rem!important;">
+                                                <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
+                                                    Applied Tags:
+                                                </div>
+
+                                                <div class = "col-7">
+                                                        <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;"> Applied tags go here
+                                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                        </span>
+                                                        <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
+                                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                            </span>
+                                                        <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
+                                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                        </span>
+                                                        <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
+                                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                            </span>
+                                                        <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
+                                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                        </span>
+                                                        <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
+                                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                            </span>
+
+                                                </div>
+
+                                                </div>
+
+                                        </div>
+                                    </div>
+                                
+                                    <!-- Teacher Confirmation File upload-->
+                                    <div class="mb-3" style="margin: 1rem!important;">
+                                            <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Teacher Authentication</label>
                                           <!-- Help documentation-->
-                                            <label title="Upload a single file which contains your resource in any format you want.&nbsp<br>&nbsp;&nbsp<br>&nbsp;If you wish to submit multiple
-                                                          files under a single resource, we recommend zipping together the resources and describing the files instead in the description"
+                                            <label title="Upload a single file which contains documentation that cofirms you are a teacher.&nbsp<br>&nbsp;&nbsp<br>&nbsp;If you wish to submit multiple
+                                                          files, we recommend zipping them together"
                                                    data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html = "true">
 
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
@@ -149,7 +224,6 @@
                                                          <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
                                                 </svg>
                                             </label>
-
                                           <div class="card flex-fill" id="resourceUpload">
                                               <div class="row">
                                                   <div class = "col-10">
@@ -163,109 +237,14 @@
 
                                                 </div>
                                           </div>
-                                      </div>
-
-                                    <!-- Tags-->
-                                    <div class="mb-3" style="margin: 1rem!important;">
-                                            <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Subject, Year Level and Tags</label>
-                                          <!-- Help documentation-->
-                                            <label title="Specify the target year level and subject of your resource. This helps users refine their search of resources to find ones which suit their context and needs.&nbsp<br>&nbsp;&nbsp<br>&nbsp;
+                                    </div>
 
 
-                                                          Select additional tags to further categorise your resource. If your resource is appropriate for multiple year levels or subjects,
-                                                          we recommend selecting all the appropriate tags and select the most relevant subject and year level."
-                                                   data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html = "true">
-
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
-                                                         <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                                         <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
-                                                </svg>
-                                            </label>
-                                          <div class="card flex-fill" id="resourceUpload">
-                                              <!-- Subject-->
-                                              <div class="row" style="margin-top: 1rem!important;">
-                                                    <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
-                                                        Select Subject:
-                                                    </div>
-                                                  <div class = "col-7">
-                                                                          <input class="form-control" style = "margin-top:0.5rem!important;"
-                                                   list="datalistOptions" id="exampleDataList" placeholder="Search Subjects...">
-                                                                      <datalist id="datalistOptions">
-                                                                            {% for item in subject %}
-                                                                          <option value="{{item}}">
-                                                                            {% endfor %}
-                                                                      </datalist>
-                                                  </div>
-                                              </div>
-                                              <!-- Year Level-->
-                                              <div class="row" style="margin-top: 1rem!important;">
-                                                    <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
-                                                        Select Grade:
-                                                    </div>
-                                                  <div class = "col-7">
-                                                                          <input class="form-control" style = "margin-top:0.5rem!important;"
-                                                   list="datalistOptions2" id="exampleDataList2" placeholder="Search Grades...">
-                                                                      <datalist id="datalistOptions2">
-                                                                            {% for item in grade %}
-                                                                          <option value="{{item}}">
-                                                                            {% endfor %}
-                                                                      </datalist>
-                                                  </div>
-                                              </div>
-                                              <!-- Tags-->
-                                              <div class="row" style="margin-top: 1rem!important;">
-                                                    <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
-                                                        Select Tags:
-                                                    </div>
-                                                  <div class = "col-7">
-                                                                          <input class="form-control" style = "margin-top:0.5rem!important;"
-                                                   list="datalistOptions3" id="exampleDataList3" placeholder="Search Tags...">
-                                                                      <datalist id="datalistOptions3">
-                                                                            {% for item in tag %}
-                                                                          <option value="{{item}}">
-                                                                            {% endfor %}
-                                                                      </datalist>
-                                                  </div>
-                                              </div>
-                                                <!-- Put the applied tags here-->
-                                                <div class = "row" style = "margin-top: 1.5rem!important; margin-bottom: 1rem!important;">
-                                                    <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
-                                                        Applied Tags:
-                                                    </div>
-
-                                                    <div class = "col-7">
-                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;"> Applied tags go here
-                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                                            </span>
-                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
-                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                                             </span>
-                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
-                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                                            </span>
-                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
-                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                                             </span>
-                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
-                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                                            </span>
-                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
-                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                                             </span>
-
-                                                  </div>
-
-                                                 </div>
-
-                                          </div>
-                                      </div>
 
                     </div>
                     <div class="float-end mt-2 pt-1" style="margin-top: 1rem!important;">
                         <!-- Button to Confirm details and create Account-->
-                      <button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;">Create Account</button>
-                        <!-- Button to cancel account creation-->
-                        <button type="Button" class="btn btn-outline-primary btn">Cancel</button>
+                      <button type="submit" class="btn btn-primary btn" style="margin-right: 1rem!important;">Create Account</button>
                     </div>
                  </form>
 

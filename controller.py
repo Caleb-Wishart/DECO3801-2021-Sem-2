@@ -149,12 +149,6 @@ def register_details():
     #Extra details page
     return render_template('registerdetails.html', title='Register')
 
-@app.route('/register/finalise', methods=["POST"])
-def finalise_account():
-    #do stuff
-
-    #all backend stuff on this function
-    return redirect(url_for('home'))
 
 
 @app.route('/login', methods=["GET","POST"])
