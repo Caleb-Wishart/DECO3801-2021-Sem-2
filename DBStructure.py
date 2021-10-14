@@ -377,7 +377,6 @@ class ResourceThumbnail(Base):
         return f"ResourceThumbnail table:\n" \
                f"rid = {self.rid}, thumbnail link = {self.thumbnail_link}"
 
-
 class ResourceVoteInfo(Base):
     """
     A table of vote status for user who voted on a resource
