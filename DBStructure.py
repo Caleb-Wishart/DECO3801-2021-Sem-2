@@ -2,7 +2,7 @@
 # This file is used to define all the DataBase Structures used in
 # our project.
 #
-# *******************************Note*****************************
+# *******************************Note****************************************
 # Under current config, the deletion of a row will be cascaded
 # to ALL tables that are dependent (i.e. table which uses this table's attribute
 # as foreign key) to this table. This is
@@ -19,6 +19,7 @@
 #############################################################################
 import datetime
 import enum
+import warnings
 
 from sqlalchemy import Column, ForeignKey, Integer, String, \
     Text, DateTime, Numeric, Boolean, Enum
@@ -27,7 +28,6 @@ from sqlalchemy.orm import relationship, backref
 from sqlalchemy import create_engine
 import pytz
 from flask_login import UserMixin
-
 
 # length of a standard string, use TEXT if longer than that
 STANDARD_STRING_LENGTH = 300
@@ -41,10 +41,10 @@ DBPASSWORD = "admin"
 DBDATABASE = "project"
 DBPATH = f"postgresql://{DBUSERNAME}:{DBPASSWORD}@localhost/{DBDATABASE}"
 
-
 # Option 2: Feel lazy to sign in to cli? No worries, you can play these using sqlite
 # on your local device
 # uncomment DBPATH below to overwrite the above PATH config
+# todo
 # DBPATH = "sqlite:///Doctrina.db"
 
 
@@ -135,8 +135,12 @@ def enum_to_website_output(item: enum.Enum) -> str:
     e.g. Subject.MATHS_A -> "Maths A:
 
     :param item: The enum item to convert
-    :return The human friendly string value of the enum item
+    :return The human friendly string value of the enum item. If enum is None then
+            returns "None" string
     """
+    if not item:
+        return "None"
+
     name = item.name
     if len(name) == 2:
         # Subject.IT/PE, no need to convert to lowercase
@@ -144,7 +148,7 @@ def enum_to_website_output(item: enum.Enum) -> str:
     return name.lower().replace('_', ' ', 1).title()
 
 
-def website_input_to_enum(readable_string: str, enum_class: enum.Enum):
+def website_input_to_enum(readable_string: str, enum_class: enum.EnumMeta):
     """
     Convert a human readable enum value to an appropriate enum variable.
     i.e. applicable to Subject, Grade and ChannelVisibility only
@@ -159,7 +163,7 @@ def website_input_to_enum(readable_string: str, enum_class: enum.Enum):
         return enum_class[value]
     except KeyError:
         # no such enum variable
-        print(f"value {readable_string} not found in enum class {enum_class}")
+        warnings.warn(f"value {readable_string} not found in enum class {enum_class}")
         return None
 
 
@@ -167,7 +171,8 @@ def dump_datetime(value):
     """Deserialize datetime object into string form for JSON processing."""
     if value is None:
         return None
-    return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")]
+    return value.astimezone(
+        pytz.timezone("Australia/Brisbane")).strftime("%d/%m/%Y, %H:%M:%S")
 
 
 Base = declarative_base()
@@ -252,23 +257,6 @@ class User(Base):
             "email" : self.email,
             "bio" : self.bio
         }
-
-
-class UserSession(Base):
-    """
-    A concept of a user login session
-    """
-    __tablename__ = "user_session"
-
-    # user id
-    uid = Column(Integer, ForeignKey("user.uid"), primary_key=True)
-
-    # last action request time
-    last_action_time = Column(DateTime(timezone=True), default=datetime.datetime.now(
-        tz=pytz.timezone("Australia/Brisbane")), nullable=False)
-
-    user = relationship("User", foreign_keys=[uid],
-                        backref=backref("user_session", cascade="all, delete"))
 
 
 class UserTeachingAreas(Base):
@@ -422,7 +410,6 @@ class ResourceThumbnail(Base):
             "thumbnail_link": self.thumbnail_link
         }
 
-
 class ResourceVoteInfo(Base):
     """
     A table of vote status for user who voted on a resource
@@ -481,14 +468,14 @@ class ResourceComment(Base):
     resource_comment_id = Column(Integer, primary_key=True, autoincrement=True)
 
     # commenter id
-    uid = Column(Integer, ForeignKey("user.uid"))
+    uid = Column(Integer, ForeignKey("user.uid"), nullable=False)
 
     # comment created time
     created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
         tz=pytz.timezone("Australia/Brisbane")), nullable=False)
 
     # resource to be commented
-    rid = Column(Integer, ForeignKey("resource.rid"))
+    rid = Column(Integer, ForeignKey("resource.rid"), nullable=False)
 
     # comment text
     comment = Column(Text, nullable=False)
@@ -637,6 +624,9 @@ class Channel(Base):
     # channel id
     cid = Column(Integer, primary_key=True, autoincrement=True)
 
+    created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
+        tz=pytz.timezone("Australia/Brisbane")), nullable=False)
+
     # subject of this channel - optional
     subject = Column("subject", Enum(Subject), nullable=True, default=None)
 
@@ -651,10 +641,13 @@ class Channel(Base):
     name = Column(String(STANDARD_STRING_LENGTH), nullable=False, unique=True)
 
     # channel admin id
-    admin_uid = Column(Integer, ForeignKey("user.uid"))
+    admin_uid = Column(Integer, ForeignKey("user.uid"), nullable=False)
 
     # description of the channel
     description = Column(Text, nullable=True)
+
+    # link to avatar of the channel
+    avatar_link = Column(Text, nullable=False)
 
     admin = relationship("User", foreign_keys=[admin_uid],
                          backref=backref("channel", cascade="all, delete"))
@@ -662,13 +655,30 @@ class Channel(Base):
     def __str__(self):
         text = f"Channel table:\n" \
                f"channel name = {self.name}, admin id = {self.admin_uid},\n" \
-               f"cid = {self.cid}, " \
+               f"cid = {self.cid}, avatar_link = {self.avatar_link}, "\
                f"visibility = {self.visibility.name}, "
         if self.subject:
             text += f"subject={self.subject.name}, "
         if self.grade:
             text += f"grade={self.grade.name},"
         return text + "\n" + f"description = {self.description}"
+
+    @property
+    def serialize(self):
+        """
+        Return Channel object data in serializable format
+        """
+        return {
+            "cid": self.cid,
+            "subject": enum_to_website_output(self.subject),
+            "grade": enum_to_website_output(self.grade),
+            "visibility": enum_to_website_output(self.visibility),
+            "name": self.name,
+            "admin_uid": self.admin_uid,
+            "description": self.description,
+            'created_at': dump_datetime(self.created_at),
+            "avatar_link": self.avatar_link
+        }
 
 
 class ChannelPersonnel(Base):
@@ -725,10 +735,10 @@ class ChannelPost(Base):
     post_id = Column(Integer, primary_key=True, autoincrement=True)
 
     # creater of the post
-    uid = Column(Integer, ForeignKey("user.uid"))
+    uid = Column(Integer, ForeignKey("user.uid"), nullable=False)
 
     # the channel this thread belongs to
-    cid = Column(Integer, ForeignKey("channel.cid"))
+    cid = Column(Integer, ForeignKey("channel.cid"), nullable=False)
 
     # the title of the post
     title = Column(String(STANDARD_STRING_LENGTH), nullable=False)
@@ -737,7 +747,7 @@ class ChannelPost(Base):
     upvote_count = Column(Integer, default=0, nullable=False, autoincrement=False)
     downvote_count = Column(Integer, default=0, nullable=False, autoincrement=False)
 
-    # thread initial reply
+    # channel post initial reply
     init_text = Column(Text, nullable=False)
 
     created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
@@ -753,6 +763,22 @@ class ChannelPost(Base):
                f"#upvote = {self.upvote_count}, #downvote = {self.downvote_count},\n" \
                f"created at = {self.created_at}\n" \
                f"init_text = {self.init_text}"
+
+    @property
+    def serialize(self):
+        """
+        Return ChannelPost object data in serializable format
+        """
+        return {
+            "post_id": self.post_id,
+            "uid": self.uid,
+            "cid": self.cid,
+            "title": self.title,
+            "upvote_count": self.upvote_count,
+            "downvote_count": self.downvote_count,
+            'init_text': self.init_text,
+            "created_at": dump_datetime(self.created_at)
+        }
 
 
 class ChannelPostVoteInfo(Base):
@@ -790,14 +816,14 @@ class PostComment(Base):
     post_comment_id = Column(Integer, primary_key=True, autoincrement=True)
 
     # post to be commented
-    post_id = Column(Integer, ForeignKey("channel_post.post_id"))
+    post_id = Column(Integer, ForeignKey("channel_post.post_id"), nullable=False)
 
     # datetime when created
     created_at = Column(DateTime(timezone=True), default=datetime.datetime.now(
         tz=pytz.timezone("Australia/Brisbane")), nullable=False)
 
     # commenter id
-    uid = Column(Integer, ForeignKey("user.uid"))
+    uid = Column(Integer, ForeignKey("user.uid"), nullable=False)
 
     # comment content
     text = Column(Text, nullable=False)
@@ -817,6 +843,21 @@ class PostComment(Base):
                f"created_at = {self.created_at},\n" \
                f"text = {self.text}\n," \
                f"#upvote = {self.upvote_count}, #downvote = {self.downvote_count}"
+
+    @property
+    def serialize(self):
+        """
+        Return PostComment object data in serializable format
+        """
+        return {
+            "post_comment_id": self.post_comment_id,
+            "post_id": self.post_id,
+            "created_at": dump_datetime(self.created_at),
+            "uid": self.uid,
+            "upvote_count": self.upvote_count,
+            "downvote_count": self.downvote_count,
+            "text": self.text
+        }
 
 
 class PostCommentVoteInfo(Base):
