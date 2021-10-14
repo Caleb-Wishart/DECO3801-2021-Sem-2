@@ -403,8 +403,16 @@ def settings():
 
 @app.route('/about')
 def about():
-    """A brief page describing what the website is about"""
-    return render_template('about.html', title='About Us', name="About Us")
+    """A brief page descibing what the website is about"""
+    #FAQs can contain html code to run on page
+    faqs = [
+        ["How do I save this page","Saving has been a super useful mechanic in many different areas of software for years. It is most commonly done by using the shortcut <kbd>Ctrl + S</kbd>, and our page is no exception."],
+        ["Can you talk like a computer?","Yeah Sure <br> <samp> Beep Boop Beep Beep Boop </samp>"],
+        ["What is Lorem Ipsum?","Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."],
+        ["Can I type maths?", "Yes, yes you can. You can find <var>x</var> as much as you like."],
+        ["Can I do my own HTML markup?", "Only in some <code>&lt;input&gt;</code> areas"]
+    ]
+    return render_template('about.html', title='About Us', name="About Us", faqs=faqs, num=len(faqs))
 
 # -----{ PAGES.CHANNELS }-------------------------------------------------------
 

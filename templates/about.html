@@ -1,8 +1,33 @@
 {% extends 'base.html' %}
 
+{% block style %}
+<style>
+    .white-round-box {
+        background-color: #FFFFFF;
+        border-color: #DDDDDD;
+        border-width: 1px;
+        border-radius: 1em;
+    };
+</style>
+{% endblock %}
+
 {% block content %}
-    <p>This is a page about us</p>
-    {% for i in range(300) %}
-        <p>{{i}}</p>
+
+<div class='container mt-5 p-4 pe-5 white-round-box shadow'>
+
+    <!-- Loops through FAQs -->
+    {% for i in range(0,num) %}
+        <div class="row row-cols-1 p-3">
+            <div class="col justify-content-start d-flex">
+                <p class="h3">{{faqs[i][0] | safe }}</p>
+            </div>
+            <div class="col justify-content-start d-flex">
+                <p class="ms-4">{{ faqs[i][1] |safe }}</p>
+            </div>
+        </div>
+
     {% endfor %}
+    
+
+</div>
 {% endblock %}

@@ -99,7 +99,7 @@ def get_random_teaching_areas() -> dict:
 # test user 1
 teaching_areas = {Subject.MATHS_A: [True], Subject.CHEMISTRY: [True], Subject.ENGLISH: [True]}
 uid0 = add_user(username="Ashley Gibbons", password="123456", email="a.gibbsons@uq.edu.au",
-                avatar_link="static/avatar/ashley_gibbons.png",
+                avatar_link="avatar/ashley_gibbons.png",
                 bio="Hi! My name is Ashley and I love children! "
                     "Especially teaching them! I have worked at Somerset College for"
                     " 4 years and honestly I wanna leave. But I am stuck while I pay for"
@@ -111,7 +111,7 @@ uid0 = add_user(username="Ashley Gibbons", password="123456", email="a.gibbsons@
 for i in range(1, 10):
     name = random_person.name()
     avatar = pagan.Avatar(name, pagan.MD5)
-    file_path = "static/avatar"
+    file_path = "avatar"
     avatar.save(file_path, f"{i}.png")
     file_path += f"/{i}.png"
     globals()[f"uid{i}"] = add_user(username=name, password="123456",
@@ -126,20 +126,20 @@ users_id = [e for e in range(1, 11)]
 
 # add tag
 add_tag("CS")
-add_tag("Math Tutorial")
-add_tag("Drama activities")
-add_tag("Math practice sheet")
-add_tag("1-min tutorial")
+add_tag("Math_Tutorial")
+add_tag("Drama_activities")
+add_tag("Math_practice_sheet")
+add_tag("1_min_tutorial")
 add_tag("brainstorming")
-add_tag('distance teaching')
-add_tag("metric math")
+add_tag('distance_teaching')
+add_tag("metric_math")
 
 # used to test unique violation rollback
 # with Session() as conn:
 #     for i in conn.query(Tag).all():
 #         print(i.tag_name)
 # # trigger unique constraint
-# add_tag("metric math")
+# add_tag("metric_math")
 # with Session() as conn:
 #     for i in conn.query(Tag).all():
 #         print(i.tag_name)
@@ -152,7 +152,7 @@ print("\n")
 # single pdf file
 src0 = add_resource(title="CS50 at Harvard - The Most Rewarding Class I Have Taken"
                           " . . . Ever!",
-                    resource_link="static/resource/CS50_at_Harvard_The_Most_Rewarding"
+                    resource_link="resource/CS50_at_Harvard_The_Most_Rewarding"
                                   "_Class_I_Have_Taken_Ever.pdf",
                     difficulty=ResourceDifficulty.EASY, subject=Subject.IT,
                     tags_id=[tags["CS"], tags["brainstorming"]],
@@ -183,8 +183,8 @@ src1 = add_resource(title="Grade 2 Math 1.1, Understanding Addition",
                     resource_link="https://www.youtube.com/embed/kztICk78ZcE",
                     difficulty=ResourceDifficulty.MODERATE,
                     grade=Grade.YEAR_2,
-                    creaters_id=sample(users_id, k=1),
-                    tags_id=[tags["Math Tutorial"], tags["1-min tutorial"]],
+                    creaters_id=sample(users_id, k=random.randint(1, len(users_id))),
+                    tags_id=[tags["Math_Tutorial"], tags["1_min_tutorial"]],
                     subject=Subject.MATHS_A,
                     description="How to do basic addition and the parts of"
                                 " an addition sentence. Using counters to add. Page"
@@ -193,7 +193,7 @@ src1 = add_resource(title="Grade 2 Math 1.1, Understanding Addition",
 """
 Embed link:
 <iframe width="560" height="315" src="https://www.youtube.com/embed/efnA7byI8sg"
- title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; 
+ title="YouTube video player" frameborder="0" allow="accelerometer; autoplay;
  clipboard-write; encrypted-media; gyroscope; picture-in-picture"
   allowfullscreen></iframe>
 """
@@ -201,8 +201,8 @@ src2 = add_resource(title="3rd Grade Math 8.6, Relate Fractions and Whole Number
                     resource_link="https://www.youtube.com/embed/efnA7byI8sg",
                     difficulty=ResourceDifficulty.SPECIALIST,
                     grade=Grade.YEAR_3,
-                    creaters_id=sample(users_id, k=1),
-                    tags_id=[tags["Math Tutorial"]],
+                    creaters_id=sample(users_id, k=random.randint(1, 10)),
+                    tags_id=[tags["Math_Tutorial"]],
                     subject=Subject.MATHS_B,
                     description="A fraction can represent an amount less than one"
                                 " whole, one whole, or more than one whole. When a "
@@ -220,8 +220,8 @@ Embed link:
 src3 = add_resource(title="Drama Lesson Activities, Grade 4-6: Creative Play",
                     resource_link="https://www.youtube.com/embed/u8VEuS-32JM",
                     difficulty=ResourceDifficulty.EASY,
-                    creaters_id=sample(users_id, k=1),
-                    tags_id=[tags["Drama activities"]], grade=Grade.YEAR_6,
+                    creaters_id=sample(users_id, k=random.randint(1, 10)),
+                    tags_id=[tags["Drama_activities"]], grade=Grade.YEAR_6,
                     subject=Subject.DRAMA,
                     description="A variety of creative drama games are explored. These games"
                                 " teach basic skills such as problem solving, communication,"
@@ -232,25 +232,25 @@ src3 = add_resource(title="Drama Lesson Activities, Grade 4-6: Creative Play",
 
 # compressed file of multiple pdfs
 src4 = add_resource(title="Grade 12 QLD Math C U10 worksheet",
-                    resource_link="static/resource/MQC-12.zip",
+                    resource_link="resource/MQC-12.zip",
                     difficulty=ResourceDifficulty.SPECIALIST,
-                    creaters_id=sample(users_id, k=1),
-                    tags_id=[tags["Math practice sheet"]],
+                    creaters_id=sample(users_id, k=random.randint(1, 10)),
+                    tags_id=[tags["Math_practice_sheet"]],
                     grade=Grade.YEAR_12, subject=Subject.MATHS_C,
                     description="Some worksheets directly copied from MCQ website.")
 
 """
 Embed link:
 <iframe width="560" height="315" src="https://www.youtube.com/embed/1IbkUY9vZcU"
- title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; 
+ title="YouTube video player" frameborder="0" allow="accelerometer; autoplay;
  clipboard-write; encrypted-media; gyroscope; picture-in-picture"
   allowfullscreen></iframe>
 """
 src5 = add_resource(title="4th Grade Math Input-Output Tables",
                     resource_link="https://www.youtube.com/embed/1IbkUY9vZcU",
                     difficulty=ResourceDifficulty.EASY,
-                    creaters_id=sample(users_id, k=1),
-                    tags_id=[tags["Math Tutorial"]],
+                    creaters_id=sample(users_id, k=random.randint(1, 10)),
+                    tags_id=[tags["Math_Tutorial"]],
                     grade=Grade.YEAR_4, subject=Subject.MATHS_A,
                     description="Learn how to find unknown quantities in the "
                                 "position or value of numbers as they relate to rule"
@@ -283,7 +283,7 @@ resource_links = ["Learn_Chinese_for_Beginners_Beginner_Chinese_Lesson_1_Self-"
                   "Grade_12_Calculus_An_Introduction_to_Calculus_and_Overview_"
                   "of_Key_Concepts_NSC_DBE_Maths_NTE.mp4",
                   "Algebra.Factorization.Factoring_Quadratic_Expressions_-_(B).US.pdf"]
-resource_links = ["static/resource/" + e for e in resource_links]
+resource_links = ["resource/" + e for e in resource_links]
 grades = [Grade.TERTIARY, Grade.YEAR_12, Grade.YEAR_12, Grade.YEAR_12, Grade.YEAR_12]
 subjects = [Subject.CHINESE, Subject.MATHS_C, Subject.MATHS_C, Subject.MATHS_C,
             Subject.MATHS_C]
@@ -315,17 +315,17 @@ descriptions = ["Learn Chinese w/ ChineseFor.Us Beginner Chinese Lesson 1: Self-
                 "\n●The Calculus of motion",
                 "Factor the following quadratic expressions."]
 
-resource_tags = [[tags["1-min tutorial"], tags['distance teaching']],
-                 [tags["Math practice sheet"], tags["brainstorming"]],
-                 [tags["Math Tutorial"]],
-                 [tags["Math Tutorial"], tags["metric math"]],
-                 [tags["Math practice sheet"]]]
+resource_tags = [[tags["1_min_tutorial"], tags['distance_teaching']],
+                 [tags["Math_practice_sheet"], tags["brainstorming"]],
+                 [tags["Math_Tutorial"]],
+                 [tags["Math_Tutorial"], tags["metric_math"]],
+                 [tags["Math_practice_sheet"]]]
 
 OFFSET = 6
 for i in range(6, 11):
     name = random_person.name()
     avatar = pagan.Avatar(name, pagan.MD5)
-    file_path = "static/thumbnail"
+    file_path = "thumbnail"
     file_name = resource_titles[i - OFFSET].replace(' ', '_') + ".png"
     avatar.save(file_path, file_name)
     file_path += f"/{file_name}"
