@@ -32,24 +32,14 @@
 
     <body>
         <script type = "text/javascript">
-            $(document).ready(function () {
-                //
-                var unsaved = false;
+            $(window).on('beforeunload', function(){
+                return "Any changes will be lost";
+            });
 
-                    $(":input").change(function(){ //triggers change in all input fields including text type
-                        unsaved = true;
-                    });
-                    $('#submit').on("submit", function() {
-                        unsaved = false;
-                    });
-
-                    function unloadPage(){
-                        if(unsaved){
-                            return "You have unsaved changes on this page. Do you want to leave this page and discard your changes or stay on this page?";
-                        }
-                    }
-
-                    window.onbeforeunload = unloadPage;
+            // Form Submit
+            $(document).on("submit", "form", function(event){
+                // disable unload warning
+                $(window).off('beforeunload');
             });
         </script>
     </body>
