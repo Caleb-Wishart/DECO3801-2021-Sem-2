@@ -22,12 +22,18 @@
 
 {% block content %}
     <!-- Handles making the user confirm they want to leave this page as all unsaved changes will be lost-->
-    <body onbeforeunload = "return leavePageFunction()">
-        <script>
-            function leavePageFunction() {
-                return "Testing something"
-            }
-        </script>
+    <body>
+    <script type="text/javascript">
+        $(window).on('beforeunload', function(){
+            return "Are you sure you want to leave? Any changes will not be saved"
+        });
+        $(document).ready(function() {
+           $("Submitting").on("submit", function(e) {
+               $(window).off("beforeunload");
+               return true;
+           });
+        });
+    </script>
 
     </body>
 
@@ -315,7 +321,7 @@
                     <div class="float-end mt-2 pt-1" style="margin-top: 1rem!important;">
                          <!-- IF WE ARE CREATING A RESOURCE, USE THE FOLLOWING BUTTONS-->
                         <!-- Button to upload the post-->
-                      <button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;">Upload Resource</button>
+                      <button type="submit" class="btn btn-primary btn" style="margin-right: 1rem!important;">Upload Resource</button>
                         <!-- Button to clear the title and body of the post-->
                         <button type="Button" class="btn btn-outline-primary btn">Discard Draft</button>
                          <!-- IF WE ARE CREATING EDITTING A RESOURCE, USE THE FOLLOWING BUTTONS-->
