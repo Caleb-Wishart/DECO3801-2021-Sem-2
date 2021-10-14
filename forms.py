@@ -17,9 +17,10 @@ class RegisterForm(FlaskForm):
 
 class ResourceForm(FlaskForm):
     """Form class for user new resource."""
-    title =TextField('title', validators=[DataRequired()])
+    title =TextAreaField('title', validators=[DataRequired()])
     description =TextAreaField('description', validators=[DataRequired()])
     files = FileField('File', validators=[DataRequired()])
+    thumbnail = FileField('File', validators=[DataRequired()])
     # thumbnail
     # tags field
     # privacy

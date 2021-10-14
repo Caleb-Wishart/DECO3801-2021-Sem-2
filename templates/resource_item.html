@@ -246,12 +246,12 @@
                 <br> #}
                 <p><strong>Subject: </strong>
                     <span class="badge rounded-pill bg-subject-tag">
-                            {{subject}}
+                            {{enum_to_website_output(subject)}}
                     </span>
                 </p>
                 <p><strong>Year Level: </strong>
                     <span class="badge rounded-pill bg-year-tag">
-                            {{grade}}
+                            {{enum_to_website_output(grade)}}
                     </span>
                 </p>
                 {% for author in authors %}
@@ -314,7 +314,7 @@
             <p><strong>Tags:&nbsp;&nbsp;</strong>
                 {% for tag in resource_tags %}
                 <span class="badge rounded-pill bg-other-tag">
-                    {{tag}}
+                    {{enum_to_website_output(tag)}}
                 </span>
                 {% endfor %}
                 {% if resource_tags | length == 0 %}

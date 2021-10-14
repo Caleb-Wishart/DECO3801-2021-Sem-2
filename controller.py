@@ -224,16 +224,46 @@ def resource(rid=None):
     }
     return render_template("resource_item.html", **kwargs)
 
+
 @app.route('/resource/new', methods=['GET', 'POST'])
+@login_required
 def resource_new():
     """The user creates a new resource
     """
     form = ResourceForm()
     if form.validate_on_submit():
-        if form.files.data:
-            f = request.files[form.files.name]
-            f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename)))
-            flash("File was uploaded",'info')
+        title = form.time.data
+        resource_link = form.file.name
+        resource_file = request.files[form.file.name]
+        difficulty = ResourceDifficulty.EASY
+        try:
+            subject = Subject[request.form.get('subject').replace(' ','_').upper()]
+        except KeyError:
+            subject = None
+        try:
+            grade = Grade[request.form.get('grades').replace(' ','_')..upper()]
+        except KeyError:
+            grade = None
+        creaters_id = current_user.uid
+        # is_public
+        # private_personnel_id
+        # tags_id = [get_tags()[t] for t in request.form.get('grades')]
+        description = form.description.data
+        resource_thumbnail_links = request.files[form.thumbnail.name]
+        resource_thumbnail_file = request.files[form.file.name]
+        warnings.warn(title)
+        warnings.warn(resource_link)
+        warnings.warn(resource_file)
+        warnings.warn(difficulty)
+        warnings.warn(subject)
+        warnings.warn(grade)
+        warnings.warn(creaters_id)
+        warnings.warn(resource_thumbnail_file)
+
+        # if form.files.data:
+        #     f = request.files[form.files.name]
+        #     f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename)))
+        #     flash("File was uploaded",'info')
     return render_template('resource_create.html', title='New Resource',form=form)
     # todo
 
@@ -472,8 +502,10 @@ def handle_exception(e):
 @app.context_processor
 def subject_processor():
     def enum_to_website_output(item: str) -> str:
-        return item.replace('_', ' ', 1).title()
+        return item.replace('_', ' ').title()
     return dict(enum_to_website_output=enum_to_website_output)
+
+
 
 @app.context_processor
 def defaults():
@@ -489,4 +521,4 @@ def defaults():
     return dict(current_user=current_user,
                 subjects=[e.name.lower() for e in Subject],
                 grades=[e.name.lower() for e in Grade],
-                tags=[e.replace(' ','_').replace('-','_') for e in get_tags().keys()])
+                tags=[e.replace(' ','_') for e in get_tags().keys()])

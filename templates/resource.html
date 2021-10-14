@@ -43,15 +43,15 @@
                         <img src="{{url_for('static', filename='img/down.png')}}" , alt="Down" , width="20" , height="20">
                     </div>
                     <div class="row">
-                        <span class="badge rounded-pill bg-year-tag">
-                            <%= res.grade %>
+                        <span class="badge rounded-pill bg-year-tag" style="text-transform: capitalize;">
+                            <%= res.grade.replace(/_/g, ' ') %>
                         </span>
-                        <span class="badge rounded-pill bg-subject-tag">
-                            <%= res.subject %>
+                        <span class="badge rounded-pill bg-subject-tag" style="text-transform: capitalize;">
+                            <%= res.subject.replace(/_/g, ' ') %>
                         </span>
                         <% _.each(res.tags,  function(tag) { %>
-                        <span class="badge rounded-pill bg-other-tag">
-                            <%= tag %>
+                        <span class="badge rounded-pill bg-other-tag" style="text-transform: capitalize;">
+                            <%= tag.replace(/_/g, ' ') %>
                         </span>
                          <% }); %>
                     </div>
@@ -290,7 +290,7 @@
                         <span class="badge rounded-pill bg-subject-tag tagSearchSpan" title="{{item}}_search" hidden>
                             <input type="checkbox" hidden id="{{item}}_input" name="{{item}}" value="{{item}}"
                                 onchange="tagChecked(this)">
-                            <label for="{{item}}_input" id="{{item}}_label">{{item}}</label>
+                            <label for="{{item}}_input" id="{{item}}_label">{{enum_to_website_output(item)}}</label>
                         </span>
                         {% endfor %}
                     <p class="h6" style="margin-top: 1rem!important; margin-bottom: 0.5rem!important;">Grade</p>
@@ -298,7 +298,7 @@
                         <span class="badge rounded-pill bg-year-tag tagSearchSpan" title="{{item}}_search" hidden>
                             <input type="checkbox" hidden id="{{item}}_input" name="{{item}}" value="{{item}}"
                                 onchange="tagChecked(this)">
-                            <label for="{{item}}_input" id="{{item}}_label">{{item}}</label>
+                            <label for="{{item}}_input" id="{{item}}_label">{{enum_to_website_output(item)}}</label>
                         </span>
                         {% endfor %}
                     <p class="h6" style="margin-top: 1rem!important; margin-bottom: 0.5rem!important;">Tags</p>
@@ -306,7 +306,7 @@
                         <span class="badge rounded-pill bg-other-tag tagSearchSpan" title="{{item}}_search" hidden>
                             <input type="checkbox" hidden id="{{item}}_input" name="{{item}}" value="{{item}}"
                                 onchange="tagChecked(this)">
-                            <label for="{{item}}_input" id="{{item}}_label">{{item}}</label>
+                            <label for="{{item}}_input" id="{{item}}_label">{{enum_to_website_output(item)}}</label>
                         </span>
                         {% endfor %}
                     <hr>
@@ -318,21 +318,21 @@
                         <span class="badge rounded-pill bg-subject-tag tagFoundSpan" title="{{item}}_selected" hidden>
                             <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
                                 onchange="tagCheckedSelected(this)">
-                            <label for="{{item}}_input____s" id="{{item}}_label____s">{{item}}</label>
+                            <label for="{{item}}_input____s" id="{{item}}_label____s">{{enum_to_website_output(item)}}</label>
                         </span>
                         {% endfor %}
                         {% for item in grades %}
                         <span class="badge rounded-pill bg-year-tag tagFoundSpan" title="{{item}}_selected" hidden>
                             <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
                                 onchange="tagCheckedSelected(this)">
-                            <label for="{{item}}_input____s" id="{{item}}_label____s">{{item}}</label>
+                            <label for="{{item}}_input____s" id="{{item}}_label____s">{{enum_to_website_output(item)}}</label>
                         </span>
                         {% endfor %}
                         {% for item in tags %}
                         <span class="badge rounded-pill bg-other-tag tagFoundSpan" title="{{item}}_selected" hidden>
                             <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
                                 onchange="tagCheckedSelected(this)">
-                            <label for="{{item}}_input____s" id="{{item}}_label____s">{{item}}</label>
+                            <label for="{{item}}_input____s" id="{{item}}_label____s">{{enum_to_website_output(item)}}</label>
                         </span>
                         {% endfor %}
                     </div>

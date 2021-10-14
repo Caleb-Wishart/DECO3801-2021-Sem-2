@@ -399,6 +399,7 @@ def get_tags() -> dict:
 
         for i in tags:
             out[i.tag_name] = i.tag_id
+        out[''] = None
     return out
 
 
