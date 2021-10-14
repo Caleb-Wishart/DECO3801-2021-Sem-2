@@ -16,7 +16,7 @@ import random
 # use this in branch
 # from .DBStructure import *
 # use this in main
-# from DBStructure import *
+from DBStructure import *
 
 # define if you want method output messages for debugging
 VERBOSE = False
@@ -357,7 +357,6 @@ def get_tags(mapping="name2id") -> dict:
                 out[i.tag_name] = i.tag_id
             else:
                 out[i.tag_id] = i.tag_name
-        out[''] = None
     return out
 
 

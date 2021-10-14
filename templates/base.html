@@ -31,8 +31,13 @@
             /* Adds a Hex honeycomb background */
             /* background-image: url({{url_for('static', filename='img/hex_back.png')}}),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
             background-color: #FFFFFF;
-            background-image: radial-gradient(rgb(254, 239, 255), rgb(246, 244, 255), rgb(254, 239, 255));
+            background-image: radial-gradient(rgb(255, 255, 255), rgb(255, 255, 255), rgb(255, 255, 255));
             background-color: rgb(254, 239, 255);
+
+
+            {#background-color: #FFFFFF;
+            background-image: radial-gradient(rgb(254, 239, 255), rgb(246, 244, 255), rgb(254, 239, 255));
+            background-color: rgb(254, 239, 255);#}
         }
 
 
@@ -89,6 +94,99 @@
       }
     </style>
     <!-- Additional web page style sheets -->
+<style>
+    a:link {
+        text-decoration: none;
+    }
+
+    a:visited {
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: none;
+    }
+
+    a:active {
+        text-decoration: none;
+    }
+
+
+        body {
+            /* Adds a Hex honeycomb background */
+            /* background-image: url(
+        {{url_for('static', filename='img/hex_back.png')}} ),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
+            background-color: #ffe5ec;
+            background-image: radial-gradient(rgb(255, 242, 245), rgb(255, 242, 245), rgb(255, 242, 245));
+
+     {#       background-color: #ffffff;
+            background-image: radial-gradient(rgb(255, 255, 255), rgb(255, 255, 255), rgb(255, 255, 255));#}
+            {# background-image: radial-gradient(rgb(255, 229, 236), rgb(255, 229, 236),rgb(255, 229, 236)); #}
+        {#background-color: rgb(245, 245, 255);#}
+        }
+    .btn-primary {
+        background-color: #ff8fab;
+        color: white;
+        border-color: #ff8fab;
+
+       {# background-color: #1b8823;
+        color: white;
+        border-color: #1b8823;#}
+    }
+    .btn-primary:hover {
+        color:white;
+        background-color: #3a78ef;
+    }
+
+    .btn-outline-primary {
+        background-color: rgb(255, 255, 255);
+        color:#000000;
+        border-color: white;
+    }
+
+    .btn-outline-primary:hover {
+        color:white;
+        background-color: #3a78ef;
+    }
+
+    .btn-check:checked+.btn-outline-primary {
+        color: white;
+        background-color:  #ff8fab;
+        border-color:   #ff8fab;
+
+        {#background-color: #1b8823;
+        color: white;
+        border-color: #1b8823;#}
+    }
+    .bg-white {
+        background-color: #ffd6e1;
+        {#background-color: #1b8823;#}
+    }
+    .bg-primary {
+        background-color: #ff8fab!important;
+        {#background-color: #1b8823 !important;#}
+
+    }
+    .btn-close {
+        width: 0.5rem;
+        height: 0.5rem;
+    }
+    a {
+        color: #000000;
+    }
+    .popover {
+        max-width: 400px;
+        whtie-space: pre-line;
+    }
+    .avatar {
+        vertical-align: middle;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+    }
+
+
+</style>
     {% block style %}{% endblock %}
     <!-- Additional web page JS -->
     {% block script %}{% endblock %}
@@ -96,7 +194,7 @@
 
 <body>
     <!-- Nav Bar -->
-    <header class="p-1 bg-light text-dark sticky-top" style = "padding: 0.8rem!important" >
+    <header class="shadow bg-light text-dark sticky-top" style = "padding: 0.8rem!important" >
         <div class="container-fluid">
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                 <!-- Logo -->
@@ -108,7 +206,7 @@
                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0" style = "margin-right: auto!important; margin-left: auto!important">
                     <li><a href="{{url_for('resource')}}" class="h4 nav-link px-4 pt-3 text-dark" style = "padding-left: 7rem!important; padding-right: 7rem!important;
                     margin-left: auto; margin-right: auto; font-size: 1.2rem">Resources</a></li>
-                    <li><a href="{{url_for('channel')}}" class="h4 nav-link px-4 pt-3 text-dark" style = "padding-left: 7rem!important; padding-right: 7rem!important;
+                    <li><a href="{{url_for('view_channel')}}" class="h4 nav-link px-4 pt-3 text-dark" style = "padding-left: 7rem!important; padding-right: 7rem!important;
                     margin-left: auto; margin-right: auto; font-size: 1.2rem">Channels</a></li>
                     <li><a href="{{url_for('about')}}" class="h4 nav-link px-4 pt-3 text-dark" style = "padding-left: 7rem!important; padding-right: 7rem!important;
                     margin-left: auto; margin-right: auto; font-size: 1.2rem">Contact Us</a></li>

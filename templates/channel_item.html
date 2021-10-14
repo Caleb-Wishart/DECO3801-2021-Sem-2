@@ -1,4 +1,4 @@
-{% extends 'base_old.html' %}
+{% extends 'base.html' %}
 
 {% block style %}
 <style>
@@ -78,7 +78,6 @@
     <% _.each(data,  function(res) { %>
     <!-- Singular Card which represents a post -->
     <div class="card shadow-sm" style="margin: 0.8rem; margin-bottom: 0rem!important;">
-{#            href="{{ url_for('view_channel_post', cid=channel.cid, post_id=post_id)}}"#}
         <!-- primitive way to redirect to view_channel_post -->
         <a class="row"  href="/channel/{{ channel.cid }}/post/<%=res.post_id%>">
             <!-- Profile Picture of Author -->
@@ -164,7 +163,6 @@
 
     });
 
-
     // AJAX
     var search_term = ""
     var sort_algo = "newest"
@@ -242,7 +240,7 @@
 
 {% block content %}
 <!-- Banner -->
-      <div class="shadow row-fluid" style = "padding: 0rem!important; background-color: #FFFFFF">
+      <div class="card row-fluid" style = "padding: 0rem!important; background-color: #FFFFFF">
          <div class = "container" style="padding-top: 0.25rem!important;">
             <div class="row p-2 bg-white rounded" style = "padding-bottom: 0rem!important">
                 <!-- Title and description -->
@@ -273,29 +271,15 @@
                             <img class="rounded img-fluid" src="{{url_for('static', filename='img/placeholder.png')}}" ,
                                  alt="Logo" width="20" style="margin:2px!important; margin-left:16px!important; margin-right: 4px!important;">
                             Visibility: {{ visibility }}
-{#
-                            <!-- Channel Tags  -->
-                            <span class="badge rounded-pill bg-primary" style="width: auto;
-                                    margin-right: 1rem!important; margin-left: 1rem!important;">General</span>
-                            <span class="badge rounded-pill bg-primary" style="width: auto;
-                                    margin-right: 1rem!important; margin-left: 1rem!important;">General</span>
-                            <span class="badge rounded-pill bg-primary" style="width: auto;
-                                    margin-right: 1rem!important; margin-left: 1rem!important;">General</span>
-                            <span class="badge rounded-pill bg-primary" style="width: auto;
-                                    margin-right: 1rem!important; margin-left: 1rem!important;">General</span>#}
-
-
                     </div>
-
-
                 </dt>
-
             </div>
 
 
              <div class="row p-3">
-                <!-- Search Bar -->
-                <div class="col d-flex justify-content-md-between" style = "padding-right: 100px; padding-left: 100px">
+        <!-- Search Bar -->
+                <div class="col d-flex justify-content-md-between" style = "padding-right: 0px; padding-left: 0px">
+
                     <div class="input-group shadow-sm">
                         <input type="search" name="title" class="form-control" placeholder="Search For Posts"
                         id="search_content">
@@ -365,120 +349,6 @@
 
     <div class="col d-flex justify-content-md-between">
             <div class="card flex-fill" id = "result">
-    <!--
-
-                    <div class="card shadow-sm" style="margin: 0.8rem; margin-bottom: 0rem!important;">
-
-                        <div class="row">
-                            <div class="col-2" style="width: 12%">
-                                <img class="rounded-circle img-fluid" src="{{url_for('static', filename='avatar/ashley_gibbon.png')}}" ,
-                                alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
-                            </div>
-                            <div class="col-8" style="margin-top: 5px!important; margin-bottom: 5px!important;">
-                                <div class = "row">
-                                    <div class="fw-bold" style="padding: 0rem!important; font-size: large">
-                                        How do I stop children watching Netflix in class
-                                    </div>
-                                </div>
-                                <div class = "row">
-                                    <span style="white-space: nowrap; font-size: small; text-overflow:ellipsis; overflow: hidden; padding: 0; max-width: 600px;">It really gets me in the mood when I watch funny cat videos on the internet with my class, but they
-                                        seem to stop caring and decide to watch netflix instead</span>
-                                </div>
-                                <div class = "row" style = "padding-top: 0.25rem!important;">
-
-                                    <div class = "col-1" style="padding-left: 0rem!important"> 4
-                                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/upvotegrey.PNG')}}" ,
-                                        alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
-                                    </div>
-
-                                    <div class = "col-1" style = "padding-left: 0rem!important;"> 2
-                                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.PNG')}}" ,
-                                    alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
-                                    </div>
-                                    <div class = "col" style = "padding-left: 0rem!important; font-size: small; margin-top: 0.2rem!important;">
-                                        Ashley Gibbons - Posted 28-08-21
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div class = "col-2"style="margin-top: 5px!important; margin-bottom: 5px!important;">
-                                <div class="fw-bold" style=" font-size: medium">
-                                        Geoffry Matrin
-                                    </div>
-                                <div class = "fw-normal" style = "font-size: small"> Replied 13 minutes ago</div>
-                                <div class = "row d-flex align-items-center">
-                                    <div class = "col-3">
-                                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/commentIcon.PNG')}}" ,
-                                    alt="Logo", width="40", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
-                                    </div>
-                                    <div class = "col" style = "padding: 0rem">
-                                         <div class = "fw-normal" style = "font-size: small; margin-top: 2.5px!important;"> 150 Comments</div>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                        </div>
-                    </div>
-                    <div class="card shadow-sm" style="margin: 0.8rem; margin-bottom: 0rem!important;">
-
-                        <div class="row">
-                            <div class="col-2" style="width: 12%">
-                                <img class="rounded-circle img-fluid" src="{{url_for('static', filename='avatar/ashley_gibbon.png')}}" ,
-                                alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
-                            </div>
-                            <div class="col-8" style="margin-top: 5px!important; margin-bottom: 5px!important;">
-                                <div class = "row">
-                                    <div class="fw-bold" style="padding: 0rem!important; font-size: large">
-                                        Why do the children at School find me Dangerous?
-                                    </div>
-                                </div>
-                               <div class = "row">
-                                    <span style="white-space: nowrap; font-size: small; text-overflow:ellipsis; overflow: hidden; padding: 0; max-width: 600px;">I stand at 6 feet 2 inches and despite this...</span>
-                                </div>
-                                <div class = "row" style = "padding-top: 0.25rem!important;">
-
-
-                                    <div class = "col-1" style="padding-left: 0rem!important"> 4
-
-                                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/UpvotePink.PNG')}}" ,
-                                    alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
-                                    </div>
-                                    <div class = "col-1" style = "padding-left: 0rem!important;"> 2
-                                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotegrey.PNG')}}" ,
-                                    alt="Logo", width="22", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
-                                    </div>
-                                    <div class = "col" style = "padding-left: 0rem!important; font-size: small; margin-top: 0.2rem!important;">
-                                        Ashley Gibbons - Posted 22-08-21
-                                    </div>
-
-
-
-
-                                </div>
-
-                            </div>
-                            <div class = "col-2"style="margin-top: 5px!important; margin-bottom: 5px!important;">
-                                <div class="fw-bold" style=" font-size: medium">
-                                        Big Kyle
-                                    </div>
-                                <div class = "fw-normal" style = "font-size: small"> Replied 12 minutes ago</div>
-                                <div class = "row d-flex align-items-center">
-                                    <div class = "col-3">
-                                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/commentIcon.PNG')}}" ,
-                                    alt="Logo", width="40", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
-                                    </div>
-                                    <div class = "col" style = "padding: 0rem">
-                                         <div class = "fw-normal" style = "font-size: small; margin-top: 2.5px!important;"> 23 Comments</div>
-                                    </div>
-                                </div>
-
-
-                            </div>
-
-                        </div>
-                    </div>
-    -->
             </div>
     </div>
 </div>

@@ -1,9 +1,12 @@
 bin/*
+env/*
 include/
 lib/*
 pyvenv.cfg
 pass.txt
 branch/
 __pycache__/
-static/avatar
-static/resource
+static/avatar/*
+static/resource/*
+static/files_for_testing/*
+static/thumbnail/*

@@ -13,11 +13,11 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import HTTPException, InternalServerError
 from re import search as re_search
 # If in branch use the following
-from .DBFunc import *
-from .forms import LoginForm, RegisterForm, ResourceForm
+# from .DBFunc import *
+# from .forms import LoginForm, RegisterForm, ResourceForm
 # If in main use the following
-# from DBFunc import *
-# from forms import LoginForm, RegisterForm, ResourceForm
+from DBFunc import *
+from forms import LoginForm, RegisterForm, ResourceForm
 
 # -----{ INIT }----------------------------------------------------------------
 DEBUG = True
@@ -80,7 +80,6 @@ def home():
 
     Also the end point of the search function where the search is a get method
     """
-
     return render_template('home.html', title='Home')
 
 # -----{ PAGES.LOGIN }---------------------------------------------------------
@@ -552,7 +551,7 @@ def view_channel(cid=None):
 
     The home channel page is displayed when cid=None
     Allows user to create a channel etc.
-   
+
     The channel/cid page shows the posts in that channel
     Allows users to add posts to the channel
 
@@ -900,7 +899,7 @@ def handle_exception(e):
 
     # non-HTTP exceptions default to 500
     if DEBUG:
-        warnings.warn(e)
+        warnings.warn(str(e))
         return render_template("errors/error_generic.html", e=InternalServerError(),fail=str(e)), 500
     return render_template("errors/error_generic.html", e=InternalServerError()), 500
 
