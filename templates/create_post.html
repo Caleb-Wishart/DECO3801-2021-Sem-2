@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% block style %}
+<style>
+    a:link {
+        text-decoration: none;
+    }
+
+    a:visited {
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: none;
+    }
+
+    a:active {
+        text-decoration: none;
+    }
+
+
+        body {
+            /* Adds a Hex honeycomb background */
+            /* background-image: url(
+        {{url_for('static', filename='img/hex_back.png')}} ),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
+            background-color: #ffe5ec;
+
+            background-image: radial-gradient(rgb(255, 242, 245), rgb(255, 242, 245), rgb(255, 242, 245));
+        {#background-color: rgb(245, 245, 255);#}
+        }
+    .btn-primary {
+        background-color: #ff8fab;
+        color: white;
+        border-color: #ff8fab;
+    }
+    .btn-primary:hover {
+        color:white;
+        background-color: #3a78ef;
+    }
+
+    .btn-outline-primary {
+        background-color: rgb(255, 255, 255);
+        color:#000000;
+        border-color: white;
+    }
+
+    .btn-outline-primary:hover {
+        color:white;
+        background-color: #3a78ef;
+    }
+
+    .btn-check:checked+.btn-outline-primary {
+        color: white;
+        background-color:  #ff8fab;
+        border-color:   #ff8fab;
+    }
+    .bg-white {
+        background-color: #ffd6e1;
+    }
+    .bg-primary {
+        background-color: #ff8fab!important;
+    }
+    .btn-close {
+        width: 0.5rem;
+        height: 0.5rem;
+    }
+
+    .popover {
+        max-width: 400px;
+    }
+
+
+
+</style>
+
+{% endblock %}
+
+
+
+
+{% block content %}
+    <!-- Handles making the user confirm they want to leave this page as all unsaved changes will be lost-->
+    <body onbeforeunload = "return leavePageFunction()">
+        <script>
+            function leavePageFunction() {
+                return "Testing something"
+            }
+        </script>
+
+    </body>
+
+
+
+<div class="container" style="margin-bottom: 3rem!important; padding-left: 200px; padding-right: 200px">
+        <!-- Title Section -->
+        <div class="row">
+                    <!-- If we are creating a post  -->
+                    <dt class="col-sm-9" style = "font-size: x-large; margin-top:2rem!important; margin-bottom: 2rem!important;">
+                         Create Post
+                    </dt>
+                    <!-- If we are editing a post  -->
+                    {#<dt class="col-sm-9" style = "font-size: x-large; margin-top:2rem!important; margin-bottom: 2rem!important;">
+                         Edit Post
+                    </dt>#}
+
+        </div>
+
+        <div class="col d-flex justify-content-md-between">
+             <form class = "form-outline flex-fill" name="create_form" id="create_form" action="{{ url_for('create_or_modify_channel_post', cid=channel['cid']) }}" onsubmit="return validate_form()" method="post">
+                    <div class = "card flex-fill shadow-sm">
+                                    <!-- Indicates what channel the post is being posted to-->
+                                    <div class = "mb-3" style="margin: 1rem!important;">
+                                        <!-- If we are creating a post  -->
+                                        <label for="channelControl" class="form-label" style="font-size: large">Create a new post in the channel:</label>
+                                        <!-- If we are editting a post  -->
+                                        {#<label for="channelControl" class="form-label" style="font-size: larger">Editting a post in the channel:</label>#}
+                                        <input class="form-control" type="text" id = "channelControl" placeholder="{{ channel["name"] }}" aria-label="Disabled input Channel Name" disabled>
+                                    </div>
+                                    <!-- Title of the post-->
+                                    <div class="mb-3" style="margin: 1rem!important;">
+                                          <label for="Titleform" class="form-label" style="font-weight: bold; font-size: larger">Title</label>
+                                             <label
+                                                     title="Give your post a title which indicates your question or topic of discussion.
+                                                     Use keywords that relate to your post as it will make it easier for other users to find your post through search."
+                                                     data-bs-toggle="popover" data-bs-placement="right" data-content="Content">
+                                                 <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
+                                                     <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                     <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                                                 </svg>
+                                             </label>
+                                        <textarea class="form-control required" id="Titleform" name="title" placeholder="Title of your post (required)"></textarea>
+                                    </div>
+                                    <!-- Body of the post-->
+                                  <div class="mb-3" style="margin: 1rem!important;">
+                                          <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Body</label>
+                                        <label title="Give your post a detailed description of your discussion you wish to post. This is the body of the thread which other users will see." data-bs-toggle="popover" data-bs-placement="right" data-content="Content">
+                                                 <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
+                                                     <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                     <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                                                 </svg>
+                                             </label>
+                                          <textarea class="form-control required" id="Bodyform" name="init_text" rows="7" placeholder="Description (required)"></textarea>
+                                  </div>
+
+
+                    </div>
+                    <div class="float-end mt-2 pt-1" style="margin-top: 1rem!important;">
+                         <!-- IF WE ARE CREATING A POST, USE THE FOLLOWING BUTTONS-->
+                        <!-- Button to upload the post-->
+                      <input type="submit" form="create_form" value="Upload Post" class="btn btn-primary btn" style="margin-right: 1rem!important;"/>
+                        <!-- Button to clear the title and body of the post-->
+                        <button type="Button" class="btn btn-outline-primary btn" onclick="go_to_current_channel_page()">Discard Draft</button>
+                         <!-- IF WE ARE CREATING EDITTING A POST, USE THE FOLLOWING BUTTONS-->
+                        {#<button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;">Save Changes</button>
+                        <button type="Button" class="btn btn-outline-primary btn">Discard Changes</button>#}
+
+                    </div>
+                 </form>
+
+        </div>
+
+    </div>
+    <!-- Validation check on form submit.-->
+    <script type="text/javascript">
+    function validate_form() {
+        var valid = true;
+
+        if (document.getElementsByClassName("required").title.value==="" ||
+            document.getElementsByClassName("required").init_text.value==="") {
+            alert("Please ensure all the required sections are filled!")
+            valid = false;
+        }
+        return valid;
+
+    }
+    </script>
+
+    <!-- Redirect to current channel page (used for discard draft) -->
+    <script type="text/javascript">
+        function go_to_current_channel_page() {
+            window.location.href="{{ url_for('view_channel', cid=channel['cid']) }}";
+        }
+    </script>
+
+    <script>
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+        var popoverList = popoverTriggerList.map(function(popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl)
+        });
+    </script>
+{% endblock %}
