@@ -1,4 +1,4 @@
-{% extends 'base_old.html' %}
+{% extends 'base.html' %}
 
 {% block style %}
 <style>
@@ -68,21 +68,15 @@
      a {
         color: #000000;
     }
-
-
-
 </style>
 {% endblock %}
 
 {% block script %}
 
 
-
-
 {% endblock %}
 
 {% block content %}
-
 
 <div class="container">
 <!-- Question and top section -->
@@ -225,7 +219,6 @@
                             width="50"
                             height="50"
                           />
-
             <form class = "form-outline w-100" id="comment_form" action="{{ url_for('add_new_post_comment', cid=channel.cid, post_id=post_info['post_id']) }}" method="post">
                 <div class="form-outline w-100">
                     <textarea
@@ -262,5 +255,4 @@
 
           </div>
         </div>
-
 {% endblock %}

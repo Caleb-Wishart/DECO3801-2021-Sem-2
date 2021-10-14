@@ -14,7 +14,7 @@ from sqlalchemy.orm import sessionmaker
 from werkzeug.security import generate_password_hash
 import random
 # use this in branch
-# from .DBStructure import *
+from .DBStructure import *
 # use this in main
 # from DBStructure import *
 

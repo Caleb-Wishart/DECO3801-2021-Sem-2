@@ -81,7 +81,7 @@
         <!-- Create the channel card with a shadow -->
         <div class="card shadow-sm" style="margin: 0.8rem; margin-bottom: 0rem!important; color: black">
             <a class="row" href="{{url_for('view_channel')}}/<%= res.cid %>">
-                <!-- Thumbnail for a channel. CHANGE THE url_for TO THE CORRECT LOCATION FOR ACTUAL IMPLEMENTATION -->
+                <!-- Thumbnail for a channel.  -->
                 <div class="col-2" style="width: 12%">
                     <img class="rounded-circle img-fluid" src="{{url_for('static', filename="")}}/<%=res.avatar_link%>" ,
                          alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
@@ -100,6 +100,7 @@
                     </div>
                     <!-- Tags on a channel. NOTE: I don't how to create a template for each tag   -->
                     <div class = "row" style = "padding-top: 0.25rem!important;">
+
                         <% _.each(res.all_tags, function(tag) { %>
 
                         <!-- Here test subject tag -->
@@ -112,6 +113,7 @@
                 <div class = "col-2"style="margin-top: 5px!important; margin-bottom: 5px!important;">
                     <!-- Most recent author -->
                     <div class="fw-bold" style=" font-size: medium">
+
                         <%= res.recent_poster_username %>
                     </div>
                     <!-- Time -->
@@ -125,6 +127,7 @@
                         </div>
                         <div class = "col" style = "padding: 0rem">
                             <!-- Number of posts in the channel-->
+
                             <div class = "fw-normal" style = "font-size: small; margin-top: 2.5px!important;"> <%= res.post_count %> Posts</div>
                         </div>
                     </div>
@@ -437,8 +440,8 @@
 
 {% block content %}
 <!-- Banner -->
-      <div class="shadow row-fluid" style = "padding: 0rem!important; background-color: #FFFFFF">
-         <div class = "container" style="padding-top: 0.25rem!important;">
+      <div class="card row-fluid" style = "padding: 0rem!important; background-color: #FFFFFF">
+         <div class = "container" style="padding-top: 0.25rem!important;  padding-left: 100px; padding-right: 100px">
             <div class="row p-2 bg-white rounded" style = "padding-bottom: 0rem!important">
                 <dt class="row">
                     <dt class="col-sm-3" style = "font-size: x-large; padding-bottom: 1rem!important;">Channel Home</dt>
@@ -450,9 +453,9 @@
             </div>
              <div class="row p-3" style = "padding-top: 0rem!important">
         <!-- Top Search Bar -->
-                <div class="col d-flex justify-content-md-between" style = "padding-right: 100px; padding-left: 100px">
+                <div class="col d-flex justify-content-md-between" style = "padding-right: 0px; padding-left: 0px">
                     <div class="input-group shadow-sm">
-                        <input type="search" name="name" class="form-control" placeholder="Search Channels"
+                        <input type="search" name="title" class="form-control" placeholder="Search Channels"
                         id="search_content">
                     </div>
                 </div>
@@ -543,4 +546,5 @@
         </div>
     </div>
 </div>
+
 {% endblock %}

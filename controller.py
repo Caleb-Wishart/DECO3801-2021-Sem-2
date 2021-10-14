@@ -80,7 +80,6 @@ def home():
 
     Also the end point of the search function where the search is a get method
     """
-
     return render_template('home.html', title='Home')
 
 # -----{ PAGES.LOGIN }---------------------------------------------------------
