@@ -27,6 +27,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy import create_engine
 import pytz
+from flask_login import UserMixin
 
 # length of a standard string, use TEXT if longer than that
 STANDARD_STRING_LENGTH = 300
@@ -222,8 +223,9 @@ class User(Base):
                f"uid = {self.uid}, username = {self.username}, created at {self.created_at},\n" \
                f"sha256 password = {self.hash_password}," \
                f"honor rating = {self.user_rating}, email = {self.email}," \
-               f"profile background link = {self.profile_background_link}\nbio = {self.bio}"
+               f"avatar link = {self.avatar_link}\nbio = {self.bio}"
 
+    @property
     def is_active(self):
         """True, as all users are active."""
         return True
@@ -232,13 +234,29 @@ class User(Base):
         """Return the email address to satisfy Flask-Login's requirements."""
         return self.email
 
+    @property
     def is_authenticated(self):
         """Return True if the user is authenticated."""
         return self.authenticated
 
+    @property
     def is_anonymous(self):
         """False, as anonymous users aren't supported."""
         return False
+
+    @property
+    def serialize(self):
+        """Return object data in serialisable format """
+        return {
+            "uid" : self.uid,
+            "username" : self.username,
+            "authenticated" : self.authenticated,
+            "avatar_link" : self.avatar_link,
+            "profile_background_link" : self.profile_background_link,
+            "created_at" : self.created_at,
+            "email" : self.email,
+            "bio" : self.bio
+        }
 
 
 class UserTeachingAreas(Base):
@@ -327,7 +345,8 @@ class Resource(Base):
             "title": self.title,
             "resource_link": self.resource_link,
             "created_at": dump_datetime(self.created_at),
-            "grade": self.grade.name,
+            "grade": self.grade.name.lower(),
+            "subject": self.subject.name.lower(),
             "difficulty": self.difficulty.name,
             "upvote_count": self.upvote_count,
             "downvote_count": self.downvote_count,
@@ -382,6 +401,14 @@ class ResourceThumbnail(Base):
     def __str__(self):
         return f"ResourceThumbnail table:\n" \
                f"rid = {self.rid}, thumbnail link = {self.thumbnail_link}"
+
+    @property
+    def serialize(self):
+        """Return object data in serialisable format """
+        return {
+            "rid": self.rid,
+            "thumbnail_link": self.thumbnail_link
+        }
 
 
 class ResourceVoteInfo(Base):
@@ -465,6 +492,17 @@ class ResourceComment(Base):
                f"rid = {self.rid},\ncreated at = {self.created_at}\n" \
                f"comment = {self.comment}"
 
+    @property
+    def serialize(self):
+        """Return object data in serialisable format """
+        return {
+            "rid": self.rid,
+            "uid": self.uid,
+            "comment": self.comment,
+            "created_at": dump_datetime(self.created_at),
+            "resource_comment_id": self.resource_comment_id
+        }
+
 
 class ResourceCommentReply(Base):
     """
@@ -499,6 +537,16 @@ class ResourceCommentReply(Base):
                f"resource_comment_id = {self.resource_comment_id}, " \
                f"replier id = {self.uid}, created_at = {self.created_at}\n" \
                f"reply = {self.reply}"
+
+    @property
+    def serialize(self):
+        """Return object data in serialisable format """
+        return {
+            "resource_comment_id" : self.resource_comment_id,
+            "reply" : self.reply,
+            "created_at" : self.created_at,
+            "uid" : self.uid
+        }
 
 
 class PrivateResourcePersonnel(Base):

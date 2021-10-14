@@ -12,14 +12,14 @@ import sqlalchemy.exc
 from sqlalchemy import or_
 from sqlalchemy.orm import sessionmaker
 from werkzeug.security import generate_password_hash
-
+import random
 # use this in branch
 # from .DBStructure import *
 # use this in main
-from DBStructure import *
+# from DBStructure import *
 
 # define if you want method output messages for debugging
-VERBOSE = True
+VERBOSE = False
 
 # this controls how DB response in case of sql commit error:
 # if DEBUG_MODE is on, when error in commit happens, simply raise error and exit program
@@ -153,7 +153,6 @@ def add_user(username, password, email, teaching_areas: dict = None,
             print(f"User {username} created")
         return user.uid
 
-
 def modify_user_teaching_areas(uid, conn, modification: Modification,
                                teaching_areas: dict = None):
     """
@@ -280,7 +279,6 @@ def remove_resource(rid: int):
             conn.delete(resource)
             conn.commit()
 
-
 def get_user(email):
     """
     Retrieve the User with the unique email as the key
@@ -295,11 +293,20 @@ def get_user(email):
         if user:
             if VERBOSE:
                 warnings.warn(f"email {email} is registered by user uid = {user.uid}")
-
             return user
         warnings.warn(f"No user has email {email}")
         return ErrorCode.INVALID_USER
 
+def user_auth(email,login=True):
+    with Session() as conn:
+        user = get_user(email)
+        if user == ErrorCode.INVALID_USER:
+            return ErrorCode.INVALID_USER
+        user.authenticated = login
+        conn.add(user)
+        if not try_to_commit(conn):
+            warnings.warn(f"failed to commit updated user")
+            return ErrorCode.COMMIT_ERROR
 
 def add_tag(tag_name, tag_description=None):
     """
@@ -350,6 +357,7 @@ def get_tags(mapping="name2id") -> dict:
                 out[i.tag_name] = i.tag_id
             else:
                 out[i.tag_id] = i.tag_name
+        out[''] = None
     return out
 
 
@@ -603,7 +611,7 @@ def modify_resource(rid: int, title=None, resource_link=None,
                     thumbnail = ResourceThumbnail(rid=rid, thumbnail_link=i)
                     conn.add(thumbnail)
 
-        # commit before making changes to resource access permission
+        # commit before making changes to resource access
         conn.add(resource)
 
         # test: here fake unique constraint violation
@@ -660,6 +668,11 @@ def modify_resource(rid: int, title=None, resource_link=None,
             return ErrorCode.COMMIT_ERROR
 
 
+def get_resource_thumbnail(rid):
+    with Session() as conn:
+        res = conn.query(ResourceThumbnail).filter_by(rid=rid).one_or_none()
+        return res if res is not None else ErrorCode.INVALID_RESOURCE
+
 def user_has_access_to_resource(uid, rid):
     """
     Check if a user has access to a private resource
@@ -685,10 +698,31 @@ def user_has_access_to_resource(uid, rid):
         return conn.query(PrivateResourcePersonnel).filter_by(uid=uid, rid=rid). \
                    one_or_none() is not None
 
+def get_resource_author(rid):
+    with Session() as conn:
+        uids = [t[0] for t in conn.query(ResourceCreater.uid).filter_by(rid=rid).all()]
+        authors = []
+        for uid in uids:
+            authors.append(conn.query(User).filter_by(uid=uid).one_or_none())
+        return list(filter(lambda x: x is not None,authors))
+
+def get_resource_tags(rid):
+    """
+    Load and returns a list of resource tags names for a resource
+
+    :param rid: The resource id
+    :return a list of all resource tags instances to this resource, if any
+    """
+    with Session() as conn:
+        tag_ids = [t[0] for t in conn.query(ResourceTagRecord.tag_id).filter_by(rid=rid)]
+        res = []
+        for i in tag_ids:
+            res.append(conn.query(Tag.tag_name).filter_by(tag_id=i).one_or_none())
+        return [r[0] for r in res if r != None]
 
 def find_resources(title_type="like", title=None,
                    created_type="after", created=EPOCH,
-                   difficulty=None, subject=None,
+                   difficulty=None, subject=None, tags=None,
                    vote_type="more", votes=None,
                    grade=None, email=None, sort_by="natural"
                    ):
@@ -715,6 +749,9 @@ def find_resources(title_type="like", title=None,
         :param subject      : The subject of the resource.
             Valid values are Subject enum values.
             Defaults to None.
+        :param tags      : The tags of the resource.
+            Valid values are a list.
+            Defaults to None.
         :param vote_type    : SQL search restriction for the votes.
             Valid values are ["more","less"]. Refers to specified amount
             Defaults to "more".
@@ -726,7 +763,7 @@ def find_resources(title_type="like", title=None,
         :param email         : The logged in users email
             Defaults to None.
         :param sort_by         : The sort by parameter
-            Valid values are ["natural","newest","upvotes"].
+            Valid values are ["natural","newest","upvotes","trending"].
             Defaults to "natural".
     """
     # Args Checking
@@ -736,8 +773,10 @@ def find_resources(title_type="like", title=None,
         created_type = "after"
     if vote_type not in ["more", "less"]:
         vote_type = "more"
-    if sort_by not in ["Natural", "newest", "upvotes"]:
+    if sort_by not in ["Natural", "newest", "upvotes", "trending"]:
         sort_by = "natural"
+    if tags is None:
+        tags = []
 
     with Session() as conn:
         # get User if exists
@@ -776,7 +815,7 @@ def find_resources(title_type="like", title=None,
             if sort_by == "newest":
                 resources = resources.order_by(Resource.created_at)
             elif sort_by == "upvotes":
-                resources = resources.order_by(Resource.upvote_count)
+                resources = resources.order_by(Resource.upvote_count.desc())
 
         if user is None:
             resources = resources.filter_by(is_public=True)
@@ -784,6 +823,13 @@ def find_resources(title_type="like", title=None,
         else:
             result = filter(lambda res: user_has_access_to_resource(user.uid, res.rid), resources.all())
 
+        for tag in tags:
+            warnings.warn(f"Searching for tag {tag}")
+            result = filter(lambda res: tag in get_resource_tags(res.rid), result)
+        result = list(result)
+        if sort_by == "trending":
+            # trending mode: fake a trend by shuffle
+            random.shuffle(result)
     return result
 
 
@@ -977,7 +1023,7 @@ def vote_resource(uid, rid, upvote=True):
             warnings.warn(f"user {uid} vote resource {rid} failed")
             return ErrorCode.COMMIT_ERROR
         if VERBOSE:
-            print(f"Vote info {msg} for resource {rid}, user {uid} upvoted = {upvote}")
+            warnings.warn(f"Vote info {msg} for resource {rid}, user {uid} upvoted = {upvote}")
 
 
 def get_user_and_resource_instance(uid, rid):

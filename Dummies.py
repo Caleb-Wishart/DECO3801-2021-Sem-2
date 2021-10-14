@@ -130,20 +130,10 @@ add_tag("CS")
 add_tag("Math_Tutorial")
 add_tag("Drama_activities")
 add_tag("Math_practice_sheet")
-add_tag("1-min_tutorial")
+add_tag("1_min_tutorial")
 add_tag("brainstorming")
 add_tag('distance_teaching')
 add_tag("metric_math")
-
-# used to test unique violation rollback
-# with Session() as conn:
-#     for i in conn.query(Tag).all():
-#         print(i.tag_name)
-# # trigger unique constraint
-# add_tag("metric math")
-# with Session() as conn:
-#     for i in conn.query(Tag).all():
-#         print(i.tag_name)
 
 tags = get_tags()
 print(tags)
@@ -153,7 +143,7 @@ print("\n")
 # single pdf file
 src0 = add_resource(title="CS50 at Harvard - The Most Rewarding Class I Have Taken"
                           " . . . Ever!",
-                    resource_link="static/resource/CS50_at_Harvard_The_Most_Rewarding"
+                    resource_link="resource/CS50_at_Harvard_The_Most_Rewarding"
                                   "_Class_I_Have_Taken_Ever.pdf",
                     difficulty=ResourceDifficulty.EASY, subject=Subject.IT,
                     tags_id=[tags["CS"], tags["brainstorming"]],
@@ -185,7 +175,7 @@ src1 = add_resource(title="Grade 2 Math 1.1, Understanding Addition",
                     difficulty=ResourceDifficulty.MODERATE,
                     grade=Grade.YEAR_2,
                     creaters_id=sample(users_id, k=1),
-                    tags_id=[tags["Math_Tutorial"], tags["1-min_tutorial"]],
+                    tags_id=[tags["Math_Tutorial"], tags["1_min_tutorial"]],
                     subject=Subject.MATHS_A,
                     description="How to do basic addition and the parts of"
                                 " an addition sentence. Using counters to add. Page"
@@ -194,7 +184,7 @@ src1 = add_resource(title="Grade 2 Math 1.1, Understanding Addition",
 """
 Embed link:
 <iframe width="560" height="315" src="https://www.youtube.com/embed/efnA7byI8sg"
- title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; 
+ title="YouTube video player" frameborder="0" allow="accelerometer; autoplay;
  clipboard-write; encrypted-media; gyroscope; picture-in-picture"
   allowfullscreen></iframe>
 """
@@ -233,7 +223,7 @@ src3 = add_resource(title="Drama Lesson Activities, Grade 4-6: Creative Play",
 
 # compressed file of multiple pdfs
 src4 = add_resource(title="Grade 12 QLD Math C U10 worksheet",
-                    resource_link="static/resource/MQC-12.zip",
+                    resource_link="resource/MQC-12.zip",
                     difficulty=ResourceDifficulty.SPECIALIST,
                     creaters_id=sample(users_id, k=1),
                     tags_id=[tags["Math_practice_sheet"]],
@@ -243,7 +233,7 @@ src4 = add_resource(title="Grade 12 QLD Math C U10 worksheet",
 """
 Embed link:
 <iframe width="560" height="315" src="https://www.youtube.com/embed/1IbkUY9vZcU"
- title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; 
+ title="YouTube video player" frameborder="0" allow="accelerometer; autoplay;
  clipboard-write; encrypted-media; gyroscope; picture-in-picture"
   allowfullscreen></iframe>
 """
@@ -263,12 +253,6 @@ for i in range(0, 6):
     rid = globals()[f"src{i}"]
     add_pseudo_comment_to_resource(rid=rid, accessors_id=users_id)
 
-    # resource_comments = get_resource_comments(rid=rid)
-    # resource_comment_replies = get_resource_comment_replies(resource_comments)
-    # print(f"rid = {rid}, number of resource comment = {len(resource_comments)},"
-    #       f"number of resource comment replies to that comment = "
-    #       f"{len(resource_comment_replies)}")
-
 # next 5 resources are private, all resources are locally stored
 resource_titles = ["Learn Chinese for Beginners Beginner Chinese"
                    " Lesson 1 Self-Introduction in Chinese Mandarin 1.1",
@@ -284,7 +268,7 @@ resource_links = ["Learn_Chinese_for_Beginners_Beginner_Chinese_Lesson_1_Self-"
                   "Grade_12_Calculus_An_Introduction_to_Calculus_and_Overview_"
                   "of_Key_Concepts_NSC_DBE_Maths_NTE.mp4",
                   "Algebra.Factorization.Factoring_Quadratic_Expressions_-_(B).US.pdf"]
-resource_links = ["static/resource/" + e for e in resource_links]
+resource_links = ["resource/" + e for e in resource_links]
 grades = [Grade.TERTIARY, Grade.YEAR_12, Grade.YEAR_12, Grade.YEAR_12, Grade.YEAR_12]
 subjects = [Subject.CHINESE, Subject.MATHS_C, Subject.MATHS_C, Subject.MATHS_C,
             Subject.MATHS_C]
@@ -316,7 +300,7 @@ descriptions = ["Learn Chinese w/ ChineseFor.Us Beginner Chinese Lesson 1: Self-
                 "\n●The Calculus of motion",
                 "Factor the following quadratic expressions."]
 
-resource_tags = [[tags["1-min_tutorial"], tags['distance_teaching']],
+resource_tags = [[tags["1_min_tutorial"], tags['distance_teaching']],
                  [tags["Math_practice_sheet"], tags["brainstorming"]],
                  [tags["Math_Tutorial"]],
                  [tags["Math_Tutorial"], tags["metric_math"]],
@@ -396,27 +380,3 @@ for i in range(0, 5):
         add_pseudo_channel_post_and_replies(cid=globals()[f"cid{i}"],
                                             accessors_id=personnel
                                             if personnel is not None else users_id)
-
-# with Session() as conn:
-#     for i in conn.query(Resource).all():
-#         print(i)
-#     print("\n")
-#
-#     for i in conn.query(ResourceTagRecord).all():
-#         print(i)
-#     print("\n")
-#
-#     for i in conn.query(PrivateResourcePersonnel).all():
-#         print(i)
-#     print("\n")
-#
-#     for i in conn.query(ResourceCreater).all():
-#         print(i)
-#     print("\n")
-#
-#     for i in conn.query(ResourceComment).all():
-#         print(i)
-#     print("\n")
-#
-#     for i in conn.query(ResourceCommentReply).all():
-#         print(i)
