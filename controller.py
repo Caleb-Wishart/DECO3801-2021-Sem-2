@@ -241,7 +241,7 @@ def resource_new():
         except KeyError:
             subject = None
         try:
-            grade = Grade[request.form.get('grades').replace(' ','_')..upper()]
+            grade = Grade[request.form.get('grades').replace(' ','_').upper()]
         except KeyError:
             grade = None
         creaters_id = current_user.uid
