@@ -39,7 +39,7 @@
                     $(":input").change(function(){ //triggers change in all input fields including text type
                         unsaved = true;
                     });
-                    $('#submit').click("submit", function() {
+                    $('#submit').on("submit", function() {
                         unsaved = false;
                     });
 
