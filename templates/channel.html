@@ -100,9 +100,12 @@
                     </div>
                     <!-- Tags on a channel. NOTE: I don't how to create a template for each tag   -->
                     <div class = "row" style = "padding-top: 0.25rem!important;">
+                        <% _.each(res.all_tags, function(tag) { %>
+
                         <!-- Here test subject tag -->
                         <span class="badge rounded-pill bg-primary" style="width: auto;
-                                   margin-right: 0.25rem!important; margin-bottom: 0.25rem!important;"><%= res.subject %></span>
+                                   margin-right: 0.25rem!important; margin-bottom: 0.25rem!important;"><%= tag %></span>
+                        <% }); %>
                     </div>
                 </div>
 

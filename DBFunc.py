@@ -1246,6 +1246,34 @@ def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subj
         return channel.cid
 
 
+def get_all_tags_for_channel(cid: int) -> list:
+    """
+    For a channel given, returns a list of all tags (Subject, Grade, other tags)
+    related to that channel
+
+    :param cid: The id of the channel
+    :return a list of tag names related to this channel (subject + grade + other tags)
+    """
+    with Session() as conn:
+        channel = conn.query(Channel).filter_by(cid=cid).first()
+        if not channel:
+            return []
+
+        tags = []
+        if channel.grade:
+            tags.append(enum_to_website_output(channel.grade).replace("_", " ", 1))
+        if channel.subject:
+            tags.append(enum_to_website_output(channel.subject).replace("_", " ", 1))
+
+        tag_records = conn.query(ChannelTagRecord).filter_by(cid=cid).all()
+
+        tag_map = get_tags(mapping="id2name")
+        for i in tag_records:
+            tags.append(tag_map[i.tag_id].replace("_", " "))
+
+        return tags
+
+
 def get_user_and_channel_instance(uid, cid):
     """
     Try to get instances User and Channel using provided uid and rid

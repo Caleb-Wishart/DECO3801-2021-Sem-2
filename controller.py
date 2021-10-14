@@ -242,7 +242,7 @@ def create_or_modify_channel(cid=None):
 
     When create/edit success, redirects to current channel page
     """
-    # todo: tag system not implemented
+    # todo: other_tag system not implemented
 
     if request.method == "GET":
         # reverse visibility options so PUBLIC is always the default choice for creation
@@ -396,7 +396,9 @@ def view_channel(cid=None):
                                user=current_user, is_admin=current_user.uid == channel.admin_uid,
                                visibility=visibility, top_posts=top_posts,
                                top_contributors=top_contributors, title=f"Channel #{channel.cid}")
+
     # load channel home page
+    # todo: other_tag system not implemented
     return render_template("channel.html", user=current_user, title="Channel Home")
 
 
@@ -412,7 +414,6 @@ def search_channel():
     uid = int(request.args.get("uid"))
 
     out = []
-    available_tags = get_tags(mapping="id2name")
 
     with Session() as conn:
         for i in find_channels(channel_name=name, is_public=is_public,
@@ -422,14 +423,12 @@ def search_channel():
                 continue
             info = i.serialize
 
+            # assign tag names of this channel
+            info["all_tags"] = get_all_tags_for_channel(cid=i.cid)
+
             posts = conn.query(ChannelPost).filter_by(cid=i.cid)
 
             post_count = posts.count()
-
-            channel_tag_records = conn.query(ChannelTagRecord).filter_by(cid=i.cid).all()
-            channel_tags = []
-            for j in channel_tag_records:
-                channel_tags.append(available_tags[j.tag_id])
 
             recent_post_time, poster_name = None, None
             if post_count != 0:
@@ -444,7 +443,7 @@ def search_channel():
             info["most_recent_post_time"] = recent_post_time
             info["recent_poster_username"] = poster_name
             info["post_count"] = post_count
-            info["channel_tags"] = channel_tags
+            # info["channel_tags"] = channel_tags
 
             out.append(info)
     if not sort_by_date:
@@ -461,7 +460,6 @@ def search_channel_post(cid=None):
     """
     Returns json object of posts of a specific channel
     """
-    # todo: posts comments cannot display for unknown reason
     title = request.args.get("title")
     sort_algo = request.args.get("sort_algo").lower()
     cid = int(cid)
@@ -584,7 +582,7 @@ def create_or_modify_channel_post(cid=None, post_id=None):
 
     if not user_has_access_to_channel(cid=cid, uid=current_user.uid):
         # no permission, go back to channel home page
-        flash("You do not have permission to visit this page")
+        flash("You do not have permission to visit this page", 'info')
         return redirect(url_for("view_channel"))
 
     with Session() as conn:
@@ -673,9 +671,6 @@ def add_new_post_comment(cid=None, post_id=None):
     """
     Add a new comment to a post
     """
-    if not cid or not post_id:
-        return redirect(url_for("view_channel"))
-
     cid, post_id = int(cid), int(post_id)
 
     if not user_has_access_to_channel(cid=cid, uid=current_user.uid):
