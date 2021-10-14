@@ -28,7 +28,30 @@
                 return "Testing something"
             }
         </script>
+    </body>
 
+    <body>
+        <script type = "text/javascript">
+            $(document).ready(function () {
+                //
+                var unsaved = false;
+
+                    $(":input").change(function(){ //triggers change in all input fields including text type
+                        unsaved = true;
+                    });
+                    $('#submit').click("submit", function() {
+                        unsaved = false;
+                    });
+
+                    function unloadPage(){
+                        if(unsaved){
+                            return "You have unsaved changes on this page. Do you want to leave this page and discard your changes or stay on this page?";
+                        }
+                    }
+
+                    window.onbeforeunload = unloadPage;
+            });
+        </script>
     </body>
 
 
@@ -315,7 +338,7 @@
                     <div class="float-end mt-2 pt-1" style="margin-top: 1rem!important;">
                          <!-- IF WE ARE CREATING A RESOURCE, USE THE FOLLOWING BUTTONS-->
                         <!-- Button to upload the post-->
-                      <button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;">Upload Resource</button>
+                      <button type="submit" class="btn btn-primary btn" style="margin-right: 1rem!important;">Upload Resource</button>
                         <!-- Button to clear the title and body of the post-->
                         <button type="button" class="btn btn-outline-primary btn">Discard Draft</button>
                          <!-- IF WE ARE CREATING EDITTING A RESOURCE, USE THE FOLLOWING BUTTONS-->
