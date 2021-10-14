@@ -24,6 +24,300 @@
             /* background-image: url(
         {{url_for('static', filename='img/hex_back.png')}} ),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
             background-color: #ffe5ec;
+            background-image: radial-gradient(rgb(255, 242, 245), rgb(255, 242, 245), rgb(255, 242, 245));
+            {# background-image: radial-gradient(rgb(255, 229, 236), rgb(255, 229, 236),rgb(255, 229, 236)); #}
+        {#background-color: rgb(245, 245, 255);#}
+        }
+    .btn-primary {
+        background-color: #ff8fab;
+        color: white;
+        border-color: #ff8fab;
+    }
+    .btn-primary:hover {
+        color:white;
+        background-color: #3a78ef;
+    }
+
+    .btn-outline-primary {
+        background-color: rgb(255, 255, 255);
+        color:#000000;
+        border-color: white;
+    }
+
+    .btn-outline-primary:hover {
+        color:white;
+        background-color: #3a78ef;
+    }
+
+    .btn-check:checked+.btn-outline-primary {
+        color: white;
+        background-color:  #ff8fab;
+        border-color:   #ff8fab;
+    }
+    .bg-white {
+        background-color: #ffd6e1;
+    }
+    .bg-primary {
+        background-color: #ff8fab!important;
+    }
+    .btn-close {
+        width: 0.5rem;
+        height: 0.5rem;
+    }
+    a {
+        color: #000000;
+    }
+
+
+
+</style>
+{% endblock %}
+
+{% block script %}
+
+    <!-- Template for a channel card -->
+<script type="text/template" id="channel_card">
+    <% _.each(data,  function(res) { %>
+        <!-- Create the channel card with a shadow -->
+        <div class="card shadow-sm" style="margin: 0.8rem; margin-bottom: 0rem!important; color: black">
+            <a class="row" href="{{url_for('view_channel')}}/<%= res.cid %>">
+                <!-- Thumbnail for a channel. CHANGE THE url_for TO THE CORRECT LOCATION FOR ACTUAL IMPLEMENTATION -->
+                <div class="col-2" style="width: 12%">
+                    <img class="rounded-circle img-fluid" src="{{url_for('static', filename="")}}/<%=res.avatar_link%>" ,
+                         alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
+                </div>
+
+                <div class="col-8" style="margin-top: 5px!important; margin-bottom: 5px!important;">
+                    <!-- Title -->
+                    <div class = "row">
+                        <div class="fw-bold" style="padding: 0rem!important; font-size: large">
+                            <%= res.name %>
+                        </div>
+                    </div>
+                    <!-- Description on a channel. This should have it so that it automatically truncates the text to fit in the card-->
+                    <div class = "row">
+                        <span style="white-space: nowrap; font-size: small; text-overflow:ellipsis; overflow: hidden; padding: 0; max-width: 600px;"><%= res.description %></span>
+                    </div>
+                    <!-- Tags on a channel. NOTE: I don't how to create a template for each tag   -->
+                    <div class = "row" style = "padding-top: 0.25rem!important;">
+                        <% _.each(res.all_tags, function(tag) { %>
+
+                        <!-- Here test subject tag -->
+                        <span class="badge rounded-pill bg-primary" style="width: auto;
+                                   margin-right: 0.25rem!important; margin-bottom: 0.25rem!important;"><%= tag %></span>
+                        <% }); %>
+                    </div>
+                </div>
+
+                <div class = "col-2"style="margin-top: 5px!important; margin-bottom: 5px!important;">
+                    <!-- Most recent author -->
+                    <div class="fw-bold" style=" font-size: medium">
+                        <%= res.recent_poster_username %>
+                    </div>
+                    <!-- Time -->
+                    <div class = "fw-normal" style = "font-size: small"> Last posted: <%= res.most_recent_post_time %></div>
+                    <div class = "row d-flex align-items-center">
+                        <!-- Number of posts a channel -->
+                        <div class = "col-3">
+                            <!-- Image of the post icon -->
+                            <img class="rounded img-fluid" src="{{url_for('static', filename='img/postIcon.PNG')}}" ,
+                                    alt="Logo", width="40", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
+                        </div>
+                        <div class = "col" style = "padding: 0rem">
+                            <!-- Number of posts in the channel-->
+                            <div class = "fw-normal" style = "font-size: small; margin-top: 2.5px!important;"> <%= res.post_count %> Posts</div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    <% }); %>
+</script>
+
+    <!-- Template for a tag with a close button for the tag filtering section -->
+<script type="text/template" id="tag_filter">
+    <% _.each(data,  function(res) { %>
+        <!-- The single tag which is a badge with the tag name inside-->
+        <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;"> <%= res.tag_name %>
+            <!-- The X button at the end of the tag so that you can delete it -->
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </span>
+    <% }); %>
+</script>
+
+    <!-- Template for a tag inside each card (no close button) -->
+<script type="text/template" id="tag_inside_card">
+    <% _.each(data,  function(res) { %>
+        <span class="badge rounded-pill bg-primary" style="width: auto;
+                                    margin-right: 0.25rem!important; margin-bottom: 0.25rem!important;"> <%= res.tag_name %> </span>
+
+    <% }); %>
+</script>
+
+<script>
+    // DROPDOWN
+    $(function () {
+
+        $(".dropdown-menu a").click(function () {
+
+            $("#dropdownMenuButton1").text($(this).text());
+            $("#dropdownMenuButton1").val($(this).text());
+        });
+
+    });
+    // AJAX
+    // global variable that stores the search_term
+    var search_term = ""
+    // if view public channel
+    var is_public = true
+    // sorting method
+    var sort_by_date = "newest"
+
+    // key up search bar implementation
+    $(document).on("keyup", "#search_content", function (e) {
+        // currently only filter by channel name
+        search_term = $('input[name=name]').val();
+        $.ajax(
+            {
+                type: "GET",
+                url: "{{url_for('search_channel')}}",
+                data: { "name": search_term,
+                        "is_public": is_public,
+                        "sort_by_date": sort_by_date,
+                        "uid": "{{ user.uid }}"},
+                success: function (response) {
+                    $("#result").empty(); // remove current results
+                    var channel_card = _.template($("#channel_card").html());
+                    $("#result").html(channel_card({ data: response })); // set new results
+                    if (response.length === 0) {
+                        $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
+                    }
+
+                }
+            }
+        )
+    });
+
+    // public channel button pressed
+    $(document).on("click", "#btnradio1", function (e) {
+        // currently only filter by channel name
+        search_term = $('input[name=name]').val();
+        is_public = true
+        $.ajax(
+            {
+                type: "GET",
+                url: "{{url_for('search_channel')}}",
+                data: { "name": search_term,
+                        "is_public": is_public,
+                        "sort_by_date": sort_by_date,
+                        "uid": "{{ user.uid }}"},
+                success: function (response) {
+                    $("#result").empty(); // remove current results
+                    var channel_card = _.template($("#channel_card").html());
+                    $("#result").html(channel_card({ data: response })); // set new results
+                    if (response.length === 0) {
+                        $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
+                    }
+                }
+            }
+        )
+    });
+
+    // private button is clicked
+    $(document).on("click", "#btnradio2", function (e) {
+        // currently only filter by channel name
+        search_term = $('input[name=name]').val();
+        is_public = false
+        $.ajax(
+            {
+                type: "GET",
+                url: "{{url_for('search_channel')}}",
+                data: { "name": search_term,
+                        "is_public": is_public,
+                        "sort_by_date": sort_by_date,
+                        "uid": "{{ user.uid }}"},
+                success: function (response) {
+                    $("#result").empty(); // remove current results
+                    var channel_card = _.template($("#channel_card").html());
+                    $("#result").html(channel_card({ data: response })); // set new results
+                    if (response.length === 0) {
+                        $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
+                    }
+                }
+            }
+        )
+    });
+
+    // sort by order changes
+    $(document).on("change", "#sort_order", function (e) {
+        // currently only filter by channel name
+        search_term = $('input[name=name]').val();
+        sort_by_date = $("#sort_order").find(":selected").text()
+        $.ajax(
+            {
+                type: "GET",
+                url: "{{url_for('search_channel')}}",
+                data: { "name": search_term,
+                        "is_public": is_public,
+                        "sort_by_date": sort_by_date,
+                        "uid": "{{ user.uid }}"},
+                success: function (response) {
+                    $("#result").empty(); // remove current results
+                    var channel_card = _.template($("#channel_card").html());
+                    $("#result").html(channel_card({ data: response })); // set new results
+                    if (response.length === 0) {
+                        $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
+                    }
+                }
+            }
+        )
+    });
+
+    // Seed AJAX
+    $(document).ready(function () {
+        $.ajax(
+            {
+                type: "GET",
+                url: "{{url_for('search_channel')}}",
+                data: { "name": search_term,
+                        "is_public": is_public,
+                        "sort_by_date": sort_by_date,
+                        "uid": "{{ user.uid }}"},
+                success: function (response) {
+                    $("#result").empty(); // remove current results
+                    var channel_card = _.template($("#channel_card").html());
+                    $("#result").html(channel_card({ data: response })); // set new results
+                }
+            }
+        )
+    });
+</script>
+{% endblock %}
+
+{% block style %}
+<style>
+    a:link {
+        text-decoration: none;
+    }
+
+    a:visited {
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: none;
+    }
+
+    a:active {
+        text-decoration: none;
+    }
+
+
+        body {
+            /* Adds a Hex honeycomb background */
+            /* background-image: url(
+        {{url_for('static', filename='img/hex_back.png')}} ),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
+            background-color: #ffe5ec;
 
             background-image: radial-gradient(rgb(255, 229, 236), rgb(255, 229, 236),rgb(255, 229, 236));
         {#background-color: rgb(245, 245, 255);#}
@@ -155,10 +449,10 @@
 
             </div>
              <div class="row p-3" style = "padding-top: 0rem!important">
-        <!-- Search Bar -->
+        <!-- Top Search Bar -->
                 <div class="col d-flex justify-content-md-between" style = "padding-right: 100px; padding-left: 100px">
                     <div class="input-group shadow-sm">
-                        <input type="search" name="title" class="form-control" placeholder="Search Channels"
+                        <input type="search" name="name" class="form-control" placeholder="Search Channels"
                         id="search_content">
                     </div>
                 </div>
@@ -173,36 +467,29 @@
         <!-- Create new Channel section -->
         <div class="col-3">
             <div class = "row pe-5">
-            <a href="{{url_for('create')}}" class="btn btn-primary d-md-block" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
+            <a href="{{url_for('create_or_modify_channel')}}" class="btn btn-primary d-md-block shadow" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
                 <dd class="text-center font-weight-bold">Create New Channel</dd>
 
             </a>
                 </div>
         </div>
-
-        <!-- Resources selection -->
+        <!-- Swapping between Public and Private Channels and Sorting -->
         <div class="col d-flex justify-content-md-between">
             <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
                 <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
-                <label class="btn btn-outline-primary" for="btnradio1" style = "margin-right: 1rem!important">Public Channels</label>
+                <label class="btn btn-outline-primary shadow" for="btnradio1" style = "margin-right: 1rem!important">Public Channels</label>
 
                 <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
-                <label class="btn btn-outline-primary" for="btnradio2">My Channels</label>
-
-
+                <label class="btn btn-outline-primary shadow" for="btnradio2">My Channels</label>
             </div>
             <div class="d-flex">
                 <p class="h5" style = "margin:auto">Sort by</p>
+                <!-- dropdown for sort_by -->
                 <div class="dropdown px-3">
-                    <button class="btn btn-primary dropdown-toggle" style="min-width: 100px; height: 90%" type="button"
-                        id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                        Newest
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" href="#">Newest </a>
-                        <a class="dropdown-item" href="#">Upvotes</a>
-                        <a class="dropdown-item" href="#">Trending</a>
-                    </div>
+                    <select class="btn btn-primary dropdown-toggle" style="min-width: 100px; height: 90%" id="sort_order"  name="sort_order">
+                        <option class="dropdown-item" value="newest"> Created </option>
+                        <option class="dropdown-item" value="trending">Trending</option>
+                    </select>
                 </div>
             </div>
 
@@ -216,8 +503,7 @@
             <div class="row pe-5">
                 <div class="card">
                     <p class="h4" style = "margin-top: 1rem!important; margin-bottom: 0.5rem!important;">Tags</p>
-                    <!-- Search for Tags -->
-
+                    <!-- Search for Tags (Naive Bootstrap) -->
                         <input class="form-control" style = "margin-bottom: 0.5rem!important; margin-top: 0.3rem!important;"
                                list="datalistOptions" id="exampleDataList" placeholder="Search Tags...">
                         <datalist id="datalistOptions">
@@ -231,144 +517,28 @@
                           <option value="{{item}}">
                             {% endfor %}
                         </datalist>
-
-
+                <!-- Applied Tags -->
                 <div class="row-3">
                         <div class = "h4"> Applied Tags</div>
-                        <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">{{ subject[0] }}</span>
-                        <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">{{ subject[1] }}</span>
-                        <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">{{ grade[0] }}</span>
                         {% for item in tag %}
-                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">{{ item }}</span>
+                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">{{ item }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </span>
                         {% endfor %}
                     </div>
-
+                <!-- Clear all tags option -->
                 <div class = "row-3">
                     <a class="btn btn-secondary d-md-block" style = "width: 100%; margin-top: 1rem!important;
                     margin-bottom: 1rem!important;" aria-haspopup="true" aria-expanded="false">
                 <dd class="text-center font-weight-bold">Clear all tags</dd>
-
             </a>
-
                 </div>
-
-                    {#<div class="col d-flex justify-content-md-between">
-                        <div class="input-group shadow-sm">
-                            <input type="search" name="title" class="form-control" placeholder="Search Tags"
-                            id="search_content">
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        {% for item in subject %}
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="check{{item}}" checked>
-                            <label class="form-check-label" for="flexCheckDefault">
-                                {{item}}
-                            </label>
-                        </div>
-                        {% endfor %}
-                    </div>#}
                 </div>
             </div>
         </div>
         <div class="col d-flex justify-content-md-between">
             <!-- Channel top level -->
-            <div class="card flex-fill">
-
-            <!-- FIXME Change UID 1 to logged in user -->
-                <!-- Singular Channel Card -->
-                    <div class="card shadow-sm">
-
-                        <div class="row">
-                            <!-- Thumbnail for a channel -->
-                            <div class="col-2" style="width: 12%">
-                                <img class="rounded-circle img-fluid" src="{{url_for('static', filename='img/placeholder.png')}}" ,
-                                alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
-                            </div>
-                            <div class="col-8" style="margin-top: 5px!important; margin-bottom: 5px!important;">
-                                <!-- Title -->
-                                <div class = "row">
-                                    <div class="fw-bold" style="padding: 0rem!important; font-size: large">
-                                        Primary School Mathematics
-                                    </div>
-                                </div>
-                                <!-- Description on a channel -->
-                                <div class = "row" style = "font-size: small">
-                                    All posts welcome about Primary School Level Mathematics</div>
-                                <!-- Tags on a channel -->
-                                <div class = "row" style = "padding-top: 0.25rem!important;">
-                                    <span class="badge rounded-pill bg-primary" style="width: auto; margin-right: 0.25rem!important;">Mathematics</span>
-                                    <span class="badge rounded-pill bg-primary" style="width: auto; margin-right: 0.25rem!important;">Primary Education</span>
-                                </div>
-
-                            </div>
-                            <div class = "col-2"style="margin-top: 5px!important; margin-bottom: 5px!important;">
-                                <!-- Most recent author -->
-                                <div class="fw-bold" style=" font-size: medium">
-                                        Geoffry Matrin
-                                    </div>
-                                <!-- Time -->
-                                <div class = "fw-normal" style = "font-size: small"> Replied 13 minutes ago</div>
-                                <div class = "row d-flex align-items-center">
-                                    <!-- Number of posts a channel -->
-                                    <div class = "col-3">
-                                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/postIcon.PNG')}}" ,
-                                    alt="Logo", width="40", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
-                                    </div>
-                                    <div class = "col" style = "padding: 0rem">
-                                         <div class = "fw-normal" style = "font-size: small; margin-top: 2.5px!important;"> 150 Posts</div>
-                                    </div>
-                                </div>
-
-
-                            </div>
-
-                        </div>
-                    </div>
-                    <!-- Another Channel Card -->
-                    <div class="card shadow-sm">
-
-                        <div class="row">
-                            <div class="col-2" style="width: 12%">
-                                <img class="rounded-circle img-fluid" src="{{url_for('static', filename='img/placeholder.png')}}" ,
-                                alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
-                            </div>
-                            <div class="col-8" style="margin-top: 5px!important; margin-bottom: 5px!important;">
-                                <div class = "row">
-                                    <div class="fw-bold" style="padding: 0rem!important; font-size: large">
-                                        School Security Systems
-                                    </div>
-                                </div>
-                                <div class = "row" style = "font-size: small">
-                                    All posts welcome about School Security Systems</div>
-                                <div class = "row" style = "padding-top: 0.25rem!important;">
-                                    <span class="badge rounded-pill bg-primary" style="width: auto; margin-right: 0.25rem!important;">General</span>
-                                </div>
-
-                            </div>
-                            <div class = "col-2"style="margin-top: 5px!important; margin-bottom: 5px!important;">
-                                <div class="fw-bold" style=" font-size: medium">
-                                        Big Kyle
-                                    </div>
-                                <div class = "fw-normal" style = "font-size: small"> Replied 12 minutes ago</div>
-                                <div class = "row d-flex align-items-center">
-                                    <div class = "col-3">
-                                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/placeholder.png')}}" ,
-                                    alt="Logo", width="40", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
-                                    </div>
-                                    <div class = "col" style = "padding: 0rem">
-                                         <div class = "fw-normal" style = "font-size: small; margin-top: 2.5px!important;"> 23 Posts</div>
-                                    </div>
-                                </div>
-
-
-                            </div>
-
-                        </div>
-                    </div>
-
-
+            <div class="card flex-fill" id="result" style="color: black">
             </div>
         </div>
     </div>
