@@ -13,11 +13,11 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import HTTPException, InternalServerError
 from re import search as re_search
 # If in branch use the following
-from .DBFunc import *
-from .forms import LoginForm, RegisterForm, ResourceForm
+# from .DBFunc import *
+# from .forms import LoginForm, RegisterForm, ResourceForm
 # If in main use the following
-# from DBFunc import *
-# from forms import LoginForm, RegisterForm, ResourceForm
+from DBFunc import *
+from forms import LoginForm, RegisterForm, ResourceForm
 
 # -----{ INIT }----------------------------------------------------------------
 DEBUG = True
