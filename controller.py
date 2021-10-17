@@ -763,7 +763,7 @@ def view_channel_post(cid=None, post_id=None):
     return render_template("post.html", title=f"Channel Post #{post.post_id}",
                            post_info=post_info, comments_info=post_comments_info,
                            has_edit_privilege=has_edit_privilege, channel=channel,
-                           current_user_id=current_user.uid)
+                           current_user=current_user)
 
 
 @app.route("/channel/<cid>/post/create", methods=["POST", "GET"])
