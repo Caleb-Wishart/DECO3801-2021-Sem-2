@@ -185,7 +185,7 @@
                 type: "GET",
                 url: "{{ url_for('vote_channel_post_or_comment') }}",
                 data: {
-                    "uid": {{ current_user_id }},
+                    "uid": {{ current_user.uid }},
                     "id": id,
                     "upvote": is_upvote,
                     "post_or_comment": post_or_comment
@@ -214,7 +214,7 @@
         <div class="d-flex flex-start w-100" style = "margin-top: 2rem!important">
               <img
                             class="rounded-circle shadow-1-strong me-3"
-                            src="{{url_for('static', filename=post_info['author_avatar_link'])}}"
+                            src="{{url_for('static', filename=current_user.avatar_link)}}"
                             alt="avatar"
                             width="50"
                             height="50"
