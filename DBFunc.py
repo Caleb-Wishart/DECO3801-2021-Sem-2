@@ -14,9 +14,9 @@ from sqlalchemy.orm import sessionmaker
 from werkzeug.security import generate_password_hash
 import random
 # use this in branch
-# from .DBStructure import *
+from .DBStructure import *
 # use this in main
-from DBStructure import *
+# from DBStructure import *
 
 # define if you want method output messages for debugging
 VERBOSE = False
@@ -412,6 +412,7 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
 
         # phase 2: find the new row, update private_resource_personnel info, tag info
         # and resource_creater table, resource_thumbnail
+        warnings.warn(resource_link)
         resource = conn.query(Resource).filter_by(resource_link=resource_link).one()
 
         # get rid of duplicate
