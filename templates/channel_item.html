@@ -1,49 +1,89 @@
 {% extends 'base.html' %}
 
 {% block style %}
+<style>
+    a:link {
+        text-decoration: none;
+    }
 
+    a:visited {
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: none;
+    }
+
+    a:active {
+        text-decoration: none;
+    }
+
+
+
+
+        body {
+            /* Adds a Hex honeycomb background */
+            /* background-image: url(
+        {{url_for('static', filename='img/hex_back.png')}} ),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
+            background-color: #ffe5ec;
+
+            background-image: radial-gradient(rgb(255, 242, 245), rgb(255, 242, 245), rgb(255, 242, 245));
+        {#background-color: rgb(245, 245, 255);#}
+        }
+    .btn-primary {
+        background-color: #ff8fab;
+        color: white;
+        border-color: #ff8fab;
+    }
+    .btn-primary:hover {
+        color:white;
+        background-color: #3a78ef;
+    }
+
+    .btn-outline-primary {
+        background-color: rgb(255, 255, 255);
+        color:#000000;
+        border-color: white;
+    }
+
+    .btn-outline-primary:hover {
+        color:white;
+        background-color: #3a78ef;
+    }
+
+    .btn-check:checked+.btn-outline-primary {
+        color: white;
+        background-color:  #ff8fab;
+        border-color:   #ff8fab;
+    }
+    .bg-white {
+        background-color: #ffd6e1;
+    }
+
+    .bg-primary {
+        background-color: #ff8fab!important;
+    }
+
+     a {
+        color: #000000;
+    }
+
+</style>
 {% endblock %}
 
 {% block script %}
-<script type="text/template" id="resource_card">
-     <% _.each(data,  function(res) { %>
-<!-- Resource Card, Take this out once you implement all the channel stuff -->
-        <div class="col-4 p-2">
-            <!-- FIXME Change UID 1 to logged in user -->
-            <a class="text-dark card shadow-sm" href="{{url_for('resource')}}/1/<%= res.rid %>">
-                <img class="bd-placeholder-img card-img-top" src="{{url_for('static', filename='img/placeholder.png')}}" ,
-                    alt="Logo" , width="150" , height="150">
-                <div class="card-body">
-                    <p class="card-text">
-                        <%= res.title %>
-                    </p>
-                    <div class="d-flex">
-                        <p class="card-text px-1">
-                            <%= res.upvote_count %>
-                        </p>
-                        <img src="{{url_for('static', filename='img/up.png')}}" , alt="Down" , width="20" , height="20">
-                        <p class="card-text px-1">
-                            <%= res.downvote_count %>
-                        </p>
-                        <img src="{{url_for('static', filename='img/down.png')}}" , alt="Down" , width="20" , height="20">
-                    </div>
-                </div>
-            </a>
-        </div>
-    <% }); %>
-</script>
-
 
     <!-- Singular Card which represents a post -->
 <script type="text/template" id="post_card">
     <% _.each(data,  function(res) { %>
     <!-- Singular Card which represents a post -->
-    <div class="card shadow-sm" style="margin: 0.5rem; margin-bottom: 0rem!important;">
-        <div class="row">
+    <div class="card shadow-sm" style="margin: 0.8rem; margin-bottom: 0rem!important;">
+        <!-- primitive way to redirect to view_channel_post -->
+        <a class="row"  href="/channel/{{ channel.cid }}/post/<%=res.post_id%>">
             <!-- Profile Picture of Author -->
             <div class="col-2" style="width: 12%">
-                <img class="rounded-circle img-fluid" src="{{url_for('static', filename='avatar/ashley_gibbon.png')}}" ,
-                     alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
+                <img class="rounded-circle img-fluid" src="{{ url_for('static', filename='')}}/<%= res.poster_avatar_link%>"
+                     alt="Logo" width="65" style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
             </div>
             <div class="col-8" style="margin-top: 5px!important; margin-bottom: 5px!important;">
                 <!-- Title -->
@@ -59,21 +99,19 @@
                 <!-- Upvotes and downvotes and bottom information -->
                 <div class = "row" style = "padding-top: 0.25rem!important;">
                     <!-- Upvotes -->
-                                    <div class = "col-1" style="padding-left: 0rem!important"> 4
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="pink" class="bi bi-arrow-up-circle-fill" style="margin-bottom: 3px" xviewBox="0 0 16 16">
-  <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
-</svg>
-                                    </div>
+                    <div class = "col-1" style="padding-left: 0rem!important"> <%= res.upvote_count %>
+                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/UpvotePink.PNG')}}" ,
+                             alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
+                    </div>
 
-                                    <!-- Downvotes -->
-                                    <div class = "col-1" style = "padding-left: 0rem!important;"> 2
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="pink" class="bi bi-arrow-down-circle-fill" style="margin-bottom: 3px" viewBox="0 0 16 16">
-  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/>
-</svg>
-                                    </div>
+                    <!-- Downvotes -->
+                    <div class = "col-1" style = "padding-left: 0rem!important;"> <%= res.downvote_count %>
+                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.PNG')}}" ,
+                             alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
+                    </div>
                     <!-- Bottom information -->
                     <div class = "col" style = "padding-left: 0rem!important; font-size: small; margin-top: 0.2rem!important;">
-                        (Creator Name) - <%= res.created_at %>
+                        <%= res.poster_username %> - Posted on <%= res.created_at %>
                     </div>
                 </div>
 
@@ -82,24 +120,24 @@
             <div class = "col-2"style="margin-top: 5px!important; margin-bottom: 5px!important;">
                 <!-- Most recent comment author -->
                 <div class="fw-bold" style=" font-size: medium">
-                    (Comment Author)
+                    <%= res.recent_commenter_name %>
                 </div>
                 <!-- Time -->
-                <div class = "fw-normal" style = "font-size: small"> Replied (time since comment) ago</div>
+                <div class = "fw-normal" style = "font-size: small"> Commented on <%= res.recent_comment_time %> </div>
                 <div class = "row d-flex align-items-center">
                     <!-- Number of comments on a post -->
                     <div class = "col-3">
                         <img class="rounded img-fluid" src="{{url_for('static', filename='img/commentIcon.PNG')}}" ,
-                                    alt="Logo", width="40", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
+                                    alt="Logo" width="40" style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
                     </div>
                     <div class = "col" style = "padding: 0rem">
-                        <div class = "fw-normal" style = "font-size: small; margin-top: 2.5px!important;"> (# comments) Comments</div>
+                        <div class = "fw-normal" style = "font-size: small; margin-top: 2.5px!important;"> <%= res.comment_count %> Comments</div>
                     </div>
                 </div>
 
             </div>
 
-        </div>
+        </a>
     </div>
     <% }); %>
 </script>
@@ -124,19 +162,29 @@
         });
 
     });
+
     // AJAX
+    var search_term = ""
+    var sort_algo = "newest"
+    var route = $(location).attr("href");
+
+
+    // key up search bar implementation
     $(document).on("keyup", "#search_content", function (e) {
-        var search_term = $('input[name=title]').val();
+        // currently only filter by channel name
+        search_term = $('input[name=title]').val();
         $.ajax(
             {
                 type: "GET",
-                url: "{{url_for('search')}}",
-                data: { "title": search_term },
+                url: "{{url_for('search_channel_post', cid=channel.cid)}}",
+                data: { "title": search_term,
+                        "sort_algo": sort_algo,
+                        },
                 success: function (response) {
                     $("#result").empty(); // remove current results
-                    var resource_card = _.template($("#resource_card").html());
-                    $("#result").html(resource_card({ data: response })); // set new results
-                    if (response.length == 0) {
+                    var post_card = _.template($("#post_card").html());
+                    $("#result").html(post_card({ data: response })); // set new results
+                    if (response.length === 0) {
                         $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
                     }
 
@@ -144,17 +192,45 @@
             }
         )
     });
+
+    // sort by order changes
+    $(document).on("change", "#sort_order", function (e) {
+        // currently only filter by channel name
+        search_term = $('input[name=title]').val();
+        sort_algo = $("#sort_order").find(":selected").text()
+        $.ajax(
+            {
+                type: "GET",
+                url: "{{url_for('search_channel_post', cid=channel.cid)}}",
+                data: { "title": search_term,
+                        "sort_algo": sort_algo,
+                        },
+                success: function (response) {
+                    $("#result").empty(); // remove current results
+                    var post_card = _.template($("#post_card").html());
+                    $("#result").html(post_card({ data: response })); // set new results
+                    if (response.length === 0) {
+                        $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
+                    }
+                }
+            }
+        )
+    });
+
     // Seed AJAX
     $(document).ready(function () {
         $.ajax(
             {
                 type: "GET",
-                url: "{{url_for('search')}}",
-                data: { "title": "" },
+                url: "{{url_for('search_channel_post', cid=channel.cid)}}",
+                data: { "title": search_term,
+                        "sort_algo": sort_algo,
+                        "route": route
+                       },
                 success: function (response) {
                     $("#result").empty(); // remove current results
-                    var resource_card = _.template($("#resource_card").html());
-                    $("#result").html(resource_card({ data: response })); // set new results
+                    var post_card = _.template($("#post_card").html());
+                    $("#result").html(post_card({ data: response })); // set new results
                 }
             }
         )
@@ -169,60 +245,41 @@
             <div class="row p-2 bg-white rounded" style = "padding-bottom: 0rem!important">
                 <!-- Title and description -->
                 <div class="row">
-                    <dt class="col-sm-9" style = "font-size: x-large; padding-bottom: 0.25rem!important;">School System Security Issues (Channel Title)</dt>
+                    <dt class="col-sm-9" style = "font-size: x-large; padding-bottom: 0.25rem!important;">{{ channel.name }}</dt>
 
                      <!-- NOTE: IF THE USER IS NOT THE ADMIN, THIS SECTION OF HTML IS DELETED -->
-                    <div class="col-3">
-                        <div class = "d-flex flex-row-reverse" >
-                         <a href="{{url_for('create')}}" class="btn btn-primary d-md-block" style = "width: 60%" aria-haspopup="true" aria-expanded="false">
-                            <dd class="text-center font-weight-bold">Edit Channel Setting</dd>
+                    {% if is_admin %}
+                        <div class="col-3">
+                            <div class = "d-flex flex-row-reverse" >
+                             <a href="{{url_for('create_or_modify_channel', cid=channel.cid)}}" class="btn btn-primary d-md-block" style = "width: 60%" aria-haspopup="true" aria-expanded="false">
+                                <dd class="text-center font-weight-bold">Edit Channel Setting</dd>
 
-                        </a>
+                            </a>
+                            </div>
                         </div>
-                    </div>
+                    {% endif %}
                      <!-- NOTE: END OF THE SECTION THAT NEEDS TO BE DELETED IF THEY ARE NOT ADMIN  -->
                     <dd class="row-3" style = "font-size: small; margin-bottom: 0rem!important; margin-top: 1rem!important;">
-                        <p>This forum discusses problems in school security... (Channel Description)
-                        This forum discusses problems in school security... (Channel Description)
-                            This forum discusses problems in school security... (Channel Description)
-                            This forum discusses problems in school security... (Channel Description)
-                            This forum discusses problems in school security... (Channel Description)
-                            This forum discusses problems in school security... (Channel Description)
-
-                        </p>
+                        <p> {{ channel.description }}</p>
                     </dd>
                     <div class = "row-3" style="font-size: small">
                             <!-- Banner Information -->
                             <img class="rounded img-fluid" src="{{url_for('static', filename='img/placeholder.png')}}" ,
-                                 alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 4px!important;">
-                            Admin: (Admin Name)
+                                 alt="Logo" width="20" style="margin:2px!important; margin-left:2px!important; margin-right: 4px!important;">
+                            Admin: {{ admin.username }}
 
                             <img class="rounded img-fluid" src="{{url_for('static', filename='img/placeholder.png')}}" ,
-                                 alt="Logo", width="20", style="margin:2px!important; margin-left:16px!important; margin-right: 4px!important;">
-                            Visibility: (Public / Private)
-{#
-                            <!-- Channel Tags  -->
-                            <span class="badge rounded-pill bg-primary" style="width: auto;
-                                    margin-right: 1rem!important; margin-left: 1rem!important;">General</span>
-                            <span class="badge rounded-pill bg-primary" style="width: auto;
-                                    margin-right: 1rem!important; margin-left: 1rem!important;">General</span>
-                            <span class="badge rounded-pill bg-primary" style="width: auto;
-                                    margin-right: 1rem!important; margin-left: 1rem!important;">General</span>
-                            <span class="badge rounded-pill bg-primary" style="width: auto;
-                                    margin-right: 1rem!important; margin-left: 1rem!important;">General</span>#}
-
-
+                                 alt="Logo" width="20" style="margin:2px!important; margin-left:16px!important; margin-right: 4px!important;">
+                            Visibility: {{ visibility }}
                     </div>
-
-
                 </dt>
-
             </div>
 
 
              <div class="row p-3">
         <!-- Search Bar -->
                 <div class="col d-flex justify-content-md-between" style = "padding-right: 0px; padding-left: 0px">
+
                     <div class="input-group shadow-sm">
                         <input type="search" name="title" class="form-control" placeholder="Search For Posts"
                         id="search_content">
@@ -237,10 +294,10 @@
 <div class="container">
 
     <div class="row p-3" style = "padding-top: 3rem!important; padding-bottom: 0rem!important">
-        <!-- Create new Channel section -->
+        <!-- Create new Post section -->
         <div class="col-3">
             <div class = "row pe-5">
-            <a href="{{url_for('create')}}" class="btn btn-primary d-md-block" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
+            <a href="{{url_for('create_or_modify_channel_post', cid=channel.cid)}}" class="btn btn-primary d-md-block" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
                 <dd class="text-center font-weight-bold">Create New Post</dd>
 
             </a>
@@ -256,17 +313,13 @@
                 <div class="d-flex">
                      <!-- Sort by -->
                     <p class="h5" style = "margin:auto">Sort by</p>
+                    <!-- dropdown for sort_by -->
                     <div class="dropdown px-3">
-                        <button class="btn btn-primary dropdown-toggle" style="min-width: 100px; height: 90%" type="button"
-                            id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                            Newest
-                        </button>
-                         <!-- Dropdown menu -->
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" href="#">Newest </a>
-                            <a class="dropdown-item" href="#">Upvotes</a>
-                            <a class="dropdown-item" href="#">Trending</a>
-                        </div>
+                        <select class="btn btn-primary dropdown-toggle" style="min-width: 100px; height: 90%" id="sort_order"  name="sort_order">
+                            <option class="dropdown-item" value="newest">Newest </option>
+                            <option class="dropdown-item" value="upvote">Upvote</option>
+                            <option class="dropdown-item" value="trending">Trending</option>
+                        </select>
                     </div>
                 </div>
 
@@ -280,159 +333,22 @@
                 <div class="card">
                     <dt style = "margin-top: 1rem!important; margin-bottom: 1rem!important; font-size: x-large"> <u> Trending Posts </u></dt>
                     <!-- Just some trending posts -->
-                        {% for i in range(1,6) %}
-                            <div class = "row" style="margin:auto; margin-bottom: 0.5rem!important;"> {{ i }}. Name of the trending post...
+                        {% for i in top_posts %}
+                            <div class = "row" style="margin:auto; margin-bottom: 0.5rem!important;"> {{ loop.index}}. {{ i.title }}
                             </div>
                         {% endfor %}
                     <!-- Just some top contributors -->
                     <dt style = "margin-top: 1rem!important; margin-bottom: 1rem!important; font-size: x-large"> <u> Top Contributors </u></dt>
-                        {% for i in range(1,6) %}
-                            <div class = "row" style="margin:auto; margin-bottom: 0.5rem!important;"> {{ i }}. Name of the top contributors...
+                        {% for i in top_contributors %}
+                            <div class = "row" style="margin:auto; margin-bottom: 0.5rem!important;"> {{ loop.index}}. {{ i }}
                             </div>
                         {% endfor %}
-
-
                 </div>
             </div>
         </div>
-         <div class="col d-flex justify-content-md-between">
-            <!-- Channel top level -->
-            <div class="card flex-fill">
 
-            <!-- FIXME Change UID 1 to logged in user -->
-                <!-- Singular Channel Card -->
-                    <div class="card shadow-sm" style="margin: 0.5rem; margin-bottom: 0rem!important;">
-
-                        <div class="row">
-                            <!-- Thumbnail for a channel -->
-                            <div class="col-2" style="width: 12%">
-                                <img class="rounded-circle img-fluid" src="{{url_for('static', filename='avatar/ashley_gibbon.png')}}" ,
-                                alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
-                            </div>
-                            <div class="col-8" style="margin-top: 5px!important; margin-bottom: 5px!important;">
-                                <!-- Title -->
-                                <div class = "row">
-                                    <div class="fw-bold" style="padding: 0rem!important; font-size: large">
-                                        How do I stop children watching Netflix in class
-                                    </div>
-                                </div>
-                                <!-- Description on a channel -->
-                                <div class = "row">
-                                    <span style="white-space: nowrap; font-size: small; text-overflow:ellipsis; overflow: hidden; padding: 0; max-width: 600px;">It really gets me in the mood when I watch funny cat videos on the internet with my class, but they
-                                        seem to stop caring and decide to watch netflix instead</span>
-                                </div>
-                                <!-- Upvotes and downvotes and bottom information -->
-                                <div class = "row" style = "padding-top: 0.25rem!important;">
-
-                                    <!-- Upvotes -->
-                                    <div class = "col-1" style="padding-left: 0rem!important"> 4
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="pink" class="bi bi-arrow-up-circle-fill" style="margin-bottom: 3px" xviewBox="0 0 16 16">
-  <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
-</svg>
-                                    </div>
-
-                                    <!-- Downvotes -->
-                                    <div class = "col-1" style = "padding-left: 0rem!important;"> 2
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="pink" class="bi bi-arrow-down-circle-fill" style="margin-bottom: 3px" viewBox="0 0 16 16">
-  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/>
-</svg>
-                                    </div>
-                                    <!-- Bottom information -->
-                                    <div class = "col" style = "padding-left: 0rem!important; font-size: small; margin-top: 0.2rem!important;">
-                                        Ashley Gibbons - Posted 28-08-21
-                                    </div>
-                                </div>
-
-                            </div>
-                            <!-- Information on RHS -->
-                            <div class = "col-2"style="margin-top: 5px!important; margin-bottom: 5px!important;">
-                                <!-- Most recent author -->
-                                <div class="fw-bold" style=" font-size: medium">
-                                        Geoffry Matrin
-                                    </div>
-                                <!-- Time -->
-                                <div class = "fw-normal" style = "font-size: small"> Replied 13 minutes ago</div>
-                                <div class = "row d-flex align-items-center">
-                                    <!-- Number of comments on a post -->
-                                    <div class = "col-3">
-                                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/commentIcon.PNG')}}" ,
-                                    alt="Logo", width="40", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
-                                    </div>
-                                    <div class = "col" style = "padding: 0rem">
-                                         <div class = "fw-normal" style = "font-size: small; margin-top: 2.5px!important;"> 150 Comments</div>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                        </div>
-                    </div>
-                    <!-- Another Channel Card -->
-                    <div class="card shadow-sm" style="margin: 0.5rem; margin-bottom: 0rem!important;">
-
-                        <div class="row">
-                            <div class="col-2" style="width: 12%">
-                                <img class="rounded-circle img-fluid" src="{{url_for('static', filename='avatar/ashley_gibbon.png')}}" ,
-                                alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
-                            </div>
-                            <div class="col-8" style="margin-top: 5px!important; margin-bottom: 5px!important;">
-                                <div class = "row">
-                                    <div class="fw-bold" style="padding: 0rem!important; font-size: large">
-                                        Why do the children at School find me Dangerous?
-                                    </div>
-                                </div>
-                               <div class = "row">
-                                    <span style="white-space: nowrap; font-size: small; text-overflow:ellipsis; overflow: hidden; padding: 0; max-width: 600px;">I stand at 6 feet 2 inches and despite this...</span>
-                                </div>
-                               <!-- Bottom info -->
-                                <div class = "row" style = "padding-top: 0.25rem!important;">
-
-
-                                    <!-- Upvotes -->
-                                    <div class = "col-1" style="padding-left: 0rem!important"> 4
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="pink" class="bi bi-arrow-up-circle-fill" style="margin-bottom: 3px" xviewBox="0 0 16 16">
-  <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
-</svg>
-                                    </div>
-
-                                    <!-- Downvotes -->
-                                    <div class = "col-1" style = "padding-left: 0rem!important;"> 2
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="pink" class="bi bi-arrow-down-circle-fill" style="margin-bottom: 3px" viewBox="0 0 16 16">
-  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/>
-</svg>
-                                    </div>
-                                    <div class = "col" style = "padding-left: 0rem!important; font-size: small; margin-top: 0.2rem!important;">
-                                        Ashley Gibbons - Posted 22-08-21
-                                    </div>
-
-
-
-
-                                </div>
-
-                            </div>
-                            <div class = "col-2"style="margin-top: 5px!important; margin-bottom: 5px!important;">
-                                <div class="fw-bold" style=" font-size: medium">
-                                        Big Kyle
-                                    </div>
-                                <div class = "fw-normal" style = "font-size: small"> Replied 12 minutes ago</div>
-                                <div class = "row d-flex align-items-center">
-                                    <div class = "col-3">
-                                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/commentIcon.PNG')}}" ,
-                                    alt="Logo", width="40", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
-                                    </div>
-                                    <div class = "col" style = "padding: 0rem">
-                                         <div class = "fw-normal" style = "font-size: small; margin-top: 2.5px!important;"> 23 Comments</div>
-                                    </div>
-                                </div>
-
-
-                            </div>
-
-                        </div>
-                    </div>
-
-
+    <div class="col d-flex justify-content-md-between">
+            <div class="card flex-fill" id = "result">
             </div>
     </div>
 </div>

@@ -1,12 +1,12 @@
 ###############################################################################
-# This script is used to import dummy resources/users/forum comments to our website
+# This script is used to import dummy resources/users/channel comments to our website
 #
 # created by Jason Aug 26, 2021
 ###############################################################################
 import random
 
 from DBFunc import *
-from random import choice, sample
+from random import choice, sample, randint
 from faker import Faker
 import pagan
 
@@ -59,8 +59,9 @@ def add_pseudo_channel_post_and_replies(cid: int, accessors_id: list):
     For a cid given, make a channel post and a post comment. Random votes
     on this post and comment by users in accessors_id
     """
-    # print(f"channel {cid} with personnel {accessors_id}")
-    channel_post = post_on_channel(uid=choice(accessors_id), title=choice(random_texts),
+    poster_uid = choice(accessors_id)
+    # warnings.warn(f"channel {cid} with personnel {accessors_id}, selected poster {poster_uid}")
+    channel_post = post_on_channel(uid=poster_uid, title=choice(random_texts),
                                    cid=cid, text=" ".join(sample(random_texts,
                                                                  k=random.randint(1, 10))))
     for voter in get_random_voters(accessors_id):
@@ -68,7 +69,7 @@ def add_pseudo_channel_post_and_replies(cid: int, accessors_id: list):
 
     repliers = sample(accessors_id, min(2, len(accessors_id)))
     for replier in repliers:
-        post_reply = comment_to_channel_post(uid=replier,
+        post_reply = comment_on_channel_post(uid=replier,
                                              post_id=channel_post,
                                              text=" ".join(sample(random_texts,
                                                                   k=random.randint(1, 10))))
@@ -77,8 +78,8 @@ def add_pseudo_channel_post_and_replies(cid: int, accessors_id: list):
                                       upvote=bool(random.getrandbits(1)))
 
 
-subject_list = [e for e in Subject]
-grade_list = [e for e in Grade]
+subject_list = [e for e in Subject if e != Subject.NULL]
+grade_list = [e for e in Grade if e != Grade.NULL]
 
 
 def get_random_teaching_areas() -> dict:
@@ -99,7 +100,7 @@ def get_random_teaching_areas() -> dict:
 # test user 1
 teaching_areas = {Subject.MATHS_A: [True], Subject.CHEMISTRY: [True], Subject.ENGLISH: [True]}
 uid0 = add_user(username="Ashley Gibbons", password="123456", email="a.gibbsons@uq.edu.au",
-                avatar_link="static/avatar/ashley_gibbons.png",
+                avatar_link="avatar/ashley_gibbons.png",
                 bio="Hi! My name is Ashley and I love children! "
                     "Especially teaching them! I have worked at Somerset College for"
                     " 4 years and honestly I wanna leave. But I am stuck while I pay for"
@@ -111,7 +112,7 @@ uid0 = add_user(username="Ashley Gibbons", password="123456", email="a.gibbsons@
 for i in range(1, 10):
     name = random_person.name()
     avatar = pagan.Avatar(name, pagan.MD5)
-    file_path = "static/avatar"
+    file_path = "avatar"
     avatar.save(file_path, f"{i}.png")
     file_path += f"/{i}.png"
     globals()[f"uid{i}"] = add_user(username=name, password="123456",
@@ -126,23 +127,13 @@ users_id = [e for e in range(1, 11)]
 
 # add tag
 add_tag("CS")
-add_tag("Math Tutorial")
-add_tag("Drama activities")
-add_tag("Math practice sheet")
-add_tag("1-min tutorial")
+add_tag("Math_Tutorial")
+add_tag("Drama_activities")
+add_tag("Math_practice_sheet")
+add_tag("1_min_tutorial")
 add_tag("brainstorming")
-add_tag('distance teaching')
-add_tag("metric math")
-
-# used to test unique violation rollback
-# with Session() as conn:
-#     for i in conn.query(Tag).all():
-#         print(i.tag_name)
-# # trigger unique constraint
-# add_tag("metric math")
-# with Session() as conn:
-#     for i in conn.query(Tag).all():
-#         print(i.tag_name)
+add_tag('distance_teaching')
+add_tag("metric_math")
 
 tags = get_tags()
 print(tags)
@@ -152,7 +143,7 @@ print("\n")
 # single pdf file
 src0 = add_resource(title="CS50 at Harvard - The Most Rewarding Class I Have Taken"
                           " . . . Ever!",
-                    resource_link="static/resource/CS50_at_Harvard_The_Most_Rewarding"
+                    resource_link="resource/CS50_at_Harvard_The_Most_Rewarding"
                                   "_Class_I_Have_Taken_Ever.pdf",
                     difficulty=ResourceDifficulty.EASY, subject=Subject.IT,
                     tags_id=[tags["CS"], tags["brainstorming"]],
@@ -170,7 +161,7 @@ src0 = add_resource(title="CS50 at Harvard - The Most Rewarding Class I Have Tak
                                 "president, who is having an animated discussion with an "
                                 "undergraduate. "
                                 " Is this a party? A film festival? No. This is CS50.",
-                    grade=Grade.TERTIARY, creaters_id=sample(users_id, k=random.randint(1, 10)))
+                    grade=Grade.TERTIARY, creaters_id=sample(users_id, k=1))
 
 """
 Embed link:
@@ -183,8 +174,8 @@ src1 = add_resource(title="Grade 2 Math 1.1, Understanding Addition",
                     resource_link="https://www.youtube.com/embed/kztICk78ZcE",
                     difficulty=ResourceDifficulty.MODERATE,
                     grade=Grade.YEAR_2,
-                    creaters_id=sample(users_id, k=random.randint(1, len(users_id))),
-                    tags_id=[tags["Math Tutorial"], tags["1-min tutorial"]],
+                    creaters_id=sample(users_id, k=1),
+                    tags_id=[tags["Math_Tutorial"], tags["1_min_tutorial"]],
                     subject=Subject.MATHS_A,
                     description="How to do basic addition and the parts of"
                                 " an addition sentence. Using counters to add. Page"
@@ -193,7 +184,7 @@ src1 = add_resource(title="Grade 2 Math 1.1, Understanding Addition",
 """
 Embed link:
 <iframe width="560" height="315" src="https://www.youtube.com/embed/efnA7byI8sg"
- title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; 
+ title="YouTube video player" frameborder="0" allow="accelerometer; autoplay;
  clipboard-write; encrypted-media; gyroscope; picture-in-picture"
   allowfullscreen></iframe>
 """
@@ -201,8 +192,8 @@ src2 = add_resource(title="3rd Grade Math 8.6, Relate Fractions and Whole Number
                     resource_link="https://www.youtube.com/embed/efnA7byI8sg",
                     difficulty=ResourceDifficulty.SPECIALIST,
                     grade=Grade.YEAR_3,
-                    creaters_id=sample(users_id, k=random.randint(1, 10)),
-                    tags_id=[tags["Math Tutorial"]],
+                    creaters_id=sample(users_id, k=1),
+                    tags_id=[tags["Math_Tutorial"]],
                     subject=Subject.MATHS_B,
                     description="A fraction can represent an amount less than one"
                                 " whole, one whole, or more than one whole. When a "
@@ -220,8 +211,8 @@ Embed link:
 src3 = add_resource(title="Drama Lesson Activities, Grade 4-6: Creative Play",
                     resource_link="https://www.youtube.com/embed/u8VEuS-32JM",
                     difficulty=ResourceDifficulty.EASY,
-                    creaters_id=sample(users_id, k=random.randint(1, 10)),
-                    tags_id=[tags["Drama activities"]], grade=Grade.YEAR_6,
+                    creaters_id=sample(users_id, k=1),
+                    tags_id=[tags["Drama_activities"]], grade=Grade.YEAR_6,
                     subject=Subject.DRAMA,
                     description="A variety of creative drama games are explored. These games"
                                 " teach basic skills such as problem solving, communication,"
@@ -232,25 +223,25 @@ src3 = add_resource(title="Drama Lesson Activities, Grade 4-6: Creative Play",
 
 # compressed file of multiple pdfs
 src4 = add_resource(title="Grade 12 QLD Math C U10 worksheet",
-                    resource_link="static/resource/MQC-12.zip",
+                    resource_link="resource/MQC-12.zip",
                     difficulty=ResourceDifficulty.SPECIALIST,
-                    creaters_id=sample(users_id, k=random.randint(1, 10)),
-                    tags_id=[tags["Math practice sheet"]],
+                    creaters_id=sample(users_id, k=1),
+                    tags_id=[tags["Math_practice_sheet"]],
                     grade=Grade.YEAR_12, subject=Subject.MATHS_C,
                     description="Some worksheets directly copied from MCQ website.")
 
 """
 Embed link:
 <iframe width="560" height="315" src="https://www.youtube.com/embed/1IbkUY9vZcU"
- title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; 
+ title="YouTube video player" frameborder="0" allow="accelerometer; autoplay;
  clipboard-write; encrypted-media; gyroscope; picture-in-picture"
   allowfullscreen></iframe>
 """
 src5 = add_resource(title="4th Grade Math Input-Output Tables",
                     resource_link="https://www.youtube.com/embed/1IbkUY9vZcU",
                     difficulty=ResourceDifficulty.EASY,
-                    creaters_id=sample(users_id, k=random.randint(1, 10)),
-                    tags_id=[tags["Math Tutorial"]],
+                    creaters_id=sample(users_id, k=1),
+                    tags_id=[tags["Math_Tutorial"]],
                     grade=Grade.YEAR_4, subject=Subject.MATHS_A,
                     description="Learn how to find unknown quantities in the "
                                 "position or value of numbers as they relate to rule"
@@ -261,12 +252,6 @@ src5 = add_resource(title="4th Grade Math Input-Output Tables",
 for i in range(0, 6):
     rid = globals()[f"src{i}"]
     add_pseudo_comment_to_resource(rid=rid, accessors_id=users_id)
-
-    # resource_comments = get_resource_comments(rid=rid)
-    # resource_comment_replies = get_resource_comment_replies(resource_comments)
-    # print(f"rid = {rid}, number of resource comment = {len(resource_comments)},"
-    #       f"number of resource comment replies to that comment = "
-    #       f"{len(resource_comment_replies)}")
 
 # next 5 resources are private, all resources are locally stored
 resource_titles = ["Learn Chinese for Beginners Beginner Chinese"
@@ -283,7 +268,7 @@ resource_links = ["Learn_Chinese_for_Beginners_Beginner_Chinese_Lesson_1_Self-"
                   "Grade_12_Calculus_An_Introduction_to_Calculus_and_Overview_"
                   "of_Key_Concepts_NSC_DBE_Maths_NTE.mp4",
                   "Algebra.Factorization.Factoring_Quadratic_Expressions_-_(B).US.pdf"]
-resource_links = ["static/resource/" + e for e in resource_links]
+resource_links = ["resource/" + e for e in resource_links]
 grades = [Grade.TERTIARY, Grade.YEAR_12, Grade.YEAR_12, Grade.YEAR_12, Grade.YEAR_12]
 subjects = [Subject.CHINESE, Subject.MATHS_C, Subject.MATHS_C, Subject.MATHS_C,
             Subject.MATHS_C]
@@ -315,21 +300,21 @@ descriptions = ["Learn Chinese w/ ChineseFor.Us Beginner Chinese Lesson 1: Self-
                 "\n●The Calculus of motion",
                 "Factor the following quadratic expressions."]
 
-resource_tags = [[tags["1-min tutorial"], tags['distance teaching']],
-                 [tags["Math practice sheet"], tags["brainstorming"]],
-                 [tags["Math Tutorial"]],
-                 [tags["Math Tutorial"], tags["metric math"]],
-                 [tags["Math practice sheet"]]]
+resource_tags = [[tags["1_min_tutorial"], tags['distance_teaching']],
+                 [tags["Math_practice_sheet"], tags["brainstorming"]],
+                 [tags["Math_Tutorial"]],
+                 [tags["Math_Tutorial"], tags["metric_math"]],
+                 [tags["Math_practice_sheet"]]]
 
 OFFSET = 6
 for i in range(6, 11):
     name = random_person.name()
     avatar = pagan.Avatar(name, pagan.MD5)
-    file_path = "static/thumbnail"
+    file_path = "thumbnail"
     file_name = resource_titles[i - OFFSET].replace(' ', '_') + ".png"
     avatar.save(file_path, file_name)
     file_path += f"/{file_name}"
-    creaters = sample(users_id, k=random.randint(1, len(users_id)))
+    creaters = sample(users_id, k=1)
     compliment = list(set(users_id) - set(creaters))
     # creater must included in personnel
     personnel = creaters + sample(compliment, k=random.randint(0, min(3, len(compliment))))
@@ -371,6 +356,11 @@ for i in range(0, 5):
 for i in range(0, 5):
     if visibility[i] != ChannelVisibility.PUBLIC:
         personnel = sample(users_id, k=random.randint(1, len(users_id)))
+
+        # add user 1 to channel 2 deliberately
+        if i == 2:
+            personnel.append(1)
+
         # get rid of duplicate admin_id, if selected by random
         personnel = list(set(personnel))
     else:
@@ -390,27 +380,3 @@ for i in range(0, 5):
         add_pseudo_channel_post_and_replies(cid=globals()[f"cid{i}"],
                                             accessors_id=personnel
                                             if personnel is not None else users_id)
-
-# with Session() as conn:
-#     for i in conn.query(Resource).all():
-#         print(i)
-#     print("\n")
-#
-#     for i in conn.query(ResourceTagRecord).all():
-#         print(i)
-#     print("\n")
-#
-#     for i in conn.query(PrivateResourcePersonnel).all():
-#         print(i)
-#     print("\n")
-#
-#     for i in conn.query(ResourceCreater).all():
-#         print(i)
-#     print("\n")
-#
-#     for i in conn.query(ResourceComment).all():
-#         print(i)
-#     print("\n")
-#
-#     for i in conn.query(ResourceCommentReply).all():
-#         print(i)

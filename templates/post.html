@@ -1,295 +1,258 @@
 {% extends 'base.html' %}
 
 {% block style %}
+<style>
+    a:link {
+        text-decoration: none;
+    }
 
+    a:visited {
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: none;
+    }
+
+    a:active {
+        text-decoration: none;
+    }
+
+
+        body {
+            /* Adds a Hex honeycomb background */
+            /* background-image: url(
+        {{url_for('static', filename='img/hex_back.png')}} ),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
+            background-color: #ffe5ec;
+
+            background-image: radial-gradient(rgb(255, 242, 245), rgb(255, 242, 245), rgb(255, 242, 245));
+        {#background-color: rgb(245, 245, 255);#}
+        }
+    .btn-primary {
+        background-color: #ff8fab;
+        color: white;
+        border-color: #ff8fab;
+    }
+    .btn-primary:hover {
+        color:white;
+        background-color: #3a78ef;
+    }
+
+    .btn-outline-primary {
+        background-color: rgb(255, 255, 255);
+        color:#000000;
+        border-color: white;
+    }
+
+    .btn-outline-primary:hover {
+        color:white;
+        background-color: #3a78ef;
+    }
+
+    .btn-check:checked+.btn-outline-primary {
+        color: white;
+        background-color:  #ff8fab;
+        border-color:   #ff8fab;
+    }
+    .bg-white {
+        background-color: #ffd6e1;
+    }
+    .bg-primary {
+        background-color: #ff8fab!important;
+    }
+    .btn-close {
+        width: 0.5rem;
+        height: 0.5rem;
+    }
+
+     a {
+        color: #000000;
+    }
+</style>
 {% endblock %}
 
 {% block script %}
-     <!-- Template for a initial post card (The initial post)-->
-<script type="text/template" id="init_post_card">
-    <% _.each(data,  function(res) { %>
-        <div class="row">
-            <!-- Profile picture-->
-            <div class="col-2" style="width: 10%">
-                <img class="rounded-circle img-fluid" src="{{url_for('static', filename='avatar/ashley_gibbon.png')}}" ,
-                     alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
-            </div>
-
-            <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important; margin-right: 2rem!important;">
-                <!-- Author name and time -->
-                <div class = "row">
-                    <div class="fw-bold" style="padding: 0rem!important; font-size: large; margin-bottom: 1rem!important;">
-                        (Author Name) - <%= res.created_at %>
-                    </div>
-                </div>
-                        <!-- Description on a channel -->
-                <div class = "row">
-                    <span style="font-size: small; padding-left: 0; text-align: justify">
-                        <%= res.init_text %>  <!-- THIS IS THE ONLY LINE THAT IS DIFFERENT TO A NORMAL COMMENT-->
-                    </span>
-                </div>
-            </div>
-        </div>
-
-                <div class="d-flex flex-row-reverse"style = "margin-right: 2rem!important; margin-top: 0.25rem!important;">
-                    <img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.PNG')}}" ,
-                             alt="Logo", width="25", style="margin:2px!important; margin-left:0.5rem!important; margin-right: 2px!important;"> <%= res.upvote_count %>
-                    <img class="rounded img-fluid" src="{{url_for('static', filename='img/UpvotePink.PNG')}}" ,
-                             alt="Logo", width="25", style="margin:2px!important; margin-left:0.5rem!important; margin-right: 1rem!important;"> <%= res.downvote_count %>
-                </div>
-
-                <hr style="width:97%; margin-right: 60px; margin-left: 15px; margin-bottom: 0rem!important;">
-    <% }); %>
-</script>
-
-    <!-- Template for a comment card (Not the intiial post)-->
-<script type="text/template" id="comment_card">
-    <% _.each(data,  function(res) { %>
-        <div class="row">
-            <!-- Profile picture-->
-            <div class="col-2" style="width: 10%">
-                <img class="rounded-circle img-fluid" src="{{url_for('static', filename='avatar/ashley_gibbon.png')}}" ,
-                     alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
-            </div>
-
-            <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important; margin-right: 2rem!important;">
-                <!-- Author name and time -->
-                <div class = "row">
-                    <div class="fw-bold" style="padding: 0rem!important; font-size: large; margin-bottom: 1rem!important;">
-                        (Author Name) - <%= res.created_at %>
-                    </div>
-                </div>
-                        <!-- Description on a channel -->
-                <div class = "row">
-                    <span style="font-size: small; padding-left: 0; text-align: justify">
-                        <%= res.text %>
-                    </span>
-                </div>
-            </div>
-        </div>
-
-                <div class="d-flex flex-row-reverse"style = "margin-right: 2rem!important; margin-top: 0.25rem!important;">
-                    <img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.PNG')}}" ,
-                             alt="Logo", width="25", style="margin:2px!important; margin-left:0.5rem!important; margin-right: 2px!important;"> <%= res.upvote_count %>
-                    <img class="rounded img-fluid" src="{{url_for('static', filename='img/UpvotePink.PNG')}}" ,
-                             alt="Logo", width="25", style="margin:2px!important; margin-left:0.5rem!important; margin-right: 1rem!important;"> <%= res.downvote_count %>
-                </div>
-
-                <hr style="width:97%; margin-right: 60px; margin-left: 15px; margin-bottom: 0rem!important;">
-    <% }); %>
-</script>
-
 
 
 {% endblock %}
 
 {% block content %}
 
-
-<div class="container" style="margin-bottom: 3rem!important; padding-left: 125px; padding-right: 125px">
+<div class="container">
 <!-- Question and top section -->
         <div class="row">
                     <dt class="col-sm-9" style = "font-size: x-large; margin-top:2rem!important;">
-                         How do I stop kids from Using Netflix in my class? (Title of the post)
+                        {{post_info["title"]}}
                     </dt>
+                    {% if has_edit_privilege %}
                      <!-- NOTE: IF THE USER IS NOT THE ADMIN, THIS SECTION OF HTML IS DELETED -->
                     <div class="col-3" style="margin-top:2rem!important;">
                         <div class = "d-flex flex-row-reverse" >
-                         <a href="{{url_for('create')}}" class="btn btn-primary d-md-block" style = "width: 60%" aria-haspopup="true" aria-expanded="false">
+                         <a href="{{url_for('create_or_modify_channel_post', cid=channel.cid, post_id=post_info['post_id'])}}" class="btn btn-primary d-md-block" style = "width: 60%" aria-haspopup="true" aria-expanded="false">
                             <dd class="text-center font-weight-bold">Edit Post</dd>
                         </a>
                         </div>
                     </div>
+                    {% endif %}
         </div>
 
-        <div class="col d-flex justify-content-md-between">
-
-            <!-- FIXME Change UID 1 to logged in user -->
-                <!-- First card to indicate the original post-->
-                    <div class="card flex-fill shadow-sm" style="margin-top: 2rem!important;">
-                        <!-- Single Comment-->
-                            <div class="row">
-                                <!-- Thumbnail for a channel -->
-                                <div class="col-2" style="width: 10%">
-                                    <img class="rounded-circle img-fluid" src="{{url_for('static', filename='avatar/ashley_gibbon.png')}}" ,
-                                    alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
-
-                                </div>
-                                <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important; margin-right: 2rem!important;">
-                                    <!-- Title -->
-                                    <div class = "row">
-                                        <div class="fw-bold" style="padding: 0rem!important; font-size: large; margin-bottom: 1rem!important;">
-                                            Ashley Gibbons (Author) - Posted on 28-08-21 12:10 (Date)
-                                        </div>
-                                    </div>
-                                    <!-- Description on a channel -->
-                                    <div class = "row">
-                                        <span style="font-size: small; padding-left: 0; text-align: justify">According to all known laws of aviation,
-                                            there is no way a bee should be able to fly. Its wings are too small to get its fat little body off the ground.
-                                            The bee, of course, flies anyway because bees don't care what humans think is impossible.
-                                            Yellow, black. Yellow, black. Yellow, black. Yellow, black. Ooh, black and yellow! Let's shake it up a little.
-                                            Barry! Breakfast is ready!
-                                            Ooming!
-                                            Hang on a second.
-                                            Hello?
-                                            - Barry? - Adam?
-                                            - Oan you believe this is happening?
-                                            - I can't. I'll pick you up.
-                                            Looking sharp.
-                                            Use the stairs. Your father
-                                            paid good money for those.
-                                            Sorry. I'm excited.
-                                            Here's the graduate.
-                                            We're very proud of you, son.
-                                            A perfect report card, all B's.
-                                            Very proud.
-                                            Ma! I got a thing going here.
-                                            - You got lint on your fuzz.
-                                            - Ow! That's me!
-                                            - Wave to us! We'll be in row 118,000.
-                                            - Bye!
-                                            Barry, I told you,
-                                            stop flying in the house!
-                                            - Hey, Adam.
-                                            - Hey, Barry.
-                                            - Is that fuzz gel?
-                                            - A little. Special day, graduation.
-                                            Never thought I'd make it.
-                                            Three days grade school,
-                                            three days high school.
-                                            Those were awkward.
-                                            Three days college. I'm glad I took
-                                            a day and hitchhiked around the hive.
-                                            You did come back different.
-                                            - Hi, Barry.
-                                            - Artie, growing a mustache? Looks good.
-                                            - Hear about Frankie?
-                                            - Yeah.
-
-                                            </span>
-                                    </div>
-                                    <!-- Tags on a channel -->
-
-
-                                </div>
-
-
-                            </div>
-
-                            <div class="d-flex flex-row-reverse"style = "margin-right: 2rem!important; margin-top: 0.25rem!important;">
-                                <img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.PNG')}}" ,
-                                         alt="Logo", width="25", style="margin:2px!important; margin-left:0.5rem!important; margin-right: 2px!important;"> 2
-                                <img class="rounded img-fluid" src="{{url_for('static', filename='img/UpvotePink.PNG')}}" ,
-                                         alt="Logo", width="25", style="margin:2px!important; margin-left:0.5rem!important; margin-right: 1rem!important;"> 4
-                            </div>
-
-                            <hr style="width:97%; margin-right: 60px; margin-left: 15px; margin-bottom: 0rem!important;">
-
-                        <!-- Single Comment-->
-                        <div class="row">
-                                <!-- Thumbnail for a channel -->
-                                <div class="col-2" style="width: 10%">
-                                    <img class="rounded-circle img-fluid" src="{{url_for('static', filename='avatar/ashley_gibbon.png')}}" ,
-                                    alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
-
-                                </div>
-                                <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important; margin-right: 2rem!important;">
-                                    <!-- Title -->
-                                    <div class = "row">
-                                        <div class="fw-bold" style="padding: 0rem!important; font-size: large; margin-bottom: 1rem!important;">
-                                            Ashley Gibbons (Author) - Posted on 29-08-21 12:12 (Date)
-                                        </div>
-                                    </div>
-                                    <!-- Description on a channel -->
-                                    <div class = "row">
-                                        <span style="font-size: small; padding-left: 0; text-align: justify">Can somebody please respond?
-                                            </span>
-                                    </div>
-
-
-                                </div>
-
-
-                            </div>
-
-                            <div class="d-flex flex-row-reverse"style = "margin-right: 2rem!important; margin-top: 0.25rem!important;">
-                                <img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.PNG')}}" ,
-                                         alt="Logo", width="25", style="margin:2px!important; margin-left:0.5rem!important; margin-right: 2px!important;"> 2
-                                <img class="rounded img-fluid" src="{{url_for('static', filename='img/UpvotePink.PNG')}}" ,
-                                         alt="Logo", width="25", style="margin:2px!important; margin-left:0.5rem!important; margin-right: 1rem!important;"> 4
-                            </div>
-
-                            <hr style="width:97%; margin-right: 60px; margin-left: 15px; margin-bottom: 0rem!important;">
-
-
-                        <!-- Another comment  -->
-                            <div class="row">
-                                <!-- Thumbnail for a channel -->
-                                <div class="col-2" style="width: 10%">
-                                    <img class="rounded-circle img-fluid" src="{{url_for('static', filename='img/default_profile.png')}}" ,
-                                    alt="Logo", width="65", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
-
-                                </div>
-                                <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important; margin-right: 2rem!important;">
-                                    <!-- Title -->
-                                    <div class = "row">
-                                        <div class="fw-bold" style="padding: 0rem!important; font-size: large; margin-bottom: 1rem!important;">
-                                            Mike Oxlong (Author) - Posted on 29-08-21 12:12 (Date)
-                                        </div>
-                                    </div>
-                                    <!-- Description on a channel -->
-                                    <div class = "row">
-                                        <span style="font-size: small; padding-left: 0; text-align: justify">Ashley please stop asking dumb questions
-                                            </span>
-                                    </div>
-
-
-                                </div>
-
-
-                            </div>
-
-                            <div class="d-flex flex-row-reverse"style = "margin-right: 2rem!important; margin-top: 0.25rem!important;">
-                                <img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.PNG')}}" ,
-                                         alt="Logo", width="25", style="margin:2px!important; margin-left:0.5rem!important; margin-right: 2px!important;"> 0
-                                <img class="rounded img-fluid" src="{{url_for('static', filename='img/UpvotePink.PNG')}}" ,
-                                         alt="Logo", width="25", style="margin:2px!important; margin-left:0.5rem!important; margin-right: 1rem!important;"> 1
-                            </div>
-
-                            <hr style="width:97%; margin-right: 60px; margin-left: 15px; margin-bottom: 0rem!important;">
 
 
 
+     <!-- Template for a initial post card (The initial post)-->
+<div class="col d-flex justif-content-md-between">
+    <div class="card flex-fill shadow-sm" style = "margin-top: 2rem!important;">
+                <div class="row">
+                    <!-- Profile picture-->
+                    <div class="col-2" style="width: 10%">
+                        <img class="rounded-circle img-fluid" src="{{url_for('static', filename=post_info['author_avatar_link'])}}" ,
+                             alt="Logo" width="65" style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
                     </div>
 
-            <!-- Reply Box -->
+                    <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important; margin-right: 2rem!important;">
+                        <!-- Author name and time -->
+                        <div class = "row">
+                            <div class="fw-bold" style="padding: 0rem!important; font-size: large; margin-bottom: 1rem!important;">
+                                {{ post_info["username"] }} - Posted on {{ post_info["created_at"] }}
+                            </div>
+                        </div>
+                                <!-- Description on a channel -->
+                        <div class = "row">
+                            <span style="font-size: small; padding-left: 0; text-align: justify">
+                                {{ post_info["init_text"] }}  <!-- THIS IS THE ONLY LINE THAT IS DIFFERENT TO A NORMAL COMMENT-->
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+{#                id="post_{{ post_info["post_id"] }}_upvote_count"#}
+                <div class="d-flex flex-row-reverse"style = "margin-right: 2rem!important; margin-top: 0.25rem!important;">
+                    <img class="rounded img-fluid"  src="{{url_for('static', filename='img/downvotepink.PNG')}}"
+                             alt="Logo" width="25" style="margin:2px!important; margin-left:0.5rem!important; margin-right: 2px!important;" onclick="votePostOrComment('post', {{ post_info['post_id'] }}, false)">
+                    <p class="card-text px-3" id="post_{{ post_info["post_id"]|string }}_downvote_count">{{ post_info["downvote_count"] }}</p>
+                    <img class="rounded img-fluid" src="{{url_for('static', filename='img/UpvotePink.PNG')}}"
+                             alt="Logo" width="25" style="margin:2px!important; margin-left:0.5rem!important; margin-right: 1rem!important;" onclick="votePostOrComment('post',{{ post_info['post_id'] }}, true)">
+                    <p class="card-text px-3" id="post_{{ post_info["post_id"]|string }}_upvote_count">{{post_info["upvote_count"]}}</p>
+                </div>
+
+                <hr style="width:97%; margin-right: 60px; margin-left: 15px; margin-bottom: 0rem!important;">
+
+
+    <!-- Template for a comment card (Not the initial post)-->
+
+    {% for comment in comments_info %}
+        <div class="row">
+            <!-- Profile picture-->
+            <div class="col-2" style="width: 10%">
+                <img class="rounded-circle img-fluid" src="{{url_for('static', filename=comment["commenter_avatar_link"])}}" ,
+                     alt="Logo" width="65" style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
+            </div>
+
+            <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important; margin-right: 2rem!important;">
+                <!-- commenter name and time -->
+                <div class = "row">
+                    <div class="fw-bold" style="padding: 0rem!important; font-size: large; margin-bottom: 1rem!important;">
+                        {{ comment["username"]}} - Posted on {{ comment["created_at"] }}
+                    </div>
+                </div>
+                        <!-- Description on a channel -->
+                <div class = "row">
+                    <span style="font-size: small; padding-left: 0; text-align: justify">
+                        {{comment["text"]}}
+                    </span>
+                </div>
+            </div>
         </div>
+
+                <div class="d-flex flex-row-reverse"style = "margin-right: 2rem!important; margin-top: 0.25rem!important;">
+                    <img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.PNG')}}"
+                             alt="Logo" width="25" style="margin:2px!important; margin-left:0.5rem!important; margin-right: 2px!important;" onclick="votePostOrComment('comment', {{ comment['post_comment_id'] }}, false)">
+                    <p class="card-text px-3" id="comment_{{ comment["post_comment_id"]|string }}_downvote_count">{{comment["downvote_count"]}}</p>
+                    <img class="rounded img-fluid" src="{{url_for('static', filename='img/UpvotePink.PNG')}}"
+                             alt="Logo" width="25" style="margin:2px!important; margin-left:0.5rem!important; margin-right: 1rem!important;" onclick="votePostOrComment('comment', {{ comment['post_comment_id'] }}, true)">
+                    <p class="card-text px-3" id="comment_{{ comment["post_comment_id"]|string }}_upvote_count">{{comment["upvote_count"]}}</p>
+
+                </div>
+
+                <hr style="width:97%; margin-right: 60px; margin-left: 15px; margin-bottom: 0rem!important;">
+    {% endfor %}
+    </div>
+</div>
+<script type="text/javascript">
+    // implement voting
+    function votePostOrComment(post_or_comment, id, is_upvote) {
+        $.ajax({
+                type: "GET",
+                url: "{{ url_for('vote_channel_post_or_comment') }}",
+                data: {
+                    "uid": {{ current_user_id }},
+                    "id": id,
+                    "upvote": is_upvote,
+                    "post_or_comment": post_or_comment
+                },
+                success: function (response) {
+                    var down_text = post_or_comment + "_" + id.toString() + "_downvote_count"
+
+                    var up_text = post_or_comment + "_" + id.toString() + "_upvote_count"
+
+                    // update
+                    $("#" + up_text).text(response["upvote_count"]);
+                    $("#" + down_text).text(response["downvote_count"]);
+                    console.log("upvote name " + up_text)
+                    console.log("new upvote is" + $('#' + up_text).text())
+                    console.log("new downvote is " + $('#' + down_text).text())
+                }
+            }
+        )
+    }
+
+</script>
+
+
+
+            <!-- Reply Box -->
         <div class="d-flex flex-start w-100" style = "margin-top: 2rem!important">
               <img
                             class="rounded-circle shadow-1-strong me-3"
-                            src="{{url_for('static', filename='img/default_profile.png')}}"
+                            src="{{url_for('static', filename='avatar/default_profile.png')}}"
                             alt="avatar"
                             width="50"
                             height="50"
                           />
-              <div class="form-outline w-100">
-                <textarea
-                  class="form-control"
-                  id="textAreaExample"
-                  rows="4"
-                  style="background: #fff;"
-                  placeholder = "Leave a comment"
-                ></textarea>
+            <form class = "form-outline w-100" id="comment_form" action="{{ url_for('add_new_post_comment', cid=channel.cid, post_id=post_info['post_id']) }}" method="post">
+                <div class="form-outline w-100">
+                    <textarea
+                      class="form-control"
+                      id="comment_input"
+                      rows="4"
+                      style="background: #fff;"
+                      placeholder = "Leave a comment"
+                      form="comment_form"
+                      name="comment_text"
+                    ></textarea>
 
-            <div class="float-end mt-2 pt-1">
+                    <div class="float-end mt-2 pt-1">
+
+
                 <!-- Button to leave a comment. NEEDS TO BE IMPLEMENTED-->
-              <button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;">Post Comment</button>
+                        <input type="submit" form="comment_form" value="Post Comment" class="btn btn-primary btn-sm"
+                               style="margin-right: 1rem!important;"/>
                 <!-- NEEDS TO BE IMPLEMENTED, clears the form / comment box-->
-              <button type="Button" class="btn btn-outline-primary btn">Cancel</button>
-            </div>
+                  <button type="Button" class="btn btn-outline-primary btn-sm" onclick="javascript:eraseText()">Clear</button>
+
+
+                    <script>
+                    // use this to clear text in textarea when Clear button is clicked
+                    function eraseText() {
+                        document.getElementById("comment_input").value = "";
+                    }
+                    </script>
+                    </div>
+                </div>
+            </form>
+
+
+
           </div>
         </div>
-
-    </div>
-</div>
 {% endblock %}
