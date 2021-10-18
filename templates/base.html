@@ -216,8 +216,8 @@
                 <a class="navbar-brand" style = "margin-right: auto!important; margin-left: auto!important;" href="{{url_for('profile')}}"
                     class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
                     <div class="d-flex">
-                        <p class="h4 nav-link px-4 pt-3 text-light" style="padding-left: 3rem!important; padding-right: 3rem!important;
-                    margin-left: auto; margin-right: auto; font-size: 1.2rem"> {{current_user.username}}</p>
+                        <p class="h4 nav-link px-4 pt-3 text-light" style="padding-left: 3rem!important; padding-right: 1.5rem!important;
+                    margin-left: auto; margin-right: auto; font-size: 1rem"> {{current_user.username}}</p>
                         <img src="{{url_for('static',filename=current_user.avatar_link)}}" , alt="profile" , width="50" ,
                         height="50">
                     </div>
@@ -226,7 +226,7 @@
                 <a class="navbar-brand" style = "margin-right: auto!important; margin-left: auto!important;" href="{{url_for('login')}}?next={{request.url}}"
                     class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
                     <div class="d-flex">
-                        <p class="h4 nav-link px-4 pt-3 text-light" style="padding-left: 3rem!important; padding-right: 3rem!important;
+                        <p class="h4 nav-link px-4 pt-3 text-light" style="padding-left: 3rem!important; padding-right: 1.5rem!important;
                     margin-left: auto; margin-right: auto; font-size: 1.2rem"> Login </p>
                         <img src="{{url_for('static', filename='img/default_profile.png')}}" , alt="profile" , width="50" ,
                             height="50">
