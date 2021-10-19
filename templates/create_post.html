@@ -103,17 +103,22 @@
      let postSubmit = false;
      window.addEventListener('beforeunload', (event) => {
         if (!postSubmit) {
-            event.returnValue = 'You have unfinished changes!';
             alert("Not submit");
+            event.returnValue = 'You have unfinished changes!';
+
          }
         alert("Submitted");
         });
      alert("Made it here 2")
+
+
     </script>
+
     <script>
     function toggle2() {
         postSubmit = true;
         alert("Made it here")
+        window.removeEventListener('beforeunload', this.Window)
     }
     </script>
 
