@@ -109,11 +109,12 @@
         if (formSubmitting) {
             return undefined;
         }
-
-        var confirmationMessage = 'It looks like you have been editing something. '
+        e.preventDefault()
+        return e
+        {#var confirmationMessage = 'It looks like you have been editing something. '
                                 + 'If you leave before saving, your changes will be lost.';
 
-        return confirmationMessage; 
+        return confirmationMessage;#}
     });
     };
     </script>
