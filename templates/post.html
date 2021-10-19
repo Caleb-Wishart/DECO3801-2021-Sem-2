@@ -2,6 +2,7 @@
 
 
 {% block style %}
+
 <style>
     .clickedUp {
         fill: #2e9cfa;
@@ -35,10 +36,7 @@
                     {% endif %}
         </div>
 
-
-
-
-     <!-- Template for a initial post card (The initial post)-->
+    <!-- Template for a initial post card (The initial post)-->
 <div class="col d-flex justif-content-md-between">
     <div class="card flex-fill shadow-sm" style = "margin-top: 2rem!important;">
                 <div class="row">
@@ -58,13 +56,12 @@
                                 <!-- Description on a channel -->
                         <div class = "row">
                             <span style="font-size: small; padding-left: 0; text-align: justify">
-                                {{ post_info["init_text"] }}  <!-- THIS IS THE ONLY LINE THAT IS DIFFERENT TO A NORMAL COMMENT-->
+                                {{ post_info["init_text"] }}
                             </span>
                         </div>
                     </div>
                 </div>
 
-{#                id="post_{{ post_info["post_id"] }}_upvote_count"#}
                 <div class="d-flex flex-row-reverse"style = "margin-right: 2rem!important; margin-top: 0.25rem!important;">
                     {#<img class="rounded img-fluid"  src="{{url_for('static', filename='img/downvotepink.PNG')}}"
                              alt="Logo" width="25" style="margin:2px!important; margin-left:0.5rem!important; margin-right: 2px!important;" onclick="votePostOrComment('post', {{ post_info['post_id'] }}, false)">
@@ -187,23 +184,18 @@ function highlight(image, bool, id) { //Changes what button is currently active 
         var y = document.getElementById("up_" + id)
         $(y).removeClass("clickedUp") //Remove any colour on the upvote
     }
-
-
 }
-
-
 </script>
 
             <!-- Reply Box -->
         <div class="d-flex flex-start w-100" style = "margin-top: 2rem!important">
-              <img
-                            class="rounded-circle shadow-1-strong me-3"
-                            src="{{url_for('static', filename=current_user.avatar_link)}}"
-                            alt="avatar"
-                            width="50"
-                            height="50"
-                            style="margin-top: 0.5rem!important;"
-                          />
+              <img class="rounded-circle shadow-1-strong me-3"
+                   src="{{url_for('static', filename=current_user.avatar_link)}}"
+                   alt="avatar"
+                   width="50"
+                   height="50"
+                   style="margin-top: 0.5rem!important;"
+              />
             <form class = "form-outline w-100" id="comment_form" action="{{ url_for('add_new_post_comment', cid=channel.cid, post_id=post_info['post_id']) }}" method="post">
                 <div class="form-outline w-100">
                     <textarea
@@ -225,7 +217,6 @@ function highlight(image, bool, id) { //Changes what button is currently active 
                 <!-- NEEDS TO BE IMPLEMENTED, clears the form / comment box-->
                   <button type="Button" class="btn btn-outline-danger btn-sm" onclick="javascript:eraseText()">Clear</button>
 
-
                     <script>
                     // use this to clear text in textarea when Clear button is clicked
                     function eraseText() {
@@ -235,9 +226,6 @@ function highlight(image, bool, id) { //Changes what button is currently active 
                     </div>
                 </div>
             </form>
-
-
-
           </div>
         </div>
 {% endblock %}

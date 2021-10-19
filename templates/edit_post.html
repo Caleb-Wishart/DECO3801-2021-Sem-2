@@ -106,6 +106,7 @@
 
     </script>
     <script>
+    //Handles leaving messages
     window.addEventListener('beforeunload', (event) => {
         if (!formSubmitting) {
             event.returnValue = 'You have unfinished changes!';
@@ -113,6 +114,7 @@
     });
     </script>
     <script>
+    //Handles it so that if you submit a form, you don't get the leaving window message
     function toggleForm() {
         formSubmitting = true;
     }
