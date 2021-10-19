@@ -3,14 +3,6 @@
 
 {% block content %}
     <!-- Handles making the user confirm they want to leave this page as all unsaved changes will be lost-->
-    <body onbeforeunload = "return leavePageFunction()">
-        <script>
-            function leavePageFunction() {
-                return "Testing something"
-            }
-        </script>
-
-    </body>
 
 
 
@@ -107,9 +99,8 @@
             event.returnValue = 'You have unfinished changes!';
 
          }
-        alert("Submitted");
         });
-     alert("Made it here 2")
+
 
 
     </script>
@@ -117,8 +108,6 @@
     <script>
     function toggle2() {
         postSubmit = true;
-        alert("Made it here")
-        window.removeEventListener('beforeunload', this.Window)
     }
     </script>
 
