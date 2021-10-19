@@ -77,7 +77,7 @@
 {#                        <!-- Button to clear the title and body of the post-->#}
 {#                        <button type="Button" class="btn btn-outline-primary btn" onclick="go_to_current_channel_page()">Discard Draft</button>#}
                          <!-- IF WE ARE CREATING EDITTING A POST, USE THE FOLLOWING BUTTONS-->
-                        <input type="submit" form="create_form" value="Save Changes" class="btn btn-primary btn" style="margin-right: 1rem!important;"/>
+                        <input type="submit" form="create_form" value="Save Changes" class="btn btn-primary btn" style="margin-right: 1rem!important;" onclick = "toggleForm()"/>
                         <button type="Button" class="btn btn-outline-danger btn" onclick="go_to_current_channel_page()">Discard Changes</button>
 
                     </div>
@@ -97,7 +97,7 @@
             alert("Please ensure all the required sections are filled!")
             valid = false;
         }
-        formSubmitting = true;
+
 
         return valid;
 
@@ -111,6 +111,11 @@
             event.returnValue = 'You have unfinished changes!';
          }
     });
+    </script>
+    <script>
+    function toggleForm() {
+        formSubmitting = true;
+    }
     </script>
 
     <!-- Redirect to current channel page (used for discard draft) -->
