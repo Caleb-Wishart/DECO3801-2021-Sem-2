@@ -103,11 +103,11 @@
 
     }
 
-    window.onbeforeunload = function () {
-        if (!formSubmitting) {
-            return "Are you sure you wish to leave?"
-        }
-    }
+    window.addEventListener('beforeunload', (event) => {
+        if (formSubmitting) {
+            event.returnValue = 'You have unfinished changes!';
+         }
+    });
     </script>
 
     <!-- Redirect to current channel page (used for discard draft) -->
