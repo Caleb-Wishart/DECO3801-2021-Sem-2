@@ -70,7 +70,7 @@
                     <div class="float-end mt-2 pt-1" style="margin-top: 1rem!important;">
                          <!-- IF WE ARE CREATING A POST, USE THE FOLLOWING BUTTONS-->
                         <!-- Button to upload the post-->
-                      <input type="submit" form="create_form" value="Upload Post" class="btn btn-primary btn" style="margin-right: 1rem!important;" onclick="toggleForm()"/>
+                      <input type="submit" form="create_form" value="Upload Post" class="btn btn-primary btn" style="margin-right: 1rem!important;" onclick="toggle2()"/>
                         <!-- Button to clear the title and body of the post-->
                         <button type="Button" class="btn btn-outline-danger btn" onclick="go_to_current_channel_page()">Discard Draft</button>
                          <!-- IF WE ARE CREATING EDITTING A POST, USE THE FOLLOWING BUTTONS-->
@@ -85,7 +85,7 @@
     </div>
     <!-- Validation check on form submit.-->
     <script type="text/javascript">
-    let formSubmitting = false;
+    let postSubmit = false;
     function validate_form() {
         var valid = true;
 
@@ -101,14 +101,14 @@
 
      <script>
     window.addEventListener('beforeunload', (event) => {
-        if (!formSubmitting) {
+        if (!postSubmit) {
             event.returnValue = 'You have unfinished changes!';
          }
     });
     </script>
     <script>
-    function toggleForm() {
-        formSubmitting = true;
+    function toggle2() {
+        postSubmit = true;
     }
     </script>
 
