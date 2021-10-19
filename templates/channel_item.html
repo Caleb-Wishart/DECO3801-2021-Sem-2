@@ -82,7 +82,7 @@
         <a class="row"  href="/channel/{{ channel.cid }}/post/<%=res.post_id%>">
             <!-- Profile Picture of Author -->
             <div class="col-2" style="width: 12%">
-                <img class="rounded-circle img-fluid" src="{{ url_for('static', filename='')}}/<%= res.poster_avatar_link%>"
+                <img class="rounded-circle img-fluid" src="<%= res.poster_avatar_link%>"
                      alt="Logo" width="65" style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
             </div>
             <div class="col-8" style="margin-top: 5px!important; margin-bottom: 5px!important;">
