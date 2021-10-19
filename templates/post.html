@@ -177,7 +177,7 @@ function highlight(image, bool, id) {
 
     if (bool) { //Upvote
         $(image).toggleClass("clicked")
-        var x = document.getElementById("up_{{ id }}")
+        var x = document.getElementById("up" + id)
         $(x).toggleClass("clicked2")
     } else { //Downvote
          $(image).toggleClass("clicked2")
