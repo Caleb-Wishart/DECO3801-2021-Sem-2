@@ -110,11 +110,7 @@
     <script>
     function toggle2() {
         postSubmit = true;
-        window.removeEventListener('beforeunload', (event) => {
-        if (!postSubmit) {
-            event.returnValue = 'You have unfinished changes!';
-         }
-    });
+        alert("Made it here")
     }
     </script>
 
