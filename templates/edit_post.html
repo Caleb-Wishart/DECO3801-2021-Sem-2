@@ -104,19 +104,11 @@
 
     }
 
-    window.onload = function() {
-    window.addEventListener("beforeunload", function (e) {
-        if (formSubmitting) {
-            return undefined;
+    window.onbeforeunload = function () {
+        if (!formSubmitting) {
+            return "Are you sure you wish to leave?"
         }
-        e.preventDefault()
-        return e
-        {#var confirmationMessage = 'It looks like you have been editing something. '
-                                + 'If you leave before saving, your changes will be lost.';
-
-        return confirmationMessage;#}
-    });
-    };
+    }
     </script>
 
     <!-- Redirect to current channel page (used for discard draft) -->
