@@ -91,9 +91,9 @@
 
 
     <!-- Template for a comment card (Not the initial post)-->
-    {% currentID = 0 %}
+
     {% for comment in comments_info %}
-        {% currentID = currentID + 1%}
+
         <div class="row">
             <!-- Profile picture-->
             <div class="col-2" style="width: 10%; margin-right: 1.5rem!important;">
@@ -122,7 +122,7 @@
                              alt="Logo" width="25" style="margin:2px!important; margin-left:0.5rem!important; margin-right: 2px!important;"
                          onclick="votePostOrComment('comment', {{ comment['post_comment_id'] }}, false)">
                     #}
-                    <svg  xmlns="http://www.w3.org/2000/svg" id = "down{{ currentID }}" width="25" height="25" fill="grey" class="bi bi-arrow-down-circle-fill" viewBox="0 0 16 16" onclick="votePostOrComment('comment', {{ comment['post_comment_id'] }}, false);
+                    <svg  xmlns="http://www.w3.org/2000/svg" id = "down_{{ comment["post_comment_id"]|string }}" width="25" height="25" fill="grey" class="bi bi-arrow-down-circle-fill" viewBox="0 0 16 16" onclick="votePostOrComment('comment', {{ comment['post_comment_id'] }}, false);
                         highlight(this, false, )">
                     <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"
                     />
@@ -130,7 +130,7 @@
                     <p class="card-text px-3" id="comment_{{ comment["post_comment_id"]|string }}_downvote_count">{{comment["downvote_count"]}}</p>
                     {#<img class="rounded img-fluid" src="{{url_for('static', filename='img/UpvotePink.PNG')}}"
                              alt="Logo" width="25" style="margin:2px!important; margin-left:0.5rem!important; margin-right: 1rem!important;" onclick="votePostOrComment('comment', {{ comment['post_comment_id'] }}, true)">#}
-                    <svg xmlns="http://www.w3.org/2000/svg" id = "up{{ currentID }}" width="25" height="25" fill="grey" class="bi bi-arrow-up-circle-fill" viewBox="0 0 16 16" onclick="votePostOrComment('comment', {{ comment['post_comment_id'] }}, true); highlight(this, true, {{ currentID }})">
+                    <svg xmlns="http://www.w3.org/2000/svg" id = "up_{{ comment["post_comment_id"]|string }}" width="25" height="25" fill="grey" class="bi bi-arrow-up-circle-fill" viewBox="0 0 16 16" onclick="votePostOrComment('comment', {{ comment['post_comment_id'] }}, true); highlight(this, true, {{ comment["post_comment_id"]|string }})">
                     <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"
                     />
                     </svg>
@@ -177,7 +177,7 @@ function highlight(image, bool, id) {
 
     if (bool) { //Upvote
         $(image).toggleClass("clicked")
-        var x = document.getElementById("down{{ id }}")
+        var x = document.getElementById("up_{{ id }}")
         $(x).toggleClass("clicked2")
     } else { //Downvote
          $(image).toggleClass("clicked2")
