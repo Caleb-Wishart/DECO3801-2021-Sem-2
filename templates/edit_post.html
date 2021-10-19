@@ -6,14 +6,14 @@
 
 {% block content %}
     <!-- Handles making the user confirm they want to leave this page as all unsaved changes will be lost-->
-    <body onbeforeunload = "return leavePageFunction()">
+    {#<body onbeforeunload = "return leavePageFunction()">
         <script>
             function leavePageFunction() {
                 return "Testing something"
             }
         </script>
 
-    </body>
+    </body>#}
 
 
 
@@ -88,6 +88,7 @@
     </div>
     <!-- Validation check on form submit.-->
     <script type="text/javascript">
+    var formSubmitting = false;
     function validate_form() {
         var valid = true;
 
@@ -96,9 +97,26 @@
             alert("Please ensure all the required sections are filled!")
             valid = false;
         }
+        if (valid) {
+            formSubmitting = true;
+        }
         return valid;
 
     }
+
+    window.onload = function() {
+    window.addEventListener("beforeunload", function (e) {
+        if (formSubmitting) {
+            return undefined;
+        }
+
+        var confirmationMessage = 'It looks like you have been editing something. '
+                                + 'If you leave before saving, your changes will be lost.';
+
+        (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+        return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+    });
+    };
     </script>
 
     <!-- Redirect to current channel page (used for discard draft) -->

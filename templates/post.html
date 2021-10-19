@@ -3,10 +3,10 @@
 
 {% block style %}
 <style>
-    .clicked {
+    .clickedUp {
         fill: #2e9cfa;
     }
-    .clicked2{
+    .clickedDown{
         fill: #ff4545;
     }
 
@@ -69,7 +69,8 @@
                     {#<img class="rounded img-fluid"  src="{{url_for('static', filename='img/downvotepink.PNG')}}"
                              alt="Logo" width="25" style="margin:2px!important; margin-left:0.5rem!important; margin-right: 2px!important;" onclick="votePostOrComment('post', {{ post_info['post_id'] }}, false)">
                     #}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="grey" Fclass="bi bi-arrow-down-circle-fill" viewBox="0 0 16 16" onclick="votePostOrComment('post', {{ post_info['post_id'] }}, false); highlight(this, false)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="grey" class="bi bi-arrow-down-circle-fill" viewBox="0 0 16 16" onclick="votePostOrComment('post', {{ post_info['post_id'] }}, false);
+                            highlight(this, false, {{ post_info["post_id"]|string }})">
                     <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"
                     />
                     </svg>
@@ -79,7 +80,8 @@
                     {#<img class="rounded img-fluid" src="{{url_for('static', filename='img/UpvotePink.PNG')}}"
                              alt="Logo" width="25" style="margin:2px!important; margin-left:0.5rem!important; margin-right: 1rem!important;" onclick="votePostOrComment('post',{{ post_info['post_id'] }}, true)">
                     #}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="grey" class="bi bi-arrow-up-circle-fill" viewBox="0 0 16 16" onclick="votePostOrComment('post',{{ post_info['post_id'] }}, true); highlight(this, true)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="grey" class="bi bi-arrow-up-circle-fill" viewBox="0 0 16 16" onclick="votePostOrComment('post',{{ post_info['post_id'] }}, true);
+                            highlight(this, true, {{ post_info["post_id"]|string }})">
                     <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"
                     />
                     </svg>
@@ -173,16 +175,16 @@
 </script>
 
 <script>
-function highlight(image, bool, id) {
+function highlight(image, bool, id) { //Changes what button is currently active or not
 
-    if (bool) { //Upvote
-        $(image).toggleClass("clicked")
+    if (bool) { //If we clicked a upvote
+        $(image).toggleClass("clickedUp") //Toggle it
         var x = document.getElementById("down_" + id)
-        $(x).removeClass("clicked2")
+        $(x).removeClass("clickedDown") //Remove any colour on the downvote
     } else { //Downvote
-         $(image).toggleClass("clicked2")
+         $(image).toggleClass("clickedDown") //Toggle it
         var y = document.getElementById("up_" + id)
-        $(y).removeClass("clicked")
+        $(y).removeClass("clickedUp") //Remove any colour on the upvote
     }
 
 
