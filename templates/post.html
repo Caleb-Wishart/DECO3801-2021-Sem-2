@@ -1,7 +1,12 @@
 {% extends 'base.html' %}
 
 
-{% block script %}
+{% block style %}
+<style>
+    .clicked {
+        fill: blue;
+    }
+</style>
 
 
 {% endblock %}
@@ -162,10 +167,8 @@
 </script>
 
 <script>
-    $('#downvote1').click(function() {
-        $('#downvote1').css({
-            "fill" : "blue"
-        })
+    $("svg").click(function () {
+        $("svg").toggleClass("clicked")
     })
 </script>
             <!-- Reply Box -->
