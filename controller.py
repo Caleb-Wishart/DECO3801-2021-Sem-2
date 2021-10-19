@@ -32,9 +32,9 @@ login_manager.login_message_category = "error"
 app.secret_key = "admin"
 
 # File upload
-app.config['UPLOAD_FOLDER'] = 'static/files/'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB
-app.config['MAX_CONTENT_PATH'] = 50  # 50 chars long
+app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path,'static')
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 # 16 MB
+app.config['MAX_CONTENT_PATH'] = 50 # 50 chars long
 
 
 # -----{ LOGIN }---------------------------------------------------------------
@@ -243,9 +243,13 @@ def resource_new():
     """
     form = ResourceForm()
     if form.validate_on_submit():
-        title = form.time.data
-        resource_link = form.file.name
-        resource_file = request.files[form.file.name]
+        title = form.title.data
+        resource_file = request.files[form.files.name]
+        resource_link = resource_file.filename
+        resource_thumbnail_file = request.files[form.thumbnail.name]
+        resource_thumbnail_links = resource_thumbnail_file.filename
+
+
         difficulty = ResourceDifficulty.EASY
         try:
             subject = Subject[request.form.get('subject').replace(' ', '_').upper()]
@@ -255,27 +259,35 @@ def resource_new():
             grade = Grade[request.form.get('grades').replace(' ', '_').upper()]
         except KeyError:
             grade = None
-        creaters_id = current_user.uid
-        # is_public
-        # private_personnel_id
-        # tags_id = [get_tags()[t] for t in request.form.get('grades')]
-        description = form.description.data
-        resource_thumbnail_links = request.files[form.thumbnail.name]
-        resource_thumbnail_file = request.files[form.file.name]
-        warnings.warn(title)
-        warnings.warn(resource_link)
-        warnings.warn(resource_file)
-        warnings.warn(difficulty)
-        warnings.warn(subject)
-        warnings.warn(grade)
-        warnings.warn(creaters_id)
-        warnings.warn(resource_thumbnail_file)
+        creaters_id = [current_user.uid]
+        private_personnel_id = [get_user(email).uid for email in request.form.getlist('personnel_ids') if get_user(email) != ErrorCode.INVALID_USER]
+        is_public = len(private_personnel_id) == 0
 
-        # if form.files.data:
-        #     f = request.files[form.files.name]
-        #     f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename)))
-        #     flash("File was uploaded",'info')
-    return render_template('resource_create.html', title='New Resource', form=form)
+        tags_id = [get_tags()[t] for t in request.form if t == request.form.get(t) and t in get_tags(t)]
+        description = form.description.data
+
+        i = 0
+        while os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'],'resource', secure_filename(resource_link))):
+            root, ext = os.path.splitext(resource_link)
+            resource_link = root + '_' + str(i) + ext
+            i += 1
+        i = 0
+        while os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'],'thumbnail', secure_filename(resource_thumbnail_links))):
+            root, ext = os.path.splitext(resource_thumbnail_links)
+            resource_thumbnail_links = root + '_' + str(i) + ext
+            i += 1
+
+        resource_file.save(os.path.join(app.config['UPLOAD_FOLDER'],'resource', secure_filename(resource_link)))
+        resource_thumbnail_file.save(os.path.join(app.config['UPLOAD_FOLDER'],'thumbnail', secure_filename(resource_thumbnail_links)))
+
+        rid = add_resource(title,os.path.join('resource', secure_filename(resource_link)), difficulty, subject,grade, creaters_id, is_public,
+                 private_personnel_id, tags_id,
+                 description, [os.path.join('thumbnail', secure_filename(resource_thumbnail_links))])
+        if isinstance(rid, ErrorCode):
+            abort(400)
+        flash("Resource created",'info')
+        return redirect(url_for('resource',rid=rid))
+    return render_template('resource_create.html', title='New Resource',form=form)
     # todo
 
 
@@ -950,7 +962,8 @@ def debug():
     error = request.args.get('error') if 'error' in request.args else None
     if error is not None:
         abort(int(error))
-    return render_template('debug.html', title='DEBUG', variable=f"{request.url}")
+
+    return render_template('debug.html', title='DEBUG',variable=f"{1}" )
 
 
 # -----{ ERRORS }--------------------------------------------------------------
