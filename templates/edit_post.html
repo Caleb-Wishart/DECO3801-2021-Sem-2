@@ -1,95 +1,19 @@
 {% extends 'base.html' %}
 
-{% block style %}
-<style>
-    a:link {
-        text-decoration: none;
-    }
-
-    a:visited {
-        text-decoration: none;
-    }
-
-    a:hover {
-        text-decoration: none;
-    }
-
-    a:active {
-        text-decoration: none;
-    }
-
-
-        body {
-            /* Adds a Hex honeycomb background */
-            /* background-image: url(
-        {{url_for('static', filename='img/hex_back.png')}} ),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
-            background-color: #ffe5ec;
-
-            background-image: radial-gradient(rgb(255, 242, 245), rgb(255, 242, 245), rgb(255, 242, 245));
-        {#background-color: rgb(245, 245, 255);#}
-        }
-    .btn-primary {
-        background-color: #ff8fab;
-        color: white;
-        border-color: #ff8fab;
-    }
-    .btn-primary:hover {
-        color:white;
-        background-color: #3a78ef;
-    }
-
-    .btn-outline-primary {
-        background-color: rgb(255, 255, 255);
-        color:#000000;
-        border-color: white;
-    }
-
-    .btn-outline-primary:hover {
-        color:white;
-        background-color: #3a78ef;
-    }
-
-    .btn-check:checked+.btn-outline-primary {
-        color: white;
-        background-color:  #ff8fab;
-        border-color:   #ff8fab;
-    }
-    .bg-white {
-        background-color: #ffd6e1;
-    }
-    .bg-primary {
-        background-color: #ff8fab!important;
-    }
-    .btn-close {
-        width: 0.5rem;
-        height: 0.5rem;
-    }
-
-    .popover {
-        max-width: 400px;
-    }
-
-
-
-</style>
-
-
-
-{% endblock %}
 
 
 
 
 {% block content %}
     <!-- Handles making the user confirm they want to leave this page as all unsaved changes will be lost-->
-    <body onbeforeunload = "return leavePageFunction()">
+    {#<body onbeforeunload = "return leavePageFunction()">
         <script>
             function leavePageFunction() {
                 return "Testing something"
             }
         </script>
 
-    </body>
+    </body>#}
 
 
 
@@ -153,8 +77,8 @@
 {#                        <!-- Button to clear the title and body of the post-->#}
 {#                        <button type="Button" class="btn btn-outline-primary btn" onclick="go_to_current_channel_page()">Discard Draft</button>#}
                          <!-- IF WE ARE CREATING EDITTING A POST, USE THE FOLLOWING BUTTONS-->
-                        <input type="submit" form="create_form" value="Save Changes" class="btn btn-primary btn" style="margin-right: 1rem!important;"/>
-                        <button type="Button" class="btn btn-outline-primary btn" onclick="go_to_current_channel_page()">Discard Changes</button>
+                        <input type="submit" form="create_form" value="Save Changes" class="btn btn-primary btn" style="margin-right: 1rem!important;" onclick = "toggleForm()"/>
+                        <button type="Button" class="btn btn-outline-danger btn" onclick="go_to_current_channel_page()">Discard Changes</button>
 
                     </div>
                  </form>
@@ -164,6 +88,7 @@
     </div>
     <!-- Validation check on form submit.-->
     <script type="text/javascript">
+    let formSubmitting = false;
     function validate_form() {
         var valid = true;
 
@@ -172,8 +97,26 @@
             alert("Please ensure all the required sections are filled!")
             valid = false;
         }
+
+
         return valid;
 
+    }
+
+
+    </script>
+    <script>
+    //Handles leaving messages
+    window.addEventListener('beforeunload', (event) => {
+        if (!formSubmitting) {
+            event.returnValue = 'You have unfinished changes!';
+         }
+    });
+    </script>
+    <script>
+    //Handles it so that if you submit a form, you don't get the leaving window message
+    function toggleForm() {
+        formSubmitting = true;
     }
     </script>
 
