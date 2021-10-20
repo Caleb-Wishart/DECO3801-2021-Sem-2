@@ -153,6 +153,7 @@ def add_user(username, password, email, teaching_areas: dict = None,
             print(f"User {username} created")
         return user.uid
 
+
 def modify_user_teaching_areas(uid, conn, modification: Modification,
                                teaching_areas: dict = None):
     """
@@ -279,6 +280,7 @@ def remove_resource(rid: int):
             conn.delete(resource)
             conn.commit()
 
+
 def get_user(email):
     """
     Retrieve the User with the unique email as the key
@@ -297,6 +299,7 @@ def get_user(email):
         warnings.warn(f"No user has email {email}")
         return ErrorCode.INVALID_USER
 
+
 def user_auth(email,login=True):
     with Session() as conn:
         user = get_user(email)
@@ -307,6 +310,7 @@ def user_auth(email,login=True):
         if not try_to_commit(conn):
             warnings.warn(f"failed to commit updated user")
             return ErrorCode.COMMIT_ERROR
+
 
 def add_tag(tag_name, tag_description=None):
     """
@@ -673,6 +677,7 @@ def get_resource_thumbnail(rid):
         res = conn.query(ResourceThumbnail).filter_by(rid=rid).one_or_none()
         return res if res is not None else ErrorCode.INVALID_RESOURCE
 
+
 def user_has_access_to_resource(uid, rid):
     """
     Check if a user has access to a private resource
@@ -698,6 +703,7 @@ def user_has_access_to_resource(uid, rid):
         return conn.query(PrivateResourcePersonnel).filter_by(uid=uid, rid=rid). \
                    one_or_none() is not None
 
+
 def get_resource_author(rid):
     with Session() as conn:
         uids = [t[0] for t in conn.query(ResourceCreater.uid).filter_by(rid=rid).all()]
@@ -705,6 +711,7 @@ def get_resource_author(rid):
         for uid in uids:
             authors.append(conn.query(User).filter_by(uid=uid).one_or_none())
         return list(filter(lambda x: x is not None,authors))
+
 
 def get_resource_tags(rid):
     """
@@ -718,7 +725,8 @@ def get_resource_tags(rid):
         res = []
         for i in tag_ids:
             res.append(conn.query(Tag.tag_name).filter_by(tag_id=i).one_or_none())
-        return [r[0] for r in res if r != None]
+        return [r[0] for r in res if r is not None]
+
 
 def find_resources(title_type="like", title=None,
                    created_type="after", created=EPOCH,
@@ -1793,4 +1801,5 @@ def get_channel_post_comments(post_id: int):
         if not post:
             warnings.warn("The post id is invalid")
             return ErrorCode.INVALID_POST
-        return conn.query(PostComment).filter_by(post_id=post_id).all()
+        return conn.query(PostComment).filter_by(post_id=post_id).\
+            order_by(PostComment.created_at.asc()).all()
