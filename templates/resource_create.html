@@ -10,7 +10,7 @@
     $(function () {
 
         $(".dropdown-menu a").click(function () {
-            if (this.id === "dropdownMenuButton1") {
+            if (this.id.equals("dropdownMenuButton1")) {
                $("#dropdownMenuButton1").text($(this).text());
                 $("#dropdownMenuButton1").val($(this).text());
                 if ($("#dropdownMenuButton1").val() == "Private"){
