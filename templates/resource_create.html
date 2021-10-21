@@ -288,18 +288,13 @@
                                             </label>
 
                                         <!-- Changing between file or URL upload -->
-                                        <div class="d-flex">
-                                                  <p class="h6" style="margin: 1.5rem!important;">File Type: </p>
-                                                    <div class="dropdown px-3" style="margin: 1rem!important;">
-                                                        <button class="btn btn-primary dropdown-toggle form-control" style="min-width: 100px; height: 100%" type="button"
-                                                            id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false"> File
-                                                        </button>
-                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
-                                                            <a class="dropdown-item" >File </a>
-                                                            <a class="dropdown-item" >URL</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                        <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                            <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+                                            <label class="btn btn-outline-primary shadow" for="btnradio1" style = "margin-right: 1rem!important">File Upload</label>
+
+                                            <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+                                            <label class="btn btn-outline-primary shadow" for="btnradio2">URL Upload</label>
+                                        </div>
                                         <!-- Resource upload section -->
                                         <!-- File Upload -->
                                           <div class="card flex-fill" id="resourceUpload">
