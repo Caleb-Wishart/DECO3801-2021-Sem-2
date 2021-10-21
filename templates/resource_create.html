@@ -496,9 +496,9 @@
                     </div>
                     <div class="float-end mt-2 pt-1" style="margin-top: 1rem!important;">
                         <!-- Button to upload the post-->
-                      <input type="submit"  class="btn btn-primary btn" style="margin-right: 1rem!important;" value="Upload Resource">
+                      <input type="submit"  class="btn btn-primary btn" style="margin-right: 1rem!important;" value="Upload Resource" onclick = "toggleForm()">
                         <!-- Button to clear the title and body of the post-->
-                        <button type="Button" class="btn btn-outline-primary btn" onclick="resetPage()">Discard Draft</button>
+                        <button type="Button" class="btn btn-outline-danger btn" onclick="resetPage()">Discard Draft</button>
                     </div>
                  </form>
 
@@ -511,5 +511,23 @@
         var popoverList = popoverTriggerList.map(function(popoverTriggerEl) {
         return new bootstrap.Popover(popoverTriggerEl)
 })
+    </script>
+
+    <script>
+     let postSubmit = false;
+     window.addEventListener('beforeunload', (event) => {
+        if (!postSubmit) {
+            alert("Not submit");
+            event.returnValue = 'You have unfinished changes!';
+
+         }
+        });
+
+    </script>
+
+    <script>
+    function toggleForm() {
+        postSubmit = true;
+    }
     </script>
 {% endblock %}
