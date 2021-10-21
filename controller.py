@@ -32,9 +32,9 @@ login_manager.login_message_category = "error"
 app.secret_key = "admin"
 
 # File upload
-app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path,'static')
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 # 16 MB
-app.config['MAX_CONTENT_PATH'] = 50 # 50 chars long
+app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static')
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB
+app.config['MAX_CONTENT_PATH'] = 50  # 50 chars long
 
 
 # -----{ LOGIN }---------------------------------------------------------------
@@ -249,7 +249,6 @@ def resource_new():
         resource_thumbnail_file = request.files[form.thumbnail.name]
         resource_thumbnail_links = resource_thumbnail_file.filename
 
-
         difficulty = ResourceDifficulty.EASY
         try:
             subject = Subject[request.form.get('subject').replace(' ', '_').upper()]
@@ -260,35 +259,146 @@ def resource_new():
         except KeyError:
             grade = None
         creaters_id = [current_user.uid]
-        private_personnel_id = [get_user(email).uid for email in request.form.getlist('personnel_ids') if get_user(email) != ErrorCode.INVALID_USER]
+        private_personnel_id = [get_user(email).uid for email in request.form.getlist('personnel_ids') if
+                                get_user(email) != ErrorCode.INVALID_USER]
         is_public = len(private_personnel_id) == 0
 
         tags_id = [get_tags()[t] for t in request.form if t == request.form.get(t) and t in get_tags(t)]
         description = form.description.data
 
         i = 0
-        while os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'],'resource', secure_filename(resource_link))):
+        while os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'], 'resource', secure_filename(resource_link))):
             root, ext = os.path.splitext(resource_link)
             resource_link = root + '_' + str(i) + ext
             i += 1
         i = 0
-        while os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'],'thumbnail', secure_filename(resource_thumbnail_links))):
+        while os.path.isfile(
+                os.path.join(app.config['UPLOAD_FOLDER'], 'thumbnail', secure_filename(resource_thumbnail_links))):
             root, ext = os.path.splitext(resource_thumbnail_links)
             resource_thumbnail_links = root + '_' + str(i) + ext
             i += 1
 
-        resource_file.save(os.path.join(app.config['UPLOAD_FOLDER'],'resource', secure_filename(resource_link)))
-        resource_thumbnail_file.save(os.path.join(app.config['UPLOAD_FOLDER'],'thumbnail', secure_filename(resource_thumbnail_links)))
+        resource_file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'resource', secure_filename(resource_link)))
+        resource_thumbnail_file.save(
+            os.path.join(app.config['UPLOAD_FOLDER'], 'thumbnail', secure_filename(resource_thumbnail_links)))
 
-        rid = add_resource(title,os.path.join('resource', secure_filename(resource_link)), difficulty, subject,grade, creaters_id, is_public,
-                 private_personnel_id, tags_id,
-                 description, [os.path.join('thumbnail', secure_filename(resource_thumbnail_links))])
+        rid = add_resource(title, os.path.join('resource', secure_filename(resource_link)), difficulty, subject, grade,
+                           creaters_id, is_public,
+                           private_personnel_id, tags_id,
+                           description, [os.path.join('thumbnail', secure_filename(resource_thumbnail_links))])
         if isinstance(rid, ErrorCode):
             abort(400)
-        flash("Resource created",'info')
-        return redirect(url_for('resource',rid=rid))
-    return render_template('resource_create.html', title='New Resource',form=form)
+        flash("Resource created", 'info')
+        return redirect(url_for('resource', rid=rid))
+    return render_template('resource_create.html', title='New Resource', form=form)
     # todo
+
+
+@app.route("/resource/<rid>/edit", methods=["GET", "POST"])
+def resource_edit(rid=None):
+    """
+    The user edits a resource they authored.
+
+    If current_user is not the creater of this resource, return to
+    current resource page. If rid is not given, redirects to resource home page
+    """
+    if not rid:
+        return redirect(url_for("resource"))
+
+    rid = int(rid)
+    _, resource_item = get_user_and_resource_instance(uid=-1, rid=rid)
+
+    if not resource_item:
+        flash("rid is invalid", "error")
+        return redirect(url_for("resource"))
+
+    with Session() as conn:
+        creater_uid = conn.query(ResourceCreater).filter_by(rid=rid).first().uid
+        if creater_uid != current_user.uid:
+            # current user does not have privilege to edit this resource,
+            # return to resource home page
+            flash("You do have edit access to current resource", "error")
+            return redirect(url_for("resource"))
+
+    form = ResourceForm()
+
+    if request.method == "GET":
+        form.title.data = resource_item.title
+        form.description.data = resource_item.description
+
+        if resource_item.resource_link.split("/")[0] == "resource":
+            # local resource, gives title
+            filename = resource_item.title
+        else:
+            # local resource, gives resource link
+            filename = resource_item.resource_link
+
+        current_grade = enum_to_website_output(resource_item.grade)
+
+        current_subject = enum_to_website_output(resource_item.subject)
+
+        with Session() as conn:
+            thumbnails = conn.query(ResourceThumbnail).filter_by(rid=rid).all()
+
+            thumbnails_filename = ""
+            if thumbnails:
+                for i in thumbnails:
+                    thumbnails_filename += i.thumbnail_link.split("/")[-1] + ", "
+                if thumbnails_filename[-2:] == ", ":
+                    thumbnails_filename = thumbnails_filename[:-2]
+
+            # populate private personnel
+            personnel_email = []
+            if not resource_item.is_public:
+                for i in conn.query(PrivateResourcePersonnel).filter_by(rid=rid).all():
+                    allowed_person = conn.query(User).filter_by(uid=i.uid).first()
+                    if allowed_person.uid != creater_uid:
+                        personnel_email.append(allowed_person.email)
+
+            tag_map = get_tags(mapping="id2name")
+            applied_tags = []
+            for tag in conn.query(ResourceTagRecord).filter_by(rid=rid).all():
+                applied_tags.append(tag_map.get(tag.tag_id))
+
+        visibility = "Public" if resource_item.is_public else "Private"
+
+        return render_template("resource_edit.html", title=f"Edit resource #{rid}", form=form,
+                               filename=filename, thumbnails_filename=thumbnails_filename,
+                               subject=current_subject, grade=current_grade,
+                               current_visibility=visibility, personnel_emails=personnel_email,
+                               applied_tags=applied_tags, rid=rid)
+    elif request.method == "POST":
+        # update resource: currently do not update other tags
+        title = form.title.data
+        resource_thumbnail_file = request.files[form.thumbnail.name]
+        subject = website_input_to_enum(request.form.get('subject'), Subject)
+        grade = website_input_to_enum(request.form.get('grades'), Grade)
+        description = form.description.data
+        is_public = True if request.form.get("visibility_choice") == 'Public' else False
+
+        thumbnail_path = None
+        if resource_thumbnail_file and resource_thumbnail_file.filename != "":
+            thumbnail_path = posixpath.join("thumbnail", secure_filename(
+                    resource_thumbnail_file.filename))
+            resource_thumbnail_file.save(posixpath.join(
+                app.config['UPLOAD_FOLDER'], thumbnail_path))
+        thumbnail_path = [thumbnail_path] if thumbnail_path else []
+
+        if not description:
+            description = "NULL"
+
+        if isinstance(modify_resource(rid=rid, title=title, subject=subject, grade=grade,
+                                      is_public=is_public, description=description,
+                                      resource_thumbnail_links=thumbnail_path),
+                      ErrorCode):
+            flash("Something went wrong, please try again.", "error")
+            return redirect(url_for("resource_edit", rid=rid))
+
+        flash("Edited successfully.", 'info')
+        return redirect(url_for("resource", rid=rid))
+
+    # invalid call, go back to resource home page
+    return redirect(url_for("resource"))
 
 
 # -----{ PAGES.RESOURCE.AJAX }-------------------------------------------------
@@ -479,13 +589,13 @@ def about():
     """A brief page descibing what the website is about"""
     # FAQs can contain html code to run on page
     faqs = [
-        ["How do I save this page",
-         "Saving has been a super useful mechanic in many different areas of software for years. It is most commonly done by using the shortcut <kbd>Ctrl + S</kbd>, and our page is no exception."],
-        ["Can you talk like a computer?", "Yeah Sure <br> <samp> Beep Boop Beep Beep Boop </samp>"],
-        ["What is Lorem Ipsum?",
-         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."],
-        ["Can I type maths?", "Yes, yes you can. You can find <var>x</var> as much as you like."],
-        ["Can I do my own HTML markup?", "Only in some <code>&lt;input&gt;</code> areas"]
+        ["What is Doctrina?","Doctrina is a website made for teachers to share in class activities, resources and more with each other. It is designed so that you - the teacher - finds it easier to do the thing you love most: teach! We help you find worksheets, tutorials and questions for your students so you can spoend more time teaching them, rather then putting time into creating said worksheets, tutorials and questions."],
+        ["What can I use Doctrina for?","You can share resources you found useful in your class, find a resource from another teacher to use in class, read insights and helpful notes for teaching a certain subject, and more! Doctrina also includes an online forum that allows you to talk to other teachers like you."],
+        ["How do I make an account?","Just click the login button in the top right and click create an account. We only require basic information about you and for legal reasons, official documentation stating you are a teacher (this is to make sure that none of your students get access to the site and taking advantage of your resources that you may be using with them)"],
+        ["How do I find a resource?","We have an advanced searching algorithm that makes use of 'tags' to sort and search data. Each channel and resource are associated with tags given by the creator which can help narrow down your search to only results you want to see."],
+        ["How do I create a resource?","Go to our resources page and click the create button. A resource can be given a title, description, a file can be uploaded if you choose to, and obviously tags to help define what areas, subjects and year levels your resource falls into."],
+        ["How can I talk to other teachers?","Our channels page contains multiple forums discussing various subjects, resources and teaching aspects. Each channel contains threads to discuss specifics about the overarching subject. Each thread can be replied to by teachers who want ot discuss and talk to others. You can create your own channels and threads by clicking create either in the main channels page or inside a channel if you would like to start a thread."],
+        ["How is a resources' popularity decided?","Each teacher can upvote or downvote a resource if they like or dislike it respectively. Resources with more upvotes are more popular and resources with more downvotes are less popular. In order to balance out upvotes and downvotes on a resource, we use an algorithm to decide how popular it is. Resources are sorted by popularity after you search."],
     ]
     return render_template('about.html', title='About Us', name="About Us", faqs=faqs, num=len(faqs))
 
@@ -962,7 +1072,10 @@ def debug():
     error = request.args.get('error') if 'error' in request.args else None
     if error is not None:
         abort(int(error))
-    return render_template('debug.html', title='DEBUG',variable=f"{1}" )
+
+
+    return render_template('debug.html', title='DEBUG', variable=f"{1}")
+
 
 
 # -----{ ERRORS }--------------------------------------------------------------
