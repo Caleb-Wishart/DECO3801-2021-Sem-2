@@ -10,7 +10,6 @@
     $(function () {
 
         $(".dropdown-menu a").click(function () {
-            if (this.id.equals("dropdownMenuButton1")) {
                $("#dropdownMenuButton1").text($(this).text());
                 $("#dropdownMenuButton1").val($(this).text());
                 if ($("#dropdownMenuButton1").val() == "Private"){
@@ -18,8 +17,6 @@
                 }else{
                     $('#privateUsersAccess').attr('hidden',true) ;
                 }
-            }
-
         });
 
     });
