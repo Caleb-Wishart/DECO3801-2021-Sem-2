@@ -6,7 +6,6 @@
         /* width: 30em; */
         /*width: 30%;*/
         height: 2.5em;
-        
         border-radius: 6.25em;
         /*position: absolute;*/
         background-color: #FFFFFF;
@@ -28,6 +27,11 @@
         width: 100%;
         padding: 0 0.714em;
     }
+    .lol {
+        background-color: #5b0b6f;
+        border: rgb(0, 238, 12);
+        border-width: 1px;
+    }
 </style>
 {% endblock %}
 
@@ -42,35 +46,43 @@
             <img src="{{url_for('static', filename='img/logo.png')}}" , alt="Logo" , width="350">
         </div>
     </div>
-    
     <div class="row p-3">
         <div class="col-12 d-flex justify-content-center">
             <h1>Create Account</h1>
         </div>
     </div>
-
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <div class="notification is-danger">
-        {{ messages[0] }}. Go to <a href="{{ url_for('auth.login') }}">login page</a>.
-    </div>
-    {% endif %}
-    {% endwith %}
-    <form method="POST" action="{{ url_for('register_details') }}">
+    <form method="POST" action="{{url_for('register')}}">
+        <!-- CSRF TOKEN -->
+        {{ form.csrf_token }}
         <!-- input fields -->
+        <!-- Username -->
+        <div class="row p-3 align-items-center justify-content-center">
+            <div class="col-4 d-flex justify-content-end">Username:</div>
+            <div class="col-4 d-flex justify-content-center">
+                <div class="c-form" style="width: 100%;">
+                    {{ form.username(class_="c-form-input") }}
+                </div>
+            </div>
+            <div class="col-4 d-flex justify-content-start"></div>
+        </div>
+        {% if data['username'] %}
+            <div class="row justify-content-center" style="color: red;">
+                {{data['username']}}
+            </div>
+        {% endif %}
         <!-- Email -->
         <div class="row p-3 align-items-center justify-content-center">
             <div class="col-4 d-flex justify-content-end">Email:</div>
             <div class="col-4 d-flex justify-content-center">
                 <div class="c-form" style="width: 100%;">
-                    <input class="c-form-input" type="email" id="email" required>
+                    {{ form.email(class_="c-form-input") }}
                 </div>
             </div>
             <div class="col-4 d-flex justify-content-start"></div>
         </div>
-        {% if emailUsed %}
+        {% if data['emailUsed'] %}
             <div class="row justify-content-center" style="color: red;">
-                Email is already used!
+                {{data['emailUsed']}}
             </div>
         {% endif %}
 
@@ -79,14 +91,14 @@
             <div class="col-4 d-flex justify-content-end">Password:</div>
             <div class="col-4 d-flex justify-content-center">
                 <div class="c-form" style="width: 100%;">
-                    <input class="c-form-input" type="password" id="password" required>
+                    {{ form.password(class_="c-form-input") }}
                 </div>
             </div>
             <div class="col-4 d-flex justify-content-start"></div>
         </div>
-        {% if passwordBad %}
+        {% if data['passwordMsg'] %}
             <div class="row justify-content-center" style="color: red;">
-                Password is too simple!
+                {{data['passwordMsg']}}
             </div>
         {% endif %}
 
@@ -95,23 +107,21 @@
             <div class="col-4 d-flex justify-content-end">Confirm Password:</div>
             <div class="col-4 d-flex justify-content-center">
                 <div class="c-form" style="width: 100%;">
-                    <input class="c-form-input" type="password" id="confirmpassword" required>
+                    {{ form.passwordConfirm(class_="c-form-input") }}
                 </div>
             </div>
             <div class="col-4 d-flex justify-content-start"></div>
         </div>
-        {% if passwordDifferent %}
+        {% if data['passwordDif'] %}
             <div class="row justify-content-center" style="color: red;">
                 Passwords do not match!
             </div>
         {% endif %}
 
-
-
         <!-- buttons -->
         <div class="row p-3">
             <div class="col-6 d-flex justify-content-end p-3">
-                <input type="submit" value="Submit" class="btn btn-primary">
+                <input type="submit" class="btn btn-primary" value="Register">
             </div>
             <div class="col-6 d-flex justify-content-start p-3">
                 <a href="{{ url_for('home') }}" class="btn btn-primary">Cancel</a>

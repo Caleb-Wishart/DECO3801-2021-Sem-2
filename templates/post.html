@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+
+
+{% block style %}
+
+<style>
+    .clickedUp {
+        fill: #2e9cfa;
+    }
+    .clickedDown{
+        fill: #ff4545;
+    }
+
+</style>
+
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container" style="margin-bottom: 3rem!important; padding-left: 200px; padding-right: 200px">
+<!-- Question and top section -->
+        <div class="row" style="margin-top: 2rem!important;">
+                    <dt class="col-sm-9" style = "font-size: x-large; margin-top:2rem!important;">
+                        {{post_info["title"]}}
+                    </dt>
+                    {% if has_edit_privilege %}
+                     <!-- NOTE: IF THE USER IS NOT THE ADMIN, THIS SECTION OF HTML IS DELETED -->
+                    <div class="col-3" style="margin-top:2rem!important;">
+                        <div class = "d-flex flex-row-reverse" >
+                         <a href="{{url_for('create_or_modify_channel_post', cid=channel.cid, post_id=post_info['post_id'])}}" class="btn btn-primary d-md-block" style = "width: 60%" aria-haspopup="true" aria-expanded="false">
+                            <dd class="text-center font-weight-bold">Edit Post</dd>
+                        </a>
+                        </div>
+                    </div>
+                    {% endif %}
+        </div>
+
+    <!-- Template for a initial post card (The initial post)-->
+<div class="col d-flex justif-content-md-between">
+    <div class="card flex-fill shadow-sm" style = "margin-top: 2rem!important;">
+                <div class="row">
+                    <!-- Profile picture-->
+                    <div class="col-2" style="width: 10%; margin-right: 1.5rem!important;">
+                        <img class="rounded-circle img-fluid" src="{{url_for('static', filename=post_info['author_avatar_link'])}}" ,
+                             alt="Logo" width="65" style="margin:15px!important; margin-left: 20px!important;">
+                    </div>
+
+                    <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important; margin-right: 2rem!important;">
+                        <!-- Author name and time -->
+                        <div class = "row">
+                            <div class="fw-bold" style="padding: 0rem!important; font-size: medium; margin-bottom: 1rem!important;">
+                                {{ post_info["username"] }} - Posted on {{ post_info["created_at"] }}
+                            </div>
+                        </div>
+                                <!-- Description on a channel -->
+                        <div class = "row">
+                            <span style="font-size: small; padding-left: 0; text-align: justify">
+                                {{ post_info["init_text"] }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-row-reverse"style = "margin-right: 2rem!important; margin-top: 0.25rem!important;">
+                    {#<img class="rounded img-fluid"  src="{{url_for('static', filename='img/downvotepink.PNG')}}"
+                             alt="Logo" width="25" style="margin:2px!important; margin-left:0.5rem!important; margin-right: 2px!important;" onclick="votePostOrComment('post', {{ post_info['post_id'] }}, false)">
+                    #}
+                    <svg xmlns="http://www.w3.org/2000/svg" id = "down_{{ post_info["post_id"]|string }}" width="25" height="25" fill="grey" class="bi bi-arrow-down-circle-fill" viewBox="0 0 16 16" onclick="votePostOrComment('post', {{ post_info['post_id'] }}, false);
+                            highlight(this, false, {{ post_info["post_id"]|string }})">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"
+                    />
+                    </svg>
+
+                    <p class="card-text px-3" style="margin-bottom: 0rem!important;" id="post_{{ post_info["post_id"]|string }}_downvote_count">{{ post_info["downvote_count"] }}</p>
+
+                    {#<img class="rounded img-fluid" src="{{url_for('static', filename='img/UpvotePink.PNG')}}"
+                             alt="Logo" width="25" style="margin:2px!important; margin-left:0.5rem!important; margin-right: 1rem!important;" onclick="votePostOrComment('post',{{ post_info['post_id'] }}, true)">
+                    #}
+                    <svg xmlns="http://www.w3.org/2000/svg" id = "up_{{ post_info["post_id"]|string }}" width="25" height="25" fill="grey" class="bi bi-arrow-up-circle-fill" viewBox="0 0 16 16" onclick="votePostOrComment('post',{{ post_info['post_id'] }}, true);
+                            highlight(this, true, {{ post_info["post_id"]|string }})">
+                    <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"
+                    />
+                    </svg>
+
+                    <p class="card-text px-3" style="margin-bottom: 0rem!important;" id="post_{{ post_info["post_id"]|string }}_upvote_count">{{post_info["upvote_count"]}}</p>
+                </div>
+
+                <hr style="width:97%; margin-right: 60px; margin-left: 15px; margin-bottom: 0rem!important;">
+
+
+    <!-- Template for a comment card (Not the initial post)-->
+
+    {% for comment in comments_info %}
+
+        <div class="row">
+            <!-- Profile picture-->
+            <div class="col-2" style="width: 10%; margin-right: 1.5rem!important;">
+                <img class="rounded-circle img-fluid" src="{{url_for('static', filename=comment["commenter_avatar_link"])}}" ,
+                     alt="Logo" width="65" style="margin:15px!important ; margin-left: 20px!important;">
+            </div>
+
+            <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important; margin-right: 2rem!important;">
+                <!-- commenter name and time -->
+                <div class = "row">
+                    <div class="fw-bold" style="padding: 0rem!important; font-size: medium; margin-bottom: 1rem!important;">
+                        {{ comment["username"]}} - Posted on {{ comment["created_at"] }}
+                    </div>
+                </div>
+                        <!-- Description on a channel -->
+                <div class = "row">
+                    <span style="font-size: small; padding-left: 0; text-align: justify">
+                        {{comment["text"]}}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+                <div class="d-flex flex-row-reverse"style = "margin-right: 2rem!important; margin-top: 0.25rem!important;">
+                    {#<img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.PNG')}}"
+                             alt="Logo" width="25" style="margin:2px!important; margin-left:0.5rem!important; margin-right: 2px!important;"
+                         onclick="votePostOrComment('comment', {{ comment['post_comment_id'] }}, false)">
+                    #}
+                    <svg  xmlns="http://www.w3.org/2000/svg" id = "down_{{ comment["post_comment_id"]|string }}" width="25" height="25" fill="grey" class="bi bi-arrow-down-circle-fill" viewBox="0 0 16 16" onclick="votePostOrComment('comment', {{ comment['post_comment_id'] }}, false);
+                        highlight(this, false, {{ comment["post_comment_id"]|string }})">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"
+                    />
+                    </svg>
+                    <p class="card-text px-3" id="comment_{{ comment["post_comment_id"]|string }}_downvote_count">{{comment["downvote_count"]}}</p>
+                    {#<img class="rounded img-fluid" src="{{url_for('static', filename='img/UpvotePink.PNG')}}"
+                             alt="Logo" width="25" style="margin:2px!important; margin-left:0.5rem!important; margin-right: 1rem!important;" onclick="votePostOrComment('comment', {{ comment['post_comment_id'] }}, true)">#}
+                    <svg xmlns="http://www.w3.org/2000/svg" id = "up_{{ comment["post_comment_id"]|string }}" width="25" height="25" fill="grey" class="bi bi-arrow-up-circle-fill" viewBox="0 0 16 16" onclick="votePostOrComment('comment', {{ comment['post_comment_id'] }}, true);
+                        highlight(this, true, {{ comment["post_comment_id"]|string }})">
+                    <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"
+                    />
+                    </svg>
+                    <p class="card-text px-3" id="comment_{{ comment["post_comment_id"]|string }}_upvote_count">{{comment["upvote_count"]}}</p>
+
+                </div>
+
+                <hr style="width:97%; margin-right: 60px; margin-left: 15px; margin-bottom: 0rem!important; margin-top: 0px;">
+    {% endfor %}
+    </div>
+</div>
+<script type="text/javascript">
+    // implement voting
+    function votePostOrComment(post_or_comment, id, is_upvote) {
+        $.ajax({
+                type: "GET",
+                url: "{{ url_for('vote_channel_post_or_comment') }}",
+                data: {
+                    "uid": {{ current_user.uid }},
+                    "id": id,
+                    "upvote": is_upvote,
+                    "post_or_comment": post_or_comment
+                },
+                success: function (response) {
+                    var down_text = post_or_comment + "_" + id.toString() + "_downvote_count"
+
+                    var up_text = post_or_comment + "_" + id.toString() + "_upvote_count"
+
+                    // update
+                    $("#" + up_text).text(response["upvote_count"]);
+                    $("#" + down_text).text(response["downvote_count"]);
+                    console.log("upvote name " + up_text)
+                    console.log("new upvote is" + $('#' + up_text).text())
+                    console.log("new downvote is " + $('#' + down_text).text())
+                }
+            }
+        )
+    }
+
+</script>
+
+<script>
+function highlight(image, bool, id) { //Changes what button is currently active or not
+
+    if (bool) { //If we clicked a upvote
+        $(image).toggleClass("clickedUp") //Toggle it
+        var x = document.getElementById("down_" + id)
+        $(x).removeClass("clickedDown") //Remove any colour on the downvote
+    } else { //Downvote
+         $(image).toggleClass("clickedDown") //Toggle it
+        var y = document.getElementById("up_" + id)
+        $(y).removeClass("clickedUp") //Remove any colour on the upvote
+    }
+}
+</script>
+
+            <!-- Reply Box -->
+        <div class="d-flex flex-start w-100" style = "margin-top: 2rem!important">
+              <img class="rounded-circle shadow-1-strong me-3"
+                   src="{{url_for('static', filename=current_user.avatar_link)}}"
+                   alt="avatar"
+                   width="50"
+                   height="50"
+                   style="margin-top: 0.5rem!important;"
+              />
+            <form class = "form-outline w-100" id="comment_form" action="{{ url_for('add_new_post_comment', cid=channel.cid, post_id=post_info['post_id']) }}" method="post">
+                <div class="form-outline w-100">
+                    <textarea
+                      class="form-control"
+                      id="comment_input"
+                      rows="4"
+                      style="background: #fff;"
+                      placeholder = "Leave a comment"
+                      form="comment_form"
+                      name="comment_text"
+                    ></textarea>
+
+                    <div class="float-end mt-2 pt-1">
+
+
+                <!-- Button to leave a comment. NEEDS TO BE IMPLEMENTED-->
+                        <input type="submit" form="comment_form" value="Post Comment" class="btn btn-primary btn-sm"
+                               style="margin-right: 1rem!important;"/>
+                <!-- NEEDS TO BE IMPLEMENTED, clears the form / comment box-->
+                  <button type="Button" class="btn btn-outline-danger btn-sm" onclick="javascript:eraseText()">Clear</button>
+
+                    <script>
+                    // use this to clear text in textarea when Clear button is clicked
+                    function eraseText() {
+                        document.getElementById("comment_input").value = "";
+                    }
+                    </script>
+                    </div>
+                </div>
+            </form>
+          </div>
+        </div>
+{% endblock %}

@@ -1,82 +1,378 @@
 {% extends 'base.html' %}
+
 {% block style %}
-<style>
-    .avatar {
-        vertical-align: middle;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
+
+{% endblock %}
+
+{% block script %}
+
+<script type="text/template" id="commentreply">
+    <div class="row" id="commentReply">
+        <!-- New Comment Reply -->
+        <div class="col-1" style="border-right: 1px dashed #333;">
+        </div>
+        <div class="col-1" align="center">
+            <img class="avatar" src="{{url_for('static',filename=current_user.avatar_link)}}" , alt="Profile Icon">
+        </div>
+        <div class="col">
+            <div class="row">
+                <p class="h6"><strong>{{current_user.username}}</strong></p>
+            </div>
+            <div class="row">
+                <textarea name="reply_text" class="form-control" id="reply_input" rows="4" style="background: rgb(255, 255, 255) none repeat scroll 0% 0%; height: 16px;" placeholder="Leave a comment"></textarea>
+                <div class = "d-flex justify-content-end">
+                    <input type="submit" form="comment_form" value="Post Comment" class="btn btn-primary btn-sm" style="margin-right: 1rem!important;" onclick='sendReply(<%= cid %>)'></input>
+                    <button type="Button" class="btn btn-outline-primary btn-sm" onclick='document.getElementById("reply_input").value = "";'>Clear</button>
+                    <button type="Button" class="btn btn-outline-primary btn-sm" onclick='$( "#commentReply" ).remove();'>Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/template" id="comment_card">
+     <% _.each(data,  function(comm) { %>
+            <!-- Resource Comment -->
+            <div class="card-body" name="comment">
+                <div class="row" style="background-color:  #eeeeee ;">
+                    <hr>
+                    <div class="col-1" align="center">
+                        <img class="avatar" src="{{url_for('static',filename='')}}/<%= comm.author.avatar_link %>" , alt="Profile Icon">
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <p class="h6"><strong><%= comm.author.username %></strong></p>
+                        </div>
+                        <div class="row">
+                            <div class="d-flex justify-content-between">
+                                <p><small> <%= comm.comment.comment %></small></p>
+                                <div>
+                                    {% if current_user.is_authenticated %}
+                                    <button class="badge rounded-pill bg-other-tag float-end" onclick='addReply(this,<%= comm.resource_comment_id %>)'>Reply</button>
+                                    {% endif %}
+                                    <% if (comm.author.username == username) { %>
+                                        <button class="badge rounded-pill bg-year-tag float-end" onclick='this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.innerHTML = "";'>Delete</button>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% _.each(comm.replies,  function(reply) { %>
+                <!-- Comment Reply -->
+                <div class="row">
+                    <div class="col-1" style="border-right: 1px dashed #333;">
+                    </div>
+                    <div class="col-1" align="center">
+                        <img class="avatar" src="{{url_for('static',filename='')}}<%= reply.author.avatar_link %>" , alt="Profile Icon">
+                    </div>
+                    <div class="col">
+                        <div class="row">
+                            <p class="h6"><strong><%= reply.author.username %></strong></p>
+                        </div>
+                        <div class="row">
+                            <div class="d-flex justify-content-between">
+                                <p><small><%= reply.reply.reply %></small></p>
+                                <div>
+                                    <% if (reply.author.username == username) { %>
+                                        <button class="badge rounded-pill bg-year-tag float-end" onclick='this.parentNode.parentNode.parentNode.parentNode.parentNode.innerHTML = "";'>Delete</button>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% }); %>
+            </div>
+            <% }); %>
+</script>
+
+<script>
+    // Voting
+    function upvote() {
+        voteAJAX(1,0);
     }
-</style>
+    function downvote() {
+        voteAJAX(0,1);
+    }
+
+    function voteAJAX(up,down) {
+        $.ajax(
+            {
+                type: "GET",
+                url: "{{url_for('resourceVote')}}",
+                data: { "rid": {{rid}} , "up": up, "down": down},
+                success: function (response) {
+                    $("#upvoteCount").text(response['up']); // set new results
+                    $("#downvoteCount").text(response['down']); // set new results
+                }
+            }
+        )
+    }
+    function addReply(node,cid){
+        if ( $( "#commentReply" ).length ) {
+            $( "#commentReply" ).remove();
+        }
+
+        var reply = _.template($("#commentreply").html());
+        $(node).parents().filter(function() {
+            return this.getAttribute("name") == "comment";
+        })[0].innerHTML += reply({ cid: cid });
+        document.getElementById("comment_input").value = "";
+        document.getElementById("commentReply").scrollIntoView();
+    }
+    function sendReply(cid){
+        $.ajax(
+            {
+                type: "GET",
+                url: "{{url_for('resourceComment')}}",
+                data: { "rid": {{rid}}, "type": "reply", "text": $('textarea[name=reply_text]').val().toLowerCase(), "cid": cid},
+                success: function (response) {
+                    updateResponse(response);
+                }
+            }
+        )
+        if ( $( "#commentReply" ).length ) {
+            $( "#commentReply" ).remove();
+        }
+    }
+    // add a comment to a resource
+    function addComment(){
+        $("#newComment").attr("hidden",true) ;
+        $.ajax(
+            {
+                type: "GET",
+                url: "{{url_for('resourceComment')}}",
+                data: { "rid": {{rid}}, "type": "comment", "text": $('textarea[name=comment_text]').val().toLowerCase()},
+                success: function (response) {
+                    updateResponse(response);
+                }
+            }
+        )
+        document.getElementById("comment_input").value = "";
+    }
+
+    // update with the response
+    function updateResponse(response){
+        console.log(response);
+        $("#result").empty(); // remove current results
+        var resource_card = _.template($("#comment_card").html());
+        $("#result").html(resource_card({ data: response, username: "{{current_user.username}}" })); // set new results
+        if (response.length == 0) {
+            $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
+        }
+    }
+
+    // get the resource comments
+    function commentAJAX() {
+        $.ajax(
+            {
+                type: "GET",
+                url: "{{url_for('resourceComment')}}",
+                data: { "rid": {{rid}}},
+                success: function (response) {
+                    updateResponse(response);
+
+                }
+            }
+        )
+    }
+    // Seed Document
+    $(document).ready(function () {
+        commentAJAX();
+    });
+
+    function editButtonFunc() {
+        $("#editButton").attr("hidden",true) ;
+        $("#saveButton").attr("hidden",false) ;
+        $("#editing").attr("hidden",false) ;
+
+        $("#resTitle").attr("contenteditable",true) ;
+        $("#resDesc").attr("contenteditable",true) ;
+
+        $("#resTitle").css("background-color","rgb(254, 239, 255)") ;
+        $("#resDesc").css("background-color","rgb(254, 239, 255)") ;
+        $("#abcEdit").css("background-color","rgb(254, 239, 255)") ;
+    }
+
+    function saveButtonFunc() {
+        $("#editButton").attr("hidden",false) ;
+        $("#saveButton").attr("hidden",true) ;
+        $("#editing").attr("hidden",true) ;
+
+        $("#resTitle").attr("contenteditable",false) ;
+        $("#resDesc").attr("contenteditable",false) ;
+        $("#resTitle").css("background-color",'') ;
+        $("#resDesc").css("background-color",'') ;
+        $("#abcEdit").css("background-color",'') ;
+    }
+</script>
 {% endblock %}
 
 
 {% block content %}
 <div class="container">
+    <div class="row p-3" id="editing" hidden>
+        <div class="d-flex justify-content-center h3 bg-warning p-1"> You are editing this page </div>
+    </div>
     <div class="row p-3">
         <!-- Resource Thumbnail -->
         <div class="col d-flex">
             <div class="card">
-                <img src="{{url_for('static', filename='img/placeholder.png')}}" , alt="Logo" , width="900" ,
+                <img src="{{url_for('static', filename=banner.thumbnail_link)}}" , alt="Resource image" , width="900" ,
                     height="200">
             </div>
         </div>
-        <div class="col-3">
+        <div class="col-3" align="center">
             <div class="card">
-                <button class="btn btn-info">&#10730; Download</button>
-                <p><small>Redirects to download page<br>PDF (Approx 2MB)</small></p>
-                <br>
+                <a class="btn btn-info"
+                {% if res.resource_link.startswith('resource/') %}
+                    href="{{url_for('static', filename=res.resource_link)}}"
+                {% else %}
+                    href="{{res.resource_link}}"
+                {% endif %}
+
+                >&#10730; View Resource</a>
+                <hr>
+                {# No longer used
                 <button class="btn btn-info">&#9998; Annotate</button>
-                <br>
-                <p><strong>Subject: </strong>{{subject}}</p>
-                <p><strong>Year Level: </strong>{{grade}}</p>
+                <br> #}
+                <p><strong>Subject: </strong>
+                    <span class="badge rounded-pill bg-subject-tag">
+                            {{enum_to_website_output(subject)}}
+                    </span>
+                </p>
+                <p><strong>Year Level: </strong>
+                    <span class="badge rounded-pill bg-year-tag">
+                            {{enum_to_website_output(grade)}}
+                    </span>
+                </p>
+                {% for author in authors %}
+                    {% if (author.username == current_user.username) %}
+                    <p id="abcEdit"><strong>Edit Page: </strong>
+                        <button class="badge rounded-pill bg-other-tag" id="editButton" onclick="editButtonFunc()">
+                                Edit Page
+                        </button>
+                        <button class="badge rounded-pill bg-other-tag" id="saveButton" onclick='saveButtonFunc()' hidden>
+                                Save
+                        </button>
+                    </p>
+                    <p id="abcDelete"><strong>Delete Resource: </strong>
+                        <button type="button" class="badge rounded-pill bg-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            Delete
+                        </button>
+                    </p>
+                    <!-- Delete Modal -->
+                    <div class="modal fade" id="deleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteModalLabel">Delete Resource</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete this resource
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                                    <a href="{{url_for('resource')}}" class="btn btn-primary">Yes</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% endif %}
+                {% endfor %}
             </div>
         </div>
     </div>
     <div class="row p-3">
-        <p class="h3">{{res.title}}</p>
-        <div class="d-flex">
-            <p><strong>Rating: </strong></p>
-            <p class="card-text px-1">{{res.upvote_count}}</p>
-            <img src="{{url_for('static', filename='img/up.png')}}" , alt="Down" , width="20" , height="20">
-            <p class="card-text px-1">{{res.downvote_count}}</p>
-            <img src="{{url_for('static', filename='img/down.png')}}" , alt="Down" , width="20" , height="20">
+        <div class="card shadow" style="border-radius: 15px">
+            <p class="h3 card-title" id="resTitle">{{res.title}}</p>
+            <div class="d-flex">
+                <p><strong>Rating&nbsp;&nbsp;</strong></p>
+                <img onclick="upvote()" src="{{url_for('static', filename='img/up.png')}}" , alt="Down" , width="20" , height="20">
+                <p class="card-text px-3" id="upvoteCount">{{res.upvote_count}}</p>
+                <img onclick="downvote()" src="{{url_for('static', filename='img/down.png')}}" , alt="Down" , width="20" , height="20">
+                <p class="card-text px-3" id="downvoteCount">{{res.downvote_count}}</p>
+            </div>
+            <p><strong>Visibility:&nbsp;</strong>
+                {% if res.is_public %}
+                    Public
+                {% else %}
+                    Private
+                {% endif %}
+            </p>
+            <div class="row">
+            <p><strong>Tags:&nbsp;&nbsp;</strong>
+                {% for tag in resource_tags %}
+                <span class="badge rounded-pill bg-other-tag">
+                    {{enum_to_website_output(tag)}}
+                </span>
+                {% endfor %}
+                {% if resource_tags | length == 0 %}
+                    No additional tags
+                {% endif %}
+            </p>
+            </div>
         </div>
-        <p><strong>Public: </strong>{{res.is_public}}</p>
-        <p><strong>Tags: </strong>[Tags go here]</p>
     </div>
     <div class="row p-3">
-        <div class="card">
-            <p class="card-title">Description</p>
+        <div class="card shadow" style="border-radius: 15px">
+            <p class="h4 card-title">Description</p>
             <div class="card-body">
-                <p>{{res.description}}</p>
+                <p id="resDesc">{{res.description}}</p>
                 <hr class="px-3">
             </div>
-            <p class="card-title">Author</p>
-            <div class="card-body">
-                <img class="avatar" src="{{url_for('static', filename='img/placeholder.png')}}" , alt="Logo">
-                <p class="h6">[Author Name]</p>
-                <p><small>[Author Bio]</small></p>
-            </div>
+            <p class="h4 card-title">Author</p>
+            <div class="row">
+                {% for author in authors %}
+                <div class="col-1" align="center">
+                    <img class="avatar" src="{{url_for('static',filename=author.avatar_link)}}" , alt="Profile Icon">
+                </div>
+                <div class="col-2">
+                    <div class="row">
+                        <p class="h6"><strong>{{author.username}}</strong></p>
+                    </div>
+                    <div class="row">
+                        <p><small>{{author.email}}</small></p>
+                    </div>
+                </div>
+                {% endfor %}
         </div>
     </div>
     <div class="row p-3">
-        <div class="card">
-            <p class="card-title">Comments</p>
-            <p>[Comments go here]</p>
-            {% for comm in comment %}
-            <div class="card-body">
-                <div class="row p-3">
-                    <div class="col d-flex">
-                        <img class="avatar" src="{{url_for('static', filename='img/placeholder.png')}}" , alt="Logo">
+        <div class="card shadow" style="border-radius: 15px">
+            <div class="d-flex justify-content-between">
+                <p class="h4 card-title">Comments</p>
+                {% if current_user.is_authenticated %}
+                <button class="badge rounded-pill bg-other-tag float-end" onclick='$("#newComment").attr("hidden",$("#newComment").is(":hidden") ? false : true) ;'>Post a comment</button>
+                {% endif %}
+            </div>
+            {% if current_user.is_authenticated %}
+            <div class="card-body" id="newComment" hidden>
+                <div class="row" style="background-color: #fcebff;">
+                    <hr>
+                    <div class="col-1" align="center">
+                        <img class="avatar" src="{{url_for('static',filename=current_user.avatar_link)}}" , alt="Profile Icon">
                     </div>
                     <div class="col">
-                        <p class="h5">[Author Name]</p>
-                        <p>[Comment content]</p>
+                        <div class="row">
+                            <p class="h6"><strong>{{current_user.username}}</strong></p>
+                        </div>
+                        <div class="row">
+                            <textarea name="comment_text" class="form-control" id="comment_input" rows="4" style="background: rgb(255, 255, 255) none repeat scroll 0% 0%; height: 16px;" placeholder="Leave a comment"></textarea>
+                            <div class = "d-flex justify-content-end">
+                                <input type="submit" form="comment_form" value="Post Comment" class="btn btn-primary btn-sm" style="margin-right: 1rem!important;" onclick='addComment()'></input>
+                                <button type="Button" class="btn btn-outline-primary btn-sm" onclick='document.getElementById("comment_input").value = "";'>Clear</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            {% endfor %}
+            {% endif %}
+            <div id="result">
+            </div>
         </div>
     </div>
 </div>
