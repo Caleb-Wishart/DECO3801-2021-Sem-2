@@ -479,13 +479,13 @@ def about():
     """A brief page descibing what the website is about"""
     # FAQs can contain html code to run on page
     faqs = [
-        ["How do I save this page",
-         "Saving has been a super useful mechanic in many different areas of software for years. It is most commonly done by using the shortcut <kbd>Ctrl + S</kbd>, and our page is no exception."],
-        ["Can you talk like a computer?", "Yeah Sure <br> <samp> Beep Boop Beep Beep Boop </samp>"],
-        ["What is Lorem Ipsum?",
-         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."],
-        ["Can I type maths?", "Yes, yes you can. You can find <var>x</var> as much as you like."],
-        ["Can I do my own HTML markup?", "Only in some <code>&lt;input&gt;</code> areas"]
+        ["What is Doctrina?","Doctrina is a website made for teachers to share in class activities, resources and more with each other. It is designed so that you - the teacher - finds it easier to do the thing you love most: teach! We help you find worksheets, tutorials and questions for your students so you can spoend more time teaching them, rather then putting time into creating said worksheets, tutorials and questions."],
+        ["What can I use Doctrina for?","You can share resources you found useful in your class, find a resource from another teacher to use in class, read insights and helpful notes for teaching a certain subject, and more! Doctrina also includes an online forum that allows you to talk to other teachers like you."],
+        ["How do I make an account?","Just click the login button in the top right and click create an account. We only require basic information about you and for legal reasons, official documentation stating you are a teacher (this is to make sure that none of your students get access to the site and taking advantage of your resources that you may be using with them)"],
+        ["How do I find a resource?","We have an advanced searching algorithm that makes use of 'tags' to sort and search data. Each channel and resource are associated with tags given by the creator which can help narrow down your search to only results you want to see."],
+        ["How do I create a resource?","Go to our resources page and click the create button. A resource can be given a title, description, a file can be uploaded if you choose to, and obviously tags to help define what areas, subjects and year levels your resource falls into."],
+        ["How can I talk to other teachers?","Our channels page contains multiple forums discussing various subjects, resources and teaching aspects. Each channel contains threads to discuss specifics about the overarching subject. Each thread can be replied to by teachers who want ot discuss and talk to others. You can create your own channels and threads by clicking create either in the main channels page or inside a channel if you would like to start a thread."],
+        ["How is a resources' popularity decided?","Each teacher can upvote or downvote a resource if they like or dislike it respectively. Resources with more upvotes are more popular and resources with more downvotes are less popular. In order to balance out upvotes and downvotes on a resource, we use an algorithm to decide how popular it is. Resources are sorted by popularity after you search."],
     ]
     return render_template('about.html', title='About Us', name="About Us", faqs=faqs, num=len(faqs))
 
