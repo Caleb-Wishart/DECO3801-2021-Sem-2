@@ -276,7 +276,7 @@
 
                                     <!-- Resource file upload-->
                                     <div class="mb-3" style="margin: 1rem!important;">
-                                            <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">File Upload</label>
+                                            <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Resource Upload</label>
                                           <!-- Help documentation-->
                                             <label title="Upload a single file which contains your resource in any format you want.&nbsp<br>&nbsp;&nbsp<br>If you wish to submit multiple
                                                           files under a single resource, we recommend zipping together the resources and describing the files instead in the description"
@@ -288,6 +288,22 @@
                                                 </svg>
                                             </label>
 
+                                        <!-- Changing between file or URL upload -->
+                                        <div class="d-flex">
+                                                  <p class="h6" style="margin: 1.5rem!important;">File Type: </p>
+                                                    <div class="dropdown px-3" style="margin: 1rem!important;">
+                                                        <button class="btn btn-primary dropdown-toggle form-control" style="min-width: 100px; height: 100%" type="button"
+                                                            id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            File
+                                                        </button>
+                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                                            <a class="dropdown-item" href='javascript:;' >File </a>
+                                                            <a class="dropdown-item" href='javascript:;' >URL</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                        <!-- Resource upload section -->
+                                        <!-- File Upload -->
                                           <div class="card flex-fill" id="resourceUpload">
                                               <div class="row">
                                                   <div class = "col-10">
@@ -302,6 +318,14 @@
                                                     </div>
                                                 </div>
                                           </div>
+                                        <!-- URL upload-->
+                                        <div class="card flex-fill" id="resourceUpload">
+                                              <div class="row">
+                                                  <textarea>
+                                                  </textarea>
+                                                </div>
+                                          </div>
+
                                       </div>
 
                                     <!-- Thumbnail file upload-->
