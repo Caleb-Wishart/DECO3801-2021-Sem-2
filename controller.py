@@ -32,9 +32,9 @@ login_manager.login_message_category = "error"
 app.secret_key = "admin"
 
 # File upload
-app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path,'static')
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 # 16 MB
-app.config['MAX_CONTENT_PATH'] = 50 # 50 chars long
+app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static')
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB
+app.config['MAX_CONTENT_PATH'] = 50  # 50 chars long
 
 
 # -----{ LOGIN }---------------------------------------------------------------
@@ -249,7 +249,6 @@ def resource_new():
         resource_thumbnail_file = request.files[form.thumbnail.name]
         resource_thumbnail_links = resource_thumbnail_file.filename
 
-
         difficulty = ResourceDifficulty.EASY
         try:
             subject = Subject[request.form.get('subject').replace(' ', '_').upper()]
@@ -260,35 +259,146 @@ def resource_new():
         except KeyError:
             grade = None
         creaters_id = [current_user.uid]
-        private_personnel_id = [get_user(email).uid for email in request.form.getlist('personnel_ids') if get_user(email) != ErrorCode.INVALID_USER]
+        private_personnel_id = [get_user(email).uid for email in request.form.getlist('personnel_ids') if
+                                get_user(email) != ErrorCode.INVALID_USER]
         is_public = len(private_personnel_id) == 0
 
         tags_id = [get_tags()[t] for t in request.form if t == request.form.get(t) and t in get_tags(t)]
         description = form.description.data
 
         i = 0
-        while os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'],'resource', secure_filename(resource_link))):
+        while os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'], 'resource', secure_filename(resource_link))):
             root, ext = os.path.splitext(resource_link)
             resource_link = root + '_' + str(i) + ext
             i += 1
         i = 0
-        while os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'],'thumbnail', secure_filename(resource_thumbnail_links))):
+        while os.path.isfile(
+                os.path.join(app.config['UPLOAD_FOLDER'], 'thumbnail', secure_filename(resource_thumbnail_links))):
             root, ext = os.path.splitext(resource_thumbnail_links)
             resource_thumbnail_links = root + '_' + str(i) + ext
             i += 1
 
-        resource_file.save(os.path.join(app.config['UPLOAD_FOLDER'],'resource', secure_filename(resource_link)))
-        resource_thumbnail_file.save(os.path.join(app.config['UPLOAD_FOLDER'],'thumbnail', secure_filename(resource_thumbnail_links)))
+        resource_file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'resource', secure_filename(resource_link)))
+        resource_thumbnail_file.save(
+            os.path.join(app.config['UPLOAD_FOLDER'], 'thumbnail', secure_filename(resource_thumbnail_links)))
 
-        rid = add_resource(title,os.path.join('resource', secure_filename(resource_link)), difficulty, subject,grade, creaters_id, is_public,
-                 private_personnel_id, tags_id,
-                 description, [os.path.join('thumbnail', secure_filename(resource_thumbnail_links))])
+        rid = add_resource(title, os.path.join('resource', secure_filename(resource_link)), difficulty, subject, grade,
+                           creaters_id, is_public,
+                           private_personnel_id, tags_id,
+                           description, [os.path.join('thumbnail', secure_filename(resource_thumbnail_links))])
         if isinstance(rid, ErrorCode):
             abort(400)
-        flash("Resource created",'info')
-        return redirect(url_for('resource',rid=rid))
-    return render_template('resource_create.html', title='New Resource',form=form)
+        flash("Resource created", 'info')
+        return redirect(url_for('resource', rid=rid))
+    return render_template('resource_create.html', title='New Resource', form=form)
     # todo
+
+
+@app.route("/resource/<rid>/edit", methods=["GET", "POST"])
+def resource_edit(rid=None):
+    """
+    The user edits a resource they authored.
+
+    If current_user is not the creater of this resource, return to
+    current resource page. If rid is not given, redirects to resource home page
+    """
+    if not rid:
+        return redirect(url_for("resource"))
+
+    rid = int(rid)
+    _, resource_item = get_user_and_resource_instance(uid=-1, rid=rid)
+
+    if not resource_item:
+        flash("rid is invalid", "error")
+        return redirect(url_for("resource"))
+
+    with Session() as conn:
+        creater_uid = conn.query(ResourceCreater).filter_by(rid=rid).first().uid
+        if creater_uid != current_user.uid:
+            # current user does not have privilege to edit this resource,
+            # return to resource home page
+            flash("You do have edit access to current resource", "error")
+            return redirect(url_for("resource"))
+
+    form = ResourceForm()
+
+    if request.method == "GET":
+        form.title.data = resource_item.title
+        form.description.data = resource_item.description
+
+        if resource_item.resource_link.split("/")[0] == "resource":
+            # local resource, gives title
+            filename = resource_item.title
+        else:
+            # local resource, gives resource link
+            filename = resource_item.resource_link
+
+        current_grade = enum_to_website_output(resource_item.grade)
+
+        current_subject = enum_to_website_output(resource_item.subject)
+
+        with Session() as conn:
+            thumbnails = conn.query(ResourceThumbnail).filter_by(rid=rid).all()
+
+            thumbnails_filename = ""
+            if thumbnails:
+                for i in thumbnails:
+                    thumbnails_filename += i.thumbnail_link.split("/")[-1] + ", "
+                if thumbnails_filename[-2:] == ", ":
+                    thumbnails_filename = thumbnails_filename[:-2]
+
+            # populate private personnel
+            personnel_email = []
+            if not resource_item.is_public:
+                for i in conn.query(PrivateResourcePersonnel).filter_by(rid=rid).all():
+                    allowed_person = conn.query(User).filter_by(uid=i.uid).first()
+                    if allowed_person.uid != creater_uid:
+                        personnel_email.append(allowed_person.email)
+
+            tag_map = get_tags(mapping="id2name")
+            applied_tags = []
+            for tag in conn.query(ResourceTagRecord).filter_by(rid=rid).all():
+                applied_tags.append(tag_map.get(tag.tag_id))
+
+        visibility = "Public" if resource_item.is_public else "Private"
+
+        return render_template("resource_edit.html", title=f"Edit resource #{rid}", form=form,
+                               filename=filename, thumbnails_filename=thumbnails_filename,
+                               subject=current_subject, grade=current_grade,
+                               current_visibility=visibility, personnel_emails=personnel_email,
+                               applied_tags=applied_tags, rid=rid)
+    elif request.method == "POST":
+        # update resource: currently do not update other tags
+        title = form.title.data
+        resource_thumbnail_file = request.files[form.thumbnail.name]
+        subject = website_input_to_enum(request.form.get('subject'), Subject)
+        grade = website_input_to_enum(request.form.get('grades'), Grade)
+        description = form.description.data
+        is_public = True if request.form.get("visibility_choice") == 'Public' else False
+
+        thumbnail_path = None
+        if resource_thumbnail_file and resource_thumbnail_file.filename != "":
+            thumbnail_path = posixpath.join("thumbnail", secure_filename(
+                    resource_thumbnail_file.filename))
+            resource_thumbnail_file.save(posixpath.join(
+                app.config['UPLOAD_FOLDER'], thumbnail_path))
+        thumbnail_path = [thumbnail_path] if thumbnail_path else []
+
+        if not description:
+            description = "NULL"
+
+        if isinstance(modify_resource(rid=rid, title=title, subject=subject, grade=grade,
+                                      is_public=is_public, description=description,
+                                      resource_thumbnail_links=thumbnail_path),
+                      ErrorCode):
+            flash("Something went wrong, please try again.", "error")
+            return redirect(url_for("resource_edit", rid=rid))
+
+        flash("Edited successfully.", 'info')
+        return redirect(url_for("resource", rid=rid))
+
+    # invalid call, go back to resource home page
+    return redirect(url_for("resource"))
 
 
 # -----{ PAGES.RESOURCE.AJAX }-------------------------------------------------
@@ -963,7 +1073,7 @@ def debug():
     if error is not None:
         abort(int(error))
 
-    return render_template('debug.html', title='DEBUG',variable=f"{1}" )
+    return render_template('debug.html', title='DEBUG', variable=f"{1}")
 
 
 # -----{ ERRORS }--------------------------------------------------------------
