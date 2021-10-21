@@ -29,7 +29,7 @@
                     <div class="col-3" style="margin-top:2rem!important;">
                         <div class = "d-flex flex-row-reverse" >
                          <a href="{{url_for('create_or_modify_channel_post', cid=channel.cid, post_id=post_info['post_id'])}}" class="btn btn-primary d-md-block" style = "width: 60%" aria-haspopup="true" aria-expanded="false">
-                            <dd class="text-center font-weight-bold">Edit Post</dd>
+                            <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important;">Edit Post</dd>
                         </a>
                         </div>
                     </div>
@@ -116,7 +116,7 @@
             </div>
         </div>
 
-                <div class="d-flex flex-row-reverse"style = "margin-right: 2rem!important; margin-top: 0.25rem!important;">
+                <div class="d-flex flex-row-reverse"style = "margin-right: 2rem!important; margin-top: 0.1rem!important;">
                     {#<img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.PNG')}}"
                              alt="Logo" width="25" style="margin:2px!important; margin-left:0.5rem!important; margin-right: 2px!important;"
                          onclick="votePostOrComment('comment', {{ comment['post_comment_id'] }}, false)">

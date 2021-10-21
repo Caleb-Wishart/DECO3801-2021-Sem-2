@@ -10,15 +10,15 @@
     $(function () {
 
         $(".dropdown-menu a").click(function () {
-
-            $("#dropdownMenuButton1").text($(this).text());
-            $("#dropdownMenuButton1").val($(this).text());
-            if ($("#dropdownMenuButton1").val() == "Private"){
-                $('#privateUsersAccess').attr('hidden',false) ;
-            }else{
-                $('#privateUsersAccess').attr('hidden',true) ;
-            }
+               $("#dropdownMenuButton1").text($(this).text());
+                $("#dropdownMenuButton1").val($(this).text());
+                if ($("#dropdownMenuButton1").val() == "Private"){
+                    $('#privateUsersAccess').attr('hidden',false) ;
+                }else{
+                    $('#privateUsersAccess').attr('hidden',true) ;
+                }
         });
+
 
     });
 
@@ -205,6 +205,16 @@
         personnel.appendChild(new_user);
     }
 
+    function onFile() {
+        $('#resourceUpload').attr('hidden',false) ;
+        $('#urlUpload').attr('hidden',true) ;
+    }
+
+    function onURL() {
+        $('#resourceUpload').attr('hidden',true) ;
+        $('#urlUpload').attr('hidden',false) ;
+    }
+
 </script>
 {% endblock %}
 
@@ -276,7 +286,7 @@
 
                                     <!-- Resource file upload-->
                                     <div class="mb-3" style="margin: 1rem!important;">
-                                            <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">File Upload</label>
+                                            <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Resource Upload</label>
                                           <!-- Help documentation-->
                                             <label title="Upload a single file which contains your resource in any format you want.&nbsp<br>&nbsp;&nbsp<br>If you wish to submit multiple
                                                           files under a single resource, we recommend zipping together the resources and describing the files instead in the description"
@@ -288,20 +298,35 @@
                                                 </svg>
                                             </label>
 
-                                          <div class="card flex-fill" id="resourceUpload">
+                                        <!-- Changing between file or URL upload -->
+                                        <div class="btn-group" role="group" aria-label="Basic radio toggle button group" style="margin-left:1rem!important; margin-bottom:0.5rem!important">
+                                            <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
+                                            <label class="btn btn-outline-primary shadow" for="btnradio1" style = "margin-right: 1rem!important" onclick="onFile()">File Upload</label>
+
+                                            <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
+                                            <label class="btn btn-outline-primary shadow" for="btnradio2" onclick="onURL()">URL Upload</label>
+                                        </div>
+                                        <!-- Resource upload section -->
+                                        <!-- File Upload -->
+                                          <div class="card flex-fill" id="resourceUpload" style="margin-top:1rem!important">
                                               <div class="row">
                                                   <div class = "col-10">
                                                       <dd id="resourceFileName" class="font-weight-bold" style="margin: 1rem!important;">Upload a File</dd>
                                                   </div>
                                                     <div class="col-2" style="margin-top: 0rem!important;">
                                                         <!-- Button to upload the post-->
-                                                        <label for="file-upload" class="btn btn-primary btn" style="margin: 1rem; margin-left: 4rem!important;">
+                                                        <label for="file-upload" class="btn btn-primary btn" style="margin: 1rem; margin-left: 0rem!important;">
                                                             Upload File
                                                         </label>
                                                         {{ form.files(id="file-upload", style="display:none;", onchange="javascript:updateFileName()") }}
                                                     </div>
                                                 </div>
                                           </div>
+                                        <!-- URL upload-->
+                                        <div class="card flex-fill" id="urlUpload" style="margin-top:1rem!important" hidden>
+                                            <textarea class="form-control" id="URL" name="URL" placeholder="URL of resource (required)" required="" rows="2"></textarea>
+                                          </div>
+
                                       </div>
 
                                     <!-- Thumbnail file upload-->
@@ -323,7 +348,7 @@
                                                   </div>
                                                     <div class="col-3" style="margin-top: 0rem!important;">
                                                         <!-- Button to upload the thumbnail-->
-                                                        <label for="thumbnail-upload" class="btn btn-primary btn" style="margin: 1rem; margin-left: 4rem!important;">
+                                                        <label for="thumbnail-upload" class="btn btn-primary btn" style="margin: 1rem; margin-left: 1.6rem!important; margin-right:0rem!important">
                                                             Upload Thumbnail
                                                         </label>
                                                         {{ form.thumbnail(id="thumbnail-upload", style="display:none;", onchange="javascript:updateThumbNailName()") }}
@@ -392,7 +417,7 @@
                                                 </div>
                                               </div>
                                             <div class = "row" style = "margin-top: 1.5rem!important; margin-bottom: 1rem!important;">
-                                                <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
+                                                <div class = "col-2" style="margin-left: 6rem!important; margin-top: 0rem!important;">
                                                     Matching Tags:
                                                 </div>
                                                 <div class = "col-7">
@@ -407,7 +432,7 @@
                                             </div>
                                             <!-- Put the applied tags here-->
                                             <div class = "row" style = "margin-top: 1.5rem!important; margin-bottom: 1rem!important;">
-                                                <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
+                                                <div class = "col-2" style="margin-left: 6rem!important; margin-top: 0rem!important;">
                                                     Applied Tags:
                                                 </div>
                                                 <div class = "col-7">
@@ -455,12 +480,12 @@
                                               <!-- Search bar for users-->
                                               <div id="privateUsersAccess" class = "row" style="margin-bottom: 2rem!important;" hidden>
                                                   <p class="h6" style="margin: 1.5rem; margin-bottom: 0rem!important;">Private User Access: </p>
-                                                  <div class="input-group" style="margin: 1.5rem; margin-left: 2rem!important; padding: 0rem; padding-right: 100px!important; ">
-                                                      <input type="email" id="new_personnel" class="form-control" placeholder="Enter emails of accounts you wish to access your resource" style="width: 95%">
+                                                  <div class="input-group" style="margin: 1.5rem; margin-left: 2rem!important; padding: 0rem; padding-right: 50px!important; ">
+                                                      <input type="email" id="new_personnel" class="form-control" placeholder="Enter emails of accounts you wish to access your resource" style="width: 60%">
                                                       <button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;" onclick="add_personnel()">Add to Personnel</button>
                                                     </div>
                                                   <!-- List of all the users -->
-                                                  <ul class="list-group" id="personnel" style="margin-left: 2rem!important; margin-bottom: 2rem!important; padding-right: 100px!important">
+                                                  <ul class="list-group" id="personnel" style="margin-left: 2rem!important; margin-bottom: 2rem!important; padding-right: 65px!important">
                                                       <div class = "overflow-auto" style="max-height: 208px">
                                                       </div>
                                                     </ul>
@@ -473,7 +498,7 @@
                         <!-- Button to upload the post-->
                       <input type="submit"  class="btn btn-primary btn" style="margin-right: 1rem!important;" value="Upload Resource">
                         <!-- Button to clear the title and body of the post-->
-                        <button type="Button" class="btn btn-outline-primary btn" onclick="resetPage()">Discard Draft</button>
+                        <button type="Button" class="btn btn-outline-danger btn" onclick="resetPage()">Discard Draft</button>
                     </div>
                  </form>
 
@@ -486,5 +511,23 @@
         var popoverList = popoverTriggerList.map(function(popoverTriggerEl) {
         return new bootstrap.Popover(popoverTriggerEl)
 })
+    </script>
+
+    <script>
+     let postSubmit = false;
+     window.addEventListener('beforeunload', (event) => {
+        if (!postSubmit) {
+            alert("Not submit");
+            event.returnValue = 'You have unfinished changes!';
+
+         }
+        });
+
+    </script>
+
+    <script>
+    function toggleForm() {
+        postSubmit = true;
+    }
     </script>
 {% endblock %}

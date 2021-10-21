@@ -1,74 +1,11 @@
 {% extends 'base.html' %}
-
 {% block style %}
-<style>
-    a:link {
-        text-decoration: none;
+    <style>
+    .dropdown-item:hover {
+        background-color: grey;
     }
+    </style>
 
-    a:visited {
-        text-decoration: none;
-    }
-
-    a:hover {
-        text-decoration: none;
-    }
-
-    a:active {
-        text-decoration: none;
-    }
-
-
-
-
-        body {
-            /* Adds a Hex honeycomb background */
-            /* background-image: url(
-        {{url_for('static', filename='img/hex_back.png')}} ),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
-            background-color: #ffe5ec;
-
-            background-image: radial-gradient(rgb(255, 242, 245), rgb(255, 242, 245), rgb(255, 242, 245));
-        {#background-color: rgb(245, 245, 255);#}
-        }
-    .btn-primary {
-        background-color: #ff8fab;
-        color: white;
-        border-color: #ff8fab;
-    }
-    .btn-primary:hover {
-        color:white;
-        background-color: #3a78ef;
-    }
-
-    .btn-outline-primary {
-        background-color: rgb(255, 255, 255);
-        color:#000000;
-        border-color: white;
-    }
-
-    .btn-outline-primary:hover {
-        color:white;
-        background-color: #3a78ef;
-    }
-
-    .btn-check:checked+.btn-outline-primary {
-        color: white;
-        background-color:  #ff8fab;
-        border-color:   #ff8fab;
-    }
-    .bg-white {
-        background-color: #ffd6e1;
-    }
-
-    .bg-primary {
-        background-color: #ff8fab!important;
-    }
-
-     a {
-        color: #000000;
-    }
-
-</style>
 {% endblock %}
 
 {% block script %}
@@ -88,7 +25,7 @@
             <div class="col-8" style="margin-top: 5px!important; margin-bottom: 5px!important;">
                 <!-- Title -->
                 <div class = "row">
-                    <div class="fw-bold" style="padding: 0rem!important; font-size: large">
+                    <div class="fw-bold" style="padding: 0rem!important; font-size: medium">
                         <%= res.title %>
                     </div>
                 </div>
@@ -100,14 +37,23 @@
                 <div class = "row" style = "padding-top: 0.25rem!important;">
                     <!-- Upvotes -->
                     <div class = "col-1" style="padding-left: 0rem!important"> <%= res.upvote_count %>
-                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/UpvotePink.PNG')}}" ,
-                             alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
+                        {#<img class="rounded img-fluid" src="{{url_for('static', filename='img/UpvotePink.PNG')}}" ,
+                             alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">#}
+                        <svg xmlns="http://www.w3.org/2000/svg"  width="17" height="17" fill="#2e9cfa" class="bi bi-arrow-up-circle-fill" viewBox="0 0 16 16" style="margin-bottom: 2px!important; margin-left: 2px!important"
+                             >
+                    <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"
+                    />
+                    </svg>
                     </div>
 
                     <!-- Downvotes -->
                     <div class = "col-1" style = "padding-left: 0rem!important;"> <%= res.downvote_count %>
-                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.PNG')}}" ,
-                             alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
+                        {#<img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.PNG')}}" ,
+                             alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">#}
+                        <svg  xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="#ff4545" class="bi bi-arrow-down-circle-fill" viewBox="0 0 16 16" style="margin-bottom: 2px!important; margin-left: 2px!important">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"
+                    />
+                    </svg>
                     </div>
                     <!-- Bottom information -->
                     <div class = "col" style = "padding-left: 0rem!important; font-size: small; margin-top: 0.2rem!important;">
@@ -119,7 +65,7 @@
             <!-- Information on RHS -->
             <div class = "col-2"style="margin-top: 5px!important; margin-bottom: 5px!important;">
                 <!-- Most recent comment author -->
-                <div class="fw-bold" style=" font-size: medium">
+                <div class="fw-bold" style=" font-size: small">
                     <%= res.recent_commenter_name %>
                 </div>
                 <!-- Time -->
@@ -127,11 +73,13 @@
                 <div class = "row d-flex align-items-center">
                     <!-- Number of comments on a post -->
                     <div class = "col-3">
-                        <img class="rounded img-fluid" src="{{url_for('static', filename='img/commentIcon.PNG')}}" ,
-                                    alt="Logo" width="40" style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="#1c42c2" class="bi bi-chat-left-dots-fill" viewBox="0 0 16 16" style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
+  <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4.414a1 1 0 0 0-.707.293L.854 15.146A.5.5 0 0 1 0 14.793V2zm5 4a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+</svg>
+
                     </div>
                     <div class = "col" style = "padding: 0rem">
-                        <div class = "fw-normal" style = "font-size: small; margin-top: 2.5px!important;"> <%= res.comment_count %> Comments</div>
+                        <div class = "fw-normal" style = "font-size: small; margin-top: 0px!important;"> <%= res.comment_count %> Comments</div>
                     </div>
                 </div>
 
@@ -240,9 +188,9 @@
 
 {% block content %}
 <!-- Banner -->
-      <div class="card row-fluid" style = "padding: 0rem!important; background-color: #FFFFFF">
-         <div class = "container" style="padding-top: 0.25rem!important;">
-            <div class="row p-2 bg-white rounded" style = "padding-bottom: 0rem!important">
+      <div class="card row-fluid" style = "padding: 0rem!important; background-color: #fbfbfb">
+         <div class = "container" style="padding-top: 0.25rem!important; background-color: #fbfbfb">
+            <div class="row p-2 rounded" style = "padding-bottom: 0rem!important; margin-top:1rem!important; background-color: #fbfbfb">
                 <!-- Title and description -->
                 <div class="row">
                     <dt class="col-sm-9" style = "font-size: x-large; padding-bottom: 0.25rem!important;">{{ channel.name }}</dt>
@@ -252,24 +200,33 @@
                         <div class="col-3">
                             <div class = "d-flex flex-row-reverse" >
                              <a href="{{url_for('create_or_modify_channel', cid=channel.cid)}}" class="btn btn-primary d-md-block" style = "width: 60%" aria-haspopup="true" aria-expanded="false">
-                                <dd class="text-center font-weight-bold">Edit Channel Setting</dd>
+                                <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important;">Edit Channel Setting</dd>
 
                             </a>
                             </div>
                         </div>
                     {% endif %}
                      <!-- NOTE: END OF THE SECTION THAT NEEDS TO BE DELETED IF THEY ARE NOT ADMIN  -->
-                    <dd class="row-3" style = "font-size: small; margin-bottom: 0rem!important; margin-top: 1rem!important;">
+                    <dd class="row-3" style = "font-size: small; text-align: justify;margin-bottom: 0rem!important; margin-top: 1rem!important;">
                         <p> {{ channel.description }}</p>
                     </dd>
                     <div class = "row-3" style="font-size: small">
                             <!-- Banner Information -->
-                            <img class="rounded img-fluid" src="{{url_for('static', filename='img/placeholder.png')}}" ,
+                            <img class="rounded img-fluid" src="{{url_for('static', filename=admin.avatar_link)}}"
                                  alt="Logo" width="20" style="margin:2px!important; margin-left:2px!important; margin-right: 4px!important;">
                             Admin: {{ admin.username }}
-
-                            <img class="rounded img-fluid" src="{{url_for('static', filename='img/placeholder.png')}}" ,
-                                 alt="Logo" width="20" style="margin:2px!important; margin-left:16px!important; margin-right: 4px!important;">
+                            {% if visibility == "Public" %}
+                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16" style="margin-left:2rem!important; margin-bottom: 2px!important; margin-right: 3px!important">
+                                <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                                <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                                </svg>
+                            {% else %}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-eye-slash" viewBox="0 0 16 16" style="margin-left:2rem!important; margin-bottom: 2px!important; margin-right: 3px!important">
+                                <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/>
+                                    <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/>
+                                     <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>
+                                </svg>
+                            {% endif %}
                             Visibility: {{ visibility }}
                     </div>
                 </dt>
@@ -298,8 +255,7 @@
         <div class="col-3">
             <div class = "row pe-5">
             <a href="{{url_for('create_or_modify_channel_post', cid=channel.cid)}}" class="btn btn-primary d-md-block" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
-                <dd class="text-center font-weight-bold">Create New Post</dd>
-
+                <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important;">Create New Post +</dd>
             </a>
             </div>
         </div>
@@ -315,12 +271,17 @@
                     <p class="h5" style = "margin:auto">Sort by</p>
                     <!-- dropdown for sort_by -->
                     <div class="dropdown px-3">
-                        <select class="btn btn-primary dropdown-toggle" style="min-width: 100px; height: 90%" id="sort_order"  name="sort_order">
-                            <option class="dropdown-item" value="newest">Newest </option>
-                            <option class="dropdown-item" value="upvote">Upvote</option>
-                            <option class="dropdown-item" value="trending">Trending</option>
+                        <select class="btn btn-primary dropdown-toggle" style="min-width: 100px; height: 85%; margin-top: 5px" id="sort_order"  name="sort_order" data-bs-toggle="dropdown" aria-expanded="false">
+                            <option class="dropdown-item" style="background-color: white" value="newest">
+                                <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important;">Newest</dd>
+                            </option>
+                            <option class="dropdown-item" style="background-color: white" value="upvote">Upvote</option>
+                            <option class="dropdown-item"  style="background-color: white" value="trending">Trending</option>
                         </select>
                     </div>
+
+
+
                 </div>
 
         </div>
@@ -334,13 +295,13 @@
                     <dt style = "margin-top: 1rem!important; margin-bottom: 1rem!important; font-size: x-large"> <u> Trending Posts </u></dt>
                     <!-- Just some trending posts -->
                         {% for i in top_posts %}
-                            <div class = "row" style="margin:auto; margin-bottom: 0.5rem!important;"> {{ loop.index}}. {{ i.title }}
+                            <div class = "row" style="margin:auto; margin-bottom: 0.5rem!important; margin-left:0.25rem!important"> {{ loop.index}}. {{ i.title }}
                             </div>
                         {% endfor %}
                     <!-- Just some top contributors -->
                     <dt style = "margin-top: 1rem!important; margin-bottom: 1rem!important; font-size: x-large"> <u> Top Contributors </u></dt>
                         {% for i in top_contributors %}
-                            <div class = "row" style="margin:auto; margin-bottom: 0.5rem!important;"> {{ loop.index}}. {{ i }}
+                            <div class = "row" style="margin:auto; margin-bottom: 0.5rem!important; margin-left:0.25rem!important"> {{ loop.index}}. {{ i }}
                             </div>
                         {% endfor %}
                 </div>
