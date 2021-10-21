@@ -10,14 +10,16 @@
     $(function () {
 
         $(".dropdown-menu a").click(function () {
-
-            $("#dropdownMenuButton1").text($(this).text());
-            $("#dropdownMenuButton1").val($(this).text());
-            if ($("#dropdownMenuButton1").val() == "Private"){
-                $('#privateUsersAccess').attr('hidden',false) ;
-            }else{
-                $('#privateUsersAccess').attr('hidden',true) ;
+            if (this == $("dropdownMenuButton1")) {
+               $("#dropdownMenuButton1").text($(this).text());
+                $("#dropdownMenuButton1").val($(this).text());
+                if ($("#dropdownMenuButton1").val() == "Private"){
+                    $('#privateUsersAccess').attr('hidden',false) ;
+                }else{
+                    $('#privateUsersAccess').attr('hidden',true) ;
+                } 
             }
+
         });
 
     });
