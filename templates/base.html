@@ -31,7 +31,7 @@
             /* Adds a Hex honeycomb background */
             /* background-image: url({{url_for('static', filename='img/hex_back.png')}}),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
             background-color: #FFFFFF;
-            background-image: radial-gradient(rgb(255, 255, 255), rgb(255, 255, 255), rgb(255, 255, 255));
+            background-image: radial-gradient(rgb(250 , 250 , 250 ), rgb(250 , 250 , 250 ), rgb(250 , 250 , 250 ));
             background-color: rgb(254, 239, 255);
 
 
@@ -42,28 +42,29 @@
 
 
         .bg-subject-tag {
-            background-color: #ff8fab !important;
+            background-color:#00b8ff !important;
             width: auto; margin: 0.25rem!important;
         }
 
         .bg-year-tag {
-            background-color: #ff6cdf !important;
+            background-color: #00b8ff !important;
             width: auto; margin: 0.25rem!important;
         }
 
         .bg-other-tag {
-            background-color: #ff8fec !important;
+            background-color: #00b8ff !important;
             width: auto; margin: 0.25rem!important;
         }
 
       .btn-primary {
-          background-color: #ff8fab;
+          background-color: #1488eb;
           color: white;
-          border-color: #ff8fab;
+          border-color: #1488eb;
       }
       .btn-primary:hover {
           color:white;
-          background-color: #3a78ef;
+          background-color: #0000FF;
+          border-color: #0000FF;
       }
 
       .btn-outline-primary {
@@ -73,14 +74,15 @@
       }
 
       .btn-outline-primary:hover {
-          color:white;
-          background-color: #3a78ef;
+          color:black;
+          background-color: #0000FF;
+          border-color: #0000FF;
       }
 
       .btn-check:checked+.btn-outline-primary {
           color: white;
-          background-color:  #ff8fab;
-          border-color:   #ff8fab;
+          background-color:  #1488eb;
+          border-color:   #1488eb;
       }
       .bg-white {
           background-color: #ffd6e1;
@@ -135,7 +137,7 @@
     }
     .btn-primary:hover {
         color:white;
-        background-color: #3a78ef;
+        background-color: #1488eb;
     }
 
     .btn-outline-primary {
@@ -146,7 +148,7 @@
 
     .btn-outline-primary:hover {
         color:white;
-        background-color: #3a78ef;
+        background-color: #1488eb;
     }
 
     .btn-check:checked+.btn-outline-primary {
@@ -154,19 +156,20 @@
         background-color:  #ff8fab;
         border-color:   #ff8fab;#}
 
-        background-color: #1b8823;
+        background-color: #1488eb;
         color: white;
-        border-color: #1b8823;
+        border-color: #1488eb;
     }
     .bg-white {
         {#background-color: #ffd6e1;#}
-        background-color: #1b8823;
+        background-color: #1488eb;
     }
     .bg-primary {
         {#background-color: #ff8fab!important;#}
-        background-color: #1b8823 !important;
+        background-color: #1488eb!important;
 
     }
+
     .btn-close {
         width: 0.5rem;
         height: 0.5rem;
@@ -194,29 +197,30 @@
 
 <body>
     <!-- Nav Bar -->
-    <header class="shadow bg-light text-dark sticky-top" style = "padding: 0.8rem!important" >
+    <header class="shadow bg-light text-dark sticky-top" style = "padding: 0.8rem!important; background-color: #1488eb!important;" >
         <div class="container-fluid">
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                 <!-- Logo -->
                 <a class="navbar-brand" style = "margin-right: auto!important; margin-left: auto!important;" href="{{url_for('home')}}"
                     class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-                    <img src="{{url_for('static', filename='img/logo.png')}}" , alt="Logo" , width="150" , height="45">
+                    <img src="{{url_for('static', filename='img/whitelogo.png')}}" , alt="Logo" , width="150" , height="45">
                 </a>
                 <!-- Links for the web page -->
                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0" style = "margin-right: auto!important; margin-left: auto!important">
-                    <li><a href="{{url_for('resource')}}" class="h4 nav-link px-4 pt-3 text-dark" style = "padding-left: 7rem!important; padding-right: 7rem!important;
+                    <li><a href="{{url_for('resource')}}" class="h4 nav-link px-4 pt-3 text-light" style = "padding-left: 7rem!important; padding-right: 7rem!important;
                     margin-left: auto; margin-right: auto; font-size: 1.2rem">Resources</a></li>
-                    <li><a href="{{url_for('view_channel')}}" class="h4 nav-link px-4 pt-3 text-dark" style = "padding-left: 7rem!important; padding-right: 7rem!important;
+                    <li><a href="{{url_for('view_channel')}}" class="h4 nav-link px-4 pt-3 text-light" style = "padding-left: 7rem!important; padding-right: 7rem!important;
                     margin-left: auto; margin-right: auto; font-size: 1.2rem">Channels</a></li>
-                    <li><a href="{{url_for('about')}}" class="h4 nav-link px-4 pt-3 text-dark" style = "padding-left: 7rem!important; padding-right: 7rem!important;
-                    margin-left: auto; margin-right: auto; font-size: 1.2rem">Contact Us</a></li>
+                    <li><a href="{{url_for('about')}}" class="h4 nav-link px-4 pt-3 text-light" style = "padding-left: 7rem!important; padding-right: 7rem!important;
+                    margin-left: auto; margin-right: auto; font-size: 1.2rem">FAQs</a></li>
                 </ul>
                 <!-- Profile -->
                 {% if current_user.is_authenticated %}
                 <a class="navbar-brand" style = "margin-right: auto!important; margin-left: auto!important;" href="{{url_for('profile')}}"
                     class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
                     <div class="d-flex">
-                        <p class="h5 pe-4 pt-3 text-dark"> {{current_user.username}}</p>
+                        <p class="h4 nav-link px-4 pt-3 text-light" style="padding-left: 0rem!important; padding-right: 1.5rem!important;
+                    margin-left: auto; margin-right: auto; font-size: 1rem"> {{current_user.username}}</p>
                         <img src="{{url_for('static',filename=current_user.avatar_link)}}" , alt="profile" , width="50" ,
                         height="50">
                     </div>
@@ -225,9 +229,10 @@
                 <a class="navbar-brand" style = "margin-right: auto!important; margin-left: auto!important;" href="{{url_for('login')}}?next={{request.url}}"
                     class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
                     <div class="d-flex">
-                        <p class="h5 pe-4 pt-3 text-dark"> Login </p>
-                        <img src="{{url_for('static', filename='img/default_profile.png')}}" , alt="profile" , width="50" ,
-                            height="50">
+                        <p class="h4 nav-link px-4 pt-3 text-light" style="padding-left: 0rem!important; padding-right: 1.5rem!important;
+                    margin-left: auto; margin-right: auto; font-size: 1.2rem"> Login </p>
+                        <img style="margin: auto" src="{{url_for('static', filename='img/default_profile.png')}}" , alt="profile" , width="30" ,
+                            height="30">
                     </div>
                 </a>
                 {% endif %}

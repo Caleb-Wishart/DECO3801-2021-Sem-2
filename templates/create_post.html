@@ -1,93 +1,8 @@
 {% extends 'base.html' %}
 
-{% block style %}
-<style>
-    a:link {
-        text-decoration: none;
-    }
-
-    a:visited {
-        text-decoration: none;
-    }
-
-    a:hover {
-        text-decoration: none;
-    }
-
-    a:active {
-        text-decoration: none;
-    }
-
-
-        body {
-            /* Adds a Hex honeycomb background */
-            /* background-image: url(
-        {{url_for('static', filename='img/hex_back.png')}} ),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
-            background-color: #ffe5ec;
-
-            background-image: radial-gradient(rgb(255, 242, 245), rgb(255, 242, 245), rgb(255, 242, 245));
-        {#background-color: rgb(245, 245, 255);#}
-        }
-    .btn-primary {
-        background-color: #ff8fab;
-        color: white;
-        border-color: #ff8fab;
-    }
-    .btn-primary:hover {
-        color:white;
-        background-color: #3a78ef;
-    }
-
-    .btn-outline-primary {
-        background-color: rgb(255, 255, 255);
-        color:#000000;
-        border-color: white;
-    }
-
-    .btn-outline-primary:hover {
-        color:white;
-        background-color: #3a78ef;
-    }
-
-    .btn-check:checked+.btn-outline-primary {
-        color: white;
-        background-color:  #ff8fab;
-        border-color:   #ff8fab;
-    }
-    .bg-white {
-        background-color: #ffd6e1;
-    }
-    .bg-primary {
-        background-color: #ff8fab!important;
-    }
-    .btn-close {
-        width: 0.5rem;
-        height: 0.5rem;
-    }
-
-    .popover {
-        max-width: 400px;
-    }
-
-
-
-</style>
-
-{% endblock %}
-
-
-
 
 {% block content %}
     <!-- Handles making the user confirm they want to leave this page as all unsaved changes will be lost-->
-    <body onbeforeunload = "return leavePageFunction()">
-        <script>
-            function leavePageFunction() {
-                return "Testing something"
-            }
-        </script>
-
-    </body>
 
 
 
@@ -111,7 +26,7 @@
                                     <!-- Indicates what channel the post is being posted to-->
                                     <div class = "mb-3" style="margin: 1rem!important;">
                                         <!-- If we are creating a post  -->
-                                        <label for="channelControl" class="form-label" style="font-size: large">Create a new post in the channel:</label>
+                                        <label for="channelControl" class="form-label" style="font-size: large">Create a new post in channel:</label>
                                         <!-- If we are editting a post  -->
                                         {#<label for="channelControl" class="form-label" style="font-size: larger">Editting a post in the channel:</label>#}
                                         <input class="form-control" type="text" id = "channelControl" placeholder="{{ channel["name"] }}" aria-label="Disabled input Channel Name" disabled>
@@ -147,9 +62,9 @@
                     <div class="float-end mt-2 pt-1" style="margin-top: 1rem!important;">
                          <!-- IF WE ARE CREATING A POST, USE THE FOLLOWING BUTTONS-->
                         <!-- Button to upload the post-->
-                      <input type="submit" form="create_form" value="Upload Post" class="btn btn-primary btn" style="margin-right: 1rem!important;"/>
+                      <input type="submit" form="create_form" value="Upload Post" class="btn btn-primary btn" style="margin-right: 1rem!important;" onclick="toggle2()"/>
                         <!-- Button to clear the title and body of the post-->
-                        <button type="Button" class="btn btn-outline-primary btn" onclick="go_to_current_channel_page()">Discard Draft</button>
+                        <button type="Button" class="btn btn-outline-danger btn" onclick="go_to_current_channel_page()">Discard Draft</button>
                          <!-- IF WE ARE CREATING EDITTING A POST, USE THE FOLLOWING BUTTONS-->
                         {#<button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;">Save Changes</button>
                         <button type="Button" class="btn btn-outline-primary btn">Discard Changes</button>#}
@@ -162,6 +77,7 @@
     </div>
     <!-- Validation check on form submit.-->
     <script type="text/javascript">
+
     function validate_form() {
         var valid = true;
 
@@ -172,6 +88,24 @@
         }
         return valid;
 
+    }
+    </script>
+
+     <script>
+     let postSubmit = false;
+     window.addEventListener('beforeunload', (event) => {
+        if (!postSubmit) {
+            alert("Not submit");
+            event.returnValue = 'You have unfinished changes!';
+
+         }
+        });
+
+    </script>
+
+    <script>
+    function toggle2() {
+        postSubmit = true;
     }
     </script>
 
