@@ -18,7 +18,7 @@
             <div class="col-8" style="margin-top: 5px!important; margin-bottom: 5px!important;">
                 <!-- Title -->
                 <div class = "row">
-                    <div class="fw-bold" style="padding: 0rem!important; font-size: large">
+                    <div class="fw-bold" style="padding: 0rem!important; font-size: medium">
                         <%= res.title %>
                     </div>
                 </div>
@@ -49,7 +49,7 @@
             <!-- Information on RHS -->
             <div class = "col-2"style="margin-top: 5px!important; margin-bottom: 5px!important;">
                 <!-- Most recent comment author -->
-                <div class="fw-bold" style=" font-size: medium">
+                <div class="fw-bold" style=" font-size: small">
                     <%= res.recent_commenter_name %>
                 </div>
                 <!-- Time -->
@@ -182,7 +182,7 @@
                         <div class="col-3">
                             <div class = "d-flex flex-row-reverse" >
                              <a href="{{url_for('create_or_modify_channel', cid=channel.cid)}}" class="btn btn-primary d-md-block" style = "width: 60%" aria-haspopup="true" aria-expanded="false">
-                                <dd class="text-center font-weight-bold" style="margin-top: 4px!important; margin-bottom: 4px!important;">Edit Channel Setting</dd>
+                                <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important;">Edit Channel Setting</dd>
 
                             </a>
                             </div>
@@ -228,7 +228,7 @@
         <div class="col-3">
             <div class = "row pe-5">
             <a href="{{url_for('create_or_modify_channel_post', cid=channel.cid)}}" class="btn btn-primary d-md-block" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
-                <dd class="text-center font-weight-bold" style="margin-top: 4px!important; margin-bottom: 4px!important;">Create New Post</dd>
+                <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important;">Create New Post</dd>
             </a>
             </div>
         </div>
