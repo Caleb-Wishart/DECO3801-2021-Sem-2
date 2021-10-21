@@ -172,7 +172,7 @@
 <!-- Banner -->
       <div class="card row-fluid" style = "padding: 0rem!important; background-color: #FFFFFF">
          <div class = "container" style="padding-top: 0.25rem!important;">
-            <div class="row p-2 bg-white rounded" style = "padding-bottom: 0rem!important">
+            <div class="row p-2 bg-white rounded" style = "padding-bottom: 0rem!important; margin-top:1rem!important;">
                 <!-- Title and description -->
                 <div class="row">
                     <dt class="col-sm-9" style = "font-size: x-large; padding-bottom: 0.25rem!important;">{{ channel.name }}</dt>
@@ -189,7 +189,7 @@
                         </div>
                     {% endif %}
                      <!-- NOTE: END OF THE SECTION THAT NEEDS TO BE DELETED IF THEY ARE NOT ADMIN  -->
-                    <dd class="row-3" style = "font-size: small; margin-bottom: 0rem!important; margin-top: 1rem!important;">
+                    <dd class="row-3" style = "font-size: small; text-align: justify;margin-bottom: 0rem!important; margin-top: 1rem!important;">
                         <p> {{ channel.description }}</p>
                     </dd>
                     <div class = "row-3" style="font-size: small">
@@ -264,13 +264,13 @@
                     <dt style = "margin-top: 1rem!important; margin-bottom: 1rem!important; font-size: x-large"> <u> Trending Posts </u></dt>
                     <!-- Just some trending posts -->
                         {% for i in top_posts %}
-                            <div class = "row" style="margin:auto; margin-bottom: 0.5rem!important;"> {{ loop.index}}. {{ i.title }}
+                            <div class = "row" style="margin:auto; margin-bottom: 0.5rem!important; margin-left:0.25rem!important"> {{ loop.index}}. {{ i.title }}
                             </div>
                         {% endfor %}
                     <!-- Just some top contributors -->
                     <dt style = "margin-top: 1rem!important; margin-bottom: 1rem!important; font-size: x-large"> <u> Top Contributors </u></dt>
                         {% for i in top_contributors %}
-                            <div class = "row" style="margin:auto; margin-bottom: 0.5rem!important;"> {{ loop.index}}. {{ i }}
+                            <div class = "row" style="margin:auto; margin-bottom: 0.5rem!important; margin-left:0.25rem!important"> {{ loop.index}}. {{ i }}
                             </div>
                         {% endfor %}
                 </div>
