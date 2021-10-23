@@ -237,7 +237,10 @@
                                                              id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                                             {% for visibility in visibility_options %}
                                                                 {% if visibility == current_visibility %}
-                                                                    <option selected class="dropdown-item" style="background-color: white" value="{{ visibility }}" >{{ visibility }}</option>
+                                                                    {% if visibility == "Fully Private" %}
+                                                                        <option selected class="dropdown-item" style="background-color: white" value="{{ visibility }}" >Private</option>
+                                                                    {% else %}
+                                                                        <option selected class="dropdown-item" style="background-color: white" value="{{ visibility }}" >{{ visibility }}</option>
                                                                  {%  elif visibility == "Fully Private" %}
                                                                     <option class="dropdown-item" style="background-color: white"  value="{{ visibility }}" >Private</option>
                                                                 {% else %}
