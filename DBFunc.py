@@ -1462,8 +1462,9 @@ def modify_channel(cid: int, name=None, visibility: ChannelVisibility = None,
                 # originally public, now private
                 channel.visibility = visibility
                 # admin must be in the channel personnel
-                modify_channel_personnel(uid=admin_uid, cid=cid,
-                                         modification=Modification.MODIFY_ADD)
+                if not conn.query(ChannelPersonnel).filter_by(uid=admin_uid, cid=cid).first():
+                    modify_channel_personnel(uid=admin_uid, cid=cid,
+                                             modification=Modification.MODIFY_ADD)
         # commit before proceed to personnel modification
         conn.add(channel)
         if not try_to_commit(conn):
