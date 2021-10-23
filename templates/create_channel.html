@@ -328,7 +328,7 @@
                                                       }
                                                   </script>
 
-                                                  <ul class="list-group" id="personnel" style="margin-left: 2rem!important; margin-bottom: 2rem!important; padding-right: 100px!important">
+                                                  <ul class="list-group" id="personnel" style="margin-left: 2rem!important; margin-bottom: 2rem!important; padding-right: 65px!important">
                                                       <div class = "overflow-auto" style="max-height: 208px">
                                                       </div>
                                                     </ul>
@@ -343,7 +343,7 @@
                     <div class="float-end mt-2 pt-1" style="margin-top: 1rem!important;">
                          <!-- IF WE ARE CREATING A RESOURCE, USE THE FOLLOWING BUTTONS-->
                         <!-- Button to upload the post-->
-                      <input type="submit" name="submit" value="Upload Resource" form="create_form" class="btn btn-primary btn" style="margin-right: 1rem!important;"/>
+                      <input type="submit" name="submit" value="Upload Resource" form="create_form" class="btn btn-primary btn" style="margin-right: 1rem!important;" onclick = "toggleChannel()"/>
                         <!-- Button to clear the title and body of the post-->
                         <button type="Button" class="btn btn-outline-danger btn" onclick="go_to_channel_home_page()">Discard Draft</button>
                          <!-- IF WE ARE CREATING EDITTING A RESOURCE, USE THE FOLLOWING BUTTONS-->
@@ -375,6 +375,25 @@
         }
         return valid;
 
+    }
+    </script>
+
+
+     <script>
+     let channelSubmit = false;
+     window.addEventListener('beforeunload', (event) => {
+        if (!channelSubmit) {
+            alert("Not submit");
+            event.returnValue = 'You have unfinished changes!';
+
+         }
+        });
+
+    </script>
+
+    <script>
+    function toggleChannel() {
+        channelSubmit = true;
     }
     </script>
 
