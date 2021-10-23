@@ -171,8 +171,8 @@
                                                   </div>
                                               </div>
                                                 <!-- Put the applied tags here-->
-                                                <div class = "row" style = "margin-top: 1.5rem!important; margin-bottom: 1rem!important;">
-                                                    <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
+                                                <div class = "row" style = "margin-top: 1rem!important; margin-bottom: 1rem!important;">
+                                                    <div class = "col-2" style="margin-left: 6rem!important; margin-top: 0rem!important;">
                                                         Applied Tags:
                                                     </div>
 
@@ -226,9 +226,9 @@
                                                              id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                                             {% for visibility in visibility_options %}
                                                                 {% if visibility == "Public" %}
-                                                                    <option selected class="dropdown-item" value="{{ visibility }}" >{{ visibility }}</option>
+                                                                    <option selected class="dropdown-item" style="background-color: white" value="{{ visibility }}" >{{ visibility }}</option>
                                                                 {% else %}
-                                                                    <option class="dropdown-item" value="{{ visibility }}" >{{ visibility }}</option>
+                                                                    <option class="dropdown-item" style="background-color: white"  value="{{ visibility }}" >{{ visibility }}</option>
                                                                 {% endif %}
                                                             {% endfor %}
                                                         </select>
