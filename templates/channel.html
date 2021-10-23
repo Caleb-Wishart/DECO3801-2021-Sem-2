@@ -1,14 +1,15 @@
 {% extends 'base.html' %}
 {% block style %}
 <style>
-.box {
+.card {
   position: relative;
   display: inline-block;
+    background-color: #fff;
   -webkit-transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
   transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-.box::after {
+.card::after {
   content: "";
   border-radius: 5px;
   position: absolute;
@@ -23,12 +24,12 @@
   transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-.box:hover {
-  -webkit-transform: scale(1.25, 1.25);
-  transform: scale(1.25, 1.25);
+.card:hover {
+  -webkit-transform: scale(1.05, 1.05);
+  transform: scale(1.05, 1.05);
 }
 
-.box:hover::after {
+.card:hover::after {
     opacity: 1;
 }
 
