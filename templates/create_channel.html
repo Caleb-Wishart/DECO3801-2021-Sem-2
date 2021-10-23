@@ -254,6 +254,8 @@
                                                             {% for visibility in visibility_options %}
                                                                 {% if visibility == "Public" %}
                                                                     <option selected class="dropdown-item" style="background-color: white" value="{{ visibility }}" >{{ visibility }}</option>
+                                                                {% elif visibility == "Fully Private" %}
+                                                                    <option class="dropdown-item" style="background-color: white"  value="{{ visibility }}" >Private</option>
                                                                 {% else %}
                                                                     <option class="dropdown-item" style="background-color: white"  value="{{ visibility }}" >{{ visibility }}</option>
                                                                 {% endif %}
