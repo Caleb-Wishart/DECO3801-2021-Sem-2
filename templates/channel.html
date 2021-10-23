@@ -18,7 +18,7 @@
                 <div class="col-8" style="margin-top: 5px!important; margin-bottom: 5px!important;">
                     <!-- Title -->
                     <div class = "row">
-                        <div class="fw-bold" style="padding: 0rem!important; font-size: large">
+                        <div class="fw-bold" style="padding: 0rem!important; font-size: medium">
                             <%= res.name %>
                         </div>
                     </div>
@@ -40,7 +40,7 @@
 
                 <div class = "col-2"style="margin-top: 5px!important; margin-bottom: 5px!important;">
                     <!-- Most recent author -->
-                    <div class="fw-bold" style=" font-size: medium">
+                    <div class="fw-bold" style=" font-size: small">
 
                         <%= res.recent_poster_username %>
                     </div>
@@ -226,11 +226,12 @@
 {% endblock %}
 
 {% block content %}
-<!-- Banner -->
+        <!-- Banner -->
       <div class="card row-fluid" style = "padding: 0rem!important; background-color: #fbfbfb">
          <div class = "container" style="padding-top: 0.25rem!important;  padding-left: 0px; padding-right: 100px">
             <div class="row p-2 rounded" style = "padding-bottom: 0rem!important; margin-top:1rem!important; background-color: #fbfbfb">
                 <dt class="row">
+                <!-- Channel heading -->
                     <dt class="col-sm-3" style = "font-size: x-large; padding-bottom: 1rem!important;">Channel Home</dt>
                         <dd class="row-3" style = "font-size: small">
                             <p>Ask any questions you have in the relevant channels below. To see private channels you have access to, click private channels</p>
@@ -278,7 +279,7 @@
             </div>
             <div class="d-flex">
                 <p class="h5" style = "margin:auto">Sort by</p>
-                <!-- dropdown for sort_by -->
+                <!-- Dropdown for Sorting -->
                 <div class="dropdown px-3">
                     <select class="btn btn-primary dropdown-toggle" style="min-width: 100px; height: 90%" id="sort_order"  name="sort_order">
                         <option class="dropdown-item" value="newest"> Created </option>
@@ -290,12 +291,12 @@
         </div>
     </div>
 
-    <!-- Tags Section -->
+    <!-- Tags Section on the left-->
     <div class="row p-3">
         <div class="col-3">
             <!-- Subject selection -->
             <div class="row pe-5">
-                <div class="card">
+                <div class="card" style="background-color: #fbfbfb">
                     <p class="h4" style = "margin-top: 1rem!important; margin-bottom: 0.5rem!important;">Tags</p>
                     <!-- Search for Tags (Naive Bootstrap) -->
                         <input class="form-control" style = "margin-bottom: 0.5rem!important; margin-top: 0.3rem!important;"
@@ -320,7 +321,7 @@
                             </span>
                         {% endfor %}
                     </div>
-                <!-- Clear all tags option -->
+                <!-- Clear all tags button -->
                 <div class = "row-3">
                     <a class="btn btn-secondary d-md-block" style = "width: 100%; margin-top: 1rem!important;
                     margin-bottom: 1rem!important;" aria-haspopup="true" aria-expanded="false">
@@ -331,8 +332,8 @@
             </div>
         </div>
         <div class="col d-flex justify-content-md-between">
-            <!-- Channel top level -->
-            <div class="card flex-fill" id="result" style="color: black">
+            <!-- List of all the channels -->
+            <div class="card flex-fill" id="result" style="color: black; background-color: #fbfbfb">
             </div>
         </div>
     </div>
