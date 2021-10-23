@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block style %}
 <style>
-.card:hover {
+.highlight2:hover {
     box-shadow: 0 0 11px rgba(33,33,33,.2);
 }
 
@@ -15,7 +15,7 @@
 <script type="text/template" id="channel_card">
     <% _.each(data,  function(res) { %>
         <!-- Create the channel card with a shadow -->
-        <div class="card shadow-sm" style="margin: 0.8rem; margin-bottom: 0rem!important; color: black">
+        <div class="card shadow-sm highlight2" style="margin: 0.8rem; margin-bottom: 0rem!important; color: black">
             <a class="row" href="{{url_for('view_channel')}}/<%= res.cid %>">
                 <!-- Thumbnail for a channel.  -->
                 <div class="col-2" style="width: 12%">
