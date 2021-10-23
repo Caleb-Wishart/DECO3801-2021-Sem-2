@@ -1,83 +1,5 @@
 {% extends 'base.html' %}
 
-{% block style %}
-<style>
-    a:link {
-        text-decoration: none;
-    }
-
-    a:visited {
-        text-decoration: none;
-    }
-
-    a:hover {
-        text-decoration: none;
-    }
-
-    a:active {
-        text-decoration: none;
-    }
-
-
-        body {
-            /* Adds a Hex honeycomb background */
-            /* background-image: url(
-        {{url_for('static', filename='img/hex_back.png')}} ),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
-            background-color: #ffe5ec;
-
-            background-image: radial-gradient(rgb(255, 242, 245), rgb(255, 242, 245), rgb(255, 242, 245));
-        {#background-color: rgb(245, 245, 255);#}
-        }
-    .btn-primary {
-        background-color: #ff8fab;
-        color: white;
-        border-color: #ff8fab;
-    }
-    .btn-primary:hover {
-        color:white;
-        background-color: #3a78ef;
-    }
-
-    .btn-outline-primary {
-        background-color: rgb(255, 255, 255);
-        color:#000000;
-        border-color: white;
-    }
-
-    .btn-outline-primary:hover {
-        color:white;
-        background-color: #3a78ef;
-    }
-
-    .btn-check:checked+.btn-outline-primary {
-        color: white;
-        background-color:  #ff8fab;
-        border-color:   #ff8fab;
-    }
-    .bg-white {
-        background-color: #ffd6e1;
-    }
-    .bg-primary {
-        background-color: #ff8fab!important;
-    }
-    .btn-close {
-        width: 0.5rem;
-        height: 0.5rem;
-    }
-
-    .popover {
-        max-width: 400px;
-        whtie-space: pre-line;
-    }
-
-
-
-</style>
-
-
-
-{% endblock %}
-
 {% block script %}
 <script>
     // DROPDOWN
@@ -95,18 +17,6 @@
 
 
 {% block content %}
-    <!-- Handles making the user confirm they want to leave this page as all unsaved changes will be lost-->
-    <body onbeforeunload = "return leavePageFunction()">
-        <script>
-            function leavePageFunction() {
-                return "Testing something"
-            }
-        </script>
-
-    </body>
-
-
-
 <div class="container" style="margin-bottom: 3rem!important;  padding-left: 200px; padding-right: 200px">
         <!-- Title Section -->
         <div class="row">
@@ -174,11 +84,6 @@
                                                   <div class = "col-9">
                                                       <dd class="font-weight-bold" style="margin: 1rem!important;"><input type="file" name="thumbnail" class="btn btn-primary btn" style="margin: 1rem; margin-left: 7.5rem!important;"/></dd>
                                                   </div>
-{#                                                    <div class="col-3" style="margin-top: 0rem!important;">#}
-{#                                                    <!-- IF WE ARE CREATING A POST, USE THE FOLLOWING BUTTONS-->#}
-{#                                                        <!-- Button to upload the thumbnail-->#}
-{#                                                      <input type="file" name="thumbnail" class="btn btn-primary btn" style="margin: 1rem; margin-left: 7.5rem!important;">Upload Thumbnail</input>#}
-{#                                                    </div>#}
                                                 </div>
                                           </div>
                                       </div>
@@ -206,7 +111,7 @@
                                                   <div class = "col-7">
                                                       <input name="subject" class="form-control" style = "margin-top:0.5rem!important;"
                                                               {% if current_subject != "None" %} value="{{ current_subject }}" {% endif %}
-                                                        list="datalistOptions" id="exampleDataList" placeholder="Search Subjects...">
+                                                        list="datalistOptions" id="exampleDataList" placeholder="{{ channel.subject }}">
                                                       <datalist id="datalistOptions">
                                                           {% for item in subjects %}
                                                               <option value="{{item}}">
@@ -222,7 +127,7 @@
                                                   <div class = "col-7">
                                                       <input name="grade" class="form-control" style = "margin-top:0.5rem!important;"
                                                              {% if current_grade != "None" %} value="{{ current_grade }}" {% endif %}
-                                                        list="datalistOptions2" id="exampleDataList2" placeholder="Search Grades...">
+                                                        list="datalistOptions2" id="exampleDataList2" placeholder="{{ channel.grade }}">
                                                         <datalist id="datalistOptions2">
                                                             {% for item in grades %}
                                                                 <option value="{{item}}">
@@ -245,6 +150,35 @@
                                                       </datalist>
                                                   </div>
                                               </div>
+                                            <!-- Put the matching tags here-->
+                                                <div class = "row" style = "margin-top: 1.5rem!important; margin-bottom: 1rem!important;">
+                                                    <div class = "col-2" style="margin-left: 6rem!important; margin-top: 0rem!important;">
+                                                        Matching Tags:
+                                                    </div>
+
+                                                    <div class = "col-7">
+                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;"> Applied tags go here
+                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                            </span>
+                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
+                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                             </span>
+                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
+                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                            </span>
+                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
+                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                             </span>
+                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
+                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                            </span>
+                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
+                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                             </span>
+
+                                                  </div>
+
+
                                                 <!-- Put the applied tags here-->
                                                 <div class = "row" style = "margin-top: 1.5rem!important; margin-bottom: 1rem!important;">
                                                     <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
@@ -300,9 +234,9 @@
                                                              id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                                             {% for visibility in visibility_options %}
                                                                 {% if visibility == current_visibility %}
-                                                                    <option selected class="dropdown-item" value="{{ visibility }}" >{{ visibility }}</option>
+                                                                    <option selected class="dropdown-item" style="background-color: white" value="{{ visibility }}" >{{ visibility }}</option>
                                                                 {% else %}
-                                                                    <option class="dropdown-item" value="{{ visibility }}" >{{ visibility }}</option>
+                                                                    <option class="dropdown-item" style="background-color: white" value="{{ visibility }}" >{{ visibility }}</option>
                                                                 {% endif %}
                                                             {% endfor %}
                                                         </select>
