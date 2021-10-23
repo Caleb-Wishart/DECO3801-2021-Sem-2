@@ -241,7 +241,8 @@
                                                                         <option selected class="dropdown-item" style="background-color: white" value="{{ visibility }}" >Private</option>
                                                                     {% else %}
                                                                         <option selected class="dropdown-item" style="background-color: white" value="{{ visibility }}" >{{ visibility }}</option>
-                                                                 {%  elif visibility == "Fully Private" %}
+                                                                    {% endif %}
+                                                                {%  elif visibility == "Fully Private" %}
                                                                     <option class="dropdown-item" style="background-color: white"  value="{{ visibility }}" >Private</option>
                                                                 {% else %}
                                                                     <option class="dropdown-item" style="background-color: white" value="{{ visibility }}" >{{ visibility }}</option>
