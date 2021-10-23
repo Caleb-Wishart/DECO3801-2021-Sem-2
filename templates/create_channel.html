@@ -13,6 +13,11 @@
         });
 
     });
+    updateThumbNailName = function() {
+        var input = document.getElementById('thumbnail-upload');
+        $("#resourceThumbNailName").text(input.files.item(0).name);
+    }
+
 </script>
 {% endblock %}
 
@@ -89,7 +94,7 @@
                                           <div class="card flex-fill" id="thumbnailUpload">
                                               <div class="row">
                                                   <div class = "col-9">
-                                                      <dd class="font-weight-bold" style="margin: 1rem!important;"> Upload Thumbnail Here
+                                                      <dd id="resourceThumbNailName" class="font-weight-bold" style="margin: 1rem!important;"> Upload Thumbnail Here
 
                                                       </dd>
                                                   </div>
