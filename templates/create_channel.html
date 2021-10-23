@@ -18,18 +18,6 @@
 
 
 {% block content %}
-    <!-- Handles making the user confirm they want to leave this page as all unsaved changes will be lost-->
-    <body onbeforeunload = "return leavePageFunction()">
-        <script>
-            function leavePageFunction() {
-                return "Testing something"
-            }
-        </script>
-
-    </body>
-
-
-
 <div class="container" style="margin-bottom: 3rem!important;  padding-left: 200px; padding-right: 200px">
         <!-- Title Section -->
         <div class="row">
@@ -341,14 +329,10 @@
 
                     </div>
                     <div class="float-end mt-2 pt-1" style="margin-top: 1rem!important;">
-                         <!-- IF WE ARE CREATING A RESOURCE, USE THE FOLLOWING BUTTONS-->
-                        <!-- Button to upload the post-->
-                      <input type="submit" name="submit" value="Upload Resource" form="create_form" class="btn btn-primary btn" style="margin-right: 1rem!important;" onclick = "toggleChannel()"/>
+                        <!-- Button to upload the channel-->
+                      <input type="submit" name="submit" value="Upload Channel" form="create_form" class="btn btn-primary btn" style="margin-right: 1rem!important;" onclick = "toggleChannel()"/>
                         <!-- Button to clear the title and body of the post-->
                         <button type="Button" class="btn btn-outline-danger btn" onclick="go_to_channel_home_page()">Discard Draft</button>
-                         <!-- IF WE ARE CREATING EDITTING A RESOURCE, USE THE FOLLOWING BUTTONS-->
-                        {#<button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;">Save Changes</button>
-                        <button type="Button" class="btn btn-outline-primary btn">Discard Changes</button>#}
 
                     </div>
                  </form>
