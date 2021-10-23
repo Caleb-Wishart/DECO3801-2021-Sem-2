@@ -12,6 +12,10 @@
         });
 
     });
+    updateThumbNailName = function() {
+        var input = document.getElementById('thumbnail-upload');
+        $("#resourceThumbNailName").text(input.files.item(0).name);
+    }
 </script>
 {% endblock %}
 
@@ -82,8 +86,17 @@
                                           <div class="card flex-fill" id="thumbnailUpload">
                                               <div class="row">
                                                   <div class = "col-9">
-                                                      <dd class="font-weight-bold" style="margin: 1rem!important;"><input type="file" name="thumbnail" class="btn btn-primary btn" style="margin: 1rem; margin-left: 7.5rem!important;"/></dd>
+                                                      <dd id="resourceThumbNailName" class="font-weight-bold" style="margin: 1rem!important;">
+                                                          {{ channel.avatar_link}}
+                                                      </dd>
                                                   </div>
+                                                  <div class = "col-3">
+                                                      <label for="thumbnail-upload" class="btn btn-primary btn" style = "margin: 1rem; margin-left: 1.6rem!important; margin-right: 0rem!important;">
+                                                          Upload Thumbnail
+                                                      </label>
+                                                       <input type="file" name="thumbnail" id = "thumbnail-upload" style="display:none;" onchange="javascript:updateThumbNailName()")/>
+                                                  </div>
+
                                                 </div>
                                           </div>
                                       </div>
