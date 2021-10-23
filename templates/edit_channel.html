@@ -238,6 +238,8 @@
                                                             {% for visibility in visibility_options %}
                                                                 {% if visibility == current_visibility %}
                                                                     <option selected class="dropdown-item" style="background-color: white" value="{{ visibility }}" >{{ visibility }}</option>
+                                                                 {%  elif visibility == "Fully Private" %}
+                                                                    <option class="dropdown-item" style="background-color: white"  value="{{ visibility }}" >Private</option>
                                                                 {% else %}
                                                                     <option class="dropdown-item" style="background-color: white" value="{{ visibility }}" >{{ visibility }}</option>
                                                                 {% endif %}
@@ -318,7 +320,7 @@
                                                       }
                                                   </script>
 
-                                                  <ul class="list-group" id="personnel" style="margin-left: 2rem!important; margin-bottom: 2rem!important; padding-right: 100px!important">
+                                                  <ul class="list-group" id="personnel" style="margin-left: 2rem!important; margin-bottom: 2rem!important; padding-right: 65px!important">
                                                       <div class = "overflow-auto" style="max-height: 208px">
                                                         <!-- load existing personnel -->
                                                           {% for email in personnel_emails %}
