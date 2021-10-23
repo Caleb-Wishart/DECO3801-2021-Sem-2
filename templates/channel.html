@@ -18,7 +18,7 @@
                 <div class="col-8" style="margin-top: 5px!important; margin-bottom: 5px!important;">
                     <!-- Title -->
                     <div class = "row">
-                        <div class="fw-bold" style="padding: 0rem!important; font-size: large">
+                        <div class="fw-bold" style="padding: 0rem!important; font-size: medium">
                             <%= res.name %>
                         </div>
                     </div>
@@ -27,7 +27,7 @@
                         <span style="white-space: nowrap; font-size: small; text-overflow:ellipsis; overflow: hidden; padding: 0; max-width: 600px;"><%= res.description %></span>
                     </div>
                     <!-- Tags on a channel. NOTE: I don't how to create a template for each tag   -->
-                    <div class = "row" style = "padding-top: 0.25rem!important;">
+                    <div class = "row" style = "padding-top: 0.5rem!important;">
 
                         <% _.each(res.all_tags, function(tag) { %>
 
@@ -40,7 +40,7 @@
 
                 <div class = "col-2"style="margin-top: 5px!important; margin-bottom: 5px!important;">
                     <!-- Most recent author -->
-                    <div class="fw-bold" style=" font-size: medium">
+                    <div class="fw-bold" style=" font-size: small">
 
                         <%= res.recent_poster_username %>
                     </div>
@@ -50,12 +50,12 @@
                         <!-- Number of posts a channel -->
                         <div class = "col-3">
                             <!-- Image of the post icon -->
-                            <img class="rounded img-fluid" src="{{url_for('static', filename='img/postIcon.PNG')}}" ,
-                                    alt="Logo", width="40", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="margin-top:4px!important; margin-left: 2px!important;" width="16" height="16" fill="#1488eb" class="bi bi-chat-square-text-fill" viewBox="0 0 16 16">
+                              <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.5a1 1 0 0 0-.8.4l-1.9 2.533a1 1 0 0 1-1.6 0L5.3 12.4a1 1 0 0 0-.8-.4H2a2 2 0 0 1-2-2V2zm3.5 1a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9zm0 2.5a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9zm0 2.5a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5z"/>
+                            </svg>
                         </div>
                         <div class = "col" style = "padding: 0rem">
                             <!-- Number of posts in the channel-->
-
                             <div class = "fw-normal" style = "font-size: small; margin-top: 2.5px!important;"> <%= res.post_count %> Posts</div>
                         </div>
                     </div>
@@ -226,11 +226,12 @@
 {% endblock %}
 
 {% block content %}
-<!-- Banner -->
-      <div class="card row-fluid" style = "padding: 0rem!important; background-color: #FFFFFF">
-         <div class = "container" style="padding-top: 0.25rem!important;  padding-left: 100px; padding-right: 100px">
-            <div class="row p-2 bg-white rounded" style = "padding-bottom: 0rem!important">
+        <!-- Banner -->
+      <div class="card row-fluid" style = "padding: 0rem!important; background-color: #fbfbfb">
+         <div class = "container" style="padding-top: 0.25rem!important;  padding-left: 0px; padding-right: 100px">
+            <div class="row p-2 rounded" style = "padding-bottom: 0rem!important; margin-top:1rem!important; background-color: #fbfbfb">
                 <dt class="row">
+                <!-- Channel heading -->
                     <dt class="col-sm-3" style = "font-size: x-large; padding-bottom: 1rem!important;">Channel Home</dt>
                         <dd class="row-3" style = "font-size: small">
                             <p>Ask any questions you have in the relevant channels below. To see private channels you have access to, click private channels</p>
@@ -258,7 +259,7 @@
         <div class="col-3">
             <div class = "row pe-5">
             <a href="{{url_for('create_or_modify_channel')}}" class="btn btn-primary d-md-block shadow" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
-                <dd class="text-center font-weight-bold">Create New Channel</dd>
+                <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important;">Create New Channel +</dd>
 
             </a>
                 </div>
@@ -267,18 +268,22 @@
         <div class="col d-flex justify-content-md-between">
             <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
                 <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
-                <label class="btn btn-outline-primary shadow" for="btnradio1" style = "margin-right: 1rem!important">Public Channels</label>
+                <label class="btn btn-outline-primary shadow" for="btnradio1" style = "margin-right: 1rem!important">
+                    <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important;">Public Channels</dd>
+                </label>
 
                 <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
-                <label class="btn btn-outline-primary shadow" for="btnradio2">My Channels</label>
+                <label class="btn btn-outline-primary shadow" for="btnradio2">
+                    <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important;">My Channels</dd>
+                </label>
             </div>
             <div class="d-flex">
                 <p class="h5" style = "margin:auto">Sort by</p>
-                <!-- dropdown for sort_by -->
+                <!-- Dropdown for Sorting -->
                 <div class="dropdown px-3">
                     <select class="btn btn-primary dropdown-toggle" style="min-width: 100px; height: 90%" id="sort_order"  name="sort_order">
-                        <option class="dropdown-item" value="newest"> Created </option>
-                        <option class="dropdown-item" value="trending">Trending</option>
+                        <option class="dropdown-item" value="newest" style="background-color: white"> Created </option>
+                        <option class="dropdown-item" value="trending" style="background-color: white">Trending</option>
                     </select>
                 </div>
             </div>
@@ -286,12 +291,12 @@
         </div>
     </div>
 
-    <!-- Tags Section -->
+    <!-- Tags Section on the left-->
     <div class="row p-3">
         <div class="col-3">
             <!-- Subject selection -->
             <div class="row pe-5">
-                <div class="card">
+                <div class="card" style="background-color: #fbfbfb">
                     <p class="h4" style = "margin-top: 1rem!important; margin-bottom: 0.5rem!important;">Tags</p>
                     <!-- Search for Tags (Naive Bootstrap) -->
                         <input class="form-control" style = "margin-bottom: 0.5rem!important; margin-top: 0.3rem!important;"
@@ -316,7 +321,7 @@
                             </span>
                         {% endfor %}
                     </div>
-                <!-- Clear all tags option -->
+                <!-- Clear all tags button -->
                 <div class = "row-3">
                     <a class="btn btn-secondary d-md-block" style = "width: 100%; margin-top: 1rem!important;
                     margin-bottom: 1rem!important;" aria-haspopup="true" aria-expanded="false">
@@ -327,8 +332,8 @@
             </div>
         </div>
         <div class="col d-flex justify-content-md-between">
-            <!-- Channel top level -->
-            <div class="card flex-fill" id="result" style="color: black">
+            <!-- List of all the channels -->
+            <div class="card flex-fill" id="result" style="color: black; background-color: #fbfbfb">
             </div>
         </div>
     </div>

@@ -1,83 +1,5 @@
 {% extends 'base.html' %}
 
-{% block style %}
-<style>
-    a:link {
-        text-decoration: none;
-    }
-
-    a:visited {
-        text-decoration: none;
-    }
-
-    a:hover {
-        text-decoration: none;
-    }
-
-    a:active {
-        text-decoration: none;
-    }
-
-
-        body {
-            /* Adds a Hex honeycomb background */
-            /* background-image: url(
-        {{url_for('static', filename='img/hex_back.png')}} ),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
-            background-color: #ffe5ec;
-
-            background-image: radial-gradient(rgb(255, 242, 245), rgb(255, 242, 245), rgb(255, 242, 245));
-        {#background-color: rgb(245, 245, 255);#}
-        }
-    .btn-primary {
-        background-color: #ff8fab;
-        color: white;
-        border-color: #ff8fab;
-    }
-    .btn-primary:hover {
-        color:white;
-        background-color: #3a78ef;
-    }
-
-    .btn-outline-primary {
-        background-color: rgb(255, 255, 255);
-        color:#000000;
-        border-color: white;
-    }
-
-    .btn-outline-primary:hover {
-        color:white;
-        background-color: #3a78ef;
-    }
-
-    .btn-check:checked+.btn-outline-primary {
-        color: white;
-        background-color:  #ff8fab;
-        border-color:   #ff8fab;
-    }
-    .bg-white {
-        background-color: #ffd6e1;
-    }
-    .bg-primary {
-        background-color: #ff8fab!important;
-    }
-    .btn-close {
-        width: 0.5rem;
-        height: 0.5rem;
-    }
-
-    .popover {
-        max-width: 400px;
-        whtie-space: pre-line;
-    }
-
-
-
-</style>
-
-
-
-{% endblock %}
-
 {% block script %}
 <script>
     // DROPDOWN
@@ -90,23 +12,15 @@
         });
 
     });
+    updateThumbNailName = function() {
+        var input = document.getElementById('thumbnail-upload');
+        $("#resourceThumbNailName").text(input.files.item(0).name);
+    }
 </script>
 {% endblock %}
 
 
 {% block content %}
-    <!-- Handles making the user confirm they want to leave this page as all unsaved changes will be lost-->
-    <body onbeforeunload = "return leavePageFunction()">
-        <script>
-            function leavePageFunction() {
-                return "Testing something"
-            }
-        </script>
-
-    </body>
-
-
-
 <div class="container" style="margin-bottom: 3rem!important;  padding-left: 200px; padding-right: 200px">
         <!-- Title Section -->
         <div class="row">
@@ -172,13 +86,17 @@
                                           <div class="card flex-fill" id="thumbnailUpload">
                                               <div class="row">
                                                   <div class = "col-9">
-                                                      <dd class="font-weight-bold" style="margin: 1rem!important;"><input type="file" name="thumbnail" class="btn btn-primary btn" style="margin: 1rem; margin-left: 7.5rem!important;"/></dd>
+                                                      <dd id="resourceThumbNailName" class="font-weight-bold" style="margin: 1rem!important;">
+                                                          {{ channel.avatar_link}}
+                                                      </dd>
                                                   </div>
-{#                                                    <div class="col-3" style="margin-top: 0rem!important;">#}
-{#                                                    <!-- IF WE ARE CREATING A POST, USE THE FOLLOWING BUTTONS-->#}
-{#                                                        <!-- Button to upload the thumbnail-->#}
-{#                                                      <input type="file" name="thumbnail" class="btn btn-primary btn" style="margin: 1rem; margin-left: 7.5rem!important;">Upload Thumbnail</input>#}
-{#                                                    </div>#}
+                                                  <div class = "col-3">
+                                                      <label for="thumbnail-upload" class="btn btn-primary btn" style = "margin: 1rem; margin-left: 1.6rem!important; margin-right: 0rem!important;">
+                                                          Upload Thumbnail
+                                                      </label>
+                                                       <input type="file" name="thumbnail" id = "thumbnail-upload" style="display:none;" onchange="javascript:updateThumbNailName()")/>
+                                                  </div>
+
                                                 </div>
                                           </div>
                                       </div>
@@ -206,7 +124,7 @@
                                                   <div class = "col-7">
                                                       <input name="subject" class="form-control" style = "margin-top:0.5rem!important;"
                                                               {% if current_subject != "None" %} value="{{ current_subject }}" {% endif %}
-                                                        list="datalistOptions" id="exampleDataList" placeholder="Search Subjects...">
+                                                        list="datalistOptions" id="exampleDataList" placeholder="{{ channel.subject }}">
                                                       <datalist id="datalistOptions">
                                                           {% for item in subjects %}
                                                               <option value="{{item}}">
@@ -222,7 +140,7 @@
                                                   <div class = "col-7">
                                                       <input name="grade" class="form-control" style = "margin-top:0.5rem!important;"
                                                              {% if current_grade != "None" %} value="{{ current_grade }}" {% endif %}
-                                                        list="datalistOptions2" id="exampleDataList2" placeholder="Search Grades...">
+                                                        list="datalistOptions2" id="exampleDataList2" placeholder="{{ channel.grade }}">
                                                         <datalist id="datalistOptions2">
                                                             {% for item in grades %}
                                                                 <option value="{{item}}">
@@ -245,6 +163,35 @@
                                                       </datalist>
                                                   </div>
                                               </div>
+                                            <!-- Put the matching tags here-->
+                                                <div class = "row" style = "margin-top: 1.5rem!important; margin-bottom: 1rem!important;">
+                                                    <div class = "col-2" style="margin-left: 6rem!important; margin-top: 0rem!important;">
+                                                        Matching Tags:
+                                                    </div>
+
+                                                    <div class = "col-7">
+                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;"> Applied tags go here
+                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                            </span>
+                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
+                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                             </span>
+                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
+                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                            </span>
+                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
+                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                             </span>
+                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
+                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                            </span>
+                                                            <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;">Applied tags go here
+                                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                             </span>
+
+                                                  </div>
+
+
                                                 <!-- Put the applied tags here-->
                                                 <div class = "row" style = "margin-top: 1.5rem!important; margin-bottom: 1rem!important;">
                                                     <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
@@ -277,13 +224,16 @@
 
                                           </div>
                                       </div>
+                                    </div>
 
                                     <!-- Privacy settings-->
                                     <div class="mb-3" style="margin: 1rem!important;">
                                             <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Privacy</label>
                                           <!-- Help documentation-->
-                                            <label title="Set the privacy settings of your resource.&nbsp<br>&nbsp;&nbsp<br>&nbsp;Public resources are viewable by anyone, whereas private resources are
-                                                          restricted to user accounts which you specify below."
+                                            <label title="Set the privacy settings of your channel.&nbsp<br>&nbsp;&nbsp<br>
+                                            Public channels are viewable, searchable and accessible by anyone.&nbsp<br>&nbsp;&nbsp<br>
+                                            Invite only channels are viewable and searchable publicly, but only accessible by those who you invite. &nbsp<br>&nbsp;&nbsp<br>
+                                            Private channels are restricted to user accounts which you specify below."
                                                    data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html = "true">
 
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
@@ -300,9 +250,15 @@
                                                              id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                                             {% for visibility in visibility_options %}
                                                                 {% if visibility == current_visibility %}
-                                                                    <option selected class="dropdown-item" value="{{ visibility }}" >{{ visibility }}</option>
+                                                                    {% if visibility == "Fully Private" %}
+                                                                        <option selected class="dropdown-item" style="background-color: white" value="{{ visibility }}" >Private</option>
+                                                                    {% else %}
+                                                                        <option selected class="dropdown-item" style="background-color: white" value="{{ visibility }}" >{{ visibility }}</option>
+                                                                    {% endif %}
+                                                                {%  elif visibility == "Fully Private" %}
+                                                                    <option class="dropdown-item" style="background-color: white"  value="{{ visibility }}" >Private</option>
                                                                 {% else %}
-                                                                    <option class="dropdown-item" value="{{ visibility }}" >{{ visibility }}</option>
+                                                                    <option class="dropdown-item" style="background-color: white" value="{{ visibility }}" >{{ visibility }}</option>
                                                                 {% endif %}
                                                             {% endfor %}
                                                         </select>
@@ -332,8 +288,8 @@
                                               <!-- Search bar for users-->
                                               <div class = "row" style="margin-bottom: 2rem!important;">
                                                   <p class="h6" style="margin: 1.5rem; margin-bottom: 0rem!important;">Private User Access: </p>
-                                                  <div class="input-group" style="margin: 1.5rem; margin-left: 2rem!important; padding: 0rem; padding-right: 100px!important; ">
-                                                      <input type="email" id="new_personnel" class="form-control" placeholder="Enter emails of accounts you wish to access your resource" style="width: 95%">
+                                                  <div class="input-group" style="margin: 1.5rem; margin-left: 2rem!important; padding: 0rem; padding-right: 50px!important; ">
+                                                      <input type="email" id="new_personnel" class="form-control" placeholder="Enter emails of accounts you wish to access your resource" style="width: 60%">
                                                       <button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;" onclick="add_personnel()">Add to Personnel</button>
                                                     </div>
                                                   <!-- List of all the users -->
@@ -381,7 +337,7 @@
                                                       }
                                                   </script>
 
-                                                  <ul class="list-group" id="personnel" style="margin-left: 2rem!important; margin-bottom: 2rem!important; padding-right: 100px!important">
+                                                  <ul class="list-group" id="personnel" style="margin-left: 2rem!important; margin-bottom: 2rem!important; padding-right: 65px!important">
                                                       <div class = "overflow-auto" style="max-height: 208px">
                                                         <!-- load existing personnel -->
                                                           {% for email in personnel_emails %}
@@ -393,31 +349,13 @@
                                                            <input type="hidden" name="personnel_ids" value="{{ email }}"/>
                                                           </li>
                                                           {% endfor %}
-{#                                                      <li class="list-group-item">PleaseGiveMeAccessToResource@yourmum.com#}
-{#                                                            <button type="button" class="btn-close float-end" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close"></button>#}
-{#                                                      </li>#}
-{#                                                          <li class="list-group-item">PeePeePooPoo@yourmum.com#}
-{#                                                            <button type="button" class="btn-close float-end" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close"></button>#}
-{#                                                      </li>#}
-{#                                                          <li class="list-group-item">LigmaBofaSuckmaAmongus@yourmum.com#}
-{#                                                            <button type="button" class="btn-close float-end" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close"></button>#}
-{#                                                      </li>#}
-{#                                                          <li class="list-group-item">SussyBalls@yourmum.com#}
-{#                                                            <button type="button" class="btn-close float-end" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close"></button>#}
-{#                                                      </li>#}
-{#                                                           <li class="list-group-item">DrakeIsTheTypeOfFella@yourmum.com#}
-{#                                                            <button type="button" class="btn-close float-end" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close"></button>#}
-{#                                                      </li>#}
-{#                                                           <li class="list-group-item">WWWWWWWWWWW@yourmum.com#}
-{#                                                            <button type="button" class="btn-close float-end" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close"></button>#}
-{#                                                      </li>#}
+{#                                                      #}
 
                                                       </div>
                                                     </ul>
 
                                               </div>
                                           </div>
-
 
                                           </div>
                                       </div>
@@ -431,8 +369,8 @@
 {#                        <!-- Button to clear the title and body of the post-->#}
 {#                        <button type="Button" class="btn btn-outline-primary btn" onclick="go_to_channel_home_page()">Discard Draft</button>#}
                          <!-- IF WE ARE CREATING EDITTING A RESOURCE, USE THE FOLLOWING BUTTONS-->
-                        <input type="submit" class="btn btn-primary btn" name="submit" value="Save Changes" style="margin-right: 1rem!important;"/>
-                        <button type="Button" class="btn btn-outline-primary btn" onclick="go_to_current_channel_page()">Discard Changes</button>
+                        <input type="submit" class="btn btn-primary btn" name="submit" value="Save Changes" style="margin-right: 1rem!important;" onclick="toggleChannel()"/>
+                        <button type="Button" class="btn btn-outline-danger btn" onclick="go_to_current_channel_page()">Discard Changes</button>
                     </div>
                  </form>
 
@@ -459,6 +397,23 @@
         }
         return valid;
 
+    }
+    </script>
+    <script>
+     let channelSubmit = false;
+     window.addEventListener('beforeunload', (event) => {
+        if (!channelSubmit) {
+            alert("Not submit");
+            event.returnValue = 'You have unfinished changes!';
+
+         }
+        });
+
+    </script>
+
+    <script>
+    function toggleChannel() {
+        channelSubmit = true;
     }
     </script>
 
