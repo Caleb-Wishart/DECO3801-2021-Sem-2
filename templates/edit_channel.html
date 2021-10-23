@@ -267,8 +267,8 @@
                                               <!-- Search bar for users-->
                                               <div class = "row" style="margin-bottom: 2rem!important;">
                                                   <p class="h6" style="margin: 1.5rem; margin-bottom: 0rem!important;">Private User Access: </p>
-                                                  <div class="input-group" style="margin: 1.5rem; margin-left: 2rem!important; padding: 0rem; padding-right: 100px!important; ">
-                                                      <input type="email" id="new_personnel" class="form-control" placeholder="Enter emails of accounts you wish to access your resource" style="width: 95%">
+                                                  <div class="input-group" style="margin: 1.5rem; margin-left: 2rem!important; padding: 0rem; padding-right: 50px!important; ">
+                                                      <input type="email" id="new_personnel" class="form-control" placeholder="Enter emails of accounts you wish to access your resource" style="width: 60%">
                                                       <button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;" onclick="add_personnel()">Add to Personnel</button>
                                                     </div>
                                                   <!-- List of all the users -->
@@ -328,24 +328,7 @@
                                                            <input type="hidden" name="personnel_ids" value="{{ email }}"/>
                                                           </li>
                                                           {% endfor %}
-{#                                                      <li class="list-group-item">PleaseGiveMeAccessToResource@yourmum.com#}
-{#                                                            <button type="button" class="btn-close float-end" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close"></button>#}
-{#                                                      </li>#}
-{#                                                          <li class="list-group-item">PeePeePooPoo@yourmum.com#}
-{#                                                            <button type="button" class="btn-close float-end" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close"></button>#}
-{#                                                      </li>#}
-{#                                                          <li class="list-group-item">LigmaBofaSuckmaAmongus@yourmum.com#}
-{#                                                            <button type="button" class="btn-close float-end" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close"></button>#}
-{#                                                      </li>#}
-{#                                                          <li class="list-group-item">SussyBalls@yourmum.com#}
-{#                                                            <button type="button" class="btn-close float-end" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close"></button>#}
-{#                                                      </li>#}
-{#                                                           <li class="list-group-item">DrakeIsTheTypeOfFella@yourmum.com#}
-{#                                                            <button type="button" class="btn-close float-end" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close"></button>#}
-{#                                                      </li>#}
-{#                                                           <li class="list-group-item">WWWWWWWWWWW@yourmum.com#}
-{#                                                            <button type="button" class="btn-close float-end" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close"></button>#}
-{#                                                      </li>#}
+{#                                                      #}
 
                                                       </div>
                                                     </ul>
@@ -365,8 +348,8 @@
 {#                        <!-- Button to clear the title and body of the post-->#}
 {#                        <button type="Button" class="btn btn-outline-primary btn" onclick="go_to_channel_home_page()">Discard Draft</button>#}
                          <!-- IF WE ARE CREATING EDITTING A RESOURCE, USE THE FOLLOWING BUTTONS-->
-                        <input type="submit" class="btn btn-primary btn" name="submit" value="Save Changes" style="margin-right: 1rem!important;"/>
-                        <button type="Button" class="btn btn-outline-primary btn" onclick="go_to_current_channel_page()">Discard Changes</button>
+                        <input type="submit" class="btn btn-primary btn" name="submit" value="Save Changes" style="margin-right: 1rem!important;" onclick="toggleChannel()"/>
+                        <button type="Button" class="btn btn-outline-danger btn" onclick="go_to_current_channel_page()">Discard Changes</button>
                     </div>
                  </form>
 
@@ -393,6 +376,23 @@
         }
         return valid;
 
+    }
+    </script>
+    <script>
+     let channelSubmit = false;
+     window.addEventListener('beforeunload', (event) => {
+        if (!channelSubmit) {
+            alert("Not submit");
+            event.returnValue = 'You have unfinished changes!';
+
+         }
+        });
+
+    </script>
+
+    <script>
+    function toggleChannel() {
+        channelSubmit = true;
     }
     </script>
 
