@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block style %}
 <style>
-.card {
+.box {
   position: relative;
   display: inline-block;
     background-color: #fff;
@@ -9,7 +9,7 @@
   transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-.card::after {
+.box::after {
   content: "";
   border-radius: 5px;
   position: absolute;
@@ -24,12 +24,12 @@
   transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-.card:hover {
+.box:hover {
   -webkit-transform: scale(1.05, 1.05);
   transform: scale(1.05, 1.05);
 }
 
-.card:hover::after {
+.box:hover::after {
     opacity: 1;
 }
 
