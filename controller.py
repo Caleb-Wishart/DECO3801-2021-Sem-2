@@ -482,6 +482,7 @@ def resourceComment():
 
     # individual resource page
     _, res = get_user_and_resource_instance(uid=-1, rid=rid)
+    print(res)
     comms = get_resource_comments(res.rid)
     comments = []
     for comment in comms:
@@ -500,6 +501,7 @@ def resourceComment():
             "replies": rep,
             "author": get_user_and_resource_instance(comment.uid, -1)[0].serialize
         })
+        print(comments)
     return jsonify(comments[::-1])
 
 
