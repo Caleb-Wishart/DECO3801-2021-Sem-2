@@ -448,7 +448,7 @@
             </div>
             {% if current_user.is_authenticated %}
             <div class="card-body" id="newComment" hidden>
-                <div class="row" style="background-color: #fcebff;">
+                <div class="row" style="background-color: #eeeeee;">
                     <hr>
                     <div class="col-1" align="center">
                         <img class="avatar" src="{{url_for('static',filename=current_user.avatar_link)}}" , alt="Profile Icon">
@@ -458,10 +458,10 @@
                             <p class="h6"><strong>{{current_user.username}}</strong></p>
                         </div>
                         <div class="row">
-                            <textarea name="comment_text" class="form-control" id="comment_input" rows="4" style="background: rgb(255, 255, 255) none repeat scroll 0% 0%; height: 16px;" placeholder="Leave a comment"></textarea>
-                            <div class = "d-flex justify-content-end">
+                            <textarea name="comment_text" class="form-control" id="comment_input" rows="4" style="background: rgb(255, 255, 255) none repeat scroll 0% 0%; height: 16px; width: 95%" placeholder="Leave a comment"></textarea>
+                            <div class = "d-flex justify-content-end" style="width: 95%; margin-bottom: 1rem!important; margin-top:1rem!important; padding-right: 0rem!important;">
                                 <input type="submit" form="comment_form" value="Post Comment" class="btn btn-primary btn-sm" style="margin-right: 1rem!important;" onclick='addComment()'></input>
-                                <button type="Button" class="btn btn-outline-primary btn-sm" onclick='document.getElementById("comment_input").value = "";'>Clear</button>
+                                <button type="Button" class="btn btn-outline-danger btn-sm" onclick='document.getElementById("comment_input").value = "";'>Clear</button>
                             </div>
                         </div>
                     </div>
