@@ -228,7 +228,7 @@
                 <!-- Channel heading -->
                     <dt class="col-sm-3" style = "font-size: x-large; padding-bottom: 1rem!important;">Resources</dt>
                         <dd class="row-3" style = "font-size: small">
-                            <p>Browse teaching resources, worksheets and videos that other educators have shared. Contribute to the community by creating your own resources.
+                            <p>Browse teaching resources that other educators have shared. Contribute to the community by creating your own resources.
                             Only public resources and private resources you have access can be found here.</p>
                         </dd>
                 </dt>
@@ -249,7 +249,9 @@
     <div class="row p-3" style="padding-top: 3rem!important; padding-bottom: 0rem!important;">
         <!-- Tags section -->
         <div class="col-3">
-            <p class="h3">Tags</p>
+            <a href="{{url_for('resource_new')}}" class="btn btn-primary" aria-haspopup="true" aria-expanded="false">
+                Create Resource
+            </a>
         </div>
         <!-- Resources selection -->
         <div class="col d-flex justify-content-md-between">
@@ -265,9 +267,6 @@
                     </select>
                 </div>
             </div>
-            <a href="{{url_for('resource_new')}}" class="btn btn-primary" aria-haspopup="true" aria-expanded="false">
-                Create Resource
-            </a>
         </div>
     </div>
     <div class="row p-3">
