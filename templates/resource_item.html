@@ -426,10 +426,11 @@
     </div>
     <hr style="margin-top: 0!important; width: 90%; margin-left: 1rem!important">
     <!-- Comments section -->
-    <div class="row p-3" style="padding-top: 0!important; width: 90%">
+    <div class="row p-3" style="padding-top: 0!important; width: 94%">
             <div class="d-flex justify-content-between">
                 <p class="h4 card-title">Comments</p>
                 {% if current_user.is_authenticated %}
+                    <button class="btn btn-outline-primary float-end">Hide Comments</button>
                 <button class="btn btn-primary float-end" onclick='$("#newComment").attr("hidden",$("#newComment").is(":hidden") ? false : true) ;'>Post a comment</button>
                 {% endif %}
             </div>
