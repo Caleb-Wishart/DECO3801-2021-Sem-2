@@ -916,7 +916,7 @@ def find_channels(title_type="like", channel_name=None,
 
         if caller_uid:
             # find all private channels this caller has access to
-            personnel = conn.query(ChannelPersonnel).filter_by(uid=caller_uid)
+            personnel = conn.query(ChannelPersonnel).filter_by(uid=caller_uid).all()
             accessible = set()
             for i in personnel:
                 accessible.add(i.cid)
@@ -931,8 +931,9 @@ def find_channels(title_type="like", channel_name=None,
 
         if sort_by_newest_date:
             # order by latest date
-            channels.order_by(Channel.created_at.desc())
-
+            channels = channels.order_by(Channel.created_at.desc())
+        else:
+            channels = channels.order_by(Channel.created_at.asc())
         return channels.all()
 
 
