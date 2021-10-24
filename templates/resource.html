@@ -45,7 +45,7 @@
      <% _.each(data,  function(res) { %>
         <!-- Resource card -->
         <div class="col-4 p-2">
-            <a class="text-dark box shadow-sm" href="{{url_for('resource')}}/<%= res.rid %>">
+            <a class="text-dark box shadow-sm" style="max-height: 500px; overflow: hidden" href="{{url_for('resource')}}/<%= res.rid %>">
                 <img class="bd-placeholder-img card-img-top" src="{{url_for('static', filename='')}}/<%= res.banner.thumbnail_link %>" ,
                     alt="Logo" , width="150" , height="150">
                 <div class="card-body" style="border-top: 2px solid #e5e5e5;">
