@@ -256,7 +256,7 @@ class User(Base):
             "created_at" : self.created_at,
             "email" : self.email,
             "bio" : self.bio,
-            "user_rating": round(self.user_rating, 1)
+            "user_rating": str(round(self.user_rating, 1))
         }
 
 

@@ -177,7 +177,7 @@ def register():
                     user = get_user(email)
                     user_auth(user.email, True)
                     login_user(user, remember=False)
-                    # return redirect(url_for('home'))
+                    return redirect(url_for('home'))
                 flash('Something went wrong, please try again', "error")
         else:
             data['emailUsed'] = 'You must provide a valid email'
