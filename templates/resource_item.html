@@ -59,14 +59,15 @@
                                 <p><small> <%= comm.comment.comment %></small></p>
                                 <div>
                                     {% if current_user.is_authenticated %}
-                                    <button class="badge rounded-pill bg-other-tag float-end" onclick='addReply(this,<%= comm.resource_comment_id %>)'>Reply</button>
+                                    <button class="btn btn-primary btn-sm float-end" onclick='addReply(this,<%= comm.resource_comment_id %>)'>Reply</button>
                                     {% endif %}
                                     <% if (comm.author.username == username) { %>
-                                        <button class="badge rounded-pill bg-year-tag float-end" onclick='this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.innerHTML = "";'>Delete</button>
+                                        <button class="btn btn-outline-danger btn-sm float-end" onclick='this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.innerHTML = "";'>Delete</button>
                                     <% } %>
                                 </div>
                             </div>
                         </div>
+                    <hr>
                     </div>
                 </div>
                 <% _.each(comm.replies,  function(reply) { %>
@@ -93,7 +94,7 @@
                                 <p><small><%= reply.reply.reply %></small></p>
                                 <div>
                                     <% if (reply.author.username == username) { %>
-                                        <button class="badge rounded-pill bg-year-tag float-end" onclick='this.parentNode.parentNode.parentNode.parentNode.parentNode.innerHTML = "";'>Delete</button>
+                                        <button class="btn btn-outline-danger btn-sm float-end" onclick='this.parentNode.parentNode.parentNode.parentNode.parentNode.innerHTML = "";'>Delete</button>
                                     <% } %>
                                 </div>
                             </div>
