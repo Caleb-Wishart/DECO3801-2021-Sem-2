@@ -354,7 +354,7 @@
             </p>#}
 
     </div>
-    <hr style="margin-top: 0!important; width: 90%; margin-left: 1rem!important">
+    <hr style="margin-top: 0!important; width: 92%; margin-left: 1rem!important">
     <!-- Author -->
     <div class="row p-3" style="padding-top: 0rem!important; padding-bottom: 0rem!important;">
             <div class="row">
@@ -388,12 +388,12 @@
                     </div>
                 </div>
                     <!-- Show more -->
-                    <div class = "col text-center" style="margin-top: 0.4rem" >
+                    <div class = "col" style="margin-top: 0.4rem" >
                         <a class = "btn btn-primary justify-content-center" >
                             Show Information
                         </a>
                     </div>
-                    <div class = "col" style="margin-top: 0.4rem">
+                    <div class = "col text-end" style="margin-top: 0.4rem">
                     {% if (author.username == current_user.username) %}
                     <p id="abcEdit">
                         <button class="btn btn-outline-primary"  id="editButton" onclick="editButtonFunc()">
@@ -438,7 +438,7 @@
 
              <div class = "col" style="margin-top: 0.4rem" >
                 {% if (author.username == current_user.username) %}
-                    <a class = "btn btn-primary">
+                    <a class = "btn btn-primary" href="{{url_for('resource_edit')}}/<%= res.rid %>">
                             Edit Resource
                         </a>
                 {% endif %}
@@ -448,7 +448,7 @@
 
 
     </div>
-     <hr style="margin-top: 0!important; width: 90%; margin-left: 1rem!important">
+     <hr style="margin-top: 0!important; width: 92%; margin-left: 1rem!important">
     <div class = "row p-3">
         <p class="h4 card-title">Description</p>
         <div class="card-body">
