@@ -315,8 +315,8 @@
             <p class="h4 card-title" id="resTitle">{{res.title}}</p>
             <div class="d-flex" style="padding-top: 0.5rem!important;">
                 <!-- Created on-->
-                <p><strong> Created on </strong></p>
-                <p style="margin-right: 2rem!important;"> {{ res.created_at }}</p>
+                <p><strong> Created on</strong></p>
+                <p style="margin-right: 2rem!important; margin-left: 0.4rem!important;"> {{ res.created_at }}</p>
                 <p><strong>Rating </strong></p>
                 <!-- Upvote-->
                 <p class="card-text px-2" id="upvoteCount">{{res.upvote_count}}</p>
@@ -389,7 +389,7 @@
                 </div>
                     <!-- Show more -->
                     <div class = "col" style="margin-top: 0.4rem" >
-                        <a class = "btn btn-primary justify-content-center" >
+                        <a class = "btn btn-primary justify-content-center" data-bs-toggle = "collapse" href="#Collapse1" role = "button" aria-expanded="false" aria-controls="Collapse1">
                             Show Information
                         </a>
                     </div>
@@ -438,6 +438,7 @@
 
              <div class = "col" style="margin-top: 0.4rem" >
                 {% if (author.username == current_user.username) %}
+                    <!-- NEED REDIRECT HELP HERE -->
                     <a class = "btn btn-primary">
                             Edit Resource
                         </a>
@@ -446,15 +447,18 @@
             {% endfor %}
             </div>
 
-
     </div>
-     <hr style="margin-top: 0!important; width: 92%; margin-left: 1rem!important">
-    <div class = "row p-3">
+
+
+    <hr style="margin-top: 0!important; width: 92%; margin-left: 1rem!important">
+    <!-- Dropdown description and information -->
+    <div class = "row p-3 collapse" id = "Collapse1">
         <p class="h4 card-title">Description</p>
         <div class="card-body">
             <p id="resDesc">{{res.description}}</p>
         </div>
     </div>
+    <!-- Comments section -->
     <div class="row p-3">
         <div class="card shadow" style="border-radius: 15px">
             <div class="d-flex justify-content-between">
