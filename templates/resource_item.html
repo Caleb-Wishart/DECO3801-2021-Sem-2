@@ -356,13 +356,13 @@
     </div>
     <hr style="margin-top: 0!important; width: 90%; margin-left: 1rem!important">
     <!-- Author -->
-    <div class="row p-3" style="padding-top: 0rem!important;">
+    <div class="row p-3" style="padding-top: 0rem!important; padding-bottom: 0rem!important;">
             <div class="row">
                 {% for author in authors %}
                 <div class="col-1" align="center" style="padding-left: 0; padding-right: 0">
                     <img class="avatar" src="{{url_for('static',filename=author.avatar_link)}}" , alt="Profile Icon">
                 </div>
-                <div class="col-5">
+                <div class="col-3">
                     <div class="row">
                             <div class = "card-body" style="padding: 0; padding-left: 0.5em!important; padding-right: 1em!important">
                             <label class="h6" style="margin-right: 0.5rem"><strong>{{author.username}}</strong></label>
@@ -388,10 +388,12 @@
                     </div>
                 </div>
                     <!-- Show more -->
-                    <div class = "col-2" >
-
+                    <div class = "col" >
+                        <a class = "btn btn primary-outline">
+                            Show more
+                        </a>
                     </div>
-                    <div class = "col-2">
+                    <div class = "col">
                     {% if (author.username == current_user.username) %}
                     <p id="abcEdit">
                         <button class="badge rounded-pill bg-other-tag" id="editButton" onclick="editButtonFunc()">
@@ -401,7 +403,14 @@
                                 Save
                         </button>
                     </p>
-                        <p id="abcDelete">
+
+                    {% endif %}
+                    </div>
+
+            <!-- Edit the resource -->
+                <div class = "col" >
+                    {% if (author.username == current_user.username) %}
+                    <p id="abcDelete">
                         <button type="button" class="badge rounded-pill bg-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
                             Delete
                         </button>
@@ -425,12 +434,16 @@
                         </div>
                     </div>
                     {% endif %}
-                    </div>
-                {% endfor %}
-            <!-- Edit the resource -->
-                <div class = "col-2" >
-
                 </div>
+
+             <div class = "col" >
+                {% if (author.username == current_user.username) %}
+                    <a class = "btn btn primary-outline">
+                            Edit Resource
+                        </a>
+                {% endif %}
+                </div>
+            {% endfor %}
             </div>
 
 
