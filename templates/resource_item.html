@@ -428,7 +428,9 @@
             <div class="d-flex justify-content-between">
                 <p class="h4 card-title col">Comments</p>
                 {% if current_user.is_authenticated %}
-                    <button class="btn btn-outline-primary float-end" style="margin-right: 2rem!important;">Hide Comments</button>
+                    <button class="btn btn-outline-primary float-end" style="margin-right: 2rem!important; "
+                            data-bs-toggle = "collapse" href="#Collapse1" role = "button" aria-expanded="false" aria-controls="Collapse1">
+                        Hide Comments</button>
                     {#<a class = "btn btn-primary justify-content-center" data-bs-toggle = "collapse" href="#Collapse1" role = "button" aria-expanded="false" aria-controls="Collapse1" id = "ShowInfo">
                             Show Information
                         </a>#}
@@ -460,7 +462,7 @@
             {#<div id="result">
             </div>#}
     </div>
-    <div class="row p-3" style="padding-top: 0!important; width: 94%">
+    <div class="row p-3 collapse" id = "Collapse1" style="padding-top: 0!important; width: 94%">
         <div id="result">
             </div>
     </div>
