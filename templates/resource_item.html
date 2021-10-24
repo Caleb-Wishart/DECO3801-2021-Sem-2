@@ -59,7 +59,7 @@
                                 <p><small> <%= comm.comment.comment %></small></p>
                                 <div>
                                     {% if current_user.is_authenticated %}
-                                    <button class="btn btn-primary btn-sm float-end" style = "margin-right: 1.5rem!important;" onclick='addReply(this,<%= comm.resource_comment_id %>)'>Reply</button>
+                                    <button class="btn btn-outline-primary btn-sm float-end" style = "margin-right: 1.5rem!important;" onclick='addReply(this,<%= comm.resource_comment_id %>)'>Reply</button>
                                     {% endif %}
                                     <% if (comm.author.username == username) { %>
                                         <button class="btn btn-outline-danger btn-sm float-end" style = "margin-right: 1.5rem!important;"onclick='this.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.innerHTML = "";'>Delete</button>
