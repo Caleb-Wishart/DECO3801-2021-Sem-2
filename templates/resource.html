@@ -45,17 +45,17 @@
      <% _.each(data,  function(res) { %>
         <!-- Resource card -->
         <div class="col-4 p-2">
-            <a class="text-dark box shadow-sm" style="max-height: 500px; overflow: hidden" href="{{url_for('resource')}}/<%= res.rid %>">
+            <a class="text-dark box shadow-sm" style="height: 375px; overflow: hidden" href="{{url_for('resource')}}/<%= res.rid %>">
                 <img class="bd-placeholder-img card-img-top" src="{{url_for('static', filename='')}}/<%= res.banner.thumbnail_link %>" ,
                     alt="Logo" , width="150" , height="150">
                 <div class="card-body" style="border-top: 2px solid #e5e5e5;">
                     <!--Resource title-->
-                    <p class="card-text">
+                    <p class="card-text" style="height: 50px; overflow: hidden">
                         <%= res.title %>
                     </p>
                      <!--Upvotes-->
                     <div class="d-flex">
-                        <p class="card-text px-1">
+                        <p class="card-text px-1" >
                             <%= res.upvote_count %>
                         </p>
                         <!--Downvotes-->
