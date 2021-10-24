@@ -221,24 +221,24 @@
         <div class="col d-flex" style="padding-left: 0px!important">
             <div class="card">
                 <img src="{{url_for('static', filename=banner.thumbnail_link)}}" , alt="Resource image" , width="900" ,
-                    height="200">
+                    height="275">
             </div>
         </div>
     <!-- Top row right hand side -->
         <div class="col-3" align="center">
             <div class="card flex-fill">
-
-                <p><strong>Subject: </strong>
+                <p style="margin-top: 1.5rem!important;"> <strong> Information</strong></p>
+                <p style="margin-top: 1.5rem!important;"><strong>Subject: </strong>
                     <span class="badge rounded-pill bg-subject-tag">
                             {{enum_to_website_output(subject)}}
                     </span>
                 </p>
-                <p><strong>Year Level: </strong>
+                <p style="margin-top: 1.5rem!important;"><strong>Year Level: </strong>
                     <span class="badge rounded-pill bg-year-tag">
                             {{enum_to_website_output(grade)}}
                     </span>
                 </p>
-                <div class = "col text-center">
+                <div class = "col text-center" style="margin-top: 1.5rem!important;">
                     <a class="btn btn-primary" style = "width: 50%"
                     {% if res.resource_link.startswith('resource/') %}
                         href="{{url_for('static', filename=res.resource_link)}}"
