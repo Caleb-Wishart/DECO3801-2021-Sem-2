@@ -247,13 +247,15 @@
     </div>
 <div class="container">
     <div class="row p-3" style="padding-top: 3rem!important; padding-bottom: 0rem!important;">
-        <!-- Tags section -->
+        <!-- Create resource button -->
         <div class="col-3">
-            <a href="{{url_for('resource_new')}}" class="btn btn-primary" aria-haspopup="true" aria-expanded="false">
-                Create Resource
+            <div class = "row pe-5">
+            <a href="{{url_for('resource_new')}}" class="btn btn-primary d-md-block shadow" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
+                <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important;">Create New Resource +</dd>
             </a>
+                </div>
         </div>
-        <!-- Resources selection -->
+        <!-- Sort by section -->
         <div class="col d-flex justify-content-md-between">
             <p class="h3">Trending Resources</p>
             <div class="d-flex">
