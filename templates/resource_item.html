@@ -45,7 +45,7 @@
      <% _.each(data,  function(comm) { %>
             <!-- Resource Comment -->
             <div class="card-body" style="padding: 12px; padding-top: 0rem!important; padding-bottom: 0rem!important;" name="comment">
-                <div class="row" style="background-color:  #e7e7e7 ;">
+                <div class="row" style="background-color:  #ececec ;">
                     <hr>
                     <div class="col-1" align="center">
                         <img class="avatar" src="{{url_for('static',filename='')}}/<%= comm.author.avatar_link %>" , alt="Profile Icon">
@@ -253,8 +253,8 @@
             </div>
         </div>
     <!-- Top row right hand side -->
-        <div class="col-3" align="center" style = "background-color: #fbfbfb">
-            <div class="card flex-fill">
+        <div class="col-3" align="center">
+            <div class="card flex-fill" style = "background-color: #fbfbfb">
                 <p style="margin-top: 1.5rem!important;"> <strong> Information</strong></p>
                 <p style="margin-top: 1.5rem!important;"><strong>Subject: </strong>
                     <span class="badge rounded-pill bg-subject-tag">
@@ -456,7 +456,7 @@
             </div>
             {% if current_user.is_authenticated %}
             <div class="card-body" id="newComment" hidden>
-                <div class="row" style="background-color: #e7e7e7;">
+                <div class="row" style="background-color: #ececec;">
                     <hr>
                     <div class="col-1" align="center">
                         <img class="avatar" src="{{url_for('static',filename=current_user.avatar_link)}}" , alt="Profile Icon">
