@@ -276,7 +276,7 @@
             <!-- Tags selection -->
             <div class="row pe-5">
                 <div class="card">
-                    <p class="h4" style="margin-top: 1rem!important; margin-bottom: 0.5rem!important;">Tags</p>
+                    <p class="h4" style="margin-top: 1rem!important; margin-bottom: 0.75rem!important;">Tags</p>
                     <!-- Search for Tags -->
                     <div class="input-group">
                         <input type="search" name="tags" class="form-control" placeholder="Search Tags..."
@@ -318,6 +318,7 @@
                             <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
                                 onchange="tagCheckedSelected(this)">
                             <label for="{{item}}_input____s" id="{{item}}_label____s">{{enum_to_website_output(item)}}</label>
+                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </span>
                         {% endfor %}
                         {% for item in grades %}
@@ -325,6 +326,7 @@
                             <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
                                 onchange="tagCheckedSelected(this)">
                             <label for="{{item}}_input____s" id="{{item}}_label____s">{{enum_to_website_output(item)}}</label>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </span>
                         {% endfor %}
                         {% for item in tags %}
@@ -332,6 +334,7 @@
                             <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
                                 onchange="tagCheckedSelected(this)">
                             <label for="{{item}}_input____s" id="{{item}}_label____s">{{enum_to_website_output(item)}}</label>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </span>
                         {% endfor %}
                     </div>
