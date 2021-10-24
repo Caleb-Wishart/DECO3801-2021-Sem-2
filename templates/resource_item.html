@@ -217,12 +217,21 @@
         $("#resDesc").css("background-color",'') ;
         $("#abcEdit").css("background-color",'') ;
     }
+    let nameChanged = false;
+    changeName = function() {
+        if (nameChanged) {
+            $("#showComments").text("Show Comments");
+        } else {
+            $("#showComments").text("Hide Comments");
+        }
+        nameChanged = !nameChanged;
+    }
 </script>
 {% endblock %}
 
 
 {% block content %}
-<div class="container" style="margin-top: 1rem;">
+<div class="container" style="margin-top: 1rem; margin-bottom:1.5rem!important;">
     <div class="row p-3" id="editing" hidden>
         <div class="d-flex justify-content-center h3 bg-warning p-1"> You are editing this page </div>
     </div>
@@ -429,7 +438,7 @@
                 <p class="h4 card-title col">Comments</p>
                 {% if current_user.is_authenticated %}
                     <button class="btn btn-outline-primary float-end" style="margin-right: 2rem!important; "
-                            data-bs-toggle = "collapse" href="#Collapse1" role = "button" aria-expanded="false" aria-controls="Collapse1">
+                            data-bs-toggle = "collapse" href="#Collapse1" role = "button" aria-expanded="false" aria-controls="Collapse1" id = "showComments" onclick="changeName()">
                         Hide Comments</button>
                     {#<a class = "btn btn-primary justify-content-center" data-bs-toggle = "collapse" href="#Collapse1" role = "button" aria-expanded="false" aria-controls="Collapse1" id = "ShowInfo">
                             Show Information
