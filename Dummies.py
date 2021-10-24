@@ -85,23 +85,24 @@ grade_list = [e for e in Grade if e != Grade.NULL]
 def get_random_teaching_areas() -> dict:
     """
     Return random number (1, 10) of teaching areas in a dict, all teaching areas are public
+    All grades are now set to None
     """
 
     areas = {}
     for count in range(random.randint(1, 10)):
-        show_grade = bool(random.getrandbits(1))
-        key = [True]
-        if show_grade:
-            key.append(random.choice(grade_list))
+        # show_grade = bool(random.getrandbits(1))
+        key = [True, None]
+        # if show_grade:
+        #     key.append(random.choice(grade_list))
         areas[random.choice(subject_list)] = key
     return areas
 
 
 # test user 1
 teaching_areas = {Subject.MATHS_A: [True], Subject.CHEMISTRY: [True], Subject.ENGLISH: [True]}
-uid0 = add_user(username="Ashley Gibbons", password="123456", email="a.gibbsons@uq.edu.au",
+uid0 = add_user(username="Johnny Appleseed", password="123456", email="j.appleseed@uq.edu.au",
                 avatar_link="avatar/ashley_gibbons.png",
-                bio="Hi! My name is Ashley and I love children! "
+                bio="Hi! My name is Johnny and I love children! "
                     "Especially teaching them! I have worked at Somerset College for"
                     " 4 years and honestly I wanna leave. But I am stuck while I pay for"
                     " the bills while fucking Harold spends all our money on the Pokies"
