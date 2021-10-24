@@ -388,18 +388,18 @@
                     </div>
                 </div>
                     <!-- Show more -->
-                    <div class = "col" style="margin-top: 0.4rem" >
+                    <div class = "col text-center" style="margin-top: 0.4rem" >
                         <a class = "btn btn-primary justify-content-center" >
                             Show Information
                         </a>
                     </div>
-                    <div class = "col">
+                    <div class = "col" style="margin-top: 0.4rem">
                     {% if (author.username == current_user.username) %}
                     <p id="abcEdit">
-                        <button class="btn btn-info" style = "color: #FFFFFF; background-color: #019ebf; border-color: #019ebf" id="editButton" onclick="editButtonFunc()">
+                        <button class="btn btn-outline-primary"  id="editButton" onclick="editButtonFunc()">
                                 Edit Page
                         </button>
-                        <button class="btn btn-info" style = "color: #FFFFFF; background-color: #019ebf; border-color: #019ebf" id="saveButton" onclick='saveButtonFunc()' hidden>
+                        <button class="btn btn-outline-primary" id="saveButton" onclick='saveButtonFunc()' hidden>
                                 Save
                         </button>
                     </p>
@@ -408,11 +408,11 @@
                     </div>
 
             <!-- Edit the resource -->
-                <div class = "col" style="margin-top: 0.4rem">
+                <div class = "col text-center" style="margin-top: 0.4rem">
                     {% if (author.username == current_user.username) %}
                     <p id="abcDelete">
                         <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                            Delete
+                            Delete Resource
                         </button>
                     </p>
                     <!-- Delete Modal -->
