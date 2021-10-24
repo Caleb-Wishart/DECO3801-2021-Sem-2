@@ -408,10 +408,10 @@
                     </div>
 
             <!-- Edit the resource -->
-                <div class = "col" >
+                <div class = "col" style="margin-top: 0.4rem">
                     {% if (author.username == current_user.username) %}
                     <p id="abcDelete">
-                        <button type="btn btn-outline danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
                             Delete
                         </button>
                     </p>
@@ -436,9 +436,9 @@
                     {% endif %}
                 </div>
 
-             <div class = "col" >
+             <div class = "col" style="margin-top: 0.4rem" >
                 {% if (author.username == current_user.username) %}
-                    <a class = "btn btn primary-outline">
+                    <a class = "btn btn-primary">
                             Edit Resource
                         </a>
                 {% endif %}
