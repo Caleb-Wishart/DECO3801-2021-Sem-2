@@ -424,6 +424,7 @@ def resourceAJAX():
         year = None
     if title == '':
         title = None
+    print("resourceAjax")
     return jsonify([dict(i.serialize, tags=get_resource_tags(i.rid),
                          banner=get_resource_thumbnail(i.rid).serialize if get_resource_thumbnail(
                              i.rid) != ErrorCode.INVALID_RESOURCE else {'thumbnail_link': 'img/placeholder.png'}) for i
