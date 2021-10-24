@@ -37,10 +37,12 @@
 {% endblock %}
 
 {% block script %}
+    <script>
     updateThumbNailName = function() {
         var input = document.getElementById('thumbnail-upload');
         $("#resourceThumbNailName").text(input.files.item(0).name);
     }
+    </script>
 {% endblock %}
 
 {% block navbar %}
