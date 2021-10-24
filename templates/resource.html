@@ -28,8 +28,8 @@
 }
 
 .box:hover {
-  -webkit-transform: scale(1.05, 1.05);
-  transform: scale(1.05, 1.05);
+  -webkit-transform: scale(1.03, 1.03);
+  transform: scale(1.03, 1.03);
 }
 
 .box:hover::after {
@@ -45,7 +45,7 @@
      <% _.each(data,  function(res) { %>
         <!-- Resource card -->
         <div class="col-4 p-2">
-            <a class="text-dark box shadow-sm" style="height: 365px; overflow: hidden" href="{{url_for('resource')}}/<%= res.rid %>">
+            <a class="box" style="height: 365px; overflow: hidden" href="{{url_for('resource')}}/<%= res.rid %>">
                 <img class="bd-placeholder-img card-img-top" src="{{url_for('static', filename='')}}/<%= res.banner.thumbnail_link %>" ,
                     alt="Logo" , width="150" , height="150">
                 <div class="card-body" style="border-top: 2px solid #e5e5e5;">
