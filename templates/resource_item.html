@@ -226,7 +226,7 @@
         </div>
     <!-- Top row right hand side -->
         <div class="col-3" align="center">
-            <div class="card">
+            <div class="card flex-fill">
 
                 <p><strong>Subject: </strong>
                     <span class="badge rounded-pill bg-subject-tag">
@@ -238,15 +238,17 @@
                             {{enum_to_website_output(grade)}}
                     </span>
                 </p>
-                <a class="btn btn-primary"
-                {% if res.resource_link.startswith('resource/') %}
-                    href="{{url_for('static', filename=res.resource_link)}}"
-                {% else %}
-                    href="{{res.resource_link}}"
-                {% endif %}
-                >View Resource</a>
-            
-                {% for author in authors %}
+                <div class = "col text-center">
+                    <a class="btn btn-primary" style = "width: 50%"
+                    {% if res.resource_link.startswith('resource/') %}
+                        href="{{url_for('static', filename=res.resource_link)}}"
+                    {% else %}
+                        href="{{res.resource_link}}"
+                    {% endif %}
+                    >View Resource</a>
+                </div>
+
+                {#{% for author in authors %}
                     {% if (author.username == current_user.username) %}
                     <p id="abcEdit"><strong>Edit Page: </strong>
                         <button class="badge rounded-pill bg-other-tag" id="editButton" onclick="editButtonFunc()">
@@ -281,7 +283,7 @@
                     </div>
 
                     {% endif %}
-                {% endfor %}
+                {% endfor %}#}
             </div>
         </div>
     </div>
