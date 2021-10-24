@@ -38,15 +38,15 @@
 {% block content %}
 <div class='container'>
     <div class="row p-3">
-        <div class="col-12 d-flex justify-content-center">
+        <div class="col-12 d-flex justify-content-center" style="margin-top: 2rem!important; margin-bottom: 2rem!important;">
             <!-- logo and title -->
-            <img src="{{url_for('static', filename='img/logo.png')}}" , alt="Logo" , width="350">
+            <img src="{{url_for('static', filename='img/logo.png')}}" , alt="Logo" , width="300">
         </div>
     </div>
 
     <div class="row p-3">
         <div class="col-12 d-flex justify-content-center">
-            <h1>Login</h1>
+            <h2>Login</h2>
         </div>
     </div>
     <form method="POST" action="{{url_for('login')}}{% if request.args.get('next') %}?next={{request.args.get('next')}}{% endif %}">
@@ -57,7 +57,7 @@
             <div class="col-4 d-flex justify-content-end">Email:</div>
             <div class="col-4 d-flex justify-content-center">
                 <div class="c-form" style="width: 100%;">
-                    {{form.email(class="c-form-input", id="email")}}
+                    {{form.email(class="c-form-input", id="email", style="background-color: #d4ebff!important;")}}
                 </div>
             </div>
             <div class="col-4 d-flex justify-content-start"></div>
@@ -68,7 +68,7 @@
             <div class="col-4 d-flex justify-content-end">Password:</div>
             <div class="col-4 d-flex justify-content-center">
                 <div class="c-form" style="width: 100%;">
-                    {{form.password(class="c-form-input", id="password")}}
+                    {{form.password(class="c-form-input", id="password", style="background-color: #d4ebff!important;")}}
                 </div>
             </div>
             <div class="col-4 d-flex justify-content-start"></div>
@@ -86,8 +86,14 @@
                 <input type="submit" value="Login" class="btn btn-primary">
             </div>
             <div class="col-6 d-flex justify-content-start p-3">
-                <a href="{{ url_for('home') }}" class="btn btn-primary">Cancel</a>
+                <a href="{{ url_for('home') }}" class="btn btn-outline-danger btn">Cancel</a>
             </div>
+        </div>
+
+        <div class = "row align-items-center justify-content-center">
+            <div class="col-4 d-flex justify-content-end"> </div>
+            <a class="col-4 d-flex justify-content-center" href="{{ url_for('register') }}"> If you don't have an account, click here to register!</a>
+            <div class="col-4 d-flex justify-content-start"> </div>
         </div>
     </form>
 </div>
