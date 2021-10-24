@@ -48,20 +48,32 @@
             <a class="text-dark box shadow-sm" href="{{url_for('resource')}}/<%= res.rid %>">
                 <img class="bd-placeholder-img card-img-top" src="{{url_for('static', filename='')}}/<%= res.banner.thumbnail_link %>" ,
                     alt="Logo" , width="150" , height="150">
-                <div class="card-body">
+                <div class="card-body" style="border-top: 2px solid #e5e5e5;">
+                    <!--Resource title-->
                     <p class="card-text">
                         <%= res.title %>
                     </p>
+                     <!--Upvotes-->
                     <div class="d-flex">
                         <p class="card-text px-1">
                             <%= res.upvote_count %>
                         </p>
-                        <img src="{{url_for('static', filename='img/up.png')}}" , alt="Down" , width="20" , height="20">
+                        <!--Downvotes-->
+                        <svg xmlns="http://www.w3.org/2000/svg"  width="17" height="17" fill="#2e9cfa" class="bi bi-arrow-up-circle-fill" viewBox="0 0 16 16" style="margin-bottom: 2px!important; margin-left: 2px!important"
+                             >
+                    <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"
+                    />
+                    </svg>
                         <p class="card-text px-1">
                             <%= res.downvote_count %>
                         </p>
-                        <img src="{{url_for('static', filename='img/down.png')}}" , alt="Down" , width="20" , height="20">
+                      <svg  xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="#ff4545" class="bi bi-arrow-down-circle-fill" viewBox="0 0 16 16" style="margin-bottom: 2px!important; margin-left: 2px!important">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"
+                    />
+                    </svg>
+
                     </div>
+                    <!--Tags-->
                     <div class="row">
                         <span class="badge rounded-pill bg-year-tag" style="text-transform: capitalize;">
                             <%= res.grade.replace(/_/g, ' ') %>
