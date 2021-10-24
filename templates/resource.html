@@ -7,7 +7,7 @@
 {% block script %}
 <script type="text/template" id="resource_card">
      <% _.each(data,  function(res) { %>
-        <!-- Resource -->
+        <!-- Resource card -->
         <div class="col-4 p-2">
             <a class="text-dark card shadow-sm" href="{{url_for('resource')}}/<%= res.rid %>">
                 <img class="bd-placeholder-img card-img-top" src="{{url_for('static', filename='')}}/<%= res.banner.thumbnail_link %>" ,
@@ -245,6 +245,7 @@
             </div>
          </div>
     </div>
+
 <div class="container">
     <div class="row p-3" style="padding-top: 3rem!important; padding-bottom: 0rem!important;">
         <!-- Create resource button -->
@@ -253,7 +254,7 @@
             <a href="{{url_for('resource_new')}}" class="btn btn-primary d-md-block shadow" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
                 <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important;">Create New Resource +</dd>
             </a>
-                </div>
+            </div>
         </div>
         <!-- Sort by section -->
         <div class="col d-flex justify-content-md-between">
@@ -263,9 +264,9 @@
                 <!-- dropdown for sort_by -->
                 <div class="dropdown px-3">
                     <select class="btn btn-primary dropdown-toggle" style="min-width: 100px; height: 90%" id="sort_order"  name="sort_order">
-                        <option class="dropdown-item" value="newest">Created</option>
-                        <option class="dropdown-item" value="upvotes">Upvotes</option>
-                        <option class="dropdown-item" value="trending">Trending</option>
+                        <option class="dropdown-item" value="newest"  style="background-color: white">Created</option>
+                        <option class="dropdown-item" value="upvotes"  style="background-color: white">Upvotes</option>
+                        <option class="dropdown-item" value="trending"  style="background-color: white">Trending</option>
                     </select>
                 </div>
             </div>
@@ -318,7 +319,7 @@
                             <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
                                 onchange="tagCheckedSelected(this)">
                             <label for="{{item}}_input____s" id="{{item}}_label____s">{{enum_to_website_output(item)}}</label>
-                             <button type="button" class="btn-close" data-bs-dismiss="alert" disabled aria-label="Close"></button>
+{#                             <button type="button" class="btn-close" data-bs-dismiss="alert" disabled aria-label="Close"></button>#}
                         </span>
                         {% endfor %}
                         {% for item in grades %}
@@ -326,7 +327,7 @@
                             <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
                                 onchange="tagCheckedSelected(this)">
                             <label for="{{item}}_input____s" id="{{item}}_label____s">{{enum_to_website_output(item)}}</label>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" disabled aria-label="Close"></button>
+                        {#                             <button type="button" class="btn-close" data-bs-dismiss="alert" disabled aria-label="Close"></button>#}
                         </span>
                         {% endfor %}
                         {% for item in tags %}
@@ -334,21 +335,21 @@
                             <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
                                 onchange="tagCheckedSelected(this)">
                             <label for="{{item}}_input____s" id="{{item}}_label____s">{{enum_to_website_output(item)}}</label>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" disabled aria-label="Close"></button>
+                        {#                             <button type="button" class="btn-close" data-bs-dismiss="alert" disabled aria-label="Close"></button>#}
                         </span>
                         {% endfor %}
                     </div>
                     <div class="row-3">
                         <div class="btn btn-secondary d-md-block" style="width: 100%; margin-top: 1rem!important;
                         margin-bottom: 1rem!important;" aria-haspopup="true" aria-expanded="false" id="resetTags">
-                            <dd class="text-center font-weight-bold">Clear all tags</dd>
+                            <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important;">Clear all tags</dd>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col d-flex justify-content-md-between">
-            <!-- Resources top level -->
+            <!-- Section that generates all of the resource cards -->
             <div class="card flex-fill">
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 p-3" id="result">
                 </div>
