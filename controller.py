@@ -482,6 +482,7 @@ def resourceComment():
 
     # individual resource page
     _, res = get_user_and_resource_instance(uid=-1, rid=rid)
+    print("here")
     print(res)
     comms = get_resource_comments(res.rid)
     comments = []
