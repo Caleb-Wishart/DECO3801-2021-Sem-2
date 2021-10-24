@@ -299,10 +299,11 @@
             </div>
         </div>
     </div>
-    <div class="row p-3">
+    <div class="row p-3" style = "padding-top: 0rem!important;">
 
-            <p class="h3 card-title" id="resTitle">{{res.title}}</p>
-            <div class="d-flex">
+            <p class="h4 card-title" id="resTitle">{{res.title}}</p>
+            <div class="d-flex" style="padding-top: 0.5rem!important;">
+                <p><strong> Created on {{ res.created_at }}</strong></p>
                 <p><strong>Rating&nbsp;&nbsp;</strong></p>
                 <img onclick="upvote()" src="{{url_for('static', filename='img/up.png')}}" , alt="Down" , width="20" , height="20">
                 <p class="card-text px-3" id="upvoteCount">{{res.upvote_count}}</p>
