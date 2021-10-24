@@ -334,24 +334,7 @@
                     />
                 </svg>
             </div>
-          {#  <p><strong>Visibility:&nbsp;</strong>
-                {% if res.is_public %}
-                    Public
-                {% else %}
-                    Private
-                {% endif %}
-            </p>
-            <div class="row">
-            <p><strong>Tags:&nbsp;&nbsp;</strong>
-                {% for tag in resource_tags %}
-                <span class="badge rounded-pill bg-other-tag">
-                    {{enum_to_website_output(tag)}}
-                </span>
-                {% endfor %}
-                {% if resource_tags | length == 0 %}
-                    No additional tags
-                {% endif %}
-            </p>#}
+
 
     </div>
     <hr style="margin-top: 0!important; width: 92%; margin-left: 1rem!important">
@@ -452,11 +435,29 @@
 
     <hr style="margin-top: 0!important; width: 92%; margin-left: 1rem!important">
     <!-- Dropdown description and information -->
-    <div class = "row p-3 collapse" id = "Collapse1">
+    <div class = "row p-3 collapse" style="padding-top: 0!important;" id = "Collapse1">
         <p class="h4 card-title">Description</p>
         <div class="card-body">
             <p id="resDesc">{{res.description}}</p>
         </div>
+         <p><strong>Visibility:&nbsp;</strong>
+                {% if res.is_public %}
+                    Public
+                {% else %}
+                    Private
+                {% endif %}
+            </p>
+            <div class="row">
+            <p><strong>Tags:&nbsp;&nbsp;</strong>
+                {% for tag in resource_tags %}
+                <span class="badge rounded-pill bg-other-tag">
+                    {{enum_to_website_output(tag)}}
+                </span>
+                {% endfor %}
+                {% if resource_tags | length == 0 %}
+                    No additional tags
+                {% endif %}
+            </p>
     </div>
     <!-- Comments section -->
     <div class="row p-3">
