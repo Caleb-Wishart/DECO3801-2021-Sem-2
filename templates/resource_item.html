@@ -393,7 +393,7 @@
                     </div>
                     <div class = "col-2">
                     {% if (author.username == current_user.username) %}
-                    <p id="abcEdit"><strong>Edit Page: </strong>
+                    <p id="abcEdit">
                         <button class="badge rounded-pill bg-other-tag" id="editButton" onclick="editButtonFunc()">
                                 Edit Page
                         </button>
@@ -401,7 +401,7 @@
                                 Save
                         </button>
                     </p>
-                        <p id="abcDelete"><strong>Delete Resource: </strong>
+                        <p id="abcDelete">
                         <button type="button" class="badge rounded-pill bg-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
                             Delete
                         </button>
@@ -418,8 +418,8 @@
                                     Are you sure you want to delete this resource
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
                                     <a href="{{url_for('resource')}}" class="btn btn-primary">Yes</a>
+                                    <button type="button" class="btn btn-outline danger" data-bs-dismiss="modal">No</button>
                                 </div>
                             </div>
                         </div>
