@@ -20,7 +20,6 @@
 import datetime
 import enum
 import warnings
-import json
 
 from sqlalchemy import Column, ForeignKey, Integer, String, \
     Text, DateTime, Numeric, Boolean, Enum
@@ -257,7 +256,7 @@ class User(Base):
             "created_at" : self.created_at,
             "email" : self.email,
             "bio" : self.bio,
-            "user_rating": json.dumps(round(self.user_rating, 1))
+            "user_rating": str(round(self.user_rating, 1))
         }
 
 
