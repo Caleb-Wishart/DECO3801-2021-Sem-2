@@ -2,7 +2,7 @@
 
 {% block style %}
 <style>
-.card {
+.box {
   position: relative;
     border-radius: 5px;
     border: 1px solid rgba(0,0,0,.125);
@@ -12,7 +12,7 @@
   transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-.card::after {
+.box::after {
   content: "";
   border-radius: 5px;
   position: absolute;
@@ -27,12 +27,12 @@
   transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-.card:hover {
+.box:hover {
   -webkit-transform: scale(1.01, 1.01);
   transform: scale(1.01, 1.01);
 }
 
-.card:hover::after {
+.box:hover::after {
     opacity: 1;
 }
 
@@ -45,7 +45,7 @@
      <% _.each(data,  function(res) { %>
         <!-- Resource card -->
         <div class="col-4 p-2">
-            <a class="text-dark card shadow-sm" href="{{url_for('resource')}}/<%= res.rid %>">
+            <a class="text-dark box shadow-sm" href="{{url_for('resource')}}/<%= res.rid %>">
                 <img class="bd-placeholder-img card-img-top" src="{{url_for('static', filename='')}}/<%= res.banner.thumbnail_link %>" ,
                     alt="Logo" , width="150" , height="150">
                 <div class="card-body">
@@ -257,7 +257,7 @@
 
 {% block content %}
     <!--Banner-->
-    <div class="box row-fluid" style = "padding: 0rem!important; background-color: #fbfbfb">
+    <div class="card row-fluid" style = "padding: 0rem!important; background-color: #fbfbfb">
          <div class = "container" style="padding-top: 0.25rem!important;  padding-left: 0px; padding-right: 100px">
             <div class="row p-2 rounded" style = "padding-bottom: 0rem!important; margin-top:1rem!important; background-color: #fbfbfb">
                 <dt class="row">
@@ -312,7 +312,7 @@
         <div class="col-3">
             <!-- Tags selection -->
             <div class="row pe-5">
-                <div class="box" style=" background-color: #fbfbfb">
+                <div class="card" style=" background-color: #fbfbfb">
                     <p class="h4" style="margin-top: 1rem!important; margin-bottom: 0.75rem!important;">Tags</p>
                     <!-- Search for Tags -->
                     <div class="input-group">
@@ -386,7 +386,7 @@
         </div>
         <div class="col d-flex justify-content-md-between">
             <!-- Section that generates all of the resource cards -->
-            <div class="box flex-fill" style=" background-color: #fbfbfb">
+            <div class="card flex-fill" style=" background-color: #fbfbfb">
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 p-3" id="result">
                 </div>
             </div>
