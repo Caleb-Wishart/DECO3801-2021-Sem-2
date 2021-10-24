@@ -352,16 +352,11 @@
                     No additional tags
                 {% endif %}
             </p>#}
-       
+
     </div>
-    <hr>
+    <hr class="px-3" style="margin-top: 0rem!important;">
     <div class="row p-3">
 
-            <p class="h4 card-title">Description</p>
-            <div class="card-body">
-                <p id="resDesc">{{res.description}}</p>
-                <hr class="px-3">
-            </div>
             <p class="h4 card-title">Author</p>
             <div class="row">
                 {% for author in authors %}
@@ -378,8 +373,13 @@
                 </div>
                 {% endfor %}
 
+            </div>
+            <hr class="px-3">
+            <p class="h4 card-title">Description</p>
+            <div class="card-body">
+                <p id="resDesc">{{res.description}}</p>
+            </div>
     </div>
-
     <div class="row p-3">
         <div class="card shadow" style="border-radius: 15px">
             <div class="d-flex justify-content-between">
