@@ -36,6 +36,13 @@
 </style>
 {% endblock %}
 
+{% block script %}
+    updateThumbNailName = function() {
+        var input = document.getElementById('thumbnail-upload');
+        $("#resourceThumbNailName").text(input.files.item(0).name);
+    }
+{% endblock %}
+
 {% block navbar %}
 {% endblock %}
 
@@ -123,7 +130,7 @@
         <!-- Teacher Authentication -->
         <div class="row p-3 align-items-center justify-content-center">
             <div class="col-2"> </div>
-            <div class="mb-3" style="margin: 1rem!important; width: 50%" >
+            <div class="mb-3" style="margin: 1rem; margin-bottom: 0.5rem!important; width: 50%" >
                 <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Teacher Authentication</label>
                 <!-- Help documentation-->
                 <label title="Upload a single file which contains documentation that cofirms you are a teacher.&nbsp<br>&nbsp;&nbsp<br>&nbsp;If you wish to submit multiple
@@ -142,9 +149,9 @@
                         </div>
                         <div class = "col-4">
                             <label for="thumbnail-upload" class="btn btn-primary btn" style = "margin: 1rem; margin-left: 1.6rem!important; margin-right: 0rem!important;">
-                                Upload Thumbnail
+                                Upload File
                             </label>
-                            <input type="file" name="thumbnail" id = "thumbnail-upload" style="display:none;"/>
+                            <input type="file" name="thumbnail" id = "thumbnail-upload" style="display:none;" onchange="javascript:updateThumbNailName()"/>
                         </div>
                     </div>
                 </div>
