@@ -30,8 +30,8 @@
                 <p class="h6"><strong>{{current_user.username}}</strong></p>
             </div>
             <div class="row">
-                <textarea name="reply_text" class="form-control" id="reply_input" rows="4" style="background: rgb(255, 255, 255) none repeat scroll 0% 0%; height: 16px;" placeholder="Leave a comment"></textarea>
-                <div class = "d-flex justify-content-end">
+                <textarea name="reply_text" class="form-control" id="reply_input" rows="2" style="background: rgb(255, 255, 255) none repeat scroll 0% 0%; width: 95%" placeholder="Leave a comment"></textarea>
+                <div class = "d-flex justify-content-end" style="width: 95%; margin-bottom: 1rem!important; margin-top:1rem!important; padding-right: 0rem!important;">
                     <input type="submit" form="comment_form" value="Post Comment" class="btn btn-primary btn-sm" style="margin-right: 1rem!important;" onclick='sendReply(<%= cid %>)'></input>
                     <button type="Button" class="btn btn-outline-primary btn-sm" onclick='document.getElementById("reply_input").value = "";'>Clear</button>
                     <button type="Button" class="btn btn-outline-primary btn-sm" onclick='$( "#commentReply" ).remove();'>Cancel</button>
