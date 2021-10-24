@@ -525,7 +525,6 @@ def profile():
     with Session() as conn:
         for area in conn.query(UserTeachingAreas). \
                 filter_by(uid=current_user.uid, is_public=True).all():
-            # concat both grade + subject
             text = enum_to_website_output(area.teaching_area)
         teaching_areas.append(text)
 
