@@ -372,9 +372,9 @@
                 </div>
                     <!-- Show more -->
                     <div class = "col" style="margin-top: 0.4rem" >
-                        <a class = "btn btn-primary justify-content-center" data-bs-toggle = "collapse" href="#Collapse1" role = "button" aria-expanded="false" aria-controls="Collapse1">
+                        {#<a class = "btn btn-primary justify-content-center" data-bs-toggle = "collapse" href="#Collapse1" role = "button" aria-expanded="false" aria-controls="Collapse1" id = "ShowInfo">
                             Show Information
-                        </a>
+                        </a>#}
                     </div>
                     <div class = "col text-end" style="margin-top: 0.4rem">
                     {% if (author.username == current_user.username) %}
@@ -435,7 +435,7 @@
 
     <hr style="margin-top: 0!important; width: 92%; margin-left: 1rem!important">
     <!-- Dropdown description and information -->
-    <div class = "row p-3 collapse" style="padding-top: 0!important;" id = "Collapse1">
+    <div class = "row p-3" style="padding-top: 0!important;" id = "Collapse1">
         <p class="h4 card-title">Description</p>
         <div class="card-body">
             <p id="resDesc">{{res.description}}</p>
