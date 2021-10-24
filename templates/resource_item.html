@@ -315,9 +315,9 @@
             <p class="h4 card-title" id="resTitle">{{res.title}}</p>
             <div class="d-flex" style="padding-top: 0.5rem!important;">
                 <!-- Created on-->
-                <p><strong> Created on: </strong></p>
+                <p><strong> Created on </strong></p>
                 <p style="margin-right: 2rem!important;"> {{ res.created_at }}</p>
-                <p><strong>Rating&nbsp;&nbsp;</strong></p>
+                <p><strong>Rating </strong></p>
                 <!-- Upvote-->
                 <p class="card-text px-2" id="upvoteCount">{{res.upvote_count}}</p>
                  <svg xmlns="http://www.w3.org/2000/svg" id = "up_1" width="20" height="20" fill="grey" class="bi bi-arrow-up-circle-fill" viewBox="0 0 16 16" onclick="upvote();
@@ -327,14 +327,14 @@
                  </svg>
 
                 <!-- Downvote-->
-                <p class="card-text px-2" id="downvoteCount">{{res.downvote_count}}</p>
+                <p class="card-text px-2" style="margin-left: 0.5rem!important;" id="downvoteCount">{{res.downvote_count}}</p>
                 <svg xmlns="http://www.w3.org/2000/svg" id = "down_1" width="20" height="20" fill="grey" class="bi bi-arrow-down-circle-fill" viewBox="0 0 16 16" onclick="downvote();
                             highlight(this, false)" style="margin-top: 3px">
                     <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"
                     />
                 </svg>
             </div>
-            <p><strong>Visibility:&nbsp;</strong>
+          {#  <p><strong>Visibility:&nbsp;</strong>
                 {% if res.is_public %}
                     Public
                 {% else %}
@@ -351,11 +351,12 @@
                 {% if resource_tags | length == 0 %}
                     No additional tags
                 {% endif %}
-            </p>
+            </p>#}
             </div>
     </div>
+    <hr>
     <div class="row p-3">
-        <div class="card shadow" style="border-radius: 15px">
+        
             <p class="h4 card-title">Description</p>
             <div class="card-body">
                 <p id="resDesc">{{res.description}}</p>
@@ -376,8 +377,9 @@
                     </div>
                 </div>
                 {% endfor %}
-        </div>
+
     </div>
+
     <div class="row p-3">
         <div class="card shadow" style="border-radius: 15px">
             <div class="d-flex justify-content-between">
