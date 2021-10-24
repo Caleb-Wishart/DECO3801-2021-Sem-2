@@ -33,8 +33,8 @@
                 <textarea name="reply_text" class="form-control" id="reply_input" rows="2" style="background: rgb(255, 255, 255) none repeat scroll 0% 0%; width: 95%" placeholder="Leave a comment"></textarea>
                 <div class = "d-flex justify-content-end" style="width: 95%; margin-bottom: 1rem!important; margin-top:1rem!important; padding-right: 0rem!important;">
                     <input type="submit" form="comment_form" value="Post Comment" class="btn btn-primary btn-sm" style="margin-right: 1rem!important;" onclick='sendReply(<%= cid %>)'></input>
-                    <button type="Button" class="btn btn-outline-primary btn-sm" onclick='document.getElementById("reply_input").value = "";'>Clear</button>
-                    <button type="Button" class="btn btn-outline-primary btn-sm" onclick='$( "#commentReply" ).remove();'>Cancel</button>
+                    <button type="Button" class="btn btn-outline-primary btn-sm"  style="margin-right: 1rem!important;" onclick='document.getElementById("reply_input").value = "";'>Clear</button>
+                    <button type="Button" class="btn btn-outline-danger btn-sm" onclick='$( "#commentReply" ).remove();'>Cancel</button>
                 </div>
             </div>
         </div>
@@ -45,7 +45,7 @@
      <% _.each(data,  function(comm) { %>
             <!-- Resource Comment -->
             <div class="card-body" style="padding: 12px; padding-top: 0rem!important; padding-bottom: 0rem!important;" name="comment">
-                <div class="row" style="background-color:  #ececec ;">
+                <div class="row" style="background-color:  #f3f3f3 ;">
                     <hr>
                     <div class="col-1" align="center">
                         <img class="avatar" src="{{url_for('static',filename='')}}/<%= comm.author.avatar_link %>" , alt="Profile Icon">
@@ -456,7 +456,7 @@
             </div>
             {% if current_user.is_authenticated %}
             <div class="card-body" id="newComment" hidden>
-                <div class="row" style="background-color: #ececec;">
+                <div class="row" style="background-color: #f3f3f3;">
                     <hr>
                     <div class="col-1" align="center">
                         <img class="avatar" src="{{url_for('static',filename=current_user.avatar_link)}}" , alt="Profile Icon">
