@@ -248,14 +248,14 @@ class User(Base):
     def serialize(self):
         """Return object data in serialisable format """
         return {
-            "uid" : self.uid,
-            "username" : self.username,
-            "authenticated" : self.authenticated,
-            "avatar_link" : self.avatar_link,
-            "profile_background_link" : self.profile_background_link,
-            "created_at" : self.created_at,
-            "email" : self.email,
-            "bio" : self.bio,
+            "uid": self.uid,
+            "username": self.username,
+            "authenticated": self.authenticated,
+            "avatar_link": self.avatar_link,
+            "profile_background_link": self.profile_background_link,
+            "created_at": dump_datetime(self.created_at),
+            "email": self.email,
+            "bio": self.bio,
             "user_rating": str(round(self.user_rating, 1))
         }
 
@@ -411,6 +411,7 @@ class ResourceThumbnail(Base):
             "thumbnail_link": self.thumbnail_link
         }
 
+
 class ResourceVoteInfo(Base):
     """
     A table of vote status for user who voted on a resource
@@ -542,10 +543,10 @@ class ResourceCommentReply(Base):
     def serialize(self):
         """Return object data in serialisable format """
         return {
-            "resource_comment_id" : self.resource_comment_id,
-            "reply" : self.reply,
-            "created_at" : self.created_at,
-            "uid" : self.uid
+            "resource_comment_id": self.resource_comment_id,
+            "reply": self.reply,
+            "created_at": self.created_at,
+            "uid": self.uid
         }
 
 
@@ -656,7 +657,7 @@ class Channel(Base):
     def __str__(self):
         text = f"Channel table:\n" \
                f"channel name = {self.name}, admin id = {self.admin_uid},\n" \
-               f"cid = {self.cid}, avatar_link = {self.avatar_link}, "\
+               f"cid = {self.cid}, avatar_link = {self.avatar_link}, " \
                f"visibility = {self.visibility.name}, " \
                f"created at = {self.created_at},\n"
         if self.subject:
