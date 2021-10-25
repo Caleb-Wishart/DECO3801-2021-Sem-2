@@ -48,7 +48,69 @@
 {% endblock %}
 
 {% block script %}
+
+    <script type="text/template" id="profile_card">
+     <% _.each(data,  function(res) { %>
+        <!-- Individual card -->
+     <div class="box shadow-sm flex-fill" style="margin: 1.1rem; margin-bottom: 0.55rem!important; margin-top: 0.55rem!important; color: black">
+         <a class="row">
+             <!-- Thumbnail for a channel.  -->
+             <div class="col-2" style="width: 12%">
+                 <img src="https://via.placeholder.com/65"
+                      alt="Logo", width="60", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
+             </div>
+
+             <div class="col-3" style="margin-top: 10px!important; margin-bottom: 5px!important;">
+                 <!-- Title -->
+                 <div class = "row">
+                     <div class="fw-bold" style="padding: 0rem!important; font-size: small">
+                         Title
+                     </div>
+                 </div>
+             </div>
+             <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important;">
+                 <!-- Date Created -->
+                 <div class = "row">
+                     <div class="fw-bold" style="padding: 0rem!important; font-size: small">
+                         Date Created
+                     </div>
+                 </div>
+                 <div class = "row">
+                     <div style="padding: 0rem!important; font-size: small">
+                         (Actual Date)
+                     </div>
+                 </div>
+             </div>
+             <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important;">
+                 <!-- Privacy Status -->
+                 <div class = "row">
+                     <div class="fw-bold" style="padding: 0rem!important; font-size: small">
+                         Privacy
+                     </div>
+                 </div>
+                 <div class = "row">
+                     <div style="padding: 0rem!important; font-size: small">
+                         (Actual Privacy)
+                     </div>
+                 </div>
+             </div>
+
+             <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important;">
+                 <!-- Manage -->
+                 <div class = "row text-center">
+                     <button type="button" class="btn btn-primary" style="width: 50%; margin: auto; margin-top: 5px!important; margin-bottom: 5px!important;">Manage</button>
+                 </div>
+
+             </div>
+         </a>
+     </div>
+
+    <% }); %>
+    </script>
+
+
     <script>
+    //Dropdown menu
     $(function () {
 
         $(".dropdown-menu a").click(function () {
@@ -68,7 +130,7 @@
         <div class="banner-visible-area" style="margin-top:10px;">
             <div class="card" style = "background-color: #fbfbfb">
                 <img src="{{ url_for("static", filename=user['profile_background_link'])}}" class="banner-image" height="250">
-                <div class="row pe-5">
+                <div class="row pe-5" style="margin-top: 1rem">
                     <div class="col-2">
                         <img src="{{ url_for('static', filename=user['avatar_link']) }}" width="80px" height="80px" style="margin-top:6px">
                     </div>
@@ -218,10 +280,10 @@
                 </div>
 
 
-                <!-- Items -->
+                <!-- Items / cards (Don't delete the div below) -->
                     <div class="col d-flex justify-content-md-between">
 
-                            <!-- Individual card -->
+                            <!-- Individual card (Put the template stuff here) -->
                             <div class="box shadow-sm flex-fill" style="margin: 1.1rem; margin-bottom: 0.55rem!important; margin-top: 0.55rem!important; color: black">
                                 <a class="row">
                                     <!-- Thumbnail for a channel.  -->
@@ -275,25 +337,7 @@
                                 </a>
                             </div>
                     </div>
-                    {#<div class="row pe-5">
-                        <div class="col d-flex justify-content-md-between">
-                            <!-- Individual card of a resource or channel -->
-                            <div class="row">
-                            <div class="box shadow-sm" style="margin: 15px 0 15px 15px">
-                                    <div class="col-2" style="padding-top:3px; padding-right:20px">
 
-                                        <img src="https://via.placeholder.com/150" style="padding: inherit" width="150px" height="150px">
-                                    </div>
-                                    <div class="col">
-                                        <p>Title: resource title pls</p>
-                                        <p>Access: private vs public pls</p>
-                                        <p>Date Created: creation date pls</p>
-                                        <p>Upvotes: num upvotes pls</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>#}
 
             </div>
         </div>
