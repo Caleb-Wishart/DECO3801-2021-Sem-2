@@ -19,7 +19,7 @@
     <!-- Profile Image/Background -->
     <div class="row text-center" style="">
         <div class="banner-visible-area" style="margin-top:10px;">
-            <div class="card">
+            <div class="card" style = "background-color: #fbfbfb">
                 <img src="{{ url_for("static", filename=user['profile_background_link'])}}" class="banner-image" height="250">
                 <div class="row pe-5">
                     <div class="col-2">
@@ -54,8 +54,8 @@
 
             <!-- Educator Rating -->
             <div class="row pe-5" style="margin-bottom: 1rem">
-                <div class="card">
-                    <p class="h5" style="margin-top: 1rem; margin-left: 12px!important;">Educator Rating</p>
+                <div class="card" style = "background-color: #fbfbfb">
+                    <p class="h5" style="margin-top: 1rem; margin-left: 12px!important;  margin-bottom: 0rem!important">Educator Rating</p>
                     <div class="card-body overflow-auto" style="padding-left:12px!important;">
                         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
                         {% for i in range(rating_whole) %}
@@ -111,8 +111,8 @@
 
             <!-- Tags -->
             <div class="row pe-5">
-                <div class="card">
-                    <p class="h4" style="margin-top: 1rem; margin-left: 12px!important;">Tags</p>
+                <div class="card" style="background-color: #fbfbfb">
+                    <p class="h5" style="margin-top: 1rem; margin-left: 12px!important; margin-bottom: 0rem!important;">Tags</p>
                     <div class="card-body overflow-auto" style="padding-left:12px!important;">
                             <div class="col-7">
                                 {% for area in teaching_areas %}
