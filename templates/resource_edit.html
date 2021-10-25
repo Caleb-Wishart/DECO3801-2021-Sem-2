@@ -10,15 +10,15 @@
     $(function () {
 
         $(".dropdown-menu a").click(function () {
-               $("#dropdownMenuButton1").text($(this).text());
-                $("#dropdownMenuButton1").val($(this).text());
-                if ($("#dropdownMenuButton1").val() == "Private"){
-                    $('#privateUsersAccess').attr('hidden',false) ;
-                }else{
-                    $('#privateUsersAccess').attr('hidden',true) ;
-                }
-        });
 
+            $("#dropdownMenuButton1").text($(this).text());
+            $("#dropdownMenuButton1").val($(this).text());
+            if ($("#dropdownMenuButton1").val() == "Private"){
+                $('#privateUsersAccess').attr('hidden',false) ;
+            }else{
+                $('#privateUsersAccess').attr('hidden',true) ;
+            }
+        });
 
     });
 
@@ -158,14 +158,6 @@
         }
     });
 
-    function showDiv(visibility) {
-        if (visibility.value!=="Public") {
-            document.getElementById("hidden_div").style.display = "block";
-        } else {
-            document.getElementById('hidden_div').style.display = "none";
-        }
-    }
-
     function add_personnel() {
         var email = document.getElementById("new_personnel").value;
 
@@ -205,16 +197,6 @@
         personnel.appendChild(new_user);
     }
 
-    function onFile() {
-        $('#resourceUpload').attr('hidden',false) ;
-        $('#urlUpload').attr('hidden',true) ;
-    }
-
-    function onURL() {
-        $('#resourceUpload').attr('hidden',true) ;
-        $('#urlUpload').attr('hidden',false) ;
-    }
-
 </script>
 {% endblock %}
 
@@ -241,12 +223,12 @@
         </div>
 
         <div class="col d-flex justify-content-md-between">
-             <form class = "form-outline flex-fill" method="POST" action="{{url_for('resource_new')}}" enctype = "multipart/form-data" onsubmit="return checkFileOrURLFilled();">
+             <form class = "form-outline flex-fill" method="POST" action="{{url_for('resource_edit', rid=rid)}}" enctype = "multipart/form-data" novalidate>
                 {{ form.csrf_token }}
                     <div class = "card flex-fill shadow-sm">
                                  <div class="mb-3" style="margin: 1rem; margin-bottom: 0rem!important;">
-                                          <label for="Titleform" class="form-label">Create
-                                          a teaching resource to share with other educators</label>
+                                          <label for="Titleform" class="form-label">Edit
+                                          a teaching resource</label>
                                     </div>
                                     <!-- Title of the resource-->
                                     <div class="mb-3" style="margin: 1rem!important;">
@@ -263,7 +245,7 @@
 
                                              </label>
 
-                                        {{ form.title(class="form-control",placeholder="Title of your resource (required)",type="email") }}
+                                        {{ form.title(class="form-control",placeholder="Title of your resource (required)",type="email" ) }}
                                     </div>
 
                                     <!-- Description of the resource-->
@@ -286,10 +268,13 @@
 
                                     <!-- Resource file upload-->
                                     <div class="mb-3" style="margin: 1rem!important;">
-                                            <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Resource Upload</label>
+                                            <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">File Upload</label>
                                           <!-- Help documentation-->
-                                            <label title="Upload a single file which contains your resource in any format you want.&nbsp<br>&nbsp;&nbsp<br>If you wish to submit multiple
-                                                          files under a single resource, we recommend zipping together the resources and describing the files instead in the description"
+{#                                            <label title="Upload a single file which contains your resource in any format you want.&nbsp<br>&nbsp;&nbsp<br>If you wish to submit multiple#}
+{#                                                          files under a single resource, we recommend zipping together the resources and describing the files instead in the description"#}
+{#                                                   data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html = "true">#}
+                                            {# prompt resource reupload not possible #}
+                                            <label title="Resources for each entity can only be uploaded once. If you have new resource, please create a new resource entity."
                                                    data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html = "true">
 
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
@@ -298,35 +283,22 @@
                                                 </svg>
                                             </label>
 
-                                        <!-- Changing between file or URL upload -->
-                                        <div class="btn-group" role="group" aria-label="Basic radio toggle button group" style="margin-left:1rem!important; margin-bottom:0.5rem!important">
-                                            <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
-                                            <label class="btn btn-outline-primary shadow" for="btnradio1" style = "margin-right: 1rem!important" onclick="onFile()">File Upload</label>
-
-                                            <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
-                                            <label class="btn btn-outline-primary shadow" for="btnradio2" onclick="onURL()">URL Upload</label>
-                                        </div>
-                                        <!-- Resource upload section -->
-                                        <!-- File Upload -->
-                                          <div class="card flex-fill" id="resourceUpload" style="margin-top:1rem!important">
+                                          <div class="card flex-fill" id="resourceUpload">
                                               <div class="row">
                                                   <div class = "col-10">
-                                                      <dd id="resourceFileName" class="font-weight-bold" style="margin: 1rem!important;">Upload a File</dd>
+                                                      <dd id="resourceFileName" class="font-weight-bold" style="margin: 1rem!important;">
+                                                          {{ "Current resource: " + filename}}</dd>
                                                   </div>
-                                                    <div class="col-2" style="margin-top: 0rem!important;">
-                                                        <!-- Button to upload the post-->
-                                                        <label for="file-upload" class="btn btn-primary btn" style="margin: 1rem; margin-left: 0rem!important;">
-                                                            Upload File
-                                                        </label>
-                                                        {{ form.files(id="file-upload", style="display:none;", onchange="javascript:updateFileName()") }}
-                                                    </div>
+                                                  {# edit resource does not allow reupload resource #}
+{#                                                    <div class="col-2" style="margin-top: 0rem!important;">#}
+{#                                                        <!-- Button to upload the post-->#}
+{#                                                        <label for="file-upload" class="btn btn-primary btn" style="margin: 1rem; margin-left: 4rem!important;">#}
+{#                                                            Upload File#}
+{#                                                        </label>#}
+{#                                                        {{ form.files(id="file-upload", style="display:none;", onchange="javascript:updateFileName()") }}#}
+{#                                                    </div>#}
                                                 </div>
                                           </div>
-                                        <!-- URL upload-->
-                                        <div class="card flex-fill" id="urlUpload" style="margin-top:1rem!important" hidden>
-                                            {{ form.resource_url(class="form-control" , placeholder="URL of resource (required)", id="resource_url", rows="2")}}
-                                          </div>
-
                                       </div>
 
                                     <!-- Thumbnail file upload-->
@@ -344,11 +316,18 @@
                                           <div class="card flex-fill" id="thumbnailUpload">
                                               <div class="row">
                                                   <div class = "col-9">
-                                                      <dd id="resourceThumbNailName" class="font-weight-bold" style="margin: 1rem!important;">Upload a thumbnail</dd>
+                                                      {% if thumbnails_filename != "" %}
+                                                          <dd id="resourceThumbNailName" class="font-weight-bold" style="margin: 1rem!important;">
+                                                          {{ "Current thumbnails: " + thumbnails_filename}}</dd>
+                                                      {% else %}
+                                                          <dd id="resourceThumbNailName" class="font-weight-bold" style="margin: 1rem!important;">
+                                                          Upload a thumbnail</dd>
+                                                      {% endif %}
+
                                                   </div>
                                                     <div class="col-3" style="margin-top: 0rem!important;">
                                                         <!-- Button to upload the thumbnail-->
-                                                        <label for="thumbnail-upload" class="btn btn-primary btn" style="margin: 1rem; margin-left: 1.6rem!important; margin-right:0rem!important">
+                                                        <label for="thumbnail-upload" class="btn btn-primary btn" style="margin: 1rem; margin-left: 4rem!important;">
                                                             Upload Thumbnail
                                                         </label>
                                                         {{ form.thumbnail(id="thumbnail-upload", style="display:none;", onchange="javascript:updateThumbNailName()") }}
@@ -381,10 +360,14 @@
                                                     </div>
                                                   <div class = "col-7">
                                                       <input class="form-control" name="subject" style = "margin-top:0.5rem!important;"
-                                                        list="datalistOptions" id="exampleDataList" placeholder="Search Subjects...">
+                                                        list="datalistOptions" id="exampleDataList" placeholder="Search Subjects..." value="{{ subject }}">
                                                       <datalist id="datalistOptions">
                                                           {% for item in subjects %}
-                                                              <option value="{{enum_to_website_output(item)}}">
+                                                              {% if subject.lower() == enum_to_website_output(item).lower() %}
+                                                                    <option selected value="{{enum_to_website_output(item)}}">
+                                                              {% else %}
+                                                                    <option value="{{enum_to_website_output(item)}}">
+                                                              {% endif %}
                                                           {% endfor %}
                                                       </datalist>
                                                   </div>
@@ -396,10 +379,14 @@
                                                     </div>
                                                   <div class = "col-7">
                                                     <input class="form-control" name="grades" style = "margin-top:0.5rem!important;"
-                                                   list="datalistOptions2" id="exampleDataList2" placeholder="Search Grades...">
+                                                   list="datalistOptions2" id="exampleDataList2" placeholder="Search Grades..." value="{{ grade }}">
                                                       <datalist id="datalistOptions2">
                                                           {% for item in grades %}
-                                                              <option value="{{enum_to_website_output(item)}}">
+                                                              {% if grade.lower() == enum_to_website_output(item).lower() %}
+                                                                    <option selected value="{{enum_to_website_output(item)}}">
+                                                              {% else %}
+                                                                    <option value="{{ enum_to_website_output(item) }}">
+                                                              {% endif %}
                                                           {% endfor %}
                                                       </datalist>
                                                   </div>
@@ -417,7 +404,7 @@
                                                 </div>
                                               </div>
                                             <div class = "row" style = "margin-top: 1.5rem!important; margin-bottom: 1rem!important;">
-                                                <div class = "col-2" style="margin-left: 6rem!important; margin-top: 0rem!important;">
+                                                <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
                                                     Matching Tags:
                                                 </div>
                                                 <div class = "col-7">
@@ -431,13 +418,13 @@
                                                 </div>
                                             </div>
                                             <!-- Put the applied tags here-->
-                                            <div class = "row" style = "margin-top: 1rem!important; margin-bottom: 1rem!important;">
-                                                <div class = "col-2" style="margin-left: 6rem!important; margin-top: 0rem!important;">
+                                            <div class = "row" style = "margin-top: 1.5rem!important; margin-bottom: 1rem!important;">
+                                                <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
                                                     Applied Tags:
                                                 </div>
                                                 <div class = "col-7">
-                                                    {% for item in tags %}
-                                                        <span class="badge rounded-pill bg-other-tag tagFoundSpan" title="{{item}}_selected" hidden>
+                                                    {% for item in applied_tags %}
+                                                        <span class="badge rounded-pill bg-other-tag tagFoundSpan" title="{{item}}_selected">
                                                             <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
                                                                 onchange="tagCheckedSelected(this)">
                                                             <label for="{{item}}_input____s" id="{{item}}_label____s">{{enum_to_website_output(item)}}</label>
@@ -467,26 +454,62 @@
                                               <div class="d-flex">
                                                   <p class="h6" style="margin: 1.5rem!important;">Access: </p>
                                                     <div class="dropdown px-3" style="margin: 1rem!important;">
-                                                        <button class="btn btn-primary dropdown-toggle form-control" style="min-width: 100px; height: 100%" type="button"
-                                                            id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false" name="privacy">
-                                                            Public
-                                                        </button>
-                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                            <a class="dropdown-item" href='javascript:;' >Public </a>
-                                                            <a class="dropdown-item" href='javascript:;' >Private</a>
-                                                        </div>
+                                                        <select class="btn btn-primary dropdown-toggle" name="visibility_choice" onchange="showDiv(this)" style="min-width: 100px; height: 100%"
+                                                             id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                                            {% for visibility in ['Public', 'Private'] %}
+                                                                {% if visibility == current_visibility %}
+                                                                    <option class="dropdown-item" value="{{ visibility }}" selected >{{ visibility }}</option>
+                                                                {% else %}
+                                                                    <option class="dropdown-item" value="{{ visibility }}" >{{ visibility }}</option>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </select>
+
+{#                                                        <button class="btn btn-primary dropdown-toggle form-control" style="min-width: 100px; height: 100%" type="button"#}
+{#                                                            id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false" name="privacy">#}
+{#                                                            Public#}
+{#                                                        </button>#}
+{#                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton1">#}
+{#                                                            <a class="dropdown-item" href='javascript:;' >Public </a>#}
+{#                                                            <a class="dropdown-item" href='javascript:;' >Private</a>#}
+{#                                                        </div>#}
                                                     </div>
+                                              <script type="text/javascript">
+                                                      function showDiv(visibility) {
+                                                          console.log(visibility.value);
+                                                          if (visibility.value !=="Public") {
+                                                            document.getElementById("hidden_div").style.display = "block";
+                                                        } else {
+                                                            document.getElementById('hidden_div').style.display = "none";
+                                                        }
+                                                    }
+
+                                                    // call this when the page is ready, in case visibility is not Public and personnel is not loaded
+                                                    document.addEventListener("readystatechange", event => {
+                                                        if (event.target.readyState === "complete") {
+                                                          showDiv(document.getElementById("dropdownMenuButton1"));
+                                                      }
+                                                    });
+                                              </script>
                                                 </div>
                                               <!-- Search bar for users-->
-                                              <div id="privateUsersAccess" class = "row" style="margin-bottom: 2rem!important;" hidden>
+                                              <div id="hidden_div" class = "row" style="margin-bottom: 2rem!important; display: none">
                                                   <p class="h6" style="margin: 1.5rem; margin-bottom: 0rem!important;">Private User Access: </p>
-                                                  <div class="input-group" style="margin: 1.5rem; margin-left: 2rem!important; padding: 0rem; padding-right: 50px!important; ">
-                                                      <input type="email" id="new_personnel" class="form-control" placeholder="Enter emails of accounts you wish to access your resource" style="width: 60%">
+                                                  <div class="input-group" style="margin: 1.5rem; margin-left: 2rem!important; padding: 0rem; padding-right: 100px!important; ">
+                                                      <input type="email" id="new_personnel" class="form-control" placeholder="Enter emails of accounts you wish to access your resource" style="width: 95%">
                                                       <button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;" onclick="add_personnel()">Add to Personnel</button>
                                                     </div>
                                                   <!-- List of all the users -->
-                                                  <ul class="list-group" id="personnel" style="margin-left: 2rem!important; margin-bottom: 2rem!important; padding-right: 65px!important">
+                                                  <ul class="list-group" id="personnel" style="margin-left: 2rem!important; margin-bottom: 2rem!important; padding-right: 100px!important">
                                                       <div class = "overflow-auto" style="max-height: 208px">
+                                                          {%  for email in personnel_emails %}
+                                                            <li class="list-group-item"> {{ email }}
+                                                                <button type="button" class="btn-close" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close"
+                                                                        onclick="parentNode.parentNode.removeChild(parentNode)">
+                                                                </button>
+                                                                <input type="hidden" name="personnel_ids" value="{{ email }}"/>
+                                                            </li>
+                                                          {% endfor %}
                                                       </div>
                                                     </ul>
 
@@ -495,10 +518,10 @@
                                       </div>
                     </div>
                     <div class="float-end mt-2 pt-1" style="margin-top: 1rem!important;">
-                        <!-- Button to upload the post-->
-                      <input type="submit"  class="btn btn-primary btn" style="margin-right: 1rem!important;" value="Upload Resource">
+                        <!-- Button to update the post-->
+                      <input type="submit"  class="btn btn-primary btn" style="margin-right: 1rem!important;" value="Update Resource">
                         <!-- Button to clear the title and body of the post-->
-                        <button type="Button" class="btn btn-outline-danger btn" onclick="resetPage()">Discard Draft</button>
+                        <button type="Button" class="btn btn-outline-primary btn" onclick="return window.location.href='{{ url_for("resource", rid=rid) }}';">Discard Draft</button>
                     </div>
                  </form>
 
@@ -511,54 +534,5 @@
         var popoverList = popoverTriggerList.map(function(popoverTriggerEl) {
         return new bootstrap.Popover(popoverTriggerEl)
 })
-    </script>
-
-    <script>
-     let postSubmit = false;
-     window.addEventListener('beforeunload', (event) => {
-        if (!postSubmit) {
-            alert("Not submit");
-            event.returnValue = 'You have unfinished changes!';
-
-         }
-        });
-
-    </script>
-
-    <script>
-    function checkFileOrURLFilled() {
-        // check either url or file is provided
-        var valid = true;
-        console.log(document.getElementById("file-upload").files.length)
-        console.log(document.getElementById("resource_url").value)
-        if (document.getElementById("file-upload").files.length === 0 &&
-                document.getElementById("resource_url").value === "") {
-            valid = false;
-            alert("Please ensure you have uploaded the resource or specify the resource url!")
-        } else if (document.getElementById("resource_url").value !== "") {
-            console.log(document.getElementById("resource_url").value);
-            // check if it is a valid url
-            try {
-                var url = new URL(document.getElementById("resource_url").value);
-            } catch (_) {
-                valid = false;
-            }
-            if (valid && url.protocol !== "http:" && url.protocol !== "https:") {
-                valid = false;
-            }
-
-            if (!valid) {
-                alert("Please ensure the url is valid");
-            }
-        }
-
-        return valid;
-    }
-    </script>
-
-    <script>
-    function toggleForm() {
-        postSubmit = true;
-    }
     </script>
 {% endblock %}

@@ -1,23 +1,28 @@
+###################################################################################
+# This script defines the backend functions that respond to all webpage requests
+#
+#
+# works of OfficialTeamName (con'd). All rights reserved.
+##################################################################################
 from flask import Flask, request, render_template, redirect, url_for, abort, flash, Response, jsonify
-from flask_login import login_required, current_user, LoginManager
 from sqlalchemy.sql.expression import func
-from werkzeug.utils import secure_filename
 import os
 import json
 import random
 import warnings
 import os
+import posixpath
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user, AnonymousUserMixin
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import HTTPException, InternalServerError
 from re import search as re_search
 # If in branch use the following
-from .DBFunc import *
-from .forms import LoginForm, RegisterForm, ResourceForm
+# from .DBFunc import *
+# from .forms import LoginForm, RegisterForm, ResourceForm
 # If in main use the following
-# from DBFunc import *
-# from forms import LoginForm, RegisterForm, ResourceForm
+from DBFunc import *
+from forms import LoginForm, RegisterForm, ResourceForm
 
 # -----{ INIT }----------------------------------------------------------------
 DEBUG = True
@@ -33,10 +38,13 @@ login_manager.login_message_category = "error"
 app.secret_key = "admin"
 
 # File upload
-app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path,'static')
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 # 16 MB
-app.config['MAX_CONTENT_PATH'] = 50 # 50 chars long
+app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static')
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB
+app.config['MAX_CONTENT_PATH'] = 50  # 50 chars long
+
+
 # -----{ LOGIN }---------------------------------------------------------------
+
 
 class Anonymous(AnonymousUserMixin):
     def __init__(self):
@@ -63,6 +71,7 @@ class Anonymous(AnonymousUserMixin):
     def __repr__(self):
         return __str__(self)
 
+
 login_manager.anonymous_user = Anonymous
 
 
@@ -72,6 +81,7 @@ def load_user(user_id):
         :param unicode user_id: user_id (email) user to retrieve
     """
     return get_user(user_id)
+
 
 # -----{ PAGES }---------------------------------------------------------------
 #
@@ -161,6 +171,7 @@ def homeAJAX():
 
     return jsonify(results)
 
+
 # -----{ PAGES.LOGIN }---------------------------------------------------------
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -178,13 +189,14 @@ def login():
         if email:
             user = get_user(email)
             if user != ErrorCode.INVALID_USER and check_password_hash(user.hash_password, form.password.data):
-                user_auth(user.email,True)
+                user_auth(user.email, True)
                 login_user(user, remember=False)
                 if 'next' in request.args:
                     return redirect(request.args.get("next"))
                 return redirect(url_for('home'))
-        flash('That username or password was incorrect',"error")
-    return render_template('login.html', title='Login',form=form)
+        flash('That username or password was incorrect', "error")
+    return render_template('login.html', title='Login', form=form)
+
 
 @app.route('/logout')
 @login_required
@@ -192,10 +204,11 @@ def logout():
     """Logout page
     Redircts in 3 seconds
     """
-    user_auth(current_user.email,False)
+    user_auth(current_user.email, False)
     logout_user()
-    flash('You have been logged out. This page will redirect in 3 seconds',"info")
-    return render_template("logout.html",title='Logout')
+    flash('You have been logged out. This page will redirect in 3 seconds', "info")
+    return render_template("logout.html", title='Logout')
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -208,11 +221,11 @@ def register():
     Other user fields are configured in profile()
     """
     data = {
-        "username" : False,
-        "emailUsed" : False,
-        "passwordMsg" : False,
-        "passwordDif" : False
-        }
+        "username": False,
+        "emailUsed": False,
+        "passwordMsg": False,
+        "passwordDif": False
+    }
     form = RegisterForm()
     if form.validate_on_submit():
         email = form.email.data
@@ -222,13 +235,13 @@ def register():
             if user != ErrorCode.INVALID_USER:
                 data['emailUsed'] = 'An account with that email already exists'
                 # flash('An account with that email already exists',"error")
-                return render_template('register.html', title='Register',form=form,data=data)
+                return render_template('register.html', title='Register', form=form, data=data)
             # email validation
-            if re_search('@',email) is None:
+            if re_search('@', email) is None:
                 data["emailUsed"] = "You must provide a valid email"
             username = form.username.data
             if not username:
-                 data['username'] = 'You must provide a username'
+                data['username'] = 'You must provide a username'
             password = form.password.data
             passwordConfirm = form.passwordConfirm.data
             # Check passwords
@@ -238,22 +251,23 @@ def register():
                 data['passwordDif'] = True
             if len(password) < 8:
                 data['passwordMsg'] = "Make sure your password is at lest 8 letters"
-            elif re_search('[0-9]',password) is None:
+            elif re_search('[0-9]', password) is None:
                 data['passwordMsg'] = "Make sure your password has a number in it"
-            elif re_search('[A-Z]',password) is None:
+            elif re_search('[A-Z]', password) is None:
                 data['passwordMsg'] = "Make sure your password has a capital letter in it"
             else:
                 # add user and log in
-                res = add_user(username,password,email)
+                res = add_user(username, password, email)
                 if res != ErrorCode.COMMIT_ERROR:
                     user = get_user(email)
-                    user_auth(user.email,True)
+                    user_auth(user.email, True)
                     login_user(user, remember=False)
-                    # return redirect(url_for('home'))
-                flash('Something went wrong, please try again',"error")
+                    return redirect(url_for('home'))
+                flash('Something went wrong, please try again', "error")
         else:
             data['emailUsed'] = 'You must provide a valid email'
-    return render_template('register.html', title='Register',form=form,data=data)
+    return render_template('register.html', title='Register', form=form, data=data)
+
 
 # -----{ PAGES.RESOURCE }------------------------------------------------------
 
@@ -281,26 +295,29 @@ def resource(rid=None):
     user, res = get_user_and_resource_instance(uid=uid, rid=rid)
     # resource does not exist
     if res is None:
-        abort(404,description="The requested resource does not exist")
+        abort(404, description="The requested resource does not exist")
     # user has access to resource
     if not is_resource_public(rid=rid) and (user is None or not user_has_access_to_resource(uid=uid, rid=rid)):
-        abort(403,description=f"You ({current_user.username}) do not have permission to access the resource : {res.title}" + "\nIf you think this is incorrect contact the resource owner")
+        abort(403,
+              description=f"You ({current_user.username}) do not have permission to access the resource : {res.title}" + "\nIf you think this is incorrect contact the resource owner")
 
-    # convert utc time to AEST
-    created_at = res.created_at.astimezone(pytz.timezone("Australia/Brisbane"))
+    if res.resource_link.startswith('resource/'):
+        res.resource_link = url_for('static', filename=res.resource_link)
 
     # render the template
     kwargs = {
         "title": res.title,
-        "rid" : rid,
-        "uid" : uid,
-        "res" : res,
-        "difficulty" : enum_to_website_output(res.difficulty),
-        "subject" : enum_to_website_output(res.subject),
-        "grade" : enum_to_website_output(res.grade),
-        "resource_tags" : get_resource_tags(res.rid),
-        "authors" : get_resource_author(res.rid),
-        "banner" : get_resource_thumbnail(rid) if get_resource_thumbnail(rid) != ErrorCode.INVALID_RESOURCE else {'thumbnail_link' : 'img/placeholder.png'}
+        "rid": rid,
+        "uid": uid,
+        "res": res,
+        "created_at": dump_datetime(res.created_at),
+        "difficulty": enum_to_website_output(res.difficulty),
+        "subject": enum_to_website_output(res.subject),
+        "grade": enum_to_website_output(res.grade),
+        "resource_tags": get_resource_tags(res.rid),
+        "authors": get_resource_author(res.rid),
+        "banner": get_resource_thumbnail(rid) if get_resource_thumbnail(rid) != ErrorCode.INVALID_RESOURCE else {
+            'thumbnail_link': 'img/placeholder.png'}
     }
     return render_template("resource_item.html", **kwargs)
 
@@ -313,51 +330,174 @@ def resource_new():
     form = ResourceForm()
     if form.validate_on_submit():
         title = form.title.data
-        resource_file = request.files[form.files.name]
-        resource_link = resource_file.filename
+        resource_url = form.resource_url.data
+        resource_file, resource_link = None, None
+        if resource_url == "":
+            # no url provided, get file
+            resource_file = request.files[form.files.name]
+            resource_link = resource_file.filename
         resource_thumbnail_file = request.files[form.thumbnail.name]
         resource_thumbnail_links = resource_thumbnail_file.filename
 
-
         difficulty = ResourceDifficulty.EASY
         try:
-            subject = Subject[request.form.get('subject').replace(' ','_').upper()]
+            subject = Subject[request.form.get('subject').replace(' ', '_').upper()]
         except KeyError:
             subject = None
         try:
-            grade = Grade[request.form.get('grades').replace(' ','_').upper()]
+            grade = Grade[request.form.get('grades').replace(' ', '_').upper()]
         except KeyError:
             grade = None
         creaters_id = [current_user.uid]
-        private_personnel_id = [get_user(email).uid for email in request.form.getlist('personnel_ids') if get_user(email) != ErrorCode.INVALID_USER]
+        private_personnel_id = [get_user(email).uid for email in request.form.getlist('personnel_ids') if
+                                get_user(email) != ErrorCode.INVALID_USER]
         is_public = len(private_personnel_id) == 0
 
         tags_id = [get_tags()[t] for t in request.form if t == request.form.get(t) and t in get_tags(t)]
         description = form.description.data
 
+        if resource_url == "":
+            i = 0
+            while os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'], 'resource', secure_filename(resource_link))):
+                root, ext = os.path.splitext(resource_link)
+                resource_link = root + '_' + str(i) + ext
+                i += 1
+            resource_file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'resource', secure_filename(resource_link)))
+
         i = 0
-        while os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'],'resource', secure_filename(resource_link))):
-            root, ext = os.path.splitext(resource_link)
-            resource_link = root + '_' + str(i) + ext
-            i += 1
-        i = 0
-        while os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'],'thumbnail', secure_filename(resource_thumbnail_links))):
+        while os.path.isfile(
+                os.path.join(app.config['UPLOAD_FOLDER'], 'thumbnail', secure_filename(resource_thumbnail_links))):
             root, ext = os.path.splitext(resource_thumbnail_links)
             resource_thumbnail_links = root + '_' + str(i) + ext
             i += 1
 
-        resource_file.save(os.path.join(app.config['UPLOAD_FOLDER'],'resource', secure_filename(resource_link)))
-        resource_thumbnail_file.save(os.path.join(app.config['UPLOAD_FOLDER'],'thumbnail', secure_filename(resource_thumbnail_links)))
+        resource_thumbnail_file.save(
+            os.path.join(app.config['UPLOAD_FOLDER'], 'thumbnail', secure_filename(resource_thumbnail_links)))
 
-        rid = add_resource(title,os.path.join('resource', secure_filename(resource_link)), difficulty, subject,grade, creaters_id, is_public,
-                 private_personnel_id, tags_id,
-                 description, [os.path.join('thumbnail', secure_filename(resource_thumbnail_links))])
+        if resource_url == "":
+            rid = add_resource(title, os.path.join('resource', secure_filename(resource_link)), difficulty, subject, grade,
+                               creaters_id, is_public,
+                               private_personnel_id, tags_id,
+                               description, [os.path.join('thumbnail', secure_filename(resource_thumbnail_links))])
+        else:
+            rid = add_resource(title, resource_url, difficulty, subject,
+                               grade,
+                               creaters_id, is_public,
+                               private_personnel_id, tags_id,
+                               description, [os.path.join('thumbnail', secure_filename(resource_thumbnail_links))])
         if isinstance(rid, ErrorCode):
             abort(400)
-        flash("Resource created",'info')
-        return redirect(url_for('resource',rid=rid))
-    return render_template('resource_create.html', title='New Resource',form=form)
-    # todo
+        flash("Resource created", 'info')
+        return redirect(url_for('resource', rid=rid))
+    return render_template('resource_create.html', title='New Resource', form=form)
+
+
+@app.route("/resource/<rid>/edit", methods=["GET", "POST"])
+def resource_edit(rid=None):
+    """
+    The user edits a resource they authored.
+
+    If current_user is not the creater of this resource, return to
+    current resource page. If rid is not given, redirects to resource home page
+    """
+    if not rid:
+        return redirect(url_for("resource"))
+
+    rid = int(rid)
+    _, resource_item = get_user_and_resource_instance(uid=-1, rid=rid)
+
+    if not resource_item:
+        flash("rid is invalid", "error")
+        return redirect(url_for("resource"))
+
+    with Session() as conn:
+        creater_uid = conn.query(ResourceCreater).filter_by(rid=rid).first().uid
+        if creater_uid != current_user.uid:
+            # current user does not have privilege to edit this resource,
+            # return to resource home page
+            flash("You do have edit access to current resource", "error")
+            return redirect(url_for("resource"))
+
+    form = ResourceForm()
+
+    if request.method == "GET":
+        form.title.data = resource_item.title
+        form.description.data = resource_item.description
+
+        if resource_item.resource_link.split("/")[0] == "resource":
+            # local resource, gives title
+            filename = resource_item.title
+        else:
+            # local resource, gives resource link
+            filename = resource_item.resource_link
+
+        current_grade = enum_to_website_output(resource_item.grade)
+
+        current_subject = enum_to_website_output(resource_item.subject)
+
+        with Session() as conn:
+            thumbnails = conn.query(ResourceThumbnail).filter_by(rid=rid).all()
+
+            thumbnails_filename = ""
+            if thumbnails:
+                for i in thumbnails:
+                    thumbnails_filename += i.thumbnail_link.split("/")[-1] + ", "
+                if thumbnails_filename[-2:] == ", ":
+                    thumbnails_filename = thumbnails_filename[:-2]
+
+            # populate private personnel
+            personnel_email = []
+            if not resource_item.is_public:
+                for i in conn.query(PrivateResourcePersonnel).filter_by(rid=rid).all():
+                    allowed_person = conn.query(User).filter_by(uid=i.uid).first()
+                    if allowed_person.uid != creater_uid:
+                        personnel_email.append(allowed_person.email)
+
+            tag_map = get_tags(mapping="id2name")
+            applied_tags = []
+            for tag in conn.query(ResourceTagRecord).filter_by(rid=rid).all():
+                applied_tags.append(tag_map.get(tag.tag_id))
+
+        visibility = "Public" if resource_item.is_public else "Private"
+
+        return render_template("resource_edit.html", title=f"Edit resource #{rid}", form=form,
+                               filename=filename, thumbnails_filename=thumbnails_filename,
+                               subject=current_subject, grade=current_grade,
+                               current_visibility=visibility, personnel_emails=personnel_email,
+                               applied_tags=applied_tags, rid=rid)
+    elif request.method == "POST":
+        # update resource: currently do not update other tags
+        title = form.title.data
+        resource_thumbnail_file = request.files[form.thumbnail.name]
+        subject = website_input_to_enum(request.form.get('subject'), Subject)
+        grade = website_input_to_enum(request.form.get('grades'), Grade)
+        description = form.description.data
+        is_public = True if request.form.get("visibility_choice") == 'Public' else False
+
+        thumbnail_path = None
+        if resource_thumbnail_file and resource_thumbnail_file.filename != "":
+            thumbnail_path = posixpath.join("thumbnail", secure_filename(
+                resource_thumbnail_file.filename))
+            resource_thumbnail_file.save(posixpath.join(
+                app.config['UPLOAD_FOLDER'], thumbnail_path))
+        thumbnail_path = [thumbnail_path] if thumbnail_path else []
+
+        if not description:
+            description = "NULL"
+
+        if isinstance(modify_resource(rid=rid, title=title, subject=subject, grade=grade,
+                                      is_public=is_public, description=description,
+                                      resource_thumbnail_links=thumbnail_path),
+                      ErrorCode):
+            flash("Something went wrong, please try again.", "error")
+            return redirect(url_for("resource_edit", rid=rid))
+
+        flash("Edited successfully.", 'info')
+        return redirect(url_for("resource", rid=rid))
+
+    # invalid call, go back to resource home page
+    return redirect(url_for("resource"))
+
 
 # -----{ PAGES.RESOURCE.AJAX }-------------------------------------------------
 
@@ -370,7 +510,7 @@ def resourceAJAX():
     subject = request.args.get('subject').upper() if 'subject' in request.args else None
     year = request.args.get('year').upper() if 'year' in request.args else None
     tags = request.args.getlist('tags[]') if 'tags[]' in request.args else None
-    tags = list(filter(lambda x: x != '',tags)) if tags is not None else None
+    tags = list(filter(lambda x: x != '', tags)) if tags is not None else None
     sort = request.args.get('sort') if 'sort' in request.args else "natural"
     try:
         subject = Subject[subject]
@@ -397,13 +537,14 @@ def resourceVote():
     if up is None or down is None:
         abort(404)
     vote_res = vote_resource(uid=current_user.uid, rid=rid, upvote=up == '1')
-    _ , res = get_user_and_resource_instance(-1,rid)
+    _, res = get_user_and_resource_instance(-1, rid)
     if res is None:
         abort(404)
     return jsonify({
         'up': res.upvote_count,
         'down': res.downvote_count
     })
+
 
 @app.route('/AJAX/resourceComment')
 def resourceComment():
@@ -420,14 +561,14 @@ def resourceComment():
         if text is None:
             abort(404)
         if postType == 'comment':
-            res = comment_to_resource(current_user.uid,rid,text)
+            res = comment_to_resource(current_user.uid, rid, text)
             if isinstance(res, ErrorCode):
                 abort(404)
         elif postType == 'reply':
             cid = request.args.get('cid') if 'cid' in request.args else None
             if cid is None:
                 abort(404)
-            res = reply_to_resource_comment(current_user.uid,cid,text)
+            res = reply_to_resource_comment(current_user.uid, cid, text)
             if isinstance(res, ErrorCode):
                 abort(404)
         else:
@@ -443,67 +584,260 @@ def resourceComment():
         if comment in replies:
             for reply in replies[comment]:
                 rep.append({
-                "reply" : reply.serialize,
-                "author" : get_user_and_resource_instance(reply.uid,-1)[0].serialize
+                    "reply": reply.serialize,
+                    "author": get_user_and_resource_instance(reply.uid, -1)[0].serialize
                 })
 
         comments.append({
-            "comment" : comment.serialize,
-            "resource_comment_id" : comment.resource_comment_id,
-            "replies" : rep,
-            "author" :  get_user_and_resource_instance(comment.uid,-1)[0].serialize
+            "comment": comment.serialize,
+            "resource_comment_id": comment.resource_comment_id,
+            "replies": rep,
+            "author": get_user_and_resource_instance(comment.uid, -1)[0].serialize
         })
     return jsonify(comments[::-1])
 
 
 # -----{ PAGES.PROFILE }-------------------------------------------------------
 
-@app.route('/profile')
+@app.route('/profile', methods=["GET"])
 @login_required
 def profile():
-    """The default view of a users profile,
-    this can be used to view your own or other users profiles.
+    """
+    The default view of a users profile,
+    this can be used to view your own profiles.
     Specified with the GET request
-    /profile?<id / name>
-
-    Shows the following content:
-        Liked resources
-        Created resources
-        Your reviews / comments
-
-    Additional options are available if viewing your own profile:
-        Manage account settings
-        Forums you are a part of
     """
-    return render_template('profile.html', title='Profile')
+    teaching_areas = []
+
+    # get hold number
+    user_rating_whole = int(current_user.user_rating)
+    # get if a user's honor rating is greater than int.5
+    user_rating_half = 0 if current_user.user_rating - user_rating_whole < .5 else 1
+    # empty stars
+    user_rating_unchecked = 5 - user_rating_whole - user_rating_half
+
+    with Session() as conn:
+        for area in conn.query(UserTeachingAreas). \
+                filter_by(uid=current_user.uid, is_public=True).all():
+            text = enum_to_website_output(area.teaching_area)
+        teaching_areas.append(text)
+
+    return render_template('profile.html', title='Profile', user=current_user.serialize,
+                           teaching_areas=teaching_areas, rating_whole=user_rating_whole,
+                           rating_half=user_rating_half, rating_unchecked=user_rating_unchecked)
 
 
-@app.route('/profile/settings')
+@app.route("/profile/studio_contents", methods=["GET"])
+def load_studio_contents():
+    """
+    Load the entries for user edit studio. Entries here can be channel or resource
+    """
+    # resource/channel
+    load_type = request.args.get("load_type")
+    # create/access
+    create_or_access = request.args.get("create_or_access")
+    title = request.args.get("title")
+    # ascending/descending of date
+    sort_algo = request.args.get("sort_algo")
+    uid = request.args.get("uid")
+
+    if not uid:
+        return
+    uid = int(uid)
+
+    # set default refinement strategy
+    if load_type not in ["resource", "channel"]:
+        load_type = "resource"
+
+    if create_or_access not in ["create", "access"]:
+        create_or_access = "create"
+
+    if sort_algo not in ['ascending', "descending"]:
+        sort_algo = 'ascending'
+    sort_algo = sort_algo.lower()
+
+    if title == "":
+        title = None
+
+    is_resource = True if load_type == "resource" else False
+    is_create = True if create_or_access == "create" else False
+
+    out = []
+    if is_resource:
+        # deal with resource
+        qualified_ids = []
+        with Session() as conn:
+            if is_create:
+                # resources created by user
+                for temp in conn.query(ResourceCreater).filter_by(uid=uid).all():
+                    qualified_ids.append(temp.rid)
+            else:
+                # resources user has access to
+                for temp in conn.query(PrivateResourcePersonnel).filter_by(uid=uid).all():
+                    qualified_ids.append(temp.rid)
+            res = conn.query(Resource).filter(Resource.rid.in_(qualified_ids))
+        if title:
+            res = res.filter(Resource.title.ilike(f"%{title}%"))
+        if sort_algo == "ascending":
+            res = res.order_by(Resource.created_at.asc()).all()
+        else:
+            res = res.order_by(Resource.created_at.desc()).all()
+        for item in res:
+            info = item.serialize
+
+            with Session() as conn:
+                creater = conn.query(ResourceCreater).filter_by(rid=item.rid, uid=uid).first()
+
+            if not creater:
+                # fill manage link to null
+                info["manage_link"] = None
+            else:
+                info["manage_link"] = url_for("resource_edit", rid=item.rid)
+
+            info["avatar_link"] = get_resource_thumbnail(item.rid).serialize["thumbnail_link"] \
+                if get_resource_thumbnail(item.rid) != ErrorCode.INVALID_RESOURCE \
+                else 'img/placeholder.png'
+            info["view_link"] = url_for("resource", rid=item.rid)
+            info["is_public"] = "Public" if True else "Private"
+
+            out.append(info)
+    else:
+        # deal with channel
+        sort_by_newest_date = True if sort_algo == "descending" else False
+        if create_or_access == "create":
+            # channels created by user
+            res = find_channels(channel_name=title, admin_uid=uid,
+                                sort_by_newest_date=sort_by_newest_date)
+        else:
+            # channels user has access to: private only
+            res = find_channels(channel_name=title, caller_uid=uid,
+                                sort_by_newest_date=sort_by_newest_date, is_public=False)
+
+        for item in res:
+            info = item.serialize
+
+            if item.visibility != ChannelVisibility.PUBLIC:
+                info['visibility'] = "Private"
+            info["is_public"] = info['visibility']
+            del info['visibility']
+
+            # need to change attribute "name"  to "title"
+            info["title"] = info["name"]
+            del info["name"]
+
+            # add upvote_count, downvote_count to '-'
+            info["upvote_count"], info["downvote_count"] = '-', '-'
+
+            if item.admin_uid != uid:
+                # fill manage link to null
+                info["manage_link"] = None
+            else:
+                info["manage_link"] = url_for("create_or_modify_channel", cid=item.cid)
+            info["view_link"] = url_for("view_channel", cid=item.cid)
+            out.append(info)
+    return jsonify(out)
+
+
+@app.route("/profile/settings", methods=["GET", "POST"])
+@login_required
 def settings():
-    """The user configuration page,
-    allows the user to edit their:
-        Bio.
-        Email.
-        Password.
-        Avatar.
-        Interests
     """
-    return render_template('base_old.html', title='Login')
+    Render user settings page when receiving GET request.
+
+    Update user settings when receiving POST request.
+    """
+    # todo: tag system not implemented
+    if request.method == "GET":
+        # send all info of the user and render template
+        subjects = [enum_to_website_output(i) for i in Subject if i != Subject.NULL]
+        grades = [enum_to_website_output(i) for i in Grade if i != Grade.NULL]
+
+        return render_template("settings.html", title="User Settings",
+                               user_info=current_user.serialize)
+    else:
+        # POST method
+        username, bio, old_password, new_password = \
+            request.form.get("username"), request.form.get("bio"), \
+            request.form.get("old_password"), request.form.get("new_password")
+        avatar, profile_background = \
+            request.files.get("avatar"), request.files.get("profile_background")
+
+        if not bio:
+            bio = "NULL"
+
+        avatar_path, profile_background_path = "NULL", "NULL"
+        if avatar and avatar.filename != "":
+            avatar_path = posixpath.join("avatar", secure_filename(avatar.filename))
+            avatar.save(posixpath.join("static", avatar_path))
+
+        if profile_background and profile_background.filename != "":
+            profile_background_path = posixpath.join("profile_background",
+                                                     secure_filename(
+                                                         profile_background.filename))
+            profile_background.save(posixpath.join("static", profile_background_path))
+
+        user, _ = get_user_and_resource_instance(uid=current_user.uid, rid=-1)
+
+        if not old_password and not check_password_hash(user.hash_password, old_password):
+            # old password does not match, do not change password
+            new_password = None
+
+        if isinstance(
+                modify_user(uid=current_user.uid, username=username,
+                            password=new_password, bio=bio, avatar_link=avatar_path,
+                            profile_background_link=profile_background_path),
+                ErrorCode):
+            # invalid action
+            flash("Cannot modify user profile at this time, try later", "error")
+            return redirect(url_for("settings"))
+        # success
+        flash("Profile modified successfully", "info")
+        return redirect(url_for("profile"))
+
 
 # -----{ PAGES.GENERIC }-------------------------------------------------------
 
 @app.route('/about')
 def about():
     """A brief page descibing what the website is about"""
-    #FAQs can contain html code to run on page
+    # FAQs can contain html code to run on page
     faqs = [
-        ["How do I save this page","Saving has been a super useful mechanic in many different areas of software for years. It is most commonly done by using the shortcut <kbd>Ctrl + S</kbd>, and our page is no exception."],
-        ["Can you talk like a computer?","Yeah Sure <br> <samp> Beep Boop Beep Beep Boop </samp>"],
-        ["What is Lorem Ipsum?","Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."],
-        ["Can I type maths?", "Yes, yes you can. You can find <var>x</var> as much as you like."],
-        ["Can I do my own HTML markup?", "Only in some <code>&lt;input&gt;</code> areas"]
+        ["What is Doctrina?",
+         "Doctrina is a website made for teachers to share in class activities, resources and more with each other. "
+         "It is designed so that you - the teacher - finds it easier to do the thing you love most: teach! We help "
+         "you find worksheets, tutorials and questions for your students so you can spoend more time teaching them, "
+         "rather then putting time into creating said worksheets, tutorials and questions."],
+        ["What can I use Doctrina for?",
+         "You can share resources you found useful in your class, find a resource from another teacher to use in "
+         "class, read insights and helpful notes for teaching a certain subject, and more! Doctrina also includes an "
+         "online forum that allows you to talk to other teachers like you."],
+        ["How do I make an account?",
+         "Just click the login button in the top right and click create an account. We only require basic information "
+         "about you and for legal reasons, official documentation stating you are a teacher (this is to make sure "
+         "that none of your students get access to the site and taking advantage of your resources that you may be "
+         "using with them)"],
+        ["How do I find a resource?",
+         "We have an advanced searching algorithm that makes use of 'tags' to sort and search data. Each channel and "
+         "resource are associated with tags given by the creator which can help narrow down your search to only "
+         "results you want to see."],
+        ["How do I create a resource?",
+         "Go to our resources page and click the create button. A resource can be given a title, description, "
+         "a file can be uploaded if you choose to, and obviously tags to help define what areas, subjects and year "
+         "levels your resource falls into."],
+        ["How can I talk to other teachers?",
+         "Our channels page contains multiple forums discussing various subjects, resources and teaching aspects. "
+         "Each channel contains threads to discuss specifics about the overarching subject. Each thread can be "
+         "replied to by teachers who want ot discuss and talk to others. You can create your own channels and threads "
+         "by clicking create either in the main channels page or inside a channel if you would like to start a "
+         "thread."],
+        ["How is a resources' popularity decided?",
+         "Each teacher can upvote or downvote a resource if they like or dislike it respectively. Resources with more "
+         "upvotes are more popular and resources with more downvotes are less popular. In order to balance out "
+         "upvotes and downvotes on a resource, we use an algorithm to decide how popular it is. Resources are sorted "
+         "by popularity after you search."],
     ]
     return render_template('about.html', title='About Us', name="About Us", faqs=faqs, num=len(faqs))
+
 
 # -----------------------------------{ PAGES.CHANNEL } ----------------------------------------
 
@@ -591,8 +925,8 @@ def create_or_modify_channel(cid=None):
 
         thumbnail_path = None
         if thumbnail.filename != "":
-            thumbnail_path = os.path.join("channel_avatar", secure_filename(thumbnail.filename))
-            thumbnail.save(os.path.join("static", thumbnail_path))
+            thumbnail_path = posixpath.join("channel_avatar", secure_filename(thumbnail.filename))
+            thumbnail.save(posixpath.join("static", thumbnail_path))
 
         visibility = website_input_to_enum(readable_string=visibility,
                                            enum_class=ChannelVisibility)
@@ -764,7 +1098,7 @@ def search_channel_post(cid=None):
 
             recent_comment_time, recent_commenter_name = None, None
             if comments_count != 0:
-                most_recent_comment = conn.query(PostComment). \
+                most_recent_comment = conn.query(PostComment).filter_by(post_id=i.post_id). \
                     order_by(PostComment.created_at.desc()).first()
                 recent_comment_time = most_recent_comment.created_at
                 # convert to local time
@@ -776,7 +1110,7 @@ def search_channel_post(cid=None):
             info["comment_count"] = comments_count
             info["recent_comment_time"] = recent_comment_time
             info["recent_commenter_name"] = recent_commenter_name
-            info["poster_avatar_link"] = poster_avatar_link
+            info["poster_avatar_link"] = url_for("static", filename=poster_avatar_link)
             info["poster_username"] = poster_username
             out.append(info)
 
@@ -842,7 +1176,7 @@ def view_channel_post(cid=None, post_id=None):
     return render_template("post.html", title=f"Channel Post #{post.post_id}",
                            post_info=post_info, comments_info=post_comments_info,
                            has_edit_privilege=has_edit_privilege, channel=channel,
-                           current_user_id=current_user.uid)
+                           current_user=current_user)
 
 
 @app.route("/channel/<cid>/post/create", methods=["POST", "GET"])
@@ -977,7 +1311,8 @@ def debug():
     error = request.args.get('error') if 'error' in request.args else None
     if error is not None:
         abort(int(error))
-    return render_template('debug.html', title='DEBUG',variable=f"{1}" )
+
+    return render_template('debug.html', title='DEBUG', variable=f"{1}")
 
 
 # -----{ ERRORS }--------------------------------------------------------------
@@ -991,7 +1326,7 @@ def handle_exception(e):
     # non-HTTP exceptions default to 500
     if DEBUG:
         warnings.warn(str(e))
-        return render_template("errors/error_generic.html", e=InternalServerError(),fail=str(e)), 500
+        return render_template("errors/error_generic.html", e=InternalServerError(), fail=str(e)), 500
     return render_template("errors/error_generic.html", e=InternalServerError()), 500
 
 
@@ -1002,6 +1337,7 @@ def handle_exception(e):
 def subject_processor():
     def enum_to_website_output(item: str) -> str:
         return item.replace('_', ' ').title()
+
     return dict(enum_to_website_output=enum_to_website_output)
 
 
@@ -1019,4 +1355,4 @@ def defaults():
     return dict(current_user=current_user,
                 subjects=[e.name.lower() for e in Subject],
                 grades=[e.name.lower() for e in Grade],
-                tags=[e.replace(' ','_') for e in get_tags().keys()])
+                tags=[e.replace(' ', '_') for e in get_tags().keys()])

@@ -1,32 +1,101 @@
 {% extends 'base.html' %}
 
 {% block style %}
+<style>
+.box {
+  position: relative;
+    border-radius: 5px;
+    border: 1px solid rgba(0,0,0,.125);
+  display: inline-block;
+    background-color: #fff;
+  -webkit-transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+  transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
 
+.box::after {
+  content: "";
+  border-radius: 5px;
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  -webkit-transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+  transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.box:hover {
+  -webkit-transform: scale(1.035, 1.035);
+  transform: scale(1.035, 1.035);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.tagSearchSpan:hover {
+    transform: scale(1.035, 1.035);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.tagSearchSpan::after {
+    transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.tagFoundSpan:hover {
+    transform: scale(1.035, 1.035);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.tagFoundSpan::after {
+    transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.box:hover::after {
+    opacity: 1;
+}
+
+
+</style>
 {% endblock %}
 
 {% block script %}
 <script type="text/template" id="resource_card">
      <% _.each(data,  function(res) { %>
-        <!-- Resource -->
+        <!-- Resource card -->
         <div class="col-4 p-2">
-            <a class="text-dark card shadow-sm" href="{{url_for('resource')}}/<%= res.rid %>">
+            <a class="box" style="height: 365px; width: 290px; overflow: hidden" href="{{url_for('resource')}}/<%= res.rid %>">
                 <img class="bd-placeholder-img card-img-top" src="{{url_for('static', filename='')}}/<%= res.banner.thumbnail_link %>" ,
-                    alt="Logo" , width="150" , height="150">
-                <div class="card-body">
-                    <p class="card-text">
+                    alt="Logo" , style="max-height: 200px; width: 100%">
+                <div class="card-body" style="border-top: 2px solid #e5e5e5;">
+                    <!--Resource title-->
+                    <p class="card-text" style="max-height: 50px; overflow: hidden">
                         <%= res.title %>
                     </p>
+                     <!--Upvotes-->
                     <div class="d-flex">
-                        <p class="card-text px-1">
+                        <p class="card-text px-1" >
                             <%= res.upvote_count %>
                         </p>
-                        <img src="{{url_for('static', filename='img/up.png')}}" , alt="Down" , width="20" , height="20">
-                        <p class="card-text px-1">
+                        <!--Downvotes-->
+                        <svg xmlns="http://www.w3.org/2000/svg"  width="17" height="17" fill="#2e9cfa" class="bi bi-arrow-up-circle-fill" viewBox="0 0 16 16" style="margin-top: 4px!important; margin-left: 3px!important"
+                             >
+                    <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"
+                    />
+                    </svg>
+                        <p class="card-text px-1" style="margin-left: 4px!important;">
                             <%= res.downvote_count %>
                         </p>
-                        <img src="{{url_for('static', filename='img/down.png')}}" , alt="Down" , width="20" , height="20">
+                      <svg  xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="#ff4545" class="bi bi-arrow-down-circle-fill" viewBox="0 0 16 16" style="margin-top: 4px!important; margin-left: 3px!important">
+                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"
+                    />
+                    </svg>
+
                     </div>
-                    <div class="row">
+                    <!--Tags-->
+                    <div class="row" style="padding-left: 3px; padding-right: 3px">
                         <span class="badge rounded-pill bg-year-tag" style="text-transform: capitalize;">
                             <%= res.grade.replace(/_/g, ' ') %>
                         </span>
@@ -220,51 +289,67 @@
 {% endblock %}
 
 {% block content %}
+    <!--Banner-->
+    <div class="card row-fluid" style = "padding: 0rem!important; background-color: #fbfbfb">
+         <div class = "container" style="padding-top: 0.25rem!important;  padding-left: 0px; padding-right: 100px">
+            <div class="row p-2 rounded" style = "padding-bottom: 0rem!important; margin-top:1rem!important; background-color: #fbfbfb">
+                <dt class="row">
+                <!-- Channel heading -->
+                    <dt class="col-sm-3" style = "font-size: x-large; padding-bottom: 1rem!important;">Resources</dt>
+                        <dd class="row-3" style = "font-size: small">
+                            <p>Browse teaching resources that other educators have shared. Contribute to the community by creating your own resources.
+                            Only public resources and private resources you have access can be found here.</p>
+                        </dd>
+                </dt>
+
+            </div>
+             <div class="row p-3" style="padding-top: 0rem!important">
+                <!-- Search Bar -->
+                <div class="col d-flex justify-content-md-between">
+                    <div class="input-group">
+                        <input type="search" name="title" class="form-control" placeholder="Search Resources..."
+                            id="search_content">
+                    </div>
+                </div>
+            </div>
+         </div>
+    </div>
+
 <div class="container">
-    <div class="row p-3">
+    <div class="row p-3" style="padding-top: 3rem!important; padding-bottom: 0rem!important;">
+        <!-- Create resource button -->
         <div class="col-3">
-        </div>
-        <!-- Search Bar -->
-        <div class="col d-flex justify-content-md-between">
-            <div class="input-group">
-                <input type="search" name="title" class="form-control" placeholder="&#128270; Search"
-                    id="search_content">
+            <div class = "row pe-5">
+            <a href="{{url_for('resource_new')}}" class="btn btn-primary d-md-block shadow" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
+                <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important;">Create New Resource +</dd>
+            </a>
             </div>
         </div>
-    </div>
-    <div class="row p-3">
-        <!-- Tags section -->
-        <div class="col-3">
-            <p class="h3">Tags</p>
-        </div>
-        <!-- Resources selection -->
+        <!-- Sort by section -->
         <div class="col d-flex justify-content-md-between">
-            <p class="h3">Trending Resources</p>
+            <p class="h5"></p>
             <div class="d-flex">
-                <p class="h3">Sort by</p>
+                <p class="h5" style="margin: auto">Sort by</p>
                 <!-- dropdown for sort_by -->
                 <div class="dropdown px-3">
                     <select class="btn btn-primary dropdown-toggle" style="min-width: 100px; height: 90%" id="sort_order"  name="sort_order">
-                        <option class="dropdown-item" value="newest">Created</option>
-                        <option class="dropdown-item" value="upvotes">Votes</option>
-                        <option class="dropdown-item" value="trending">Trending</option>
+                        <option class="dropdown-item" value="newest"  style="background-color: white">Created</option>
+                        <option class="dropdown-item" value="upvotes"  style="background-color: white">Upvotes</option>
+                        <option class="dropdown-item" value="trending"  style="background-color: white">Trending</option>
                     </select>
                 </div>
             </div>
-            <a href="{{url_for('resource_new')}}" class="btn btn-primary" aria-haspopup="true" aria-expanded="false">
-                Create Resource
-            </a>
         </div>
     </div>
     <div class="row p-3">
         <div class="col-3">
             <!-- Tags selection -->
             <div class="row pe-5">
-                <div class="card">
-                    <p class="h4" style="margin-top: 1rem!important; margin-bottom: 0.5rem!important;">Tags</p>
+                <div class="card" style=" background-color: #fbfbfb">
+                    <p class="h4" style="margin-top: 1rem!important; margin-bottom: 0.75rem!important;">Tags</p>
                     <!-- Search for Tags -->
                     <div class="input-group">
-                        <input type="search" name="tags" class="form-control" placeholder="&#128270; Search Tags..."
+                        <input type="search" name="tags" class="form-control" placeholder="Search Tags..."
                             id="search_tags">
                     </div>
                     <div class="row-3" id="found_tags">
@@ -303,6 +388,7 @@
                             <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
                                 onchange="tagCheckedSelected(this)">
                             <label for="{{item}}_input____s" id="{{item}}_label____s">{{enum_to_website_output(item)}}</label>
+{#                             <button type="button" class="btn-close" data-bs-dismiss="alert" disabled aria-label="Close"></button>#}
                         </span>
                         {% endfor %}
                         {% for item in grades %}
@@ -310,6 +396,7 @@
                             <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
                                 onchange="tagCheckedSelected(this)">
                             <label for="{{item}}_input____s" id="{{item}}_label____s">{{enum_to_website_output(item)}}</label>
+                        {#                             <button type="button" class="btn-close" data-bs-dismiss="alert" disabled aria-label="Close"></button>#}
                         </span>
                         {% endfor %}
                         {% for item in tags %}
@@ -317,21 +404,22 @@
                             <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
                                 onchange="tagCheckedSelected(this)">
                             <label for="{{item}}_input____s" id="{{item}}_label____s">{{enum_to_website_output(item)}}</label>
+                        {#                             <button type="button" class="btn-close" data-bs-dismiss="alert" disabled aria-label="Close"></button>#}
                         </span>
                         {% endfor %}
                     </div>
                     <div class="row-3">
                         <div class="btn btn-secondary d-md-block" style="width: 100%; margin-top: 1rem!important;
                         margin-bottom: 1rem!important;" aria-haspopup="true" aria-expanded="false" id="resetTags">
-                            <dd class="text-center font-weight-bold">Clear all tags</dd>
+                            <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important;">Clear all tags</dd>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col d-flex justify-content-md-between">
-            <!-- Resources top level -->
-            <div class="card flex-fill">
+            <!-- Section that generates all of the resource cards -->
+            <div class="card flex-fill" style=" background-color: #fbfbfb">
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 p-3" id="result">
                 </div>
             </div>
