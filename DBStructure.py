@@ -255,7 +255,8 @@ class User(Base):
             "profile_background_link" : self.profile_background_link,
             "created_at" : self.created_at,
             "email" : self.email,
-            "bio" : self.bio
+            "bio" : self.bio,
+            "user_rating": str(round(self.user_rating, 1))
         }
 
 
@@ -656,7 +657,8 @@ class Channel(Base):
         text = f"Channel table:\n" \
                f"channel name = {self.name}, admin id = {self.admin_uid},\n" \
                f"cid = {self.cid}, avatar_link = {self.avatar_link}, "\
-               f"visibility = {self.visibility.name}, "
+               f"visibility = {self.visibility.name}, " \
+               f"created at = {self.created_at},\n"
         if self.subject:
             text += f"subject={self.subject.name}, "
         if self.grade:

@@ -177,7 +177,7 @@ def register():
                     user = get_user(email)
                     user_auth(user.email, True)
                     login_user(user, remember=False)
-                    # return redirect(url_for('home'))
+                    return redirect(url_for('home'))
                 flash('Something went wrong, please try again', "error")
         else:
             data['emailUsed'] = 'You must provide a valid email'
@@ -379,7 +379,7 @@ def resource_edit(rid=None):
         thumbnail_path = None
         if resource_thumbnail_file and resource_thumbnail_file.filename != "":
             thumbnail_path = posixpath.join("thumbnail", secure_filename(
-                    resource_thumbnail_file.filename))
+                resource_thumbnail_file.filename))
             resource_thumbnail_file.save(posixpath.join(
                 app.config['UPLOAD_FOLDER'], thumbnail_path))
         thumbnail_path = [thumbnail_path] if thumbnail_path else []
@@ -505,24 +505,127 @@ def resourceComment():
 
 # -----{ PAGES.PROFILE }-------------------------------------------------------
 
-@app.route('/profile')
+@app.route('/profile', methods=["GET"])
 @login_required
 def profile():
-    """The default view of a users profile,
-    this can be used to view your own or other users profiles.
-    Specified with the GET request
-    /profile?<id / name>
-
-    Shows the following content:
-        Liked resources
-        Created resources
-        Your reviews / comments
-
-    Additional options are available if viewing your own profile:
-        Manage account settings
-        Forums you are a part of
     """
-    return render_template('profile.html', title='Profile')
+    The default view of a users profile,
+    this can be used to view your own profiles.
+    Specified with the GET request
+    """
+    teaching_areas = []
+
+    # get hold number
+    user_rating_whole = int(current_user.user_rating)
+    # get if a user's honor rating is greater than int.5
+    user_rating_half = 0 if current_user.user_rating - user_rating_whole < .5 else 1
+    # empty stars
+    user_rating_unchecked = 5 - user_rating_whole - user_rating_half
+
+    with Session() as conn:
+        for area in conn.query(UserTeachingAreas). \
+                filter_by(uid=current_user.uid, is_public=True).all():
+            text = enum_to_website_output(area.teaching_area)
+        teaching_areas.append(text)
+
+    return render_template('profile.html', title='Profile', user=current_user.serialize,
+                           teaching_areas=teaching_areas, rating_whole=user_rating_whole,
+                           rating_half=user_rating_half, rating_unchecked=user_rating_unchecked)
+
+
+@app.route("/profile/studio_contents", methods=["GET"])
+def load_studio_contents():
+    """
+    Load the entries for user edit studio. Entries here can be channel or resource
+    """
+    # resource/channel
+    load_type = request.args.get("load_type")
+    # create/access
+    create_or_access = request.args.get("create_or_access")
+    title = request.args.get("title")
+    # ascending/descending of date
+    sort_algo = request.args.get("sort_algo")
+    uid = request.args.get("uid")
+
+    if not uid:
+        return
+    uid = int(uid)
+
+    # set default refinement strategy
+    if load_type not in ["resource", "channel"]:
+        load_type = "resource"
+
+    if create_or_access not in ["create", "access"]:
+        create_or_access = "create"
+
+    if sort_algo not in ['ascending', "descending"]:
+        sort_algo = 'ascending'
+    sort_algo = sort_algo.lower()
+
+    if title == "":
+        title = None
+
+    is_resource = True if load_type == "resource" else False
+    is_create = True if create_or_access == "create" else False
+
+    out = []
+    if is_resource:
+        # deal with resource
+        qualified_ids = []
+        with Session() as conn:
+            if is_create:
+                # resources created by user
+                for temp in conn.query(ResourceCreater).filter_by(uid=uid).all():
+                    qualified_ids.append(temp.rid)
+            else:
+                # resources user has access to
+                for temp in conn.query(PrivateResourcePersonnel).filter_by(uid=uid).all():
+                    qualified_ids.append(temp.rid)
+            res = conn.query(Resource).filter(Resource.rid.in_(qualified_ids))
+        if title:
+            res = res.filter(Resource.name.ilike(f"%{title}%"))
+        if sort_algo == "ascending":
+            res = res.order_by(Resource.created_at.asc()).all()
+        else:
+            res = res.order_by(Resource.created_at.desc()).all()
+        for item in res:
+            info = item.serialize
+            if not is_create:
+                # fill manage link to null
+                info["manage_link"] = None
+            else:
+                info["manage_link"] = url_for("resource_edit", rid=item.rid)
+
+            out.append(info)
+    else:
+        # deal with channel
+        sort_by_newest_date = True if sort_algo == "descending" else False
+        if create_or_access == "create":
+            # channels created by user
+            res = find_channels(channel_name=title, admin_uid=uid,
+                                sort_by_newest_date=sort_by_newest_date)
+        else:
+            # channels user has access to: private only
+            res = find_channels(channel_name=title, caller_uid=uid,
+                                sort_by_newest_date=sort_by_newest_date, is_public=False)
+
+        for item in res:
+            info = item.serialize
+
+            # need to change attribute "name"  to "title"
+            info["title"] = info["name"]
+            del info["name"]
+
+            # add upvote_count, downvote_count to '-'
+            info["upvote_count"], info["downvote_count"] = '-', '-'
+
+            if not is_create:
+                # fill manage link to null
+                info["manage_link"] = None
+            else:
+                info["manage_link"] = url_for("create_or_modify_channel", cid=item.cid)
+            out.append(info)
+    return jsonify(out)
 
 
 @app.route("/profile/settings", methods=["GET", "POST"])
@@ -589,13 +692,39 @@ def about():
     """A brief page descibing what the website is about"""
     # FAQs can contain html code to run on page
     faqs = [
-        ["What is Doctrina?","Doctrina is a website made for teachers to share in class activities, resources and more with each other. It is designed so that you - the teacher - finds it easier to do the thing you love most: teach! We help you find worksheets, tutorials and questions for your students so you can spoend more time teaching them, rather then putting time into creating said worksheets, tutorials and questions."],
-        ["What can I use Doctrina for?","You can share resources you found useful in your class, find a resource from another teacher to use in class, read insights and helpful notes for teaching a certain subject, and more! Doctrina also includes an online forum that allows you to talk to other teachers like you."],
-        ["How do I make an account?","Just click the login button in the top right and click create an account. We only require basic information about you and for legal reasons, official documentation stating you are a teacher (this is to make sure that none of your students get access to the site and taking advantage of your resources that you may be using with them)"],
-        ["How do I find a resource?","We have an advanced searching algorithm that makes use of 'tags' to sort and search data. Each channel and resource are associated with tags given by the creator which can help narrow down your search to only results you want to see."],
-        ["How do I create a resource?","Go to our resources page and click the create button. A resource can be given a title, description, a file can be uploaded if you choose to, and obviously tags to help define what areas, subjects and year levels your resource falls into."],
-        ["How can I talk to other teachers?","Our channels page contains multiple forums discussing various subjects, resources and teaching aspects. Each channel contains threads to discuss specifics about the overarching subject. Each thread can be replied to by teachers who want ot discuss and talk to others. You can create your own channels and threads by clicking create either in the main channels page or inside a channel if you would like to start a thread."],
-        ["How is a resources' popularity decided?","Each teacher can upvote or downvote a resource if they like or dislike it respectively. Resources with more upvotes are more popular and resources with more downvotes are less popular. In order to balance out upvotes and downvotes on a resource, we use an algorithm to decide how popular it is. Resources are sorted by popularity after you search."],
+        ["What is Doctrina?",
+         "Doctrina is a website made for teachers to share in class activities, resources and more with each other. "
+         "It is designed so that you - the teacher - finds it easier to do the thing you love most: teach! We help "
+         "you find worksheets, tutorials and questions for your students so you can spoend more time teaching them, "
+         "rather then putting time into creating said worksheets, tutorials and questions."],
+        ["What can I use Doctrina for?",
+         "You can share resources you found useful in your class, find a resource from another teacher to use in "
+         "class, read insights and helpful notes for teaching a certain subject, and more! Doctrina also includes an "
+         "online forum that allows you to talk to other teachers like you."],
+        ["How do I make an account?",
+         "Just click the login button in the top right and click create an account. We only require basic information "
+         "about you and for legal reasons, official documentation stating you are a teacher (this is to make sure "
+         "that none of your students get access to the site and taking advantage of your resources that you may be "
+         "using with them)"],
+        ["How do I find a resource?",
+         "We have an advanced searching algorithm that makes use of 'tags' to sort and search data. Each channel and "
+         "resource are associated with tags given by the creator which can help narrow down your search to only "
+         "results you want to see."],
+        ["How do I create a resource?",
+         "Go to our resources page and click the create button. A resource can be given a title, description, "
+         "a file can be uploaded if you choose to, and obviously tags to help define what areas, subjects and year "
+         "levels your resource falls into."],
+        ["How can I talk to other teachers?",
+         "Our channels page contains multiple forums discussing various subjects, resources and teaching aspects. "
+         "Each channel contains threads to discuss specifics about the overarching subject. Each thread can be "
+         "replied to by teachers who want ot discuss and talk to others. You can create your own channels and threads "
+         "by clicking create either in the main channels page or inside a channel if you would like to start a "
+         "thread."],
+        ["How is a resources' popularity decided?",
+         "Each teacher can upvote or downvote a resource if they like or dislike it respectively. Resources with more "
+         "upvotes are more popular and resources with more downvotes are less popular. In order to balance out "
+         "upvotes and downvotes on a resource, we use an algorithm to decide how popular it is. Resources are sorted "
+         "by popularity after you search."],
     ]
     return render_template('about.html', title='About Us', name="About Us", faqs=faqs, num=len(faqs))
 
@@ -1073,9 +1202,7 @@ def debug():
     if error is not None:
         abort(int(error))
 
-
     return render_template('debug.html', title='DEBUG', variable=f"{1}")
-
 
 
 # -----{ ERRORS }--------------------------------------------------------------
