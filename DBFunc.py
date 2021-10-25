@@ -2,9 +2,8 @@
 # This file provides some basic wrapper functions to create and
 # modify the DB objects
 #
-# report bug to Jason on messenger
 #
-# Created by Jason Aug 20, 2021
+# works of OfficialTeamName (con'd). All rights reserved.
 ##################################################################
 import traceback
 
@@ -300,7 +299,7 @@ def get_user(email):
         return ErrorCode.INVALID_USER
 
 
-def user_auth(email,login=True):
+def user_auth(email, login=True):
     with Session() as conn:
         user = get_user(email)
         if user == ErrorCode.INVALID_USER:
