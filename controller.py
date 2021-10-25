@@ -18,11 +18,11 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import HTTPException, InternalServerError
 from re import search as re_search
 # If in branch use the following
-# from .DBFunc import *
-# from .forms import LoginForm, RegisterForm, ResourceForm
+from .DBFunc import *
+from .forms import LoginForm, RegisterForm, ResourceForm
 # If in main use the following
-from DBFunc import *
-from forms import LoginForm, RegisterForm, ResourceForm
+# from DBFunc import *
+# from forms import LoginForm, RegisterForm, ResourceForm
 
 # -----{ INIT }----------------------------------------------------------------
 DEBUG = True
@@ -607,8 +607,6 @@ def profile():
     this can be used to view your own profiles.
     Specified with the GET request
     """
-    teaching_areas = []
-
     # get hold number
     user_rating_whole = int(current_user.user_rating)
     # get if a user's honor rating is greater than int.5
@@ -616,14 +614,8 @@ def profile():
     # empty stars
     user_rating_unchecked = 5 - user_rating_whole - user_rating_half
 
-    with Session() as conn:
-        for area in conn.query(UserTeachingAreas). \
-                filter_by(uid=current_user.uid, is_public=True).all():
-            text = enum_to_website_output(area.teaching_area)
-        teaching_areas.append(text)
-
     return render_template('profile.html', title='Profile', user=current_user.serialize,
-                           teaching_areas=teaching_areas, rating_whole=user_rating_whole,
+                           teaching_areas=get_user_teaching_areas(current_user.uid), rating_whole=user_rating_whole,
                            rating_half=user_rating_half, rating_unchecked=user_rating_unchecked)
 
 
@@ -762,6 +754,14 @@ def settings():
         avatar, profile_background = \
             request.files.get("avatar"), request.files.get("profile_background")
 
+        subjects = [t for t in request.form if t == request.form.get(t)]
+        teaching_areas = {}
+        for s in subjects:
+            try:
+                teaching_areas[Subject[s.replace(' ', '_').upper()]] = [True]
+            except KeyError:
+                continue
+
         if not bio:
             bio = "NULL"
 
@@ -785,7 +785,8 @@ def settings():
         if isinstance(
                 modify_user(uid=current_user.uid, username=username,
                             password=new_password, bio=bio, avatar_link=avatar_path,
-                            profile_background_link=profile_background_path),
+                            profile_background_link=profile_background_path,
+                            teaching_areas_to_add=teaching_areas),
                 ErrorCode):
             # invalid action
             flash("Cannot modify user profile at this time, try later", "error")
@@ -935,6 +936,8 @@ def create_or_modify_channel(cid=None):
 
         grade = website_input_to_enum(readable_string=grade, enum_class=Grade)
 
+        tags_id = [get_tags()[t] for t in request.form if t == request.form.get(t) and t in get_tags(t)]
+
         # convert personnel emails to personnel ids
         personnel_ids = []
         for i in personnel_emails:
@@ -947,7 +950,8 @@ def create_or_modify_channel(cid=None):
             cid = create_channel(name=name, visibility=visibility,
                                  admin_uid=current_user.uid, subject=subject,
                                  grade=grade, description=description,
-                                 personnel_id=personnel_ids, avatar_link=thumbnail_path)
+                                 personnel_id=personnel_ids, avatar_link=thumbnail_path,
+                                 tags_id=tags_id)
             if isinstance(cid, ErrorCode):
                 flash("Cannot create channel at the moment")
                 return redirect(url_for("create_or_modify_channel"))
@@ -963,7 +967,8 @@ def create_or_modify_channel(cid=None):
 
             modify_channel(cid=cid, name=name, visibility=visibility, admin_uid=current_user.uid,
                            subject=subject, grade=grade, description=description,
-                           personnel_ids=personnel_ids, avatar_link=thumbnail_path)
+                           personnel_ids=personnel_ids, avatar_link=thumbnail_path,
+                           tags_id=tags_id)
             flash("Channel edited")
         return redirect(url_for("view_channel", cid=cid))
 
@@ -1027,12 +1032,17 @@ def search_channel():
     is_public = True if (is_public == 'true' or is_public is True) else False
     sort_by_date = True if request.args.get("sort_by_date") == "newest" else False
     uid = int(request.args.get("uid"))
+    tags = request.args.getlist('tags[]') if 'tags[]' in request.args else None
+    tags = list(filter(lambda x: x != '', tags)) if tags is not None else None
+    tags = [get_tags()[t] for t in tags if t in get_tags()] if tags is not None else None
+    subject = request.args.get('subject').upper() if 'subject' in request.args else None
+    year = request.args.get('year').upper() if 'year' in request.args else None
 
     out = []
 
     with Session() as conn:
         for i in find_channels(channel_name=name, is_public=is_public,
-                               sort_by_newest_date=sort_by_date):
+                               sort_by_newest_date=sort_by_date,tag_ids=tags,subject=subject,grade=year):
             if not user_has_access_to_channel(uid=uid, cid=i.cid):
                 # user does not have access to channel
                 continue

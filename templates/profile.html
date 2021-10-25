@@ -229,9 +229,9 @@
                     <p class="h5" style="margin-top: 1rem; margin-left: 12px!important; margin-bottom: 0rem!important;">Tags</p>
                     <div class="card-body overflow-auto" style="padding-left:12px!important;">
                             <div class="col-7">
-                                {% for area in teaching_areas %}
+                                {% for ta in teaching_areas %}
                                     <span class="badge rounded-pill bg-primary" style="width: auto;
-                                      margin: 0.25rem!important;">{{ area }} </span>
+                                      margin: 0.25rem!important;">{{ enum_to_website_output(ta.teaching_area.name) }} </span>
                                 {% endfor %}
                             </div>
                     </div>

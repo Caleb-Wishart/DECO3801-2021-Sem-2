@@ -13,9 +13,9 @@ from sqlalchemy.orm import sessionmaker
 from werkzeug.security import generate_password_hash
 import random
 # use this in branch
-# from .DBStructure import *
+from .DBStructure import *
 # use this in main
-from DBStructure import *
+# from DBStructure import *
 
 # define if you want method output messages for debugging
 VERBOSE = False
@@ -173,9 +173,14 @@ def modify_user_teaching_areas(uid, conn, modification: Modification,
         if isinstance(area, Subject):
             if modification == Modification.MODIFY_ADD:
                 # insert new user teaching areas
-                new_teach_area = UserTeachingAreas(uid=uid, teaching_area=area,
-                                                   is_public=is_public, grade=grade)
-                conn.add(new_teach_area)
+                teaching_area = conn.query(UserTeachingAreas). \
+                    filter_by(uid=uid, teaching_area=area,
+                              is_public=is_public, grade=grade).one_or_none()
+                if teaching_area is None:
+                    new_teach_area = UserTeachingAreas(uid=uid, teaching_area=area,
+                                                    is_public=is_public, grade=grade)
+                    warnings.warn("Added new teaching area: "  + area.name)
+                    conn.add(new_teach_area)
             else:
                 # delete user teaching areas
                 teaching_area = conn.query(UserTeachingAreas). \
