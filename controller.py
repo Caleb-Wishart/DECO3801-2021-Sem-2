@@ -216,8 +216,8 @@ def resource(rid=None):
         abort(403,
               description=f"You ({current_user.username}) do not have permission to access the resource : {res.title}" + "\nIf you think this is incorrect contact the resource owner")
 
-    # convert utc time to AEST
-    created_at = res.created_at.astimezone(pytz.timezone("Australia/Brisbane"))
+    if res.resource_link.startswith('resource/'):
+        res.resource_link = url_for('static', filename=res.resource_link)
 
     # render the template
     kwargs = {
@@ -225,6 +225,7 @@ def resource(rid=None):
         "rid": rid,
         "uid": uid,
         "res": res,
+        "created_at": dump_datetime(res.created_at),
         "difficulty": enum_to_website_output(res.difficulty),
         "subject": enum_to_website_output(res.subject),
         "grade": enum_to_website_output(res.grade),
@@ -244,8 +245,12 @@ def resource_new():
     form = ResourceForm()
     if form.validate_on_submit():
         title = form.title.data
-        resource_file = request.files[form.files.name]
-        resource_link = resource_file.filename
+        resource_url = form.resource_url.data
+        resource_file, resource_link = None, None
+        if resource_url == "":
+            # no url provided, get file
+            resource_file = request.files[form.files.name]
+            resource_link = resource_file.filename
         resource_thumbnail_file = request.files[form.thumbnail.name]
         resource_thumbnail_links = resource_thumbnail_file.filename
 
@@ -266,11 +271,14 @@ def resource_new():
         tags_id = [get_tags()[t] for t in request.form if t == request.form.get(t) and t in get_tags(t)]
         description = form.description.data
 
-        i = 0
-        while os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'], 'resource', secure_filename(resource_link))):
-            root, ext = os.path.splitext(resource_link)
-            resource_link = root + '_' + str(i) + ext
-            i += 1
+        if resource_url == "":
+            i = 0
+            while os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'], 'resource', secure_filename(resource_link))):
+                root, ext = os.path.splitext(resource_link)
+                resource_link = root + '_' + str(i) + ext
+                i += 1
+            resource_file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'resource', secure_filename(resource_link)))
+
         i = 0
         while os.path.isfile(
                 os.path.join(app.config['UPLOAD_FOLDER'], 'thumbnail', secure_filename(resource_thumbnail_links))):
@@ -278,20 +286,25 @@ def resource_new():
             resource_thumbnail_links = root + '_' + str(i) + ext
             i += 1
 
-        resource_file.save(os.path.join(app.config['UPLOAD_FOLDER'], 'resource', secure_filename(resource_link)))
         resource_thumbnail_file.save(
             os.path.join(app.config['UPLOAD_FOLDER'], 'thumbnail', secure_filename(resource_thumbnail_links)))
 
-        rid = add_resource(title, os.path.join('resource', secure_filename(resource_link)), difficulty, subject, grade,
-                           creaters_id, is_public,
-                           private_personnel_id, tags_id,
-                           description, [os.path.join('thumbnail', secure_filename(resource_thumbnail_links))])
+        if resource_url == "":
+            rid = add_resource(title, os.path.join('resource', secure_filename(resource_link)), difficulty, subject, grade,
+                               creaters_id, is_public,
+                               private_personnel_id, tags_id,
+                               description, [os.path.join('thumbnail', secure_filename(resource_thumbnail_links))])
+        else:
+            rid = add_resource(title, resource_url, difficulty, subject,
+                               grade,
+                               creaters_id, is_public,
+                               private_personnel_id, tags_id,
+                               description, [os.path.join('thumbnail', secure_filename(resource_thumbnail_links))])
         if isinstance(rid, ErrorCode):
             abort(400)
         flash("Resource created", 'info')
         return redirect(url_for('resource', rid=rid))
     return render_template('resource_create.html', title='New Resource', form=form)
-    # todo
 
 
 @app.route("/resource/<rid>/edit", methods=["GET", "POST"])

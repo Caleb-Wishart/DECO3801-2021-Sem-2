@@ -274,11 +274,7 @@
                 </p>
                 <div class = "col text-center" style="margin-top: 1.5rem!important; margin-bottom: 1.5rem!important;">
                     <a class="btn btn-primary" style = "width: 60%"
-                    {% if res.resource_link.startswith('resource/') %}
-                        href="{{url_for('static', filename=res.resource_link)}}"
-                    {% else %}
-                        href="{{res.resource_link}}"
-                    {% endif %}>
+                    href="{{res.resource_link}}">
                         <div class="row">
                                 <div class="col-1" style="padding-top:2px; padding-left: 14px; padding-right:5px">
                                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-card-text" viewBox="0 0 16 16">
@@ -303,7 +299,7 @@
             <div class="d-flex" style="padding-top: 0.5rem!important;">
                 <!-- Created on-->
                 <p><strong> Created on</strong></p>
-                <p style="margin-right: 2rem!important; margin-left: 0.4rem!important;"> {{ res.created_at }}</p>
+                <p style="margin-right: 2rem!important; margin-left: 0.4rem!important;"> {{ created_at }}</p>
                 <p><strong>Rating </strong></p>
                 <!-- Upvote-->
                 <p class="card-text px-2" id="upvoteCount">{{res.upvote_count}}</p>
@@ -407,7 +403,7 @@
              <div class = "col" style="margin-top: 0.4rem" >
                 {% if (author.username == current_user.username) %}
                     <!-- NEED REDIRECT HELP HERE -->
-                    <a class = "btn btn-primary">
+                    <a class = "btn btn-primary" href="{{ url_for('resource_edit', rid=rid) }}">
                             Edit Resource
                         </a>
                 {% endif %}
