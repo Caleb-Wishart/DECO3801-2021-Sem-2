@@ -2,9 +2,8 @@
 # This file provides some basic wrapper functions to create and
 # modify the DB objects
 #
-# report bug to Jason on messenger
 #
-# Created by Jason Aug 20, 2021
+# works of OfficialTeamName (con'd). All rights reserved.
 ##################################################################
 import traceback
 
@@ -31,7 +30,7 @@ DEBUG_MODE = True
 # link to default user profile background
 DEFAULT_PROFILE_BACKGROUND_LINK = "profile_background/default_background.jpg"
 # link to default user avatar
-DEFAULT_USER_AVATAR_LINK = "avatar/ashley_gibbons.png"
+DEFAULT_USER_AVATAR_LINK = "avatar/1.png"
 # link to default channel avatar
 DEFAULT_CHANNEL_AVATAR_LINK = "channel_avatar/logo_icon.png"
 
@@ -185,6 +184,10 @@ def modify_user_teaching_areas(uid, conn, modification: Modification,
                 if teaching_area:
                     conn.delete(teaching_area)
 
+def get_user_teaching_areas(uid:int):
+    with Session() as conn:
+        return conn.query(UserTeachingAreas).filter_by(uid=uid).all()
+
 
 def modify_user(uid: int, username=None, password=None, email=None,
                 teaching_areas_to_add: dict = None,
@@ -300,7 +303,7 @@ def get_user(email):
         return ErrorCode.INVALID_USER
 
 
-def user_auth(email,login=True):
+def user_auth(email, login=True):
     with Session() as conn:
         user = get_user(email)
         if user == ErrorCode.INVALID_USER:
@@ -1805,3 +1808,14 @@ def get_channel_post_comments(post_id: int):
             return ErrorCode.INVALID_POST
         return conn.query(PostComment).filter_by(post_id=post_id).\
             order_by(PostComment.created_at.asc()).all()
+
+def get_channel_post(cid: int):
+    """
+    Returns a list of all posts on a channel
+
+    :param post_id: The id of the post
+    :return If the post_id is valid, a list of post comments are returned
+            ErrorCode.INVALID_POST if post_id is invalid
+    """
+    with Session() as conn:
+        return conn.query(ChannelPost).filter_by(cid=cid).all()

@@ -1,7 +1,8 @@
 ###############################################################################
 # This script is used to import dummy resources/users/channel comments to our website
 #
-# created by Jason Aug 26, 2021
+#
+# works of OfficialTeamName (cond'). All rights reserved.
 ###############################################################################
 import random
 

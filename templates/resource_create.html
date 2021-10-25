@@ -241,7 +241,7 @@
         </div>
 
         <div class="col d-flex justify-content-md-between">
-             <form class = "form-outline flex-fill" method="POST" action="{{url_for('resource_new')}}" enctype = "multipart/form-data">
+             <form class = "form-outline flex-fill" method="POST" action="{{url_for('resource_new')}}" enctype = "multipart/form-data" onsubmit="return checkFileOrURLFilled();">
                 {{ form.csrf_token }}
                     <div class = "card flex-fill shadow-sm">
                                  <div class="mb-3" style="margin: 1rem; margin-bottom: 0rem!important;">
@@ -324,7 +324,7 @@
                                           </div>
                                         <!-- URL upload-->
                                         <div class="card flex-fill" id="urlUpload" style="margin-top:1rem!important" hidden>
-                                            <textarea class="form-control" id="URL" name="URL" placeholder="URL of resource (required)" required="" rows="2"></textarea>
+                                            {{ form.resource_url(class="form-control" , placeholder="URL of resource (required)", id="resource_url", rows="2")}}
                                           </div>
 
                                       </div>
@@ -523,6 +523,37 @@
          }
         });
 
+    </script>
+
+    <script>
+    function checkFileOrURLFilled() {
+        // check either url or file is provided
+        var valid = true;
+        console.log(document.getElementById("file-upload").files.length)
+        console.log(document.getElementById("resource_url").value)
+        if (document.getElementById("file-upload").files.length === 0 &&
+                document.getElementById("resource_url").value === "") {
+            valid = false;
+            alert("Please ensure you have uploaded the resource or specify the resource url!")
+        } else if (document.getElementById("resource_url").value !== "") {
+            console.log(document.getElementById("resource_url").value);
+            // check if it is a valid url
+            try {
+                var url = new URL(document.getElementById("resource_url").value);
+            } catch (_) {
+                valid = false;
+            }
+            if (valid && url.protocol !== "http:" && url.protocol !== "https:") {
+                valid = false;
+            }
+
+            if (!valid) {
+                alert("Please ensure the url is valid");
+            }
+        }
+
+        return valid;
+    }
     </script>
 
     <script>
