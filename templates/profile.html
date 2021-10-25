@@ -48,7 +48,17 @@
 {% endblock %}
 
 {% block script %}
+    <script>
+    $(function () {
 
+        $(".dropdown-menu a").click(function () {
+
+            $("#dropdownMenuButton1").text($(this).text());
+            $("#dropdownMenuButton1").val($(this).text());
+        });
+
+    });
+    </script>
 {% endblock %}
 
 {% block content %}
