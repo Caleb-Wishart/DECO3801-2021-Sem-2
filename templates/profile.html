@@ -124,11 +124,11 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container" style="margin-top: 1rem!important;">
     <!-- Profile Image/Background -->
     <div class="row text-center" style="">
-        <div class="banner-visible-area" style="margin-top:10px;">
-            <div class="card" style = "background-color: #fbfbfb">
+        <div class="banner-visible-area">
+            <div class="card" style = "background-color: #fbfbfb; margin-top:12px!important;">
                 <img src="{{ url_for("static", filename=user['profile_background_link'])}}" class="banner-image" height="250">
                 <div class="row pe-5" style="margin-top: 1rem">
                     <div class="col-2">
