@@ -15,7 +15,7 @@
 # section.
 #
 #
-# Created by Jason Aug 20, 2021
+# Works of OfficialTeamName (con'd). All rights reserved.
 #############################################################################
 import datetime
 import enum
@@ -44,7 +44,6 @@ DBPATH = f"postgresql://{DBUSERNAME}:{DBPASSWORD}@localhost/{DBDATABASE}"
 # Option 2: Feel lazy to sign in to cli? No worries, you can play these using sqlite
 # on your local device
 # uncomment DBPATH below to overwrite the above PATH config
-# todo
 # DBPATH = "sqlite:///Doctrina.db"
 
 

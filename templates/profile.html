@@ -242,19 +242,28 @@
                     <div class="row">
                         <!-- Resource/Channel Headings -->
                         <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                            <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked="">
-                            <label class="btn btn-outline-primary" for="btnradio1">My
+                            <input type="radio" class="btn-check" name="btnradio"  id="myResourceChecked" autocomplete="off" checked="">
+                            <label class="btn btn-outline-primary" for="btnradio1" id="myResourceBtn" onclick="unCheckAllButThis(this);">My
                                 Resources</label>
 
-                            <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="btnradio2">My Channels</label>
+                            <input type="radio" class="btn-check" name="btnradio"  autocomplete="off"  id="myChannelChecked">
+                            <label class="btn btn-outline-primary" for="btnradio2" id="myChannelBtn" onclick="unCheckAllButThis(this);">My Channels</label>
 
-                            <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="btnradio3">Private Resources</label>
+                            <input type="radio" class="btn-check"  name="btnradio" autocomplete="off" id="privateResourceChecked">
+                            <label class="btn btn-outline-primary" for="btnradio3" id="privateResourceBtn" onclick="unCheckAllButThis(this);">Private Resources</label>
 
-                            <input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off">
-                            <label class="btn btn-outline-primary" for="btnradio4">Private Channels</label>
+                            <input type="radio" class="btn-check" name="btnradio"  autocomplete="off" id="privateChannelChecked">
+                            <label class="btn btn-outline-primary" for="btnradio4" id="privateChannelBtn" onclick="unCheckAllButThis(this);">Private Channels</label>
                         </div>
+
+                        <script>
+                            // try to checked current item and unchecked others
+                            function unCheckAllButThis(checked_item) {
+                                var buttonID = checked_item.id.slice(0, -3) + "Checked";
+                                console.log(buttonID);
+                                document.getElementById(buttonID).click();
+                            }
+                        </script>
                     </div>
             </div>
                 <!-- Search Bar -->
@@ -268,35 +277,30 @@
                     <div class="d-flex col-3" style="padding-top: 0rem!important">
                     <p class="h7" style="padding-top: 0.5rem!important;">Sort by</p>
                     <div class="dropdown px-3">
-                        <button class="btn btn-primary dropdown-toggle" style="min-width: 100px; height: 90%" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                            Newest
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="">
-                            <a class="dropdown-item">Newest</a>
-                            <a class="dropdown-item">Oldest</a>
-                        </div>
+                        <select class="btn btn-primary dropdown-toggle" style="min-width: 100px; height: 90%" type="button" id="sort_order" data-bs-toggle="dropdown" aria-expanded="false">
+                            <option class="dropdown-item" value="descending" selected>Newest</option>
+                            <option class="dropdown-item" value="ascending">Oldest</option>
+                        </select>
                     </div>
                 </div>
                 </div>
 
 
-                <!-- Items / cards (Don't delete the div below) -->
-                    <div class="col d-flex justify-content-md-between">
-
+                <script type="text/template" id="studio_card">
+                    <% _.each(data, function(res) { %>
                             <!-- Individual card (Put the template stuff here) -->
-                            <div class="box shadow-sm flex-fill" style="margin: 1.1rem; margin-bottom: 0.55rem!important; margin-top: 0.55rem!important; color: black">
-                                <a class="row">
+                                <a class="row" >
                                     <!-- Thumbnail for a channel.  -->
                                     <div class="col-2" style="width: 12%">
-                                        <img src="https://via.placeholder.com/65"
-                                             alt="Logo", width="60", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
+                                        <img src="{{ url_for('static', filename='') }}/<%= res['avatar_link']%>"
+                                             alt="Logo" width="60" style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
                                     </div>
 
                                     <div class="col-3" style="margin-top: 10px!important; margin-bottom: 5px!important;">
                                         <!-- Title -->
                                         <div class = "row">
-                                            <div class="fw-bold" style="padding: 0rem!important; font-size: small">
-                                                Title
+                                            <div class="fw-bold" style="padding: 0rem!important; font-size: small" onclick="location.href = '<%= res.view_link %>'">
+                                                <%= res['title'] %>
                                             </div>
                                         </div>
                                     </div>
@@ -309,7 +313,7 @@
                                         </div>
                                         <div class = "row">
                                             <div style="padding: 0rem!important; font-size: small">
-                                                (Actual Date)
+                                                <%= res['created_at'] %>
                                             </div>
                                         </div>
                                     </div>
@@ -322,7 +326,7 @@
                                         </div>
                                         <div class = "row">
                                             <div style="padding: 0rem!important; font-size: small">
-                                                (Actual Privacy)
+                                                <%= res["is_public"] %>
                                             </div>
                                         </div>
                                     </div>
@@ -330,15 +334,214 @@
                                     <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important;">
                                         <!-- Manage -->
                                         <div class = "row text-center">
-                                            <button type="button" class="btn btn-primary" style="width: 50%; margin: auto; margin-top: 5px!important; margin-bottom: 5px!important;">Manage</button>
+                                            <% if (res.manage_link != null) { %>
+                                                <button type="button" class="btn btn-primary" style="width: 50%; margin: auto; margin-top: 5px!important; margin-bottom: 5px!important;"
+                                                        onclick="location.href = '<%= res.manage_link %>';">Manage</button>
+                                            <% } %>
                                         </div>
 
                                     </div>
                                 </a>
-                            </div>
+                    <% }); %>
+                </script>
+
+                    <!-- Items / cards (Don't delete the div below) -->
+                    <div class="col d-flex justify-content-md-between" >
+                        <div class="box shadow-sm flex-fill" style="margin: 1.1rem; margin-bottom: 0.55rem!important; margin-top: 0.55rem!important; color: black" id="result">
+                        </div>
                     </div>
 
+                <script>
+                    // global variables that stores the studio options
 
+                    // default load my resource
+                    var load_type = "resource";
+                    var create_or_access = "create";
+                    var search_term = "";
+                    // default sort by newest date order
+                    var sort_algo = "descending";
+
+                    // initialization
+                    $(document).ready(function () {
+                        $.ajax(
+                            {
+                                type: "GET",
+                                url: "{{ url_for('load_studio_contents') }}",
+                                data: {
+                                    "load_type": load_type,
+                                    "create_or_access": create_or_access,
+                                    "title": search_term,
+                                    "sort_algo": sort_algo,
+                                    "uid": {{ user['uid'] }}
+                                },
+                                success: function (response) {
+                                    $("#result").empty();
+                                    var studio_card = _.template($("#studio_card").html());
+                                    $("#result").html(studio_card({ data: response }));
+                                    if (response.length === 0) {
+                                        $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
+                                    }
+                                }
+                            })
+                    });
+
+
+                    // key up search bar
+                    $(document).on("keyup", "#search_content", function (e) {
+                        search_term = $('input[name=title]').val();
+                        $.ajax(
+                            {
+                                type: "GET",
+                                url: "{{ url_for('load_studio_contents') }}",
+                                data: {
+                                    "load_type": load_type,
+                                    "create_or_access": create_or_access,
+                                    "title": search_term,
+                                    "sort_algo": sort_algo,
+                                    "uid": {{ user['uid'] }}
+                                },
+                                success: function (response) {
+                                    $("#result").empty();
+                                    var studio_card = _.template($("#studio_card").html());
+                                    $("#result").html(studio_card({ data: response }));
+                                    if (response.length === 0) {
+                                        $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
+                                    }
+                                }
+                            }
+                        )
+                    });
+
+
+                    // pressed myResource
+                    $(document).on("click", "#myResourceBtn", function (e) {
+                        load_type = "resource";
+                        create_or_access = "create";
+                        $.ajax(
+                            {
+                                type: "GET",
+                                url: "{{ url_for('load_studio_contents') }}",
+                                data: {
+                                    "load_type": load_type,
+                                    "create_or_access": create_or_access,
+                                    "title": search_term,
+                                    "sort_algo": sort_algo,
+                                    "uid": {{ user['uid'] }}
+                                },
+                                success: function (response) {
+                                    $("#result").empty();
+                                    var studio_card = _.template($("#studio_card").html());
+                                    $("#result").html(studio_card({ data: response }));
+                                    if (response.length === 0) {
+                                        $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
+                                    }
+                                }
+                            })
+                    });
+
+                    // pressed privateResource
+                    $(document).on("click", "#privateResourceBtn", function (e) {
+                        load_type = "resource";
+                        create_or_access = "access";
+                        $.ajax(
+                            {
+                                type: "GET",
+                                url: "{{ url_for('load_studio_contents') }}",
+                                data: {
+                                    "load_type": load_type,
+                                    "create_or_access": create_or_access,
+                                    "title": search_term,
+                                    "sort_algo": sort_algo,
+                                    "uid": {{ user['uid'] }}
+                                },
+                                success: function (response) {
+                                    $("#result").empty();
+                                    var studio_card = _.template($("#studio_card").html());
+                                    $("#result").html(studio_card({ data: response }));
+                                    if (response.length === 0) {
+                                        $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
+                                    }
+                                }
+                            })
+                    });
+
+                    // pressed myChannel
+                    $(document).on("click", "#myChannelBtn", function () {
+                        load_type = "channel";
+                        create_or_access = "create";
+                        $.ajax(
+                            {
+                                type: "GET",
+                                url: "{{ url_for('load_studio_contents') }}",
+                                data: {
+                                    "load_type": load_type,
+                                    "create_or_access": create_or_access,
+                                    "title": search_term,
+                                    "sort_algo": sort_algo,
+                                    "uid": {{ user['uid'] }}
+                                },
+                                success: function (response) {
+                                    $("#result").empty();
+                                    var studio_card = _.template($("#studio_card").html());
+                                    $("#result").html(studio_card({ data: response }));
+                                    if (response.length === 0) {
+                                        $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
+                                    }
+                                }
+                            })
+                    });
+
+                    // pressed privateChannel
+                    $(document).on("click", "#privateChannelBtn", function () {
+                        load_type = "channel";
+                        create_or_access = "access";
+                        $.ajax(
+                            {
+                                type: "GET",
+                                url: "{{ url_for('load_studio_contents') }}",
+                                data: {
+                                    "load_type": load_type,
+                                    "create_or_access": create_or_access,
+                                    "title": search_term,
+                                    "sort_algo": sort_algo,
+                                    "uid": {{ user['uid'] }}
+                                },
+                                success: function (response) {
+                                    $("#result").empty();
+                                    var studio_card = _.template($("#studio_card").html());
+                                    $("#result").html(studio_card({ data: response }));
+                                    if (response.length === 0) {
+                                        $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
+                                    }
+                                }
+                            })
+                    });
+
+                    // sort by order changes
+                    $(document).on("change", "#sort_order", function (e) {
+                        sort_algo = $("#sort_order").find(":selected").val();
+                        $.ajax(
+                            {
+                                type: "GET",
+                                url: "{{ url_for('load_studio_contents') }}",
+                                data: {
+                                    "load_type": load_type,
+                                    "create_or_access": create_or_access,
+                                    "title": search_term,
+                                    "sort_algo": sort_algo,
+                                    "uid": {{ user['uid'] }}
+                                },
+                                success: function (response) {
+                                    $("#result").empty();
+                                    var studio_card = _.template($("#studio_card").html());
+                                    $("#result").html(studio_card({ data: response }));
+                                    if (response.length === 0) {
+                                        $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
+                                    }
+                                }
+                            })
+                    });
+                </script>
             </div>
         </div>
     </div>

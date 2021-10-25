@@ -1,3 +1,9 @@
+###################################################################################
+# This script defines the backend functions that respond to all webpage requests
+#
+#
+# works of OfficialTeamName (con'd). All rights reserved.
+##################################################################################
 from flask import Flask, request, render_template, redirect, url_for, abort, flash, Response, jsonify
 from sqlalchemy.sql.expression import func
 import os
@@ -596,18 +602,28 @@ def load_studio_contents():
                     qualified_ids.append(temp.rid)
             res = conn.query(Resource).filter(Resource.rid.in_(qualified_ids))
         if title:
-            res = res.filter(Resource.name.ilike(f"%{title}%"))
+            res = res.filter(Resource.title.ilike(f"%{title}%"))
         if sort_algo == "ascending":
             res = res.order_by(Resource.created_at.asc()).all()
         else:
             res = res.order_by(Resource.created_at.desc()).all()
         for item in res:
             info = item.serialize
-            if not is_create:
+
+            with Session() as conn:
+                creater = conn.query(ResourceCreater).filter_by(rid=item.rid, uid=uid).first()
+
+            if not creater:
                 # fill manage link to null
                 info["manage_link"] = None
             else:
                 info["manage_link"] = url_for("resource_edit", rid=item.rid)
+
+            info["avatar_link"] = get_resource_thumbnail(item.rid).serialize["thumbnail_link"] \
+                if get_resource_thumbnail(item.rid) != ErrorCode.INVALID_RESOURCE \
+                else 'img/placeholder.png'
+            info["view_link"] = url_for("resource", rid=item.rid)
+            info["is_public"] = "Public" if True else "Private"
 
             out.append(info)
     else:
@@ -625,6 +641,11 @@ def load_studio_contents():
         for item in res:
             info = item.serialize
 
+            if item.visibility != ChannelVisibility.PUBLIC:
+                info['visibility'] = "Private"
+            info["is_public"] = info['visibility']
+            del info['visibility']
+
             # need to change attribute "name"  to "title"
             info["title"] = info["name"]
             del info["name"]
@@ -632,11 +653,12 @@ def load_studio_contents():
             # add upvote_count, downvote_count to '-'
             info["upvote_count"], info["downvote_count"] = '-', '-'
 
-            if not is_create:
+            if item.admin_uid != uid:
                 # fill manage link to null
                 info["manage_link"] = None
             else:
                 info["manage_link"] = url_for("create_or_modify_channel", cid=item.cid)
+            info["view_link"] = url_for("view_channel", cid=item.cid)
             out.append(info)
     return jsonify(out)
 
