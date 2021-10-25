@@ -31,7 +31,7 @@ DEBUG_MODE = True
 # link to default user profile background
 DEFAULT_PROFILE_BACKGROUND_LINK = "profile_background/default_background.jpg"
 # link to default user avatar
-DEFAULT_USER_AVATAR_LINK = "avatar/ashley_gibbons.png"
+DEFAULT_USER_AVATAR_LINK = "avatar/1.png"
 # link to default channel avatar
 DEFAULT_CHANNEL_AVATAR_LINK = "channel_avatar/logo_icon.png"
 
@@ -183,6 +183,10 @@ def modify_user_teaching_areas(uid, conn, modification: Modification,
                               is_public=is_public, grade=grade).one_or_none()
                 if teaching_area:
                     conn.delete(teaching_area)
+
+def get_user_teaching_areas(uid:int):
+    with Session() as conn:
+        return conn.query(UserTeachingAreas).filter_by(uid=uid).all()
 
 
 def modify_user(uid: int, username=None, password=None, email=None,
@@ -1794,3 +1798,14 @@ def get_channel_post_comments(post_id: int):
             warnings.warn("The post id is invalid")
             return ErrorCode.INVALID_POST
         return conn.query(PostComment).filter_by(post_id=post_id).all()
+
+def get_channel_post(cid: int):
+    """
+    Returns a list of all posts on a channel
+
+    :param post_id: The id of the post
+    :return If the post_id is valid, a list of post comments are returned
+            ErrorCode.INVALID_POST if post_id is invalid
+    """
+    with Session() as conn:
+        return conn.query(ChannelPost).filter_by(cid=cid).all()
