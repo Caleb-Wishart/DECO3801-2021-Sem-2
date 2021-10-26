@@ -13,9 +13,9 @@ from sqlalchemy.orm import sessionmaker
 from werkzeug.security import generate_password_hash
 import random
 # use this in branch
-from .DBStructure import *
+# from .DBStructure import *
 # use this in main
-# from DBStructure import *
+from DBStructure import *
 
 # define if you want method output messages for debugging
 VERBOSE = False
@@ -25,7 +25,7 @@ VERBOSE = False
 # on the contrary, when DB is not in this mode, any operations within the transaction
 # that causes commit error will be roll-backed. Error message will be shown as
 # a warning on screen
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 # link to default user profile background
 DEFAULT_PROFILE_BACKGROUND_LINK = "profile_background/default_background.jpg"
@@ -178,8 +178,8 @@ def modify_user_teaching_areas(uid, conn, modification: Modification,
                               is_public=is_public, grade=grade).one_or_none()
                 if teaching_area is None:
                     new_teach_area = UserTeachingAreas(uid=uid, teaching_area=area,
-                                                    is_public=is_public, grade=grade)
-                    warnings.warn("Added new teaching area: "  + area.name)
+                                                       is_public=is_public, grade=grade)
+                    warnings.warn("Added new teaching area: " + area.name)
                     conn.add(new_teach_area)
             else:
                 # delete user teaching areas
@@ -189,7 +189,8 @@ def modify_user_teaching_areas(uid, conn, modification: Modification,
                 if teaching_area:
                     conn.delete(teaching_area)
 
-def get_user_teaching_areas(uid:int):
+
+def get_user_teaching_areas(uid: int):
     with Session() as conn:
         return conn.query(UserTeachingAreas).filter_by(uid=uid).all()
 
@@ -610,10 +611,9 @@ def modify_resource(rid: int, title=None, resource_link=None,
 
         if resource_thumbnail_links:
             thumbnails = conn.query(ResourceThumbnail).filter(
-                ResourceThumbnail.rid == rid,
-                ResourceThumbnail.thumbnail_link.in_(resource_thumbnail_links))
+                ResourceThumbnail.rid == rid)
             deleted_thumbnails = set()
-            for i in thumbnails:
+            for i in thumbnails.all():
                 deleted_thumbnails.add(i.thumbnail_link)
                 conn.delete(i)
             new_thumbnails = list(set(
@@ -625,11 +625,6 @@ def modify_resource(rid: int, title=None, resource_link=None,
 
         # commit before making changes to resource access
         conn.add(resource)
-
-        # test: here fake unique constraint violation
-        # test = conn.query(Resource).filter_by(rid=2).first()
-        # test.title = "Temp title"
-        # conn.add(test)
 
         if not try_to_commit(conn):
             warnings.warn("Error committing")
@@ -718,7 +713,7 @@ def get_resource_author(rid):
         authors = []
         for uid in uids:
             authors.append(conn.query(User).filter_by(uid=uid).one_or_none())
-        return list(filter(lambda x: x is not None,authors))
+        return list(filter(lambda x: x is not None, authors))
 
 
 def get_resource_tags(rid):
@@ -833,11 +828,13 @@ def find_resources(title_type="like", title=None,
             elif sort_by == "upvotes":
                 resources = resources.order_by(Resource.upvote_count.desc())
 
-        if user is None:
+        if user is None and email != 'demo':
             resources = resources.filter_by(is_public=True)
             result = resources.all()
-        else:
+        elif email != 'demo':
             result = filter(lambda res: user_has_access_to_resource(user.uid, res.rid), resources.all())
+        else:
+            result = resources.all()
 
         for tag in tags:
             warnings.warn(f"Searching for tag {tag}")
@@ -908,12 +905,14 @@ def find_channels(title_type="like", channel_name=None,
             channels = channels.filter_by(subject=subject)
         if grade:
             channels = channels.filter_by(grade=grade)
-        if is_public:
-            channels = channels.filter_by(visibility=ChannelVisibility.PUBLIC)
-        else:
-            channels = channels.filter(
-                or_(Channel.visibility == ChannelVisibility.FULLY_PRIVATE,
-                    Channel.visibility == ChannelVisibility.INVITE_ONLY))
+
+        if not admin_uid:
+            if is_public:
+                channels = channels.filter_by(visibility=ChannelVisibility.PUBLIC)
+            else:
+                channels = channels.filter(
+                    or_(Channel.visibility == ChannelVisibility.FULLY_PRIVATE,
+                        Channel.visibility == ChannelVisibility.INVITE_ONLY))
 
         if channel_name:
             if title_type == "like":
@@ -922,7 +921,7 @@ def find_channels(title_type="like", channel_name=None,
                 # exact match
                 channels = channels.filter_by(name=channel_name)
 
-        if caller_uid:
+        if caller_uid and caller_uid != -2:
             # find all private channels this caller has access to
             personnel = conn.query(ChannelPersonnel).filter_by(uid=caller_uid).all()
             accessible = set()
@@ -1493,16 +1492,6 @@ def modify_channel(cid: int, name=None, visibility: ChannelVisibility = None,
             for i in personnel_ids:
                 modify_channel_personnel(uid=i, cid=cid, modification=Modification.MODIFY_ADD)
 
-            # if ids_to_add_to_personnel:
-            #     for i in ids_to_add_to_personnel:
-            #         personnel = ChannelPersonnel(cid=cid, uid=i)
-            #         conn.add(personnel)
-            # if ids_to_delete_from_personnel:
-            #     for i in ids_to_delete_from_personnel:
-            #         personnel = conn.query(ChannelPersonnel). \
-            #             filter_by(cid=cid, uid=i).one_or_none()
-            #         if personnel:
-            #             conn.delete(personnel)
         if not try_to_commit(conn):
             warnings.warn("Error committing")
             return ErrorCode.COMMIT_ERROR
@@ -1811,15 +1800,16 @@ def get_channel_post_comments(post_id: int):
         if not post:
             warnings.warn("The post id is invalid")
             return ErrorCode.INVALID_POST
-        return conn.query(PostComment).filter_by(post_id=post_id).\
+        return conn.query(PostComment).filter_by(post_id=post_id). \
             order_by(PostComment.created_at.asc()).all()
+
 
 def get_channel_post(cid: int):
     """
     Returns a list of all posts on a channel
 
-    :param post_id: The id of the post
-    :return If the post_id is valid, a list of post comments are returned
+    :param cid: The id of the channel
+    :return If the cid is valid, a list of posts belong to that channel are returned
             ErrorCode.INVALID_POST if post_id is invalid
     """
     with Session() as conn:

@@ -66,7 +66,7 @@
      <% _.each(data,  function(res) { %>
         <!-- Resource card -->
         <div class="col-4 p-2">
-            <a class="box" style="height: 365px; width: 290px; overflow: hidden" href="{{url_for('resource')}}/<%= res.rid %>">
+            <a class="box" style="height: 355px; width: 290px; overflow: hidden" href="{{url_for('resource')}}/<%= res.rid %>">
                 <img class="bd-placeholder-img card-img-top" src="{{url_for('static', filename='')}}/<%= res.banner.thumbnail_link %>" ,
                     alt="Logo" , style="max-height: 200px; width: 100%">
                 <div class="card-body" style="border-top: 2px solid #e5e5e5;">
@@ -370,7 +370,7 @@
                             <label for="{{item}}_input" id="{{item}}_label">{{enum_to_website_output(item)}}</label>
                         </span>
                         {% endfor %}
-                    <p class="h6" style="margin-top: 1rem!important; margin-bottom: 0.5rem!important;">Tags</p>
+                    <p class="h6" style="margin-top: 1rem!important; margin-bottom: 0.5rem!important;">Resource Tags</p>
                         {% for item in tags %}
                         <span class="badge rounded-pill bg-other-tag tagSearchSpan" title="{{item}}_search" hidden>
                             <input type="checkbox" hidden id="{{item}}_input" name="{{item}}" value="{{item}}"

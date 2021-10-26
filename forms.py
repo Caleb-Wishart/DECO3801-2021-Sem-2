@@ -1,4 +1,9 @@
-"""Forms for the application."""
+############################################################################
+# Configuration of flask forms for the application.
+#
+#
+# works of OfficialTeamName (con'd). All rights reserved.
+###########################################################################
 from flask_wtf import FlaskForm
 from wtforms import TextField, PasswordField, TextAreaField, FileField
 from wtforms.validators import DataRequired
@@ -25,6 +30,3 @@ class ResourceForm(FlaskForm):
     files = FileField('File')
     resource_url = TextAreaField("resource_url")
     thumbnail = FileField('File', validators=[DataRequired()])
-    # thumbnail
-    # tags field
-    # privacy

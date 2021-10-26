@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block style %}
 <style>
+/* Styling for channel cards to give a dropshadow and animation on hover*/
 .box {
   position: relative;
     border-radius: 5px;
@@ -69,13 +70,9 @@
                 <div class = "row" style = "padding-top: 0.25rem!important;">
                     <!-- Upvotes -->
                     <div class = "col-1" style="padding-left: 0rem!important"> <%= res.upvote_count %>
-                        {#<img class="rounded img-fluid" src="{{url_for('static', filename='img/UpvotePink.PNG')}}" ,
-                             alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">#}
-                        <svg xmlns="http://www.w3.org/2000/svg"  width="17" height="17" fill="#2e9cfa" class="bi bi-arrow-up-circle-fill" viewBox="0 0 16 16" style="margin-bottom: 2px!important; margin-left: 2px!important"
-                             >
-                    <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"
-                    />
-                    </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg"  width="17" height="17" fill="#2e9cfa" class="bi bi-arrow-up-circle-fill" viewBox="0 0 16 16" style="margin-bottom: 2px!important; margin-left: 2px!important">
+                        <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
+                        </svg>
                     </div>
 
                     <!-- Downvotes -->
@@ -83,9 +80,8 @@
                         {#<img class="rounded img-fluid" src="{{url_for('static', filename='img/downvotepink.PNG')}}" ,
                              alt="Logo", width="20", style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">#}
                         <svg  xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="#ff4545" class="bi bi-arrow-down-circle-fill" viewBox="0 0 16 16" style="margin-bottom: 2px!important; margin-left: 2px!important">
-                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"
-                    />
-                    </svg>
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/>
+                        </svg>
                     </div>
                     <!-- Bottom information -->
                     <div class = "col" style = "padding-left: 0rem!important; font-size: small; margin-top: 0.2rem!important;">
@@ -106,33 +102,21 @@
                     <!-- Number of comments on a post -->
                     <div class = "col-3">
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="#1c42c2" class="bi bi-chat-left-dots-fill" viewBox="0 0 16 16" style="margin:2px!important; margin-left:2px!important; margin-right: 2px!important;">
-  <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4.414a1 1 0 0 0-.707.293L.854 15.146A.5.5 0 0 1 0 14.793V2zm5 4a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-</svg>
-
+                            <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4.414a1 1 0 0 0-.707.293L.854 15.146A.5.5 0 0 1 0 14.793V2zm5 4a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                        </svg>
                     </div>
                     <div class = "col" style = "padding: 0rem">
                         <div class = "fw-normal" style = "font-size: small; margin-top: 0px!important;"> <%= res.comment_count %> Comments</div>
                     </div>
                 </div>
-
             </div>
-
         </a>
     </div>
     <% }); %>
 </script>
 
-{#    <!-- Template for a tag inside of the banner -->
-<script type="text/template" id="tag_in_banner">
-    <% _.each(data,  function(res) { %>
-        <span class="badge rounded-pill bg-primary" style="width: auto;
-                                    margin-right: 1rem!important; margin-left: 1rem!important;"> <%= res.tag_name %> </span>
-    <% }); %>
-</script>#}
-
-
 <script>
-    // DROPDOWN
+    // Handles dropdown menu
     $(function () {
 
         $(".dropdown-menu a").click(function () {
@@ -227,7 +211,7 @@
                 <div class="row">
                     <dt class="col-sm-9" style = "font-size: x-large; padding-bottom: 0.25rem!important;">{{ channel.name }}</dt>
 
-                     <!-- NOTE: IF THE USER IS NOT THE ADMIN, THIS SECTION OF HTML IS DELETED -->
+                     <!-- NOTE: IF THE USER IS NOT THE ADMIN, THIS SECTION OF HTML IS DELETED (Edit channel button)-->
                     {% if is_admin %}
                         <div class="col-3" style="padding-right: 6px!important;">
                             <div class = "d-flex flex-row-reverse" >
@@ -306,7 +290,6 @@
         <div class="col d-flex justify-content-md-between">
             <!-- Title that says Posts -->
                 <div class="h3" style = "margin-right:auto; margin-top: auto">Posts
-
                 </div>
                 <div class="d-flex">
                      <!-- Sort by -->
@@ -321,9 +304,6 @@
                             <option class="dropdown-item"  style="background-color: white" value="trending">Trending</option>
                         </select>
                     </div>
-
-
-
                 </div>
 
         </div>

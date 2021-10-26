@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block style %}
 <style>
+/* Styling for channel cards to give a dropshadow and animation on hover*/
 .box {
   position: relative;
     border-radius: 5px;
@@ -41,7 +42,7 @@
 
 {% block script %}
 
-    <!-- Template for a channel card -->
+    <!-- Template for a individual channel card -->
 <script type="text/template" id="channel_card">
     <% _.each(data,  function(res) { %>
         <!-- Create the channel card with a shadow -->
@@ -124,7 +125,7 @@
 </script>
 
 <script>
-    // DROPDOWN
+    // Handles dropdown menu
     $(function () {
 
         $(".dropdown-menu a").click(function () {
@@ -448,7 +449,7 @@
 
                 <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
                 <label class="btn btn-outline-primary shadow" for="btnradio2">
-                    <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important;">My Channels</dd>
+                    <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important;">Private Channels</dd>
                 </label>
             </div>
             <div class="d-flex">
@@ -479,7 +480,7 @@
                     </div>
                     <div class="row-3" id="found_tags">
                     <hr>
-                    <p class="h6" style="margin-top: 1rem!important; margin-bottom: 0.5rem!important;">Tags</p>
+                    <p class="h6" style="margin-top: 1rem!important; margin-bottom: 0.5rem!important;">Channel Tags</p>
                         {% for item in subjects %}
                         <span class="badge rounded-pill bg-subject-tag tagSearchSpan" title="{{item}}_search" hidden>
                             <input type="checkbox" hidden id="{{item}}_input" name="{{item}}" value="{{item}}"
@@ -506,7 +507,7 @@
                     </div>
                     <!-- Selected Tags -->
                     <div class="row-3">
-                        <div class="h4">Applied Tags</div>
+                        <div class="h5">Applied Tags</div>
                         {% for item in subjects %}
                         <span class="badge rounded-pill bg-subject-tag tagFoundSpan" title="{{item}}_selected" hidden>
                             <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"

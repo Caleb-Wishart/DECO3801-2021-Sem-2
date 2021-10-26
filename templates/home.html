@@ -1,13 +1,46 @@
-
 {% extends 'base.html' %}
 {% block style %}
+    <style>
+    /* Styling for home cards to give a dropshadow and animation on hover*/
+        .card {
+            position: relative;
+            border-radius: 5px;
+            border: 1px solid rgba(0,0,0,.125);
+            display: inline-block;
+            background-color: #fff;
+            -webkit-transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .card::after {
+            content: "";
+            border-radius: 5px;
+            position: absolute;
+            z-index: -1;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            -webkit-transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .card:hover {
+            -webkit-transform: scale(1.025, 1.025);
+            transform: scale(1.025, 1.025);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .card:hover::after {
+            opacity: 1;
+        }
 
+
+    </style>
 {% endblock %}
 
 {% block script %}
-
-<script type="text/template" id="resource_home_card">
-    <% _.each(data,  function(res) { %>
+    <script type="text/template" id="resource_home_card">
+        <% _.each(data,  function(res) { %>
         <!-- Resource Home Card-->
         <a class="row" href="{{url_for('resource')}}/<%= res.rid %>">
             <div class="card flex-fill" style="margin-right: 4.5rem!important; margin-left: 12px!important; margin-bottom: 1rem!important;">
@@ -20,15 +53,14 @@
                              alt="Logo" style="width:95%; max-height: 150px; margin:10px">
 
                     </div>
-
                     <!-- Top Section Right Col-->
                     <div class="col" style="margin-top: 10px">
                         <dt class="h5">
-                             Resource:
+                            Resource:
                         </dt>
                         <!-- Title-->
                         <dt class="h5">
-                             <%= res.title %>
+                            <%= res.title %>
                         </dt>
                         <!-- Author-->
                         <dt class="h6" style="display:inline">
@@ -48,30 +80,30 @@
                 <!-- Bottom Section-->
                 <div class="row">
                     <div class="col">
-                        <div class="d-flex" style="margin-left: 10px; margin-right: 10px">
-                            {# <!--Views-->
-                           <p class="card-text px-1" style="margin-bottom: 0.5rem!important">
-                                Views: 5000
-                            </p> #}
-                            <!-- Upvotes and Downvotes-->
-                            <p class="card-text px-1" style="margin-bottom: 0.5rem!important">
+                        <div class="d-flex" style = "margin-left: 0.5rem!important;">
+                            <p class="card-text px-1" >
                                 <%= res.upvote_count %>
                             </p>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="pink" class="bi bi-arrow-up-circle-fill" style="margin-top: 4px" xviewBox="0 0 16 16">
-                                    <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
+                            <!--Downvotes-->
+                            <svg xmlns="http://www.w3.org/2000/svg"  width="17" height="17" fill="#2e9cfa" class="bi bi-arrow-up-circle-fill" viewBox="0 0 16 16" style="margin-top: 4px!important; margin-left: 3px!important"
+                            >
+                                <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"
+                                />
                             </svg>
-                            <p class="card-text px-1" style="margin-bottom: 0.5rem!important">
+                            <p class="card-text px-1" style="margin-left: 4px!important;">
                                 <%= res.downvote_count %>
                             </p>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="pink" class="bi bi-arrow-up-circle-fill" style="margin-top: 4px" xviewBox="0 0 16 16">
-                                <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
+                            <svg  xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="#ff4545" class="bi bi-arrow-down-circle-fill" viewBox="0 0 16 16" style="margin-top: 4px!important; margin-left: 3px!important">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"
+                                />
                             </svg>
+
                         </div>
                         <!-- Subject and Grade-->
-                        <dt class="h6 px-1" style="margin-left: 10px">
+                        <dt class="h6 px-1" style="margin-left: 10px; text-transform: capitalize">
                             Subject: <%= res.subject.replace(/_/g, ' ') %>
                         </dt>
-                        <dt class="h6 px-1" style="margin-left: 10px">
+                        <dt class="h6 px-1" style="margin-left: 10px; text-transform: capitalize">
                             Year Level: <%= res.grade.replace(/_/g, ' ') %>
                         </dt>
                     </div>
@@ -80,25 +112,24 @@
                         <dt class="h6">
                             Tags
                         </dt>
-                            <!-- Tags -->
-                            <% _.each(res.tags,  function(tag) { %>
-                            <span class="badge rounded-pill bg-primary" style="width: auto;
+                        <!-- Tags -->
+                        <% _.each(res.tags,  function(tag) { %>
+                        <span class="badge rounded-pill bg-primary" style="width: auto;
                            margin-right: 0.25rem!important; margin-bottom: 0.25rem!important;">
                                 <%= tag.replace(/_/g, ' ') %>
                             </span>
-                            <% }); %>
+                        <% }); %>
                     </div>
                 </div>
             </div>
 
         </a>
-    <% }); %>
-</script>
+        <% }); %>
+    </script>
 
-<script type="text/template" id="channel_home_card">
-    <% _.each(data,  function(res) { %>
+    <script type="text/template" id="channel_home_card">
+        <% _.each(data,  function(res) { %>
         <!-- Channel Home Card-->
-
         <a class="row" href="{{url_for('view_channel')}}/<%= res.cid %>">
             <div class="card flex-fill" style="margin-right: 4.5rem!important; margin-left: 12px!important; margin-bottom: 1rem!important;">
                 <!-- Top section-->
@@ -108,16 +139,13 @@
                         <!-- Thumbnail-->
                         <img class="bd-placeholder-img card-img-top" src="{{url_for('static', filename='')}}/<%= res.avatar_link %>" ,
                              alt="Logo" style="width:95%; max-height: 150px; margin:10px">
-
-
                     </div>
-
                     <!-- Top section Right Col-->
                     <div class="col" style="margin-top: 10px">
                         <dt class="h5">
-                             Channel:
+                            Channel:
                         </dt>
-                         <!-- Title-->
+                        <!-- Title-->
                         <dt class="h5">
                             <%= res.name %>
                         </dt>
@@ -133,28 +161,26 @@
                             text-overflow:ellipsis;max-width: 400px; margin-top: 1rem!important;">
                                 <%= res.description %></span>
                         </div>
-
-
                     </div>
                 </div>
                 <!-- Bottom section-->
                 <div class="row">
                     <!-- Bottom section left col-->
                     <div class="col">
-                         <div class="d-flex" style="margin-left: 10px; margin-right: 10px">
-                             <!-- Number of posts-->
-                           <p class="card-text px-1" style="margin-bottom: 0.5rem!important">
+                        <div class="d-flex" style="margin-left: 10px; margin-right: 10px">
+                            <!-- Number of posts-->
+                            <p class="card-text px-1" style="margin-bottom: 0.5rem!important">
                                 Number of Posts: <%= res.posts %>
                             </p>
+
                         </div>
                         <!-- Subject and year level if given-->
-                        <dt class="h6 px-1" style="margin-left: 10px">
+                        <dt class="h6 px-1" style="margin-left: 10px; text-transform: capitalize">
                             Subject: <%= res.subject.replace(/_/g, ' ') %>
                         </dt>
-                        <dt class="h6 px-1" style="margin-left: 10px">
+                        <dt class="h6 px-1" style="margin-left: 10px; text-transform: capitalize">
                             Year Level: <%= res.grade.replace(/_/g, ' ') %>
                         </dt>
-
                     </div>
                     <!-- Bottom section right col-->
                     <div class="col">
@@ -175,49 +201,46 @@
                            margin-right: 0.25rem!important; margin-bottom: 0.25rem!important;">
                             <%= tag.replace(/_/g, ' ') %>
                         </span>
-                         <% }); %>
+                        <% }); %>
                     </div>
                 </div>
-
             </div>
-
         </a>
-    <% }); %>
-</script>
+        <% }); %>
+    </script>
 
-
-<script>
-function doAJAX() {
-        $.ajax(
-            {
-                type: "GET",
-                url: "{{url_for('homeAJAX')}}",
-                data: {},
-                success: function (response) {
-                    $("#result").empty(); // remove current results
-                    var resource_card = _.template($("#resource_home_card").html());
-                    var channel_card = _.template($("#channel_home_card").html());
-                    $("#result").html(resource_card({ data: response.resources })); // set new results
-                    $("#result").append(channel_card({ data: response.channels })); // set new results
-                    if (response.length == 0) {
-                        $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
+    <script>
+        function doAJAX() {
+            $.ajax(
+                {
+                    type: "GET",
+                    url: "{{url_for('homeAJAX')}}",
+                    data: {},
+                    success: function (response) {
+                        $("#result").empty(); // remove current results
+                        var resource_card = _.template($("#resource_home_card").html());
+                        var channel_card = _.template($("#channel_home_card").html());
+                        $("#result").html(resource_card({ data: response.resources })); // set new results
+                        $("#result").append(channel_card({ data: response.channels })); // set new results
+                        if (response.length == 0) {
+                            $("#result").html('<div></div><div class="text-center"><p class="h2 text-muted">No Results</p></div>');
+                        }
                     }
                 }
-            }
-        )
-    }
+            )
+        }
 
-    // Seed Document
-    $(document).ready(function () {
-        doAJAX();
-    });
-</script>
+        // Seed Document
+        $(document).ready(function () {
+            doAJAX();
+        });
+    </script>
 {% endblock %}
 
 {% block content %}
     <div class="container" style="padding: 50px">
         <div class="row">
-             <!-- Left Hand Column of Home Page-->
+            <!-- Left Hand Column of Home Page-->
             <div class="col">
                 <div class="h4" style="margin-bottom: 1rem!important;"> Welcome Back {{current_user.username}}</div>
                 <dd>
@@ -227,16 +250,14 @@ function doAJAX() {
 
                 <!-- Resource Card-->
                 <div class="row">
-                    <div class="card flex-fill" style="margin-right: 4.5rem!important; margin-left: 12px!important; margin-bottom: 1rem!important;"  id="result">
+                    <div  style="margin-right: 4.5rem!important; margin-left: 12px!important; margin-bottom: 1rem!important; margin-top: 1rem!important;"  id="result">
                     </div>
-
                 </div>
-
             </div>
 
-            <!-- Right hand Column of Home Page DONT DELETE BELOW HERE-->
+            <!-- Right hand Column of Home Page-->
             <div class="col-3">
-                 <!-- Notifications-->
+                <!-- Notifications-->
                 <div class="row">
                     <div class="dropdown float-end">
                         <button class="btn btn-primary dropdown-toggle float-end" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -253,24 +274,23 @@ function doAJAX() {
                                         </span>
                                         </div>
                                         <div class="col-1" style="margin-right: 1rem!important;">
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="$(this).closest('li').remove();$('#numspan').html(parseInt($('#numspan').html(), 10)-1);"></button>
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="$(this).closest('li').remove();$('#numspan').html(parseInt($('#numspan').html(), 10)-1);"></button>
                                         </div>
 
-                                        </div>
-                                    </a>
+                                    </div>
+                                </a>
                                 </li>
                             {%  endfor %}
 
                             <li><a class="dropdown-item">
-                                    <button class="d-flex justify-content-center" onclick="$('#numspan').text(0);$('.m-active').remove();">
-                                         Clear All Notifications
-                                    </button>
-                                </a>
+                                <button class="d-flex justify-content-center" onclick="$('#numspan').text(0);$('.m-active').remove();">
+                                    Clear All Notifications
+                                </button>
+                            </a>
                             </li>
-
                         </ul>
                     </div>
-	            </div>
+                </div>
                 <!-- Contribute to Community-->
                 <hr style="margin-top: 5rem!important; margin-bottom: 1rem!important;">
                 <div class="row">
@@ -282,9 +302,9 @@ function doAJAX() {
                 </div>
                 <div class="row">
                     <div class="d-flex justify-content-center">
-                         <a href="{{url_for('resource_new')}}" class="btn btn-primary d-md-block shadow" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
-                            <dd class="text-center font-weight-bold">Create New Resource</dd>
-                         </a>
+                        <a href="{{url_for('resource_new')}}" class="btn btn-primary d-md-block shadow" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
+                            <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important;">Create New Resource +</dd>
+                        </a>
                     </div>
                 </div>
 
@@ -296,9 +316,9 @@ function doAJAX() {
                 </div>
                 <div class="row">
                     <div class="d-flex justify-content-center">
-                         <a href="{{url_for('create_or_modify_channel')}}" class="btn btn-primary d-md-block shadow" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
-                            <dd class="text-center font-weight-bold">Create New Channel</dd>
-                         </a>
+                        <a href="{{url_for('create_or_modify_channel')}}" class="btn btn-primary d-md-block shadow" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
+                            <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important;">Create New Channel +</dd>
+                        </a>
                     </div>
                 </div>
                 <hr style="margin-top: 2rem!important; margin-bottom: 1rem!important;">
@@ -309,20 +329,16 @@ function doAJAX() {
                 <div class="row" style="padding-left: 12px; padding-right:12px">
                     {% for ta in teaching_areas %}
                         {% if ta.grade != None %}
-                        <span class="badge rounded-pill bg-primary" style="width: auto;
+                            <span class="badge rounded-pill bg-primary" style="width: auto;
                                     margin-right: 0.25rem!important; margin-bottom: 0.25rem!important;">{{enum_to_website_output(ta.grade.name)}}</span>
                         {% endif %}
                         {% if ta.teaching_area != None %}
-                        <span class="badge rounded-pill bg-primary" style="width: auto;
+                            <span class="badge rounded-pill bg-primary" style="width: auto;
                                     margin-right: 0.25rem!important; margin-bottom: 0.25rem!important;">{{enum_to_website_output(ta.teaching_area.name)}}</span>
                         {% endif %}
                     {% endfor %}
                 </div>
-
-
             </div>
-
         </div>
-
     </div>
 {% endblock %}
