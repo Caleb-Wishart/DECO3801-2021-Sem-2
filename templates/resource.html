@@ -66,9 +66,9 @@
      <% _.each(data,  function(res) { %>
         <!-- Resource card -->
         <div class="col-4 p-2">
-            <a class="box" style="height: 365px; overflow: hidden" href="{{url_for('resource')}}/<%= res.rid %>">
+            <a class="box" style="height: 365px; width: 290px; overflow: hidden" href="{{url_for('resource')}}/<%= res.rid %>">
                 <img class="bd-placeholder-img card-img-top" src="{{url_for('static', filename='')}}/<%= res.banner.thumbnail_link %>" ,
-                    alt="Logo" , width="150" , height="150">
+                    alt="Logo" , style="max-height: 200px; width: 100%">
                 <div class="card-body" style="border-top: 2px solid #e5e5e5;">
                     <!--Resource title-->
                     <p class="card-text" style="max-height: 50px; overflow: hidden">

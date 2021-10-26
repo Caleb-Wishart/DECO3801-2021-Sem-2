@@ -26,6 +26,7 @@ from forms import LoginForm, RegisterForm, ResourceForm
 
 # -----{ INIT }----------------------------------------------------------------
 DEBUG = True
+DEMO = True
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -50,6 +51,20 @@ class Anonymous(AnonymousUserMixin):
     def __init__(self):
         self.uid = -1
         self.username = "Guest User"
+        self.email = None
+        self.authenticated = False
+        self.avatar_link = "img/placeholder.png"
+        # profile background link
+        self.profile_background_link = "img/placeholder.png"
+        # user account created time
+        self.created_at = datetime.datetime.now(
+            tz=pytz.timezone("Australia/Brisbane"))
+        # user hash_password -- sha256 encoded
+        self.hash_password = ""
+        # user honor rating
+        self.user_rating = 0
+        # user bio
+        self.bio = ""
 
     def __str__(self):
         return f"Anonymous User: uid = {self.uid}"
@@ -57,6 +72,65 @@ class Anonymous(AnonymousUserMixin):
     def __repr__(self):
         return __str__(self)
 
+if DEMO:
+    class DemoUser(AnonymousUserMixin):
+        def __init__(self):
+            self.uid = -2
+            self.username = "Demo User"
+            self.email = "demo"
+            self.authenticated = True
+            self.avatar_link = "img/placeholder.png"
+            # profile background link
+            self.profile_background_link = "img/placeholder.png"
+            # user account created time
+            self.created_at = datetime.datetime.now(
+                tz=pytz.timezone("Australia/Brisbane"))
+            # user hash_password -- sha256 encoded
+            self.hash_password = "demo"
+            # user honor rating
+            self.user_rating = 0
+            # user bio
+            self.bio = "Demo User"
+
+        def __str__(self):
+            return f"Demo User: uid = {self.uid}"
+
+        def __repr__(self):
+            return __str__(self)
+
+        @property
+        def is_active(self):
+            """True, as all users are active."""
+            return True
+
+        def get_id(self):
+            """Return the email address to satisfy Flask-Login's requirements."""
+            return self.email
+
+        @property
+        def is_authenticated(self):
+            """Return True if the user is authenticated."""
+            return self.authenticated
+
+        @property
+        def is_anonymous(self):
+            """False, as anonymous users aren't supported."""
+            return False
+
+        @property
+        def serialize(self):
+            """Return object data in serialisable format """
+            return {
+                "uid": self.uid,
+                "username": self.username,
+                "authenticated": self.authenticated,
+                "avatar_link": self.avatar_link,
+                "profile_background_link": self.profile_background_link,
+                "created_at": dump_datetime(self.created_at),
+                "email": self.email,
+                "bio": self.bio,
+                "user_rating": str(round(self.user_rating, 1))
+            }
 
 login_manager.anonymous_user = Anonymous
 
@@ -66,6 +140,9 @@ def load_user(user_id):
     """
         :param unicode user_id: user_id (email) user to retrieve
     """
+    if DEMO:
+        if user_id == "demo":
+            return DemoUser()
     return get_user(user_id)
 
 
@@ -73,7 +150,7 @@ def load_user(user_id):
 #
 # This section contains the different landing pages for the web page
 #
-# -----{ PAGES.MAIN }----------------------------------------------------------
+# -----{ PAGES.HOME }----------------------------------------------------------
 @app.route('/')
 def index():
     """The index root directory of this website
@@ -90,7 +167,72 @@ def home():
 
     Also the end point of the search function where the search is a get method
     """
-    return render_template('home.html', title='Home')
+    areas = get_user_teaching_areas(current_user.uid)
+    areas = areas if areas is not None else []
+    messages = ["Richard Fritz responded to your channel comment",
+                "Scott Wilson responded to your resource comment",
+                "Amanda Moore responded to your channel comment",
+                "Amanda Moore liked your resource",
+                "Richard Fritz commented on your resource",
+                "Richard Fritz commented to your resource"]
+    return render_template('home.html', title='Home',teaching_areas=areas,messages=messages)
+
+@app.route('/AJAX/homeAJAX')
+def homeAJAX():
+    """The endpoint for the AJAX search for resources using a get request
+    returns it in json format
+    """
+    areas = get_user_teaching_areas(current_user.uid)
+    grades = [ta.grade for ta in areas if ta.grade != None]
+    subjects = [ta.teaching_area for ta in areas if ta.teaching_area != None]
+
+    resources = [dict(r.serialize,author=get_resource_author(r.rid)[0].serialize, tags=get_resource_tags(r.rid),banner=get_resource_thumbnail(r.rid).serialize if get_resource_thumbnail(r.rid) != ErrorCode.INVALID_RESOURCE else {'thumbnail_link' : 'img/placeholder.png'}) for l in [find_resources(email=current_user.email,grade=g) for g in grades] for r in l]
+    resources += [dict(r.serialize,author=get_resource_author(r.rid)[0].serialize,tags=get_resource_tags(r.rid),banner=get_resource_thumbnail(r.rid).serialize if get_resource_thumbnail(r.rid) != ErrorCode.INVALID_RESOURCE else {'thumbnail_link' : 'img/placeholder.png'}) for l in [find_resources(email=current_user.email,subject=s) for s in subjects] for r in l]
+    a = []
+    b = []
+    for r in resources:
+        if r['rid'] not in b:
+            a.append(r)
+            b.append(r['rid'])
+    resources = a
+    if len(resources) < 3:
+        rec = [dict(r.serialize,author=get_resource_author(r.rid)[0].serialize,tags=get_resource_tags(r.rid),banner=get_resource_thumbnail(r.rid).serialize if get_resource_thumbnail(r.rid) != ErrorCode.INVALID_RESOURCE else {'thumbnail_link' : 'img/placeholder.png'}) for r in find_resources()]
+        while(len(resources) != 3):
+            random.shuffle(rec)
+            if rec[0]['cid'] in b:
+                continue
+            resources += [rec[0]]
+            b.append(cen[0]['cid'])
+
+    elif len(resources) > 3:
+        resources = resources[:3]
+
+    channels = []
+    channels = [dict(r.serialize,admin=get_user_and_resource_instance(r.admin_uid,-1)[0].serialize,posts=len(get_channel_post(r.cid))) for l in [find_channels(caller_uid=current_user.uid,grade=g) for g in grades] for r in l]
+    channels += [dict(r.serialize,admin=get_user_and_resource_instance(r.admin_uid,-1)[0].serialize,posts=len(get_channel_post(r.cid))) for l in [find_channels(caller_uid=current_user.uid,subject=s) for s in subjects] for r in l]
+    a = []
+    b = []
+    for r in channels:
+        if r['cid'] not in b:
+            a.append(r)
+            b.append(r['cid'])
+    channels = a
+    if len(channels) < 2:
+        cen = [dict(r.serialize,admin=get_user_and_resource_instance(r.admin_uid,-1)[0].serialize,posts=len(get_channel_post(r.cid))) for r in find_channels()]
+        while(len(channels) != 2):
+            random.shuffle(cen)
+            if cen[0]['cid'] in b:
+                continue
+            channels += [cen[0]]
+            b.append(cen[0]['cid'])
+    elif len(channels) > 2:
+        channels = channels[:2]
+    results = {
+        "resources":resources,
+        "channels":channels
+    }
+
+    return jsonify(results)
 
 
 # -----{ PAGES.LOGIN }---------------------------------------------------------
@@ -107,6 +249,13 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         email = form.email.data
+        if DEMO:
+            if email == "demo" and form.password.data == "demo":
+                login_user(DemoUser(),remember=False)
+                if 'next' in request.args:
+                    return redirect(request.args.get("next"))
+                return redirect(url_for('home'))
+
         if email:
             user = get_user(email)
             if user != ErrorCode.INVALID_USER and check_password_hash(user.hash_password, form.password.data):
@@ -218,7 +367,7 @@ def resource(rid=None):
     if res is None:
         abort(404, description="The requested resource does not exist")
     # user has access to resource
-    if not is_resource_public(rid=rid) and (user is None or not user_has_access_to_resource(uid=uid, rid=rid)):
+    if not is_resource_public(rid=rid) and (user is None or not user_has_access_to_resource(uid=uid, rid=rid)) and uid != -2:
         abort(403,
               description=f"You ({current_user.username}) do not have permission to access the resource : {res.title}" + "\nIf you think this is incorrect contact the resource owner")
 
@@ -443,11 +592,7 @@ def resourceAJAX():
         year = None
     if title == '':
         title = None
-    return jsonify([dict(i.serialize, tags=get_resource_tags(i.rid),
-                         banner=get_resource_thumbnail(i.rid).serialize if get_resource_thumbnail(
-                             i.rid) != ErrorCode.INVALID_RESOURCE else {'thumbnail_link': 'img/placeholder.png'}) for i
-                    in find_resources(title=title, subject=subject, grade=year, tags=tags, sort_by=sort)])
-
+    return jsonify([dict(i.serialize,tags=get_resource_tags(i.rid),banner=get_resource_thumbnail(i.rid).serialize if get_resource_thumbnail(i.rid) != ErrorCode.INVALID_RESOURCE else {'thumbnail_link' : 'img/placeholder.png'}) for i in find_resources(title=title,subject=subject,grade=year,tags=tags,sort_by=sort,email=current_user.email)])
 
 @app.route('/AJAX/resourceVote')
 def resourceVote():
@@ -532,8 +677,6 @@ def profile():
     this can be used to view your own profiles.
     Specified with the GET request
     """
-    teaching_areas = []
-
     # get hold number
     user_rating_whole = int(current_user.user_rating)
     # get if a user's honor rating is greater than int.5
@@ -541,14 +684,8 @@ def profile():
     # empty stars
     user_rating_unchecked = 5 - user_rating_whole - user_rating_half
 
-    with Session() as conn:
-        for area in conn.query(UserTeachingAreas). \
-                filter_by(uid=current_user.uid, is_public=True).all():
-            text = enum_to_website_output(area.teaching_area)
-        teaching_areas.append(text)
-
     return render_template('profile.html', title='Profile', user=current_user.serialize,
-                           teaching_areas=teaching_areas, rating_whole=user_rating_whole,
+                           teaching_areas=get_user_teaching_areas(current_user.uid), rating_whole=user_rating_whole,
                            rating_half=user_rating_half, rating_unchecked=user_rating_unchecked)
 
 
@@ -687,6 +824,14 @@ def settings():
         avatar, profile_background = \
             request.files.get("avatar"), request.files.get("profile_background")
 
+        subjects = [t for t in request.form if t == request.form.get(t)]
+        teaching_areas = {}
+        for s in subjects:
+            try:
+                teaching_areas[Subject[s.replace(' ', '_').upper()]] = [True]
+            except KeyError:
+                continue
+
         if not bio:
             bio = "NULL"
 
@@ -710,7 +855,8 @@ def settings():
         if isinstance(
                 modify_user(uid=current_user.uid, username=username,
                             password=new_password, bio=bio, avatar_link=avatar_path,
-                            profile_background_link=profile_background_path),
+                            profile_background_link=profile_background_path,
+                            teaching_areas_to_add=teaching_areas),
                 ErrorCode):
             # invalid action
             flash("Cannot modify user profile at this time, try later", "error")
@@ -860,6 +1006,8 @@ def create_or_modify_channel(cid=None):
 
         grade = website_input_to_enum(readable_string=grade, enum_class=Grade)
 
+        tags_id = [get_tags()[t] for t in request.form if t == request.form.get(t) and t in get_tags(t)]
+
         # convert personnel emails to personnel ids
         personnel_ids = []
         for i in personnel_emails:
@@ -872,7 +1020,8 @@ def create_or_modify_channel(cid=None):
             cid = create_channel(name=name, visibility=visibility,
                                  admin_uid=current_user.uid, subject=subject,
                                  grade=grade, description=description,
-                                 personnel_id=personnel_ids, avatar_link=thumbnail_path)
+                                 personnel_id=personnel_ids, avatar_link=thumbnail_path,
+                                 tags_id=tags_id)
             if isinstance(cid, ErrorCode):
                 flash("Cannot create channel at the moment")
                 return redirect(url_for("create_or_modify_channel"))
@@ -888,7 +1037,8 @@ def create_or_modify_channel(cid=None):
 
             modify_channel(cid=cid, name=name, visibility=visibility, admin_uid=current_user.uid,
                            subject=subject, grade=grade, description=description,
-                           personnel_ids=personnel_ids, avatar_link=thumbnail_path)
+                           personnel_ids=personnel_ids, avatar_link=thumbnail_path,
+                           tags_id=tags_id)
             flash("Channel edited")
         return redirect(url_for("view_channel", cid=cid))
 
@@ -952,13 +1102,18 @@ def search_channel():
     is_public = True if (is_public == 'true' or is_public is True) else False
     sort_by_date = True if request.args.get("sort_by_date") == "newest" else False
     uid = int(request.args.get("uid"))
+    tags = request.args.getlist('tags[]') if 'tags[]' in request.args else None
+    tags = list(filter(lambda x: x != '', tags)) if tags is not None else None
+    tags = [get_tags()[t] for t in tags if t in get_tags()] if tags is not None else None
+    subject = request.args.get('subject').upper() if 'subject' in request.args else None
+    year = request.args.get('year').upper() if 'year' in request.args else None
 
     out = []
 
     with Session() as conn:
         for i in find_channels(channel_name=name, is_public=is_public,
-                               sort_by_newest_date=sort_by_date):
-            if not user_has_access_to_channel(uid=uid, cid=i.cid):
+                               sort_by_newest_date=sort_by_date,tag_ids=tags,subject=subject,grade=year):
+            if uid != -2 and not user_has_access_to_channel(uid=uid, cid=i.cid):
                 # user does not have access to channel
                 continue
             info = i.serialize

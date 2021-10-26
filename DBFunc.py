@@ -30,7 +30,7 @@ DEBUG_MODE = True
 # link to default user profile background
 DEFAULT_PROFILE_BACKGROUND_LINK = "profile_background/default_background.jpg"
 # link to default user avatar
-DEFAULT_USER_AVATAR_LINK = "avatar/ashley_gibbons.png"
+DEFAULT_USER_AVATAR_LINK = "avatar/1.png"
 # link to default channel avatar
 DEFAULT_CHANNEL_AVATAR_LINK = "channel_avatar/logo_icon.png"
 
@@ -173,9 +173,14 @@ def modify_user_teaching_areas(uid, conn, modification: Modification,
         if isinstance(area, Subject):
             if modification == Modification.MODIFY_ADD:
                 # insert new user teaching areas
-                new_teach_area = UserTeachingAreas(uid=uid, teaching_area=area,
-                                                   is_public=is_public, grade=grade)
-                conn.add(new_teach_area)
+                teaching_area = conn.query(UserTeachingAreas). \
+                    filter_by(uid=uid, teaching_area=area,
+                              is_public=is_public, grade=grade).one_or_none()
+                if teaching_area is None:
+                    new_teach_area = UserTeachingAreas(uid=uid, teaching_area=area,
+                                                    is_public=is_public, grade=grade)
+                    warnings.warn("Added new teaching area: "  + area.name)
+                    conn.add(new_teach_area)
             else:
                 # delete user teaching areas
                 teaching_area = conn.query(UserTeachingAreas). \
@@ -183,6 +188,10 @@ def modify_user_teaching_areas(uid, conn, modification: Modification,
                               is_public=is_public, grade=grade).one_or_none()
                 if teaching_area:
                     conn.delete(teaching_area)
+
+def get_user_teaching_areas(uid:int):
+    with Session() as conn:
+        return conn.query(UserTeachingAreas).filter_by(uid=uid).all()
 
 
 def modify_user(uid: int, username=None, password=None, email=None,
@@ -824,11 +833,13 @@ def find_resources(title_type="like", title=None,
             elif sort_by == "upvotes":
                 resources = resources.order_by(Resource.upvote_count.desc())
 
-        if user is None:
+        if user is None and email != 'demo':
             resources = resources.filter_by(is_public=True)
             result = resources.all()
-        else:
+        elif email != 'demo':
             result = filter(lambda res: user_has_access_to_resource(user.uid, res.rid), resources.all())
+        else:
+            result = resources.all()
 
         for tag in tags:
             warnings.warn(f"Searching for tag {tag}")
@@ -913,7 +924,7 @@ def find_channels(title_type="like", channel_name=None,
                 # exact match
                 channels = channels.filter_by(name=channel_name)
 
-        if caller_uid:
+        if caller_uid != -2:
             # find all private channels this caller has access to
             personnel = conn.query(ChannelPersonnel).filter_by(uid=caller_uid).all()
             accessible = set()
@@ -1804,3 +1815,14 @@ def get_channel_post_comments(post_id: int):
             return ErrorCode.INVALID_POST
         return conn.query(PostComment).filter_by(post_id=post_id).\
             order_by(PostComment.created_at.asc()).all()
+
+def get_channel_post(cid: int):
+    """
+    Returns a list of all posts on a channel
+
+    :param post_id: The id of the post
+    :return If the post_id is valid, a list of post comments are returned
+            ErrorCode.INVALID_POST if post_id is invalid
+    """
+    with Session() as conn:
+        return conn.query(ChannelPost).filter_by(cid=cid).all()
