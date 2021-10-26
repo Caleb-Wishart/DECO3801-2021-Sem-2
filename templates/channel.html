@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block style %}
 <style>
+/* Styling for channel cards to give a dropshadow and animation on hover*/
 .box {
   position: relative;
     border-radius: 5px;
@@ -41,7 +42,7 @@
 
 {% block script %}
 
-    <!-- Template for a channel card -->
+    <!-- Template for a individual channel card -->
 <script type="text/template" id="channel_card">
     <% _.each(data,  function(res) { %>
         <!-- Create the channel card with a shadow -->
@@ -124,7 +125,7 @@
 </script>
 
 <script>
-    // DROPDOWN
+    // Handles dropdown menu
     $(function () {
 
         $(".dropdown-menu a").click(function () {
