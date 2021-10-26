@@ -1,5 +1,5 @@
 ###################################################################################
-# This script defines the backend functions that respond to all webpage requests.
+# This script defines the backend functions that respond to all webpage requests
 #
 #
 # works of OfficialTeamName (con'd). All rights reserved.
@@ -71,7 +71,6 @@ class Anonymous(AnonymousUserMixin):
 
     def __repr__(self):
         return __str__(self)
-
 
 if DEMO:
     class DemoUser(AnonymousUserMixin):
@@ -176,8 +175,7 @@ def home():
                 "Amanda Moore liked your resource",
                 "Richard Fritz commented on your resource",
                 "Richard Fritz commented to your resource"]
-    return render_template('home.html', title='Home', teaching_areas=areas, messages=messages)
-
+    return render_template('home.html', title='Home',teaching_areas=areas,messages=messages)
 
 @app.route('/AJAX/homeAJAX')
 def homeAJAX():
@@ -188,14 +186,8 @@ def homeAJAX():
     grades = [ta.grade for ta in areas if ta.grade != None]
     subjects = [ta.teaching_area for ta in areas if ta.teaching_area != None]
 
-    resources = [dict(r.serialize, author=get_resource_author(r.rid)[0].serialize, tags=get_resource_tags(r.rid),
-                      banner=get_resource_thumbnail(r.rid).serialize if get_resource_thumbnail(
-                          r.rid) != ErrorCode.INVALID_RESOURCE else {'thumbnail_link': 'img/placeholder.png'}) for l in
-                 [find_resources(email=current_user.email, grade=g) for g in grades] for r in l]
-    resources += [dict(r.serialize, author=get_resource_author(r.rid)[0].serialize, tags=get_resource_tags(r.rid),
-                       banner=get_resource_thumbnail(r.rid).serialize if get_resource_thumbnail(
-                           r.rid) != ErrorCode.INVALID_RESOURCE else {'thumbnail_link': 'img/placeholder.png'}) for l in
-                  [find_resources(email=current_user.email, subject=s) for s in subjects] for r in l]
+    resources = [dict(r.serialize,author=get_resource_author(r.rid)[0].serialize, tags=get_resource_tags(r.rid),banner=get_resource_thumbnail(r.rid).serialize if get_resource_thumbnail(r.rid) != ErrorCode.INVALID_RESOURCE else {'thumbnail_link' : 'img/placeholder.png'}) for l in [find_resources(email=current_user.email,grade=g) for g in grades] for r in l]
+    resources += [dict(r.serialize,author=get_resource_author(r.rid)[0].serialize,tags=get_resource_tags(r.rid),banner=get_resource_thumbnail(r.rid).serialize if get_resource_thumbnail(r.rid) != ErrorCode.INVALID_RESOURCE else {'thumbnail_link' : 'img/placeholder.png'}) for l in [find_resources(email=current_user.email,subject=s) for s in subjects] for r in l]
     a = []
     b = []
     for r in resources:
@@ -204,11 +196,8 @@ def homeAJAX():
             b.append(r['rid'])
     resources = a
     if len(resources) < 3:
-        rec = [dict(r.serialize, author=get_resource_author(r.rid)[0].serialize, tags=get_resource_tags(r.rid),
-                    banner=get_resource_thumbnail(r.rid).serialize if get_resource_thumbnail(
-                        r.rid) != ErrorCode.INVALID_RESOURCE else {'thumbnail_link': 'img/placeholder.png'}) for r in
-               find_resources()]
-        while len(resources) != 3:
+        rec = [dict(r.serialize,author=get_resource_author(r.rid)[0].serialize,tags=get_resource_tags(r.rid),banner=get_resource_thumbnail(r.rid).serialize if get_resource_thumbnail(r.rid) != ErrorCode.INVALID_RESOURCE else {'thumbnail_link' : 'img/placeholder.png'}) for r in find_resources()]
+        while(len(resources) != 3):
             random.shuffle(rec)
             if rec[0]['cid'] in b:
                 continue
@@ -219,12 +208,8 @@ def homeAJAX():
         resources = resources[:3]
 
     channels = []
-    channels = [dict(r.serialize, admin=get_user_and_resource_instance(r.admin_uid, -1)[0].serialize,
-                     posts=len(get_channel_post(r.cid))) for l in
-                [find_channels(caller_uid=current_user.uid, grade=g) for g in grades] for r in l]
-    channels += [dict(r.serialize, admin=get_user_and_resource_instance(r.admin_uid, -1)[0].serialize,
-                      posts=len(get_channel_post(r.cid))) for l in
-                 [find_channels(caller_uid=current_user.uid, subject=s) for s in subjects] for r in l]
+    channels = [dict(r.serialize,admin=get_user_and_resource_instance(r.admin_uid,-1)[0].serialize,posts=len(get_channel_post(r.cid))) for l in [find_channels(caller_uid=current_user.uid,grade=g) for g in grades] for r in l]
+    channels += [dict(r.serialize,admin=get_user_and_resource_instance(r.admin_uid,-1)[0].serialize,posts=len(get_channel_post(r.cid))) for l in [find_channels(caller_uid=current_user.uid,subject=s) for s in subjects] for r in l]
     a = []
     b = []
     for r in channels:
@@ -233,9 +218,8 @@ def homeAJAX():
             b.append(r['cid'])
     channels = a
     if len(channels) < 2:
-        cen = [dict(r.serialize, admin=get_user_and_resource_instance(r.admin_uid, -1)[0].serialize,
-                    posts=len(get_channel_post(r.cid))) for r in find_channels()]
-        while len(channels) != 2:
+        cen = [dict(r.serialize,admin=get_user_and_resource_instance(r.admin_uid,-1)[0].serialize,posts=len(get_channel_post(r.cid))) for r in find_channels()]
+        while(len(channels) != 2):
             random.shuffle(cen)
             if cen[0]['cid'] in b:
                 continue
@@ -244,8 +228,8 @@ def homeAJAX():
     elif len(channels) > 2:
         channels = channels[:2]
     results = {
-        "resources": resources,
-        "channels": channels
+        "resources":resources,
+        "channels":channels
     }
 
     return jsonify(results)
@@ -267,7 +251,7 @@ def login():
         email = form.email.data
         if DEMO:
             if email == "demo" and form.password.data == "demo":
-                login_user(DemoUser(), remember=False)
+                login_user(DemoUser(),remember=False)
                 if 'next' in request.args:
                     return redirect(request.args.get("next"))
                 return redirect(url_for('home'))
@@ -288,7 +272,7 @@ def login():
 @login_required
 def logout():
     """Logout page
-    Redirects in 3 seconds
+    Redircts in 3 seconds
     """
     user_auth(current_user.email, False)
     logout_user()
@@ -383,24 +367,12 @@ def resource(rid=None):
     if res is None:
         abort(404, description="The requested resource does not exist")
     # user has access to resource
-    if not is_resource_public(rid=rid) and (
-            user is None or not user_has_access_to_resource(uid=uid, rid=rid)) and uid != -2:
+    if not is_resource_public(rid=rid) and (user is None or not user_has_access_to_resource(uid=uid, rid=rid)) and uid != -2:
         abort(403,
-              description=f"You ({current_user.username}) do not have permission to access the resource : {res.title}" +
-                          "\nIf you think this is incorrect contact the resource owner")
+              description=f"You ({current_user.username}) do not have permission to access the resource : {res.title}" + "\nIf you think this is incorrect contact the resource owner")
 
     if res.resource_link.startswith('resource/'):
         res.resource_link = url_for('static', filename=res.resource_link)
-
-    # get hold resource creater's honor rating
-    with Session() as conn:
-        creater = conn.query(ResourceCreater).filter_by(rid=rid).first()
-        creater = conn.query(User).filter_by(uid=creater.uid).first()
-    creater_rating_whole = int(creater.user_rating)
-    # get if a user's honor rating is greater than int.5
-    creater_rating_half = 0 if creater.user_rating - creater_rating_whole < .5 else 1
-    # empty stars
-    creater_rating_unchecked = 5 - creater_rating_whole - creater_rating_half
 
     # render the template
     kwargs = {
@@ -408,9 +380,6 @@ def resource(rid=None):
         "rid": rid,
         "uid": uid,
         "res": res,
-        "rating_whole": creater_rating_whole,
-        "rating_half": creater_rating_half,
-        "rating_unchecked": creater_rating_unchecked,
         "created_at": dump_datetime(res.created_at),
         "difficulty": enum_to_website_output(res.difficulty),
         "subject": enum_to_website_output(res.subject),
@@ -476,8 +445,7 @@ def resource_new():
             os.path.join(app.config['UPLOAD_FOLDER'], 'thumbnail', secure_filename(resource_thumbnail_links)))
 
         if resource_url == "":
-            rid = add_resource(title, os.path.join('resource', secure_filename(resource_link)), difficulty, subject,
-                               grade,
+            rid = add_resource(title, os.path.join('resource', secure_filename(resource_link)), difficulty, subject, grade,
                                creaters_id, is_public,
                                private_personnel_id, tags_id,
                                description, [os.path.join('thumbnail', secure_filename(resource_thumbnail_links))])
@@ -624,12 +592,7 @@ def resourceAJAX():
         year = None
     if title == '':
         title = None
-    return jsonify([dict(i.serialize, tags=get_resource_tags(i.rid),
-                         banner=get_resource_thumbnail(i.rid).serialize if get_resource_thumbnail(
-                             i.rid) != ErrorCode.INVALID_RESOURCE else {'thumbnail_link': 'img/placeholder.png'}) for i
-                    in find_resources(title=title, subject=subject, grade=year, tags=tags, sort_by=sort,
-                                      email=current_user.email)])
-
+    return jsonify([dict(i.serialize,tags=get_resource_tags(i.rid),banner=get_resource_thumbnail(i.rid).serialize if get_resource_thumbnail(i.rid) != ErrorCode.INVALID_RESOURCE else {'thumbnail_link' : 'img/placeholder.png'}) for i in find_resources(title=title,subject=subject,grade=year,tags=tags,sort_by=sort,email=current_user.email)])
 
 @app.route('/AJAX/resourceVote')
 def resourceVote():
@@ -846,6 +809,10 @@ def settings():
     Update user settings when receiving POST request.
     """
     if request.method == "GET":
+        # send all info of the user and render template
+        subjects = [enum_to_website_output(i) for i in Subject if i != Subject.NULL]
+        grades = [enum_to_website_output(i) for i in Grade if i != Grade.NULL]
+
         return render_template("settings.html", title="User Settings",
                                user_info=current_user.serialize)
     else:
@@ -1141,7 +1108,7 @@ def search_channel():
 
     with Session() as conn:
         for i in find_channels(channel_name=name, is_public=is_public,
-                               sort_by_newest_date=sort_by_date, tag_ids=tags, subject=subject, grade=year):
+                               sort_by_newest_date=sort_by_date,tag_ids=tags,subject=subject,grade=year):
             if uid != -2 and not user_has_access_to_channel(uid=uid, cid=i.cid):
                 # user does not have access to channel
                 continue

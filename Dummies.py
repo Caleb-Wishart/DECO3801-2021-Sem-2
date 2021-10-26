@@ -106,7 +106,7 @@ uid0 = add_user(username="Johnny Appleseed", password="123456", email="j.applese
                 bio="Hi! My name is Johnny and I love children! "
                     "Especially teaching them! I have worked at Somerset College for"
                     " 4 years and honestly I wanna leave. But I am stuck while I pay for"
-                    " the bills while fucking Harold spends all our money on the Pokies. "
+                    " the bills while fucking Harold spends all our money on the Pokies"
                     "Yall will see contents I uploaded not just restrict to Math, but"
                     "a little bit of this and a little bit of that. Don't ask why. I need that money!",
                 teaching_areas=teaching_areas)
