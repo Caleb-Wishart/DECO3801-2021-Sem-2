@@ -36,7 +36,9 @@ The HTML is written pure with dynamic elements added using the JINJA2 engine. Th
 The CSS is augmented using the [Bootstrap5](https://getbootstrap.com/) <img src="https://img.icons8.com/color/20/000000/bootstrap.png"/> framework which provides many useful presets for design such as cards and colours.
 ```HTML
 <button class="btn btn-primary">Post a comment</button>
+```
 
+```
 <style>
     /* Sourced from BOOTSTRAP5 */
     .btn-primary {
