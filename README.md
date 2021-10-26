@@ -62,8 +62,9 @@ The CSS is augmented using the [Bootstrap5](https://getbootstrap.com/) <img src=
     }
 </style>
 ```
-
+```
 <button class="btn btn-primary float-end" disabled>Post a comment</button>
+```
 
 Additionally Bootstrap has a flavour of custom Icons which we used in conjunction with the [w3 SVG's](http://www.w3.org/2000/svg) to use custom Icons in our webpage to break up the static text styles.
 ```html
