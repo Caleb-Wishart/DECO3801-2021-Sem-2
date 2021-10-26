@@ -19,13 +19,13 @@
     <div class="container" style="margin-bottom: 3rem!important; padding-left: 200px; padding-right: 200px">
         <!-- Question and top section -->
         <div class="row" style="margin-top: 2rem!important;">
-            <div class = "col-1">
+            <div class = "col-1" style="margin-top: 1.6rem">
                 <a href="{{url_for('create_or_modify_channel_post', cid=channel.cid, post_id=post_info['post_id'])}}"
-                   class="btn btn-outline-primary d-md-block" style = "width: 60%; border: 0px" aria-haspopup="true" aria-expanded="false">
-                            <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important; font-size: large"><</dd>
+                   class="btn btn-outline-primary d-md-block" style = "width: 80%; border: 0px" aria-haspopup="true" aria-expanded="false">
+                            <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important; font-size: x-large"><</dd>
                 </a>
             </div>
-            <dt class="col-sm-8" style = "font-size: large; margin-top:2rem!important;">
+            <dt class="col-sm-8" style = "font-size: larger; margin-top:2.5rem!important;">
                 {{post_info["title"]}}
             </dt>
             {% if has_edit_privilege %}
