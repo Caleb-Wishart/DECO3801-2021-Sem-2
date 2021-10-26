@@ -874,8 +874,8 @@ def settings():
 
         if profile_background and profile_background.filename != "":
             profile_background_path = os.path.join("profile_background",
-                                                     secure_filename(
-                                                         profile_background.filename))
+                                                   secure_filename(
+                                                       profile_background.filename))
             profile_background.save(os.path.join("static", profile_background_path))
 
         user, _ = get_user_and_resource_instance(uid=current_user.uid, rid=-1)
