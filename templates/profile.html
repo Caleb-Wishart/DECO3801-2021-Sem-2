@@ -137,7 +137,7 @@
                     <div class="col-8">
                         <p class="h4" style="text-align: left">{{ user['username']}}</p>
                         <p class="h6" style="text-align: left">{{ user['email'] }}</p>
-                        <div class="card-body overflow-auto" style="max-height: 350px; text-align: justify; margin: 1rem 0 0 0; padding: 0">
+                        <div class="card-body overflow-auto" style="max-height: 350px; text-align: justify; margin: 1rem 0 0 0; padding: 0; margin-right: 1.2rem!important;">
                             <p class="h6">{{ user['bio'] }}</p>
                         </div>
                     </div>
@@ -294,6 +294,7 @@
                 <script type="text/template" id="studio_card">
                     <% _.each(data, function(res) { %>
                             <!-- Individual card (Put the template stuff here) -->
+                    <div class="box shadow-sm flex-fill" style="margin: 1.1rem; margin-bottom: 0.55rem!important; margin-top: 0.55rem!important; color: black" id="result">
                                 <a class="row" >
                                     <!-- Thumbnail for a channel.  -->
                                     <div class="col-2" style="width: 12%">
@@ -347,13 +348,16 @@
 
                                     </div>
                                 </a>
+                        </div>
                     <% }); %>
                 </script>
 
                     <!-- Items / cards (Don't delete the div below) -->
                     <div class="col d-flex justify-content-md-between" >
-                        <div class="box shadow-sm flex-fill" style="margin: 1.1rem; margin-bottom: 0.55rem!important; margin-top: 0.55rem!important; color: black" id="result">
+                        <div class = "card flex-fill" style="background-color: #fbfbfb; border: 0px" id = "result">
+
                         </div>
+
                     </div>
 
                 <script>

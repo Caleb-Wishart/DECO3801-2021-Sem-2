@@ -392,11 +392,11 @@
                                                       }
                                                   </script>
 
-                                                  <ul class="list-group" id="personnel" style="margin-left: 2rem!important; margin-bottom: 2rem!important; padding-right: 65px!important">
+                                                  <ul class="list-group text-start" id="personnel" style="margin-left: 2rem!important; margin-bottom: 2rem!important; padding-right: 65px!important">
                                                       <div class = "overflow-auto" style="max-height: 208px">
                                                         <!-- load existing personnel -->
                                                           {% for email in personnel_emails %}
-                                                          <li class="list-group-item"> {{ email }}
+                                                          <li class="list-group-item text-start"> {{ email }}
                                                               <button type="button" class="btn-close float-end" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close"
                                                               onclick="parentNode.parentNode.removeChild(parentNode)"></button>
 
