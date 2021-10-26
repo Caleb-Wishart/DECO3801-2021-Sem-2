@@ -150,7 +150,7 @@
                             </button>
                         </div>
                         <div class="row" style="padding: 5px; margin-top: 0.5rem; margin-bottom: 0.5rem">
-                            <button type="button" class="btn btn-primary" onclick="window.location.href='{{ url_for('settings', uid=user['uid']) }}'">
+                            <button type="button" class="btn btn-primary" onclick="window.location.href='{{ url_for('logout') }}'">
                                 Sign Out
                             </button>
                         </div>
@@ -229,9 +229,9 @@
                     <p class="h5" style="margin-top: 1rem; margin-left: 12px!important; margin-bottom: 0rem!important;">Tags</p>
                     <div class="card-body overflow-auto" style="padding-left:12px!important;">
                             <div class="col-7">
-                                {% for area in teaching_areas %}
+                                {% for ta in teaching_areas %}
                                     <span class="badge rounded-pill bg-primary" style="width: auto;
-                                      margin: 0.25rem!important;">{{ area }} </span>
+                                      margin: 0.25rem!important;">{{ enum_to_website_output(ta.teaching_area.name) }} </span>
                                 {% endfor %}
                             </div>
                     </div>

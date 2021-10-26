@@ -64,7 +64,94 @@
 {% endblock %}
 
 {% block script %}
+<script>
+// Tags button
+    function tagChecked(checkboxElem) {
+        id = checkboxElem.id + '____s';
+        other = document.getElementById(id)
+        tagId = checkboxElem.name + '_selected';
+        otherTag = document.querySelector('[title='+tagId+']')
+        myTagId = checkboxElem.name + '_search';
+        myTag = document.querySelector('[title='+myTagId+']')
+        if (checkboxElem.checked) {
+            other.checked = false;
+            otherTag.hidden = false;
+            myTag.hidden = true;
+        } else {
+            other.checked = true;
+            otherTag.hidden = true;
+            myTag.hidden = false;
+        }
+    }
+    function tagCheckedSelected(checkboxElem) {
+        id = checkboxElem.id.replace('____s', '');
+        other = document.getElementById(id)
+        tagId = checkboxElem.name + '_search';
+        otherTag = document.querySelector('[title='+tagId+']')
+        myTagId = checkboxElem.name + '_selected';
+        myTag = document.querySelector('[title='+myTagId+']')
+        if (checkboxElem.checked) {
+            other.checked = false;
+            var search_term = $('input[name=tags]').val().toLowerCase();
+            if (otherTag.title.toLowerCase().indexOf(search_term) > -1) {
+                otherTag.hidden = false;
+            } else {
+                otherTag.hidden = true;
+            }
+            if (search_term == '') {
+                otherTag.hidden = true;
+            }
+            myTag.hidden = true;
+        } else {
+            other.checked = true;
+            otherTag.hidden = true;
+            myTag.hidden = false;
+        }
+    }
 
+
+    // Tags search
+    $(document).on("keyup", "#search_tags", function (e) {
+        var search_term = $('input[name=tags]').val().toLowerCase();
+        var spanBoxes = document.getElementsByClassName('tagSearchSpan');
+        for (var i = 0; i < spanBoxes.length; i++) {
+            box = spanBoxes[i];
+            if (search_term == '') {
+                box.hidden = true;
+            } else if (box.title.toLowerCase().indexOf(search_term) > -1) {
+                tagId = box.title.replace('_search', '_selected');
+                try {
+                    otherTag = document.querySelector('[title='+tagId+']')
+                    if(otherTag.hidden){
+                        box.hidden = false;
+                    }else{
+                        box.hidden = true;
+                    }
+                } catch (err) {
+                    box.hidden = true;
+                }
+            } else {
+                box.hidden = true;
+            }
+        }
+    });
+    // Seed Document
+    $(document).ready(function () {
+        var search_term = $('input[name=tags]').val().toLowerCase();
+        var spanBoxes = document.getElementsByClassName('tagSearchSpan');
+        for (var i = 0; i < spanBoxes.length; i++) {
+            box = spanBoxes[i];
+            if (box.title.toLowerCase().indexOf(search_term) > -1) {
+                box.hidden = false;
+            } else {
+                box.hidden = true;
+            }
+            if (search_term == '') {
+                box.hidden = true;
+            }
+        }
+    });
+</script>
 {% endblock %}
 
 {% block content %}
@@ -222,22 +309,47 @@
              </dt>
 
             <div class="card flex-fill shadow-sm">
-                <!-- Tags-->
-                <div class="mb-3 row" style="margin: 1rem!important; margin-left: 5rem!important; margin-right: auto">
-                    <label for="inputConfirmPassword" style="font-size: large; font-weight:inherit" class="col-sm-1 col-form-label">Add Tags</label>
-                    <div style="margin-left: inherit" class="col-8">
-                        <input class="form-control" list="datalistOptions3" id="exampleDataList3" placeholder="Search Tags...">
-                    </div>
-                </div>
-
-                <div class="mb-3 row" style="margin: 1rem!important; margin-left: 5rem!important; margin-right: auto">
-                    <label for="AppliedTags" style="font-size: large; font-weight:inherit" class="col-sm-1 col-form-label">My Tags</label>
-                    <div class="col-8" style="margin-left: inherit">
-                        <span class="badge rounded-pill bg-primary" style="width: auto; margin: 0.25rem!important;"> Applied tags go here
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </span>
-                    </div>
-                </div>
+                <!-- Search for Tags -->
+                                              <div class="row" style="margin-top: 1rem!important;">
+                                                    <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
+                                                        Select Tags:
+                                                    </div>
+                                                  <div class = "col-7">
+                                                    <div class="input-group">
+                                                        <input class="form-control" type="search" name="tags" style = "margin-top:0.5rem!important;" placeholder="Search Tags..."
+                                                            id="search_tags">
+                                                    </div>
+                                                </div>
+                                              </div>
+                                            <div class = "row" style = "margin-top: 1.5rem!important; margin-bottom: 1rem!important;">
+                                                <div class = "col-2" style="margin-left: 6rem!important; margin-top: 0rem!important;">
+                                                    Matching Tags:
+                                                </div>
+                                                <div class = "col-7">
+                                                    {% for item in subjects %}
+                                                    <span class="badge rounded-pill bg-other-tag tagSearchSpan" title="{{item}}_search" hidden>
+                                                        <input type="checkbox" hidden id="{{item}}_input" name="{{item}}" value="{{item}}"
+                                                            onchange="tagChecked(this)">
+                                                        <label for="{{item}}_input" id="{{item}}_label">{{enum_to_website_output(item)}}</label>
+                                                    </span>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                            <!-- Put the applied tags here-->
+                                            <div class = "row" style = "margin-top: 1rem!important; margin-bottom: 1rem!important;">
+                                                <div class = "col-2" style="margin-left: 6rem!important; margin-top: 0rem!important;">
+                                                    Applied Tags:
+                                                </div>
+                                                <div class = "col-7">
+                                                    {% for item in subjects %}
+                                                        <span class="badge rounded-pill bg-other-tag tagFoundSpan" title="{{item}}_selected" hidden>
+                                                            <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
+                                                                onchange="tagCheckedSelected(this)">
+                                                            <label for="{{item}}_input____s" id="{{item}}_label____s">{{enum_to_website_output(item)}}</label>
+                                                        </span>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
             </div>
 
              <div class="float-end mt-2 pt-1" style="margin-top: 1rem!important;">

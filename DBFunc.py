@@ -173,9 +173,14 @@ def modify_user_teaching_areas(uid, conn, modification: Modification,
         if isinstance(area, Subject):
             if modification == Modification.MODIFY_ADD:
                 # insert new user teaching areas
-                new_teach_area = UserTeachingAreas(uid=uid, teaching_area=area,
-                                                   is_public=is_public, grade=grade)
-                conn.add(new_teach_area)
+                teaching_area = conn.query(UserTeachingAreas). \
+                    filter_by(uid=uid, teaching_area=area,
+                              is_public=is_public, grade=grade).one_or_none()
+                if teaching_area is None:
+                    new_teach_area = UserTeachingAreas(uid=uid, teaching_area=area,
+                                                    is_public=is_public, grade=grade)
+                    warnings.warn("Added new teaching area: "  + area.name)
+                    conn.add(new_teach_area)
             else:
                 # delete user teaching areas
                 teaching_area = conn.query(UserTeachingAreas). \
@@ -828,11 +833,13 @@ def find_resources(title_type="like", title=None,
             elif sort_by == "upvotes":
                 resources = resources.order_by(Resource.upvote_count.desc())
 
-        if user is None:
+        if user is None and email != 'demo':
             resources = resources.filter_by(is_public=True)
             result = resources.all()
-        else:
+        elif email != 'demo':
             result = filter(lambda res: user_has_access_to_resource(user.uid, res.rid), resources.all())
+        else:
+            result = resources.all()
 
         for tag in tags:
             warnings.warn(f"Searching for tag {tag}")
@@ -917,7 +924,7 @@ def find_channels(title_type="like", channel_name=None,
                 # exact match
                 channels = channels.filter_by(name=channel_name)
 
-        if caller_uid:
+        if caller_uid != -2:
             # find all private channels this caller has access to
             personnel = conn.query(ChannelPersonnel).filter_by(uid=caller_uid).all()
             accessible = set()
