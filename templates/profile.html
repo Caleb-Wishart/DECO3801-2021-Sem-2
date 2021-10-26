@@ -297,12 +297,12 @@
                         <div class="box shadow-sm flex-fill" style="margin: 1.1rem; margin-bottom: 0.55rem!important; margin-top: 0.55rem!important; color: black" id="result">
                             <a class="row" >
                                 <!-- Thumbnail for a channel.  -->
-                                <div class="col-2" style="width: 12%">
+                                <div class="col-2" style="width: 12%" onclick="location.href = '<%= res.view_link %>'">
                                     <img src="{{ url_for('static', filename='') }}/<%= res['avatar_link']%>"
                                          alt="Logo" width="60" style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
                                 </div>
 
-                                <div class="col-3" style="margin-top: 10px!important; margin-bottom: 5px!important;">
+                                <div class="col-3" style="margin-top: 10px!important; margin-bottom: 5px!important;" onclick="location.href = '<%= res.view_link %>'">
                                     <!-- Title -->
                                     <div class = "row">
                                         <div class="fw-bold" style="padding: 0rem!important; font-size: small" onclick="location.href = '<%= res.view_link %>'">
@@ -310,7 +310,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important;">
+                                <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important;" onclick="location.href = '<%= res.view_link %>'">
                                     <!-- Date Created -->
                                     <div class = "row">
                                         <div class="fw-bold" style="padding: 0rem!important; font-size: small">
@@ -323,7 +323,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important;">
+                                <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important;" onclick="location.href = '<%= res.view_link %>'">
                                     <!-- Privacy Status -->
                                     <div class = "row">
                                         <div class="fw-bold" style="padding: 0rem!important; font-size: small">
