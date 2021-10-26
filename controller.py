@@ -808,7 +808,6 @@ def settings():
 
     Update user settings when receiving POST request.
     """
-    # todo: tag system not implemented
     if request.method == "GET":
         # send all info of the user and render template
         subjects = [enum_to_website_output(i) for i in Subject if i != Subject.NULL]
@@ -928,8 +927,6 @@ def create_or_modify_channel(cid=None):
 
     When create/edit success, redirects to current channel page
     """
-    # todo: other_tag system not implemented
-
     if request.method == "GET":
         # reverse visibility options so PUBLIC is always the default choice for creation
         visibility_options = [enum_to_website_output(i) for i in ChannelVisibility][::-1]
@@ -1088,7 +1085,6 @@ def view_channel(cid=None):
                                top_contributors=top_contributors, title=f"Channel #{channel.cid}")
 
     # load channel home page
-    # todo: other_tag system not implemented
     return render_template("channel.html", user=current_user, title="Channel Home")
 
 

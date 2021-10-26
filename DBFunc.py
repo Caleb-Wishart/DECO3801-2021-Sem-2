@@ -910,12 +910,14 @@ def find_channels(title_type="like", channel_name=None,
             channels = channels.filter_by(subject=subject)
         if grade:
             channels = channels.filter_by(grade=grade)
-        if is_public:
-            channels = channels.filter_by(visibility=ChannelVisibility.PUBLIC)
-        else:
-            channels = channels.filter(
-                or_(Channel.visibility == ChannelVisibility.FULLY_PRIVATE,
-                    Channel.visibility == ChannelVisibility.INVITE_ONLY))
+
+        if not admin_uid:
+            if is_public:
+                channels = channels.filter_by(visibility=ChannelVisibility.PUBLIC)
+            else:
+                channels = channels.filter(
+                    or_(Channel.visibility == ChannelVisibility.FULLY_PRIVATE,
+                        Channel.visibility == ChannelVisibility.INVITE_ONLY))
 
         if channel_name:
             if title_type == "like":
@@ -924,7 +926,7 @@ def find_channels(title_type="like", channel_name=None,
                 # exact match
                 channels = channels.filter_by(name=channel_name)
 
-        if caller_uid != -2:
+        if caller_uid and caller_uid != -2:
             # find all private channels this caller has access to
             personnel = conn.query(ChannelPersonnel).filter_by(uid=caller_uid).all()
             accessible = set()
