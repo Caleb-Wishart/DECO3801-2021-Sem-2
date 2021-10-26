@@ -26,6 +26,7 @@ from forms import LoginForm, RegisterForm, ResourceForm
 
 # -----{ INIT }----------------------------------------------------------------
 DEBUG = True
+DEMO = True
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -71,6 +72,65 @@ class Anonymous(AnonymousUserMixin):
     def __repr__(self):
         return __str__(self)
 
+if DEMO:
+    class DemoUser(AnonymousUserMixin):
+        def __init__(self):
+            self.uid = -2
+            self.username = "Demo User"
+            self.email = "demo"
+            self.authenticated = True
+            self.avatar_link = "img/placeholder.png"
+            # profile background link
+            self.profile_background_link = "img/placeholder.png"
+            # user account created time
+            self.created_at = datetime.datetime.now(
+                tz=pytz.timezone("Australia/Brisbane"))
+            # user hash_password -- sha256 encoded
+            self.hash_password = "demo"
+            # user honor rating
+            self.user_rating = 0
+            # user bio
+            self.bio = "Demo User"
+
+        def __str__(self):
+            return f"Demo User: uid = {self.uid}"
+
+        def __repr__(self):
+            return __str__(self)
+
+        @property
+        def is_active(self):
+            """True, as all users are active."""
+            return True
+
+        def get_id(self):
+            """Return the email address to satisfy Flask-Login's requirements."""
+            return self.email
+
+        @property
+        def is_authenticated(self):
+            """Return True if the user is authenticated."""
+            return self.authenticated
+
+        @property
+        def is_anonymous(self):
+            """False, as anonymous users aren't supported."""
+            return False
+
+        @property
+        def serialize(self):
+            """Return object data in serialisable format """
+            return {
+                "uid": self.uid,
+                "username": self.username,
+                "authenticated": self.authenticated,
+                "avatar_link": self.avatar_link,
+                "profile_background_link": self.profile_background_link,
+                "created_at": dump_datetime(self.created_at),
+                "email": self.email,
+                "bio": self.bio,
+                "user_rating": str(round(self.user_rating, 1))
+            }
 
 login_manager.anonymous_user = Anonymous
 
@@ -80,6 +140,9 @@ def load_user(user_id):
     """
         :param unicode user_id: user_id (email) user to retrieve
     """
+    if DEMO:
+        if user_id == "demo":
+            return DemoUser()
     return get_user(user_id)
 
 
@@ -186,6 +249,13 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         email = form.email.data
+        if DEMO:
+            if email == "demo" and form.password.data == "demo":
+                login_user(DemoUser(),remember=False)
+                if 'next' in request.args:
+                    return redirect(request.args.get("next"))
+                return redirect(url_for('home'))
+
         if email:
             user = get_user(email)
             if user != ErrorCode.INVALID_USER and check_password_hash(user.hash_password, form.password.data):
@@ -297,7 +367,7 @@ def resource(rid=None):
     if res is None:
         abort(404, description="The requested resource does not exist")
     # user has access to resource
-    if not is_resource_public(rid=rid) and (user is None or not user_has_access_to_resource(uid=uid, rid=rid)):
+    if not is_resource_public(rid=rid) and (user is None or not user_has_access_to_resource(uid=uid, rid=rid)) and uid != -2:
         abort(403,
               description=f"You ({current_user.username}) do not have permission to access the resource : {res.title}" + "\nIf you think this is incorrect contact the resource owner")
 
@@ -1043,7 +1113,7 @@ def search_channel():
     with Session() as conn:
         for i in find_channels(channel_name=name, is_public=is_public,
                                sort_by_newest_date=sort_by_date,tag_ids=tags,subject=subject,grade=year):
-            if not user_has_access_to_channel(uid=uid, cid=i.cid):
+            if uid != -2 and not user_has_access_to_channel(uid=uid, cid=i.cid):
                 # user does not have access to channel
                 continue
             info = i.serialize
