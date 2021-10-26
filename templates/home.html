@@ -10,7 +10,7 @@
     <% _.each(data,  function(res) { %>
         <!-- Resource Home Card-->
         <a class="row" href="{{url_for('resource')}}/<%= res.rid %>">
-            <div class="card flex-fill" style="margin-right: 4.5rem!important; margin-left: 12px!important; margin-bottom: 1rem!important;">
+            <div class="box flex-fill" style="margin-right: 4.5rem!important; margin-left: 12px!important; margin-bottom: 1rem!important;">
                 <!-- Top section-->
                 <div class="row">
                     <!-- Top section Left Col-->
@@ -227,7 +227,7 @@ function doAJAX() {
 
                 <!-- Resource Card-->
                 <div class="row">
-                    <div class="card flex-fill" style="margin-right: 4.5rem!important; margin-left: 12px!important; margin-bottom: 1rem!important;"  id="result">
+                    <div  style="margin-right: 4.5rem!important; margin-left: 12px!important; margin-bottom: 1rem!important;"  id="result">
                     </div>
 
                 </div>
