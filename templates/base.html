@@ -25,19 +25,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.0/backbone-min.js"
         integrity="sha512-9EgQDzuYx8wJBppM4hcxK8iXc5a1rFLp/Chug4kIcSWRDEgjMiClF8Y3Ja9/0t8RDDg19IfY5rs6zaPS9eaEBw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!-- Backgrond -->
+    <!-- Background -->
     <style>
         body {
             /* Adds a Hex honeycomb background */
             /* background-image: url({{url_for('static', filename='img/hex_back.png')}}),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
+            /* Background colours */
             background-color: #FFFFFF;
             background-image: radial-gradient(rgb(250 , 250 , 250 ), rgb(250 , 250 , 250 ), rgb(250 , 250 , 250 ));
             background-color: rgb(254, 239, 255);
-
-
-            {#background-color: #FFFFFF;
-            background-image: radial-gradient(rgb(254, 239, 255), rgb(246, 244, 255), rgb(254, 239, 255));
-            background-color: rgb(254, 239, 255);#}
         }
 
         /*Subject tag for resources*/
@@ -114,28 +110,16 @@
             /* Adds a Hex honeycomb background */
             /* background-image: url(
         {{url_for('static', filename='img/hex_back.png')}} ),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
-            {#background-color: #ffe5ec;
-            background-image: radial-gradient(rgb(255, 242, 245), rgb(255, 242, 245), rgb(255, 242, 245));#}
 
             background-color: #ffffff;
             background-image: radial-gradient(rgb(255, 255, 255), rgb(255, 255, 255), rgb(255, 255, 255));#}
-            {# background-image: radial-gradient(rgb(255, 229, 236), rgb(255, 229, 236),rgb(255, 229, 236)); #}
-        {#background-color: rgb(245, 245, 255);
         }
-    .btn-primary {
-        background-color: #ff8fab;
-        color: white;
-        border-color: #ff8fab;
 
-       {# background-color: #1b8823;
-        color: white;
-        border-color: #1b8823;#}
-    }
+     /* Styling buttons*/
     .btn-primary:hover {
         color:white;
         background-color: #1488eb;
     }
-
 
     .btn-check:checked+.btn-outline-primary {
         {#color: white;
@@ -164,49 +148,51 @@
         color: #000000;
         text-decoration: none  ;
     }
+     /* Styling help documentation */
     .popover {
         max-width: 400px;
         whtie-space: pre-line;
     }
+    /* Styling for avatar class*/
     .avatar {
         vertical-align: middle;
         width: 50px;
         height: 50px;
-        border-radius: 50%;
+        border-radius: 20%;
     }
-
-li:after {
-  background: none repeat scroll 0 0 transparent;
-  bottom: 0;
-  content: "";
-  display: block;
-  height: 2px;
-  left: 50%;
-  position: absolute;
-  background: #fff;
-  transition: width 0.3s ease 0s, left 0.3s ease 0s;
-  width: 0;
-}
-li:hover:after {
-  width: 50%;
-    left: 5rem;
-    right: 2rem;
-}
-.btn:active {
-            transform: scale(0.98);
-            /* Scaling button to 0.98 to its original size */
-            box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
-            /* Lowering the shadow */
-        }
-ul {
-  list-style: none;
-  display: table;
-  text-align: center;
-}
-li {
-  display: table-cell;
-  position: relative;
-}
+    /* Styling for the navbar*/
+    li:after {
+      background: none repeat scroll 0 0 transparent;
+      bottom: 0;
+      content: "";
+      display: block;
+      height: 2px;
+      left: 50%;
+      position: absolute;
+      background: #fff;
+      transition: width 0.3s ease 0s, left 0.3s ease 0s;
+      width: 0;
+    }
+    li:hover:after {
+      width: 50%;
+        left: 5rem;
+        right: 2rem;
+    }
+    .btn:active {
+                transform: scale(0.98);
+                /* Scaling button to 0.98 to its original size */
+                box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+                /* Lowering the shadow */
+            }
+    ul {
+      list-style: none;
+      display: table;
+      text-align: center;
+    }
+    li {
+      display: table-cell;
+      position: relative;
+    }
 
 </style>
     {% block style %}{% endblock %}
@@ -219,12 +205,12 @@ li {
     <header class="shadow bg-light text-dark sticky-top" style = "padding: 0.8rem!important; background-color: #1488eb!important;" >
         <div class="container-fluid">
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                <!-- Logo -->
+                <!-- Logo / Home-->
                 <a class="navbar-brand" style = "margin-right: auto!important; margin-left: auto!important;" href="{{url_for('home')}}"
                     class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
                     <img src="{{url_for('static', filename='img/whitelogo.png')}}" , alt="Logo" , width="150" , height="45">
                 </a>
-                <!-- Links for the web page -->
+                <!-- Links for the web page (Key Sections)-->
                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0" style = "margin-right: auto!important; margin-left: auto!important">
                     <li><a href="{{url_for('resource')}}" class="h4 nav-link px-4 pt-3 text-light" style = "padding-left: 7rem!important; padding-right: 7rem!important;
                     margin-left: auto; margin-right: auto; font-size: 1.2rem">Resources</a></li>
@@ -233,7 +219,7 @@ li {
                     <li><a href="{{url_for('about')}}" class="h4 nav-link px-4 pt-3 text-light" style = "padding-left: 7rem!important; padding-right: 4rem!important;
                     margin-left: auto; margin-right: auto; font-size: 1.2rem">FAQs</a></li>
                 </ul>
-                <!-- Profile -->
+                <!-- User Profile and Image-->
                 {% if current_user.is_authenticated %}
                 <a class="navbar-brand" style = "margin-right: auto!important; margin-left: auto!important;" href="{{url_for('profile')}}"
                     class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
@@ -250,7 +236,7 @@ li {
                     <div class="d-flex">
                         <p class="h4 nav-link px-4 pt-3 text-light" style="padding-left: 0rem!important; padding-right: 1.5rem!important;
                     margin-left: auto; margin-right: auto; font-size: 1.2rem"> Login </p>
-                        <img style="margin: auto" src="{{url_for('static', filename='img/default_profile.png')}}" , alt="profile" , width="30" ,
+                        <img style="margin: auto" src="{{url_for('static', filename='img/default_profile.png')}}" , class = "avatar" alt="profile" , width="30" ,
                             height="30">
                     </div>
                 </a>
