@@ -1,68 +1,5 @@
 {% extends 'base.html' %}
 
-{% block style %}
-    <style>
-        a:link {
-            text-decoration: none;
-        }
-
-        a:visited {
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: none;
-        }
-
-        a:active {
-            text-decoration: none;
-        }
-        .btn-primary {
-            background-color: #ff8fab;
-            color: white;
-            border-color: #ff8fab;
-        }
-        .btn-primary:hover {
-            color:white;
-            background-color: #3a78ef;
-        }
-
-        .btn-outline-primary {
-            background-color: rgb(255, 255, 255);
-            color:#000000;
-            border-color: white;
-        }
-
-        .btn-outline-primary:hover {
-            color:white;
-            background-color: #3a78ef;
-        }
-
-        .btn-check:checked+.btn-outline-primary {
-            color: white;
-            background-color:  #ff8fab;
-            border-color:   #ff8fab;
-        }
-        .bg-primary {
-            background-color: #ff8fab!important;
-        }
-        .btn-close {
-            width: 0.5rem;
-            height: 0.5rem;
-        }
-
-        .banner-image {
-          border-radius: 100px;
-      }
-
-      .profile-image {
-          margin-top: -25px;
-          margin-left: -25px;
-          border-radius: 500px;
-      }
-    </style>
-{% endblock %}
-
 {% block script %}
 <script>
 // Tags button
@@ -155,11 +92,11 @@
 {% endblock %}
 
 {% block content %}
-<div class="container" style="margin-bottom: 3rem!important;">
+<div class="container" style="margin-bottom: 3rem!important; margin-top: 1rem!important;  padding-left: 200px; padding-right: 200px">
     <!-- Title Section -->
     <div class="row">
         <dt class="col-sm-9" style="font-size: x-large; margin-top:2rem!important; margin-bottom: 2rem!important;">
-            Basic Settings
+            Account Settings
         </dt>
     </div>
 
@@ -174,7 +111,7 @@
                          <div class="row pe-5">
                              <div class="col text-center" style="margin-top: 3rem">
                                  <img id="avatar" src="{{ url_for('static', filename=user_info['avatar_link']) }}"
-                                      class="profile-image" width="312px" height="312px">
+                                      class="profile-image" width="200px" height="200px">
                              </div>
                          </div>
                          <div style="margin-top: 0rem!important;" class="row pe-5">
@@ -182,7 +119,7 @@
                                  <input type="file" id="avatar_upload" style="display:none;" name="avatar">
                                  <button type="button" id="avatar_upload_button"
                                          class="btn btn-primary btn" style="margin-top:
-                                 1rem; margin-bottom: 1rem; border-radius: 100px">Change Profile Picture</button>
+                                 1rem; margin-bottom: 1rem; ">Change Profile Picture</button>
                              </div>
                          </div>
                      </div>
@@ -190,7 +127,7 @@
                          <div class="row">
                              <div class="col" style="margin-top: 5rem; margin-right: 2rem; margin-left: 0">
                                  <img  src="{{ url_for('static', filename=user_info['profile_background_link']) }}"
-                                      class="banner-image" height="250" id="profile_background">
+                                      class="banner-image" height="200" id="profile_background">
                              </div>
                          </div>
                          <div class="row pe-5">
@@ -198,7 +135,7 @@
                                  <input type="file" id="background_upload" style="display:none;" name="profile_background">
                                  <button type="button" class="btn btn-primary btn"
                                          id="background_upload_button" style="margin-top: 1rem; margin-bottom: 1rem;
-                                 border-radius: 100px">Change Profile Background</button>
+                               ">Change Profile Background</button>
                              </div>
                          </div>
                      </div>
@@ -225,17 +162,17 @@
                                  </script>
                  </div>
                  <!-- email (fake, do not change in DB) -->
-                <div class="mb-3 row" style="margin: 1rem!important;">
-                    <label style="font-size: large; font-weight:inherit" for="inputInstitution" class="col-sm-1 col-form-label">Email</label>
-                    <div class="col-sm-7">
+                <div class="mb-3 row" style="margin: 1rem; margin-top: 2rem!important;">
+                    <label style="font-size: large; font-weight:inherit; margin-left: 2rem!important;" for="inputInstitution" class="col-sm-2 col-form-label">Email</label>
+                    <div class="col">
                         <input class="form-control required" value="{{ user_info['email'] }}" id="email" name="email" type="email">
                     </div>
                 </div>
 
                  <!-- Username -->
                  <div class="mb-3 row" style="margin: 1rem!important;">
-                     <label style="font-size: large; font-weight:inherit" for="inputPosition" class="col-sm-1 col-form-label">Username</label>
-                     <div class="col-sm-7">
+                     <label style="font-size: large; font-weight:inherit; margin-left: 2rem!important;" for="inputPosition" class="col-sm-2 col-form-label">Username</label>
+                     <div class="col">
                          <input class="form-control required" value="{{ user_info['username'] }}"
                                  name="username" type="text" id="username">
                      </div>
@@ -244,21 +181,21 @@
                 <!-- Bio -->
                 <div class="mb-3" style="margin: 1rem!important;">
                     <label for="Titleform" class="form-label" style="font-weight: inherit;
-                    font-size: larger">Edit Bio</label>
+                    font-size: larger; padding-left: 12px">Edit Bio</label>
 
                     <textarea class="form-control" rows="7" name="bio" type="text">{{ user_info['bio'] }}</textarea>
                 </div>
              </div>
 
             <!-- Password -->
-             <dt class="col-sm-9" style="font-size: x-large; margin-top:2rem!important; margin-bottom: 2rem!important;">
+             <dt class="col-sm-9" style="font-size: x-large; margin-top:2rem!important; margin-bottom: 1rem!important;">
                  Change Password
              </dt>
 
             <div class="card flex-fill shadow-sm">
                 <!-- Old Password -->
                 <div class="mb-3 row" style="margin: 1rem!important;">
-                    <label style="font-size: large; font-weight:inherit" for="inputOldPassword" class="col-sm-2 col-form-label">Current Password</label>
+                    <label style="font-size: medium; font-weight:inherit" for="inputOldPassword" class="col-sm-2 col-form-label">Current Password</label>
                     <div class="col">
                         <input class="form-control required" id="old_password" name="old_password" type="password">
                     </div>
@@ -266,7 +203,7 @@
 
                 <!-- New Password -->
                 <div class="mb-3 row" style="margin: 1rem!important;">
-                    <label style="font-size: large; font-weight:inherit" for="inputNewPassword"  class="col-sm-2 col-form-label">New Password</label>
+                    <label style="font-size: medium; font-weight:inherit" for="inputNewPassword"  class="col-sm-2 col-form-label">New Password</label>
                     <div class="col">
                         <input class="form-control required" id="new_password" name="new_password" type="password">
                     </div>
@@ -274,7 +211,7 @@
 
                 <!-- Confirm New Password -->
                 <div class="mb-3 row" style="margin: 1rem!important; margin-bottom: 0; padding-bottom: 0">
-                    <label style="font-size: large; font-weight:inherit" for="inputConfirmPassword" class="col-sm-2 col-form-label">Confirm New Password</label>
+                    <label style="font-size: medium; font-weight:inherit" for="inputConfirmPassword" class="col-sm-2 col-form-label">Confirm New Password</label>
                     <div class="col">
                         <input class="form-control required" id="confirm_password" type="password">
                     </div>
@@ -304,7 +241,7 @@
             </div>
 
             <!-- Tags -->
-            <dt class="col-sm-9" style="font-size: x-large; margin-top:2rem!important; margin-bottom: 2rem!important;">
+            <dt class="col-sm-9" style="font-size: x-large; margin-top:2rem!important; margin-bottom: 1rem!important;">
                  Change Tags
              </dt>
 
@@ -356,7 +293,7 @@
                 <!-- Button to update-->
                 <input type="submit" name="submit" value="Update" form="edit_form" class="btn btn-primary btn" style="margin-right: 1rem!important;"/>
                  {# redirect to profile page #}
-                <button type="Button" class="btn btn-outline-primary btn" onclick="window.location.href='{{ url_for('profile') }}';">Discard Draft</button>
+                <button type="Button" class="btn btn-outline-danger btn" onclick="window.location.href='{{ url_for('profile') }}';">Discard Draft</button>
 
              </div>
          </form>
