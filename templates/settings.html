@@ -162,8 +162,8 @@
                                  </script>
                  </div>
                  <!-- email (fake, do not change in DB) -->
-                <div class="mb-3 row" style="margin: 1rem!important;">
-                    <label style="font-size: large; font-weight:inherit; margin-top: 1rem!important; margin-left: 2rem!important;" for="inputInstitution" class="col-sm-1 col-form-label">Email</label>
+                <div class="mb-3 row" style="margin: 1rem; margin-top: 2rem!important;">
+                    <label style="font-size: large; font-weight:inherit; margin-left: 2rem!important;" for="inputInstitution" class="col-sm-1 col-form-label">Email</label>
                     <div class="col">
                         <input class="form-control required" value="{{ user_info['email'] }}" id="email" name="email" type="email">
                     </div>
@@ -181,7 +181,7 @@
                 <!-- Bio -->
                 <div class="mb-3" style="margin: 1rem!important;">
                     <label for="Titleform" class="form-label" style="font-weight: inherit;
-                    font-size: larger">Edit Bio</label>
+                    font-size: larger; padding-left: 12px">Edit Bio</label>
 
                     <textarea class="form-control" rows="7" name="bio" type="text">{{ user_info['bio'] }}</textarea>
                 </div>
