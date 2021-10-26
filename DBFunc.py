@@ -924,7 +924,7 @@ def find_channels(title_type="like", channel_name=None,
                 # exact match
                 channels = channels.filter_by(name=channel_name)
 
-        if caller_uid != -2:
+        if caller_uid and caller_uid != -2:
             # find all private channels this caller has access to
             personnel = conn.query(ChannelPersonnel).filter_by(uid=caller_uid).all()
             accessible = set()
