@@ -178,8 +178,8 @@ def modify_user_teaching_areas(uid, conn, modification: Modification,
                               is_public=is_public, grade=grade).one_or_none()
                 if teaching_area is None:
                     new_teach_area = UserTeachingAreas(uid=uid, teaching_area=area,
-                                                    is_public=is_public, grade=grade)
-                    warnings.warn("Added new teaching area: "  + area.name)
+                                                       is_public=is_public, grade=grade)
+                    warnings.warn("Added new teaching area: " + area.name)
                     conn.add(new_teach_area)
             else:
                 # delete user teaching areas
@@ -189,7 +189,8 @@ def modify_user_teaching_areas(uid, conn, modification: Modification,
                 if teaching_area:
                     conn.delete(teaching_area)
 
-def get_user_teaching_areas(uid:int):
+
+def get_user_teaching_areas(uid: int):
     with Session() as conn:
         return conn.query(UserTeachingAreas).filter_by(uid=uid).all()
 
@@ -718,7 +719,7 @@ def get_resource_author(rid):
         authors = []
         for uid in uids:
             authors.append(conn.query(User).filter_by(uid=uid).one_or_none())
-        return list(filter(lambda x: x is not None,authors))
+        return list(filter(lambda x: x is not None, authors))
 
 
 def get_resource_tags(rid):
@@ -1497,16 +1498,6 @@ def modify_channel(cid: int, name=None, visibility: ChannelVisibility = None,
             for i in personnel_ids:
                 modify_channel_personnel(uid=i, cid=cid, modification=Modification.MODIFY_ADD)
 
-            # if ids_to_add_to_personnel:
-            #     for i in ids_to_add_to_personnel:
-            #         personnel = ChannelPersonnel(cid=cid, uid=i)
-            #         conn.add(personnel)
-            # if ids_to_delete_from_personnel:
-            #     for i in ids_to_delete_from_personnel:
-            #         personnel = conn.query(ChannelPersonnel). \
-            #             filter_by(cid=cid, uid=i).one_or_none()
-            #         if personnel:
-            #             conn.delete(personnel)
         if not try_to_commit(conn):
             warnings.warn("Error committing")
             return ErrorCode.COMMIT_ERROR
@@ -1815,15 +1806,16 @@ def get_channel_post_comments(post_id: int):
         if not post:
             warnings.warn("The post id is invalid")
             return ErrorCode.INVALID_POST
-        return conn.query(PostComment).filter_by(post_id=post_id).\
+        return conn.query(PostComment).filter_by(post_id=post_id). \
             order_by(PostComment.created_at.asc()).all()
+
 
 def get_channel_post(cid: int):
     """
     Returns a list of all posts on a channel
 
-    :param post_id: The id of the post
-    :return If the post_id is valid, a list of post comments are returned
+    :param cid: The id of the channel
+    :return If the cid is valid, a list of posts belong to that channel are returned
             ErrorCode.INVALID_POST if post_id is invalid
     """
     with Session() as conn:
