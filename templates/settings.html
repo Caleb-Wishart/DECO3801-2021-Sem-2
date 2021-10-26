@@ -163,7 +163,7 @@
                  </div>
                  <!-- email (fake, do not change in DB) -->
                 <div class="mb-3 row" style="margin: 1rem; margin-top: 2rem!important;">
-                    <label style="font-size: large; font-weight:inherit; margin-left: 2rem!important;" for="inputInstitution" class="col-sm-1 col-form-label">Email</label>
+                    <label style="font-size: large; font-weight:inherit; margin-left: 2rem!important;" for="inputInstitution" class="col-sm-2 col-form-label">Email</label>
                     <div class="col">
                         <input class="form-control required" value="{{ user_info['email'] }}" id="email" name="email" type="email">
                     </div>
@@ -171,7 +171,7 @@
 
                  <!-- Username -->
                  <div class="mb-3 row" style="margin: 1rem!important;">
-                     <label style="font-size: large; font-weight:inherit; margin-left: 2rem!important;" for="inputPosition" class="col-sm-1 col-form-label">Username</label>
+                     <label style="font-size: large; font-weight:inherit; margin-left: 2rem!important;" for="inputPosition" class="col-sm-2 col-form-label">Username</label>
                      <div class="col">
                          <input class="form-control required" value="{{ user_info['username'] }}"
                                  name="username" type="text" id="username">
@@ -188,14 +188,14 @@
              </div>
 
             <!-- Password -->
-             <dt class="col-sm-9" style="font-size: x-large; margin-top:2rem!important; margin-bottom: 2rem!important;">
+             <dt class="col-sm-9" style="font-size: x-large; margin-top:2rem!important; margin-bottom: 1rem!important;">
                  Change Password
              </dt>
 
             <div class="card flex-fill shadow-sm">
                 <!-- Old Password -->
                 <div class="mb-3 row" style="margin: 1rem!important;">
-                    <label style="font-size: large; font-weight:inherit" for="inputOldPassword" class="col-sm-2 col-form-label">Current Password</label>
+                    <label style="font-size: medium; font-weight:inherit" for="inputOldPassword" class="col-sm-2 col-form-label">Current Password</label>
                     <div class="col">
                         <input class="form-control required" id="old_password" name="old_password" type="password">
                     </div>
@@ -203,7 +203,7 @@
 
                 <!-- New Password -->
                 <div class="mb-3 row" style="margin: 1rem!important;">
-                    <label style="font-size: large; font-weight:inherit" for="inputNewPassword"  class="col-sm-2 col-form-label">New Password</label>
+                    <label style="font-size: medium; font-weight:inherit" for="inputNewPassword"  class="col-sm-2 col-form-label">New Password</label>
                     <div class="col">
                         <input class="form-control required" id="new_password" name="new_password" type="password">
                     </div>
@@ -211,7 +211,7 @@
 
                 <!-- Confirm New Password -->
                 <div class="mb-3 row" style="margin: 1rem!important; margin-bottom: 0; padding-bottom: 0">
-                    <label style="font-size: large; font-weight:inherit" for="inputConfirmPassword" class="col-sm-2 col-form-label">Confirm New Password</label>
+                    <label style="font-size: medium; font-weight:inherit" for="inputConfirmPassword" class="col-sm-2 col-form-label">Confirm New Password</label>
                     <div class="col">
                         <input class="form-control required" id="confirm_password" type="password">
                     </div>
@@ -241,7 +241,7 @@
             </div>
 
             <!-- Tags -->
-            <dt class="col-sm-9" style="font-size: x-large; margin-top:2rem!important; margin-bottom: 2rem!important;">
+            <dt class="col-sm-9" style="font-size: x-large; margin-top:2rem!important; margin-bottom: 1rem!important;">
                  Change Tags
              </dt>
 
