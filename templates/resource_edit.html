@@ -5,525 +5,513 @@
 {% endblock %}
 
 {% block script %}
-<script>
-    // DROPDOWN
-    $(function () {
+    <script>
+        // Handles dropdown menu
+        $(function () {
 
-        $(".dropdown-menu a").click(function () {
+            $(".dropdown-menu a").click(function () {
 
-            $("#dropdownMenuButton1").text($(this).text());
-            $("#dropdownMenuButton1").val($(this).text());
-            if ($("#dropdownMenuButton1").val() == "Private"){
-                $('#privateUsersAccess').attr('hidden',false) ;
-            }else{
-                $('#privateUsersAccess').attr('hidden',true) ;
+                $("#dropdownMenuButton1").text($(this).text());
+                $("#dropdownMenuButton1").val($(this).text());
+                if ($("#dropdownMenuButton1").val() == "Private"){
+                    $('#privateUsersAccess').attr('hidden',false) ;
+                }else{
+                    $('#privateUsersAccess').attr('hidden',true) ;
+                }
+            });
+
+        });
+
+        updateFileName = function() {
+            var input = document.getElementById('file-upload');
+            $("#resourceFileName").text(input.files.item(0).name);
+        }
+        updateThumbNailName = function() {
+            var input = document.getElementById('thumbnail-upload');
+            $("#resourceThumbNailName").text(input.files.item(0).name);
+        }
+        addPrivateUser = function() {
+            $('#privateUsers').append('<li class="list-group-item"><input class="form-control" name="addedUserEmails" style = "margin-top:0.5rem!important;" placeholder="' + $('#addUser').val() + '" value="' + $('#addUser').val() + '"" disabled><button type="button" class="btn-close float-end" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close" onclick="this.parentNode.remove()"></button></li>');
+        }
+
+        resetPage = function() {
+            $('#addUser').val('');
+            document.getElementById('file-upload').value = null;
+            document.getElementById('thumbnail-upload').value = null;
+            $("#resourceFileName").text("Upload a File");
+            $("#resourceThumbNailName").text("Uplod a thumbnail");
+            $('#title').val('');
+            $('#description').val('');
+            $('#exampleDataList').val('');
+            $('#exampleDataList1').val('');
+            $('#exampleDataList2').val('');
+            $('#search_tags').val('');
+            $('#privateUsers').html('');
+
+            var spanBoxes = document.getElementsByClassName('tagSearchSpan');
+            var search_term = $('input[name=tags]').val().toLowerCase();
+            for (var i = 0; i < spanBoxes.length; i++) {
+                box = spanBoxes[i];
+                if (box.title.toLowerCase().indexOf(search_term) > -1) {
+                    box.hidden = false;
+                } else {
+                    box.hidden = true;
+                }
+                if (search_term == '') {
+                    box.hidden = true;
+                }
+            }
+            var spanFoundBoxes = document.getElementsByClassName('tagFoundSpan');
+            for (var i = 0; i < spanFoundBoxes.length; i++) {
+                box = spanFoundBoxes[i];
+                box.hidden = true;
+                box.getElementsByTagName('input')[0].checked = false
+                id = box.getElementsByTagName('input')[0].id.replace('____s', '');
+                document.getElementById(id).checked = false
+            }
+        }
+
+        // Tags button
+        function tagChecked(checkboxElem) {
+            id = checkboxElem.id + '____s';
+            other = document.getElementById(id)
+            tagId = checkboxElem.name + '_selected';
+            otherTag = document.querySelector('[title='+tagId+']')
+            myTagId = checkboxElem.name + '_search';
+            myTag = document.querySelector('[title='+myTagId+']')
+            if (checkboxElem.checked) {
+                other.checked = false;
+                otherTag.hidden = false;
+                myTag.hidden = true;
+            } else {
+                other.checked = true;
+                otherTag.hidden = true;
+                myTag.hidden = false;
+            }
+        }
+        function tagCheckedSelected(checkboxElem) {
+            id = checkboxElem.id.replace('____s', '');
+            other = document.getElementById(id)
+            tagId = checkboxElem.name + '_search';
+            otherTag = document.querySelector('[title='+tagId+']')
+            myTagId = checkboxElem.name + '_selected';
+            myTag = document.querySelector('[title='+myTagId+']')
+            if (checkboxElem.checked) {
+                other.checked = false;
+                var search_term = $('input[name=tags]').val().toLowerCase();
+                if (otherTag.title.toLowerCase().indexOf(search_term) > -1) {
+                    otherTag.hidden = false;
+                } else {
+                    otherTag.hidden = true;
+                }
+                if (search_term == '') {
+                    otherTag.hidden = true;
+                }
+                myTag.hidden = true;
+            } else {
+                other.checked = true;
+                otherTag.hidden = true;
+                myTag.hidden = false;
+            }
+        }
+
+
+        // Tags search
+        $(document).on("keyup", "#search_tags", function (e) {
+            var search_term = $('input[name=tags]').val().toLowerCase();
+            var spanBoxes = document.getElementsByClassName('tagSearchSpan');
+            for (var i = 0; i < spanBoxes.length; i++) {
+                box = spanBoxes[i];
+                if (search_term == '') {
+                    box.hidden = true;
+                } else if (box.title.toLowerCase().indexOf(search_term) > -1) {
+                    tagId = box.title.replace('_search', '_selected');
+                    try {
+                        otherTag = document.querySelector('[title='+tagId+']')
+                        if(otherTag.hidden){
+                            box.hidden = false;
+                        }else{
+                            box.hidden = true;
+                        }
+                    } catch (err) {
+                        box.hidden = true;
+                    }
+                } else {
+                    box.hidden = true;
+                }
+            }
+        });
+        // Seed Document
+        $(document).ready(function () {
+            var search_term = $('input[name=tags]').val().toLowerCase();
+            var spanBoxes = document.getElementsByClassName('tagSearchSpan');
+            for (var i = 0; i < spanBoxes.length; i++) {
+                box = spanBoxes[i];
+                if (box.title.toLowerCase().indexOf(search_term) > -1) {
+                    box.hidden = false;
+                } else {
+                    box.hidden = true;
+                }
+                if (search_term == '') {
+                    box.hidden = true;
+                }
             }
         });
 
-    });
+        function add_personnel() {
+            var email = document.getElementById("new_personnel").value;
 
-    updateFileName = function() {
-        var input = document.getElementById('file-upload');
-        $("#resourceFileName").text(input.files.item(0).name);
-    }
-    updateThumbNailName = function() {
-        var input = document.getElementById('thumbnail-upload');
-        $("#resourceThumbNailName").text(input.files.item(0).name);
-    }
-    addPrivateUser = function() {
-        $('#privateUsers').append('<li class="list-group-item"><input class="form-control" name="addedUserEmails" style = "margin-top:0.5rem!important;" placeholder="' + $('#addUser').val() + '" value="' + $('#addUser').val() + '"" disabled><button type="button" class="btn-close float-end" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close" onclick="this.parentNode.remove()"></button></li>');
-    }
+            // clear input text
+            document.getElementById("new_personnel").value="";
 
-    resetPage = function() {
-        $('#addUser').val('');
-        document.getElementById('file-upload').value = null;
-        document.getElementById('thumbnail-upload').value = null;
-        $("#resourceFileName").text("Upload a File");
-        $("#resourceThumbNailName").text("Uplod a thumbnail");
-        $('#title').val('');
-        $('#description').val('');
-        $('#exampleDataList').val('');
-        $('#exampleDataList1').val('');
-        $('#exampleDataList2').val('');
-        $('#search_tags').val('');
-        $('#privateUsers').html('');
+            // check email validity
+            var validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
-        var spanBoxes = document.getElementsByClassName('tagSearchSpan');
-        var search_term = $('input[name=tags]').val().toLowerCase();
-        for (var i = 0; i < spanBoxes.length; i++) {
-            box = spanBoxes[i];
-            if (box.title.toLowerCase().indexOf(search_term) > -1) {
-                box.hidden = false;
-            } else {
-                box.hidden = true;
+            if (!email.match(validRegex)) {
+                alert("Please ensure the email address is valid");
+                return;
             }
-            if (search_term == '') {
-                box.hidden = true;
-            }
-        }
-        var spanFoundBoxes = document.getElementsByClassName('tagFoundSpan');
-        for (var i = 0; i < spanFoundBoxes.length; i++) {
-            box = spanFoundBoxes[i];
-            box.hidden = true;
-            box.getElementsByTagName('input')[0].checked = false
-            id = box.getElementsByTagName('input')[0].id.replace('____s', '');
-            document.getElementById(id).checked = false
-        }
-    }
 
-    // Tags button
-    function tagChecked(checkboxElem) {
-        id = checkboxElem.id + '____s';
-        other = document.getElementById(id)
-        tagId = checkboxElem.name + '_selected';
-        otherTag = document.querySelector('[title='+tagId+']')
-        myTagId = checkboxElem.name + '_search';
-        myTag = document.querySelector('[title='+myTagId+']')
-        if (checkboxElem.checked) {
-            other.checked = false;
-            otherTag.hidden = false;
-            myTag.hidden = true;
-        } else {
-            other.checked = true;
-            otherTag.hidden = true;
-            myTag.hidden = false;
-        }
-    }
-    function tagCheckedSelected(checkboxElem) {
-        id = checkboxElem.id.replace('____s', '');
-        other = document.getElementById(id)
-        tagId = checkboxElem.name + '_search';
-        otherTag = document.querySelector('[title='+tagId+']')
-        myTagId = checkboxElem.name + '_selected';
-        myTag = document.querySelector('[title='+myTagId+']')
-        if (checkboxElem.checked) {
-            other.checked = false;
-            var search_term = $('input[name=tags]').val().toLowerCase();
-            if (otherTag.title.toLowerCase().indexOf(search_term) > -1) {
-                otherTag.hidden = false;
-            } else {
-                otherTag.hidden = true;
-            }
-            if (search_term == '') {
-                otherTag.hidden = true;
-            }
-            myTag.hidden = true;
-        } else {
-            other.checked = true;
-            otherTag.hidden = true;
-            myTag.hidden = false;
-        }
-    }
+            console.log("email entered is " + email);
+            // entire personnel
+            var personnel = document.getElementById("personnel").getElementsByClassName("overflow-auto")[0];
+            // new li representing a new user email
+            var new_user = document.createElement("li");
+            new_user.setAttribute("class", "list-group-item");
+            new_user.textContent = email;
+            // create a hidden label that stores users' email
+            var user_email = document.createElement("input");
+            user_email.setAttribute("type", "hidden");
+            user_email.setAttribute("name", "personnel_ids");
+            user_email.setAttribute("value", email);
+            new_user.appendChild(user_email);
+            // button, onclick, remove this new_user li
+            var delete_user = document.createElement('button');
+            delete_user.setAttribute("class", "btn-close float-end");
+            delete_user.setAttribute("style", "margin-top: 5px");
+            delete_user.setAttribute("data-bs-dismiss", "alert");
+            delete_user.setAttribute('aria-label', "Close");
+            delete_user.setAttribute("onclick", "parentNode.parentNode.removeChild(parentNode)");
+            new_user.appendChild(delete_user);
 
-
-    // Tags search
-    $(document).on("keyup", "#search_tags", function (e) {
-        var search_term = $('input[name=tags]').val().toLowerCase();
-        var spanBoxes = document.getElementsByClassName('tagSearchSpan');
-        for (var i = 0; i < spanBoxes.length; i++) {
-            box = spanBoxes[i];
-            if (search_term == '') {
-                box.hidden = true;
-            } else if (box.title.toLowerCase().indexOf(search_term) > -1) {
-                tagId = box.title.replace('_search', '_selected');
-                try {
-                    otherTag = document.querySelector('[title='+tagId+']')
-                    if(otherTag.hidden){
-                        box.hidden = false;
-                    }else{
-                        box.hidden = true;
-                    }
-                } catch (err) {
-                    box.hidden = true;
-                }
-            } else {
-                box.hidden = true;
-            }
-        }
-    });
-    // Seed Document
-    $(document).ready(function () {
-        var search_term = $('input[name=tags]').val().toLowerCase();
-        var spanBoxes = document.getElementsByClassName('tagSearchSpan');
-        for (var i = 0; i < spanBoxes.length; i++) {
-            box = spanBoxes[i];
-            if (box.title.toLowerCase().indexOf(search_term) > -1) {
-                box.hidden = false;
-            } else {
-                box.hidden = true;
-            }
-            if (search_term == '') {
-                box.hidden = true;
-            }
-        }
-    });
-
-    function add_personnel() {
-        var email = document.getElementById("new_personnel").value;
-
-        // clear input text
-        document.getElementById("new_personnel").value="";
-
-        // check email validity
-        var validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-
-        if (!email.match(validRegex)) {
-            alert("Please ensure the email address is valid");
-            return;
+            personnel.appendChild(new_user);
         }
 
-        console.log("email entered is " + email);
-        // entire personnel
-        var personnel = document.getElementById("personnel").getElementsByClassName("overflow-auto")[0];
-        // new li representing a new user email
-        var new_user = document.createElement("li");
-        new_user.setAttribute("class", "list-group-item");
-        new_user.textContent = email;
-        // create a hidden label that stores users' email
-        var user_email = document.createElement("input");
-        user_email.setAttribute("type", "hidden");
-        user_email.setAttribute("name", "personnel_ids");
-        user_email.setAttribute("value", email);
-        new_user.appendChild(user_email);
-        // button, onclick, remove this new_user li
-        var delete_user = document.createElement('button');
-        delete_user.setAttribute("class", "btn-close float-end");
-        delete_user.setAttribute("style", "margin-top: 5px");
-        delete_user.setAttribute("data-bs-dismiss", "alert");
-        delete_user.setAttribute('aria-label', "Close");
-        delete_user.setAttribute("onclick", "parentNode.parentNode.removeChild(parentNode)");
-        new_user.appendChild(delete_user);
-
-        personnel.appendChild(new_user);
-    }
-
-</script>
+    </script>
 {% endblock %}
 
 
 {% block content %}
     <!-- Handles making the user confirm they want to leave this page as all unsaved changes will be lost-->
     <body onbeforeunload = "return leavePageFunction()">
-        <script>
-            function leavePageFunction() {
-                return "Testing something"
-            }
-        </script>
+    <script>
+        function leavePageFunction() {
+            return "Testing something"
+        }
+    </script>
 
     </body>
-
-
-
-<div class="container" style="margin-bottom: 3rem!important;  padding-left: 200px; padding-right: 200px">
+    <div class="container" style="margin-bottom: 3rem!important;  padding-left: 200px; padding-right: 200px">
         <!-- Title Section -->
         <div class="row">
             <dt class="col-sm-9" style = "font-size: x-large; margin-top:2rem!important; margin-bottom: 2rem!important;">
-                    Create Resource
+                Create Resource
             </dt>
         </div>
 
         <div class="col d-flex justify-content-md-between">
-             <form class = "form-outline flex-fill" method="POST" action="{{url_for('resource_edit', rid=rid)}}" enctype = "multipart/form-data" novalidate>
+            <form class = "form-outline flex-fill" method="POST" action="{{url_for('resource_edit', rid=rid)}}" enctype = "multipart/form-data" novalidate>
                 {{ form.csrf_token }}
-                    <div class = "card flex-fill shadow-sm">
-                                 <div class="mb-3" style="margin: 1rem; margin-bottom: 0rem!important;">
-                                          <label for="Titleform" class="form-label">Edit
-                                          a teaching resource</label>
-                                    </div>
-                                    <!-- Title of the resource-->
-                                    <div class="mb-3" style="margin: 1rem!important;">
-                                          <label for="Titleform" class="form-label" style="font-weight: bold; font-size: larger">Title</label>
-                                        <!-- Help documentation -->
-                                             <label title="Give your resource a relevant title.&nbsp<br>&nbsp;&nbsp<br>Use keywords that relate to the resource in the
+                <div class = "card flex-fill shadow-sm">
+                    <div class="mb-3" style="margin: 1rem; margin-bottom: 0rem!important;">
+                        <label for="Titleform" class="form-label">Edit
+                            a teaching resource</label>
+                    </div>
+                    <!-- Title of the resource-->
+                    <div class="mb-3" style="margin: 1rem!important;">
+                        <label for="Titleform" class="form-label" style="font-weight: bold; font-size: larger">Title</label>
+                        <!-- Help documentation -->
+                        <label title="Give your resource a relevant title.&nbsp<br>&nbsp;&nbsp<br>Use keywords that relate to the resource in the
                                                      title to make it easier for other users to find your resource through searching."
-                                                     data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html="true">
+                               data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html="true">
 
-                                                 <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
-                                                     <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                                     <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
-                                                 </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                            </svg>
 
-                                             </label>
+                        </label>
 
-                                        {{ form.title(class="form-control",placeholder="Title of your resource (required)",type="email" ) }}
-                                    </div>
+                        {{ form.title(class="form-control",placeholder="Title of your resource (required)",type="email" ) }}
+                    </div>
 
-                                    <!-- Description of the resource-->
-                                  <div class="mb-3" style="margin: 1rem!important;">
-                                        <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Body</label>
-                                      <!-- Help documentation-->
-                                        <label title="Give your resource a detailed overview or descriptions.&nbsp<br>&nbsp;&nbsp<br>Good starting points are to
+                    <!-- Description of the resource-->
+                    <div class="mb-3" style="margin: 1rem!important;">
+                        <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Body</label>
+                        <!-- Help documentation-->
+                        <label title="Give your resource a detailed overview or descriptions.&nbsp<br>&nbsp;&nbsp<br>Good starting points are to
                                         include the resources contents, guide to use resource and what the resource aims to achieve.
                                         This is important as other users will read this to understand your resource."
-                                               data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html="true">
+                               data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html="true">
 
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
-                                                     <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                                     <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
-                                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                            </svg>
 
-                                        </label>
-                                      {{ form.description(class="form-control",rows="7", placeholder="Description (required)") }}
-                                  </div>
+                        </label>
+                        {{ form.description(class="form-control",rows="7", placeholder="Description (required)") }}
+                    </div>
 
-                                    <!-- Resource file upload-->
-                                    <div class="mb-3" style="margin: 1rem!important;">
-                                            <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">File Upload</label>
-                                          <!-- Help documentation-->
-{#                                            <label title="Upload a single file which contains your resource in any format you want.&nbsp<br>&nbsp;&nbsp<br>If you wish to submit multiple#}
-{#                                                          files under a single resource, we recommend zipping together the resources and describing the files instead in the description"#}
-{#                                                   data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html = "true">#}
-                                            {# prompt resource reupload not possible #}
-                                            <label title="Resources for each entity can only be uploaded once. If you have new resource, please create a new resource entity."
-                                                   data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html = "true">
+                    <!-- Resource file upload-->
+                    <div class="mb-3" style="margin: 1rem!important;">
+                        <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">File Upload</label>
+                        <!-- Help documentation-->
+                        {#                                            <label title="Upload a single file which contains your resource in any format you want.&nbsp<br>&nbsp;&nbsp<br>If you wish to submit multiple#}
+                        {#                                                          files under a single resource, we recommend zipping together the resources and describing the files instead in the description"#}
+                        {#                                                   data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html = "true">#}
+                        {# prompt resource reupload not possible #}
+                        <label title="Resources for each entity can only be uploaded once. If you have new resource, please create a new resource entity."
+                               data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html = "true">
 
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
-                                                         <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                                         <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
-                                                </svg>
-                                            </label>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                            </svg>
+                        </label>
 
-                                          <div class="card flex-fill" id="resourceUpload">
-                                              <div class="row">
-                                                  <div class = "col-10">
-                                                      <dd id="resourceFileName" class="font-weight-bold" style="margin: 1rem!important;">
-                                                          {{ "Current resource: " + filename}}</dd>
-                                                  </div>
-                                                  {# edit resource does not allow reupload resource #}
-{#                                                    <div class="col-2" style="margin-top: 0rem!important;">#}
-{#                                                        <!-- Button to upload the post-->#}
-{#                                                        <label for="file-upload" class="btn btn-primary btn" style="margin: 1rem; margin-left: 4rem!important;">#}
-{#                                                            Upload File#}
-{#                                                        </label>#}
-{#                                                        {{ form.files(id="file-upload", style="display:none;", onchange="javascript:updateFileName()") }}#}
-{#                                                    </div>#}
-                                                </div>
-                                          </div>
-                                      </div>
+                        <div class="card flex-fill" id="resourceUpload">
+                            <div class="row">
+                                <div class = "col-10">
+                                    <dd id="resourceFileName" class="font-weight-bold" style="margin: 1rem!important;">
+                                        {{ "Current resource: " + filename}}</dd>
+                                </div>
+                                {# edit resource does not allow reupload resource #}
+                                {#                                                    <div class="col-2" style="margin-top: 0rem!important;">#}
+                                {#                                                        <!-- Button to upload the post-->#}
+                                {#                                                        <label for="file-upload" class="btn btn-primary btn" style="margin: 1rem; margin-left: 4rem!important;">#}
+                                {#                                                            Upload File#}
+                                {#                                                        </label>#}
+                                {#                                                        {{ form.files(id="file-upload", style="display:none;", onchange="javascript:updateFileName()") }}#}
+                                {#                                                    </div>#}
+                            </div>
+                        </div>
+                    </div>
 
-                                    <!-- Thumbnail file upload-->
-                                    <div class="mb-3" style="margin: 1rem!important;">
-                                            <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Thumbnail Upload</label>
-                                          <!-- Help documentation-->
-                                            <label title="Upload a thumbnail which will be the cover image of the resource visible to users.&nbsp<br>&nbsp;&nbsp<br>Make it eye catching to draw attention to your resource."
-                                                   data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html = "true">
+                    <!-- Thumbnail file upload-->
+                    <div class="mb-3" style="margin: 1rem!important;">
+                        <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Thumbnail Upload</label>
+                        <!-- Help documentation-->
+                        <label title="Upload a thumbnail which will be the cover image of the resource visible to users.&nbsp<br>&nbsp;&nbsp<br>Make it eye catching to draw attention to your resource."
+                               data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html = "true">
 
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
-                                                         <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                                         <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
-                                                </svg>
-                                            </label>
-                                          <div class="card flex-fill" id="thumbnailUpload">
-                                              <div class="row">
-                                                  <div class = "col-8">
-                                                      {% if thumbnails_filename != "" %}
-                                                          <dd id="resourceThumbNailName" class="font-weight-bold" style="margin: 1rem!important;">
-                                                          {{ "Current thumbnails: " + thumbnails_filename}}</dd>
-                                                      {% else %}
-                                                          <dd id="resourceThumbNailName" class="font-weight-bold" style="margin: 1rem!important;">
-                                                          Upload a thumbnail</dd>
-                                                      {% endif %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                            </svg>
+                        </label>
+                        <div class="card flex-fill" id="thumbnailUpload">
+                            <div class="row">
+                                <div class = "col-8">
+                                    {% if thumbnails_filename != "" %}
+                                        <dd id="resourceThumbNailName" class="font-weight-bold" style="margin: 1rem!important;">
+                                            {{ "Current thumbnails: " + thumbnails_filename}}</dd>
+                                    {% else %}
+                                        <dd id="resourceThumbNailName" class="font-weight-bold" style="margin: 1rem!important;">
+                                            Upload a thumbnail</dd>
+                                    {% endif %}
 
-                                                  </div>
-                                                    <div class="col-4" style="margin-top: 0rem!important;">
-                                                        <!-- Button to upload the thumbnail-->
-                                                        <label for="thumbnail-upload" class="btn btn-primary btn" style="margin: 1rem; margin-left: 6rem!important;">
-                                                            Upload Thumbnail
-                                                        </label>
-                                                        {{ form.thumbnail(id="thumbnail-upload", style="display:none;", onchange="javascript:updateThumbNailName()") }}
-                                                    </div>
+                                </div>
+                                <div class="col-4" style="margin-top: 0rem!important;">
+                                    <!-- Button to upload the thumbnail-->
+                                    <label for="thumbnail-upload" class="btn btn-primary btn" style="margin: 1rem; margin-left: 6rem!important;">
+                                        Upload Thumbnail
+                                    </label>
+                                    {{ form.thumbnail(id="thumbnail-upload", style="display:none;", onchange="javascript:updateThumbNailName()") }}
+                                </div>
 
 
-                                                </div>
-                                          </div>
-                                      </div>
+                            </div>
+                        </div>
+                    </div>
 
-                                    <!-- Tags-->
-                                    <div class="mb-3" style="margin: 1rem!important;">
-                                            <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Subject, Year Level and Tags</label>
-                                          <!-- Help documentation-->
-                                            <label title="Specify the target year level and subject of your resource. This helps users refine their search of resources to find ones which suit their context and needs.&nbsp<br>&nbsp;&nbsp<br>
+                    <!-- Tags-->
+                    <div class="mb-3" style="margin: 1rem!important;">
+                        <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Subject, Year Level and Tags</label>
+                        <!-- Help documentation-->
+                        <label title="Specify the target year level and subject of your resource. This helps users refine their search of resources to find ones which suit their context and needs.&nbsp<br>&nbsp;&nbsp<br>
                                                           Select additional tags to further categorise your resource. If your resource is appropriate for multiple year levels or subjects,
                                                           we recommend selecting all the appropriate tags and select the most relevant subject and year level."
-                                                   data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html = "true">
+                               data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html = "true">
 
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
-                                                         <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                                         <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
-                                                </svg>
-                                            </label>
-                                          <div class="card flex-fill" id="tagUpload">
-                                              <!-- Subject-->
-                                              <div class="row" style="margin-top: 1rem!important;">
-                                                    <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
-                                                        Select Subject:
-                                                    </div>
-                                                  <div class = "col-7">
-                                                      <input class="form-control" name="subject" style = "margin-top:0.5rem!important;"
-                                                        list="datalistOptions" id="exampleDataList" placeholder="Search Subjects..." value="{{ subject }}">
-                                                      <datalist id="datalistOptions">
-                                                          {% for item in subjects %}
-                                                              {% if subject.lower() == enum_to_website_output(item).lower() %}
-                                                                    <option selected value="{{enum_to_website_output(item)}}">
-                                                              {% else %}
-                                                                    <option value="{{enum_to_website_output(item)}}">
-                                                              {% endif %}
-                                                          {% endfor %}
-                                                      </datalist>
-                                                  </div>
-                                              </div>
-                                              <!-- Year Level-->
-                                              <div class="row" style="margin-top: 1rem!important;">
-                                                    <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
-                                                        Select Grade:
-                                                    </div>
-                                                  <div class = "col-7">
-                                                    <input class="form-control" name="grades" style = "margin-top:0.5rem!important;"
-                                                   list="datalistOptions2" id="exampleDataList2" placeholder="Search Grades..." value="{{ grade }}">
-                                                      <datalist id="datalistOptions2">
-                                                          {% for item in grades %}
-                                                              {% if grade.lower() == enum_to_website_output(item).lower() %}
-                                                                    <option selected value="{{enum_to_website_output(item)}}">
-                                                              {% else %}
-                                                                    <option value="{{ enum_to_website_output(item) }}">
-                                                              {% endif %}
-                                                          {% endfor %}
-                                                      </datalist>
-                                                  </div>
-                                              </div>
-                                              <!-- Search for Tags -->
-                                              <div class="row" style="margin-top: 1rem!important;">
-                                                    <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
-                                                        Select Tags:
-                                                    </div>
-                                                  <div class = "col-7">
-                                                    <div class="input-group">
-                                                        <input class="form-control" type="search" name="tags" style = "margin-top:0.5rem!important;" placeholder="Search Tags..."
-                                                            id="search_tags">
-                                                    </div>
-                                                </div>
-                                              </div>
-                                            <div class = "row" style = "margin-top: 1.5rem!important; margin-bottom: 1rem!important;">
-                                                <div class = "col-2" style="margin-left: 6rem!important;">
-                                                    Matching Tags:
-                                                </div>
-                                                <div class = "col-7">
-                                                    {% for item in tags %}
-                                                    <span class="badge rounded-pill bg-other-tag tagSearchSpan" title="{{item}}_search" hidden>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                            </svg>
+                        </label>
+                        <div class="card flex-fill" id="tagUpload">
+                            <!-- Subject-->
+                            <div class="row" style="margin-top: 1rem!important;">
+                                <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
+                                    Select Subject:
+                                </div>
+                                <div class = "col-7">
+                                    <input class="form-control" name="subject" style = "margin-top:0.5rem!important;"
+                                           list="datalistOptions" id="exampleDataList" placeholder="Search Subjects..." value="{{ subject }}">
+                                    <datalist id="datalistOptions">
+                                        {% for item in subjects %}
+                                            {% if subject.lower() == enum_to_website_output(item).lower() %}
+                                                <option selected value="{{enum_to_website_output(item)}}">
+                                                    {% else %}
+                                                <option value="{{enum_to_website_output(item)}}">
+                                            {% endif %}
+                                        {% endfor %}
+                                    </datalist>
+                                </div>
+                            </div>
+                            <!-- Year Level-->
+                            <div class="row" style="margin-top: 1rem!important;">
+                                <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
+                                    Select Grade:
+                                </div>
+                                <div class = "col-7">
+                                    <input class="form-control" name="grades" style = "margin-top:0.5rem!important;"
+                                           list="datalistOptions2" id="exampleDataList2" placeholder="Search Grades..." value="{{ grade }}">
+                                    <datalist id="datalistOptions2">
+                                        {% for item in grades %}
+                                            {% if grade.lower() == enum_to_website_output(item).lower() %}
+                                                <option selected value="{{enum_to_website_output(item)}}">
+                                                    {% else %}
+                                                <option value="{{ enum_to_website_output(item) }}">
+                                            {% endif %}
+                                        {% endfor %}
+                                    </datalist>
+                                </div>
+                            </div>
+                            <!-- Search for Tags -->
+                            <div class="row" style="margin-top: 1rem!important;">
+                                <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
+                                    Select Tags:
+                                </div>
+                                <div class = "col-7">
+                                    <div class="input-group">
+                                        <input class="form-control" type="search" name="tags" style = "margin-top:0.5rem!important;" placeholder="Search Tags..."
+                                               id="search_tags">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class = "row" style = "margin-top: 1.5rem!important; margin-bottom: 1rem!important;">
+                                <div class = "col-2" style="margin-left: 6rem!important;">
+                                    Matching Tags:
+                                </div>
+                                <div class = "col-7">
+                                    {% for item in tags %}
+                                        <span class="badge rounded-pill bg-other-tag tagSearchSpan" title="{{item}}_search" hidden>
                                                         <input type="checkbox" hidden id="{{item}}_input" name="{{item}}" value="{{item}}"
-                                                            onchange="tagChecked(this)">
+                                                               onchange="tagChecked(this)">
                                                         <label for="{{item}}_input" id="{{item}}_label">{{enum_to_website_output(item)}}</label>
                                                     </span>
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                            <!-- Put the applied tags here-->
-                                            <div class = "row" style = "margin-top: 1.5rem!important; margin-bottom: 1rem!important;">
-                                                <div class = "col-2" style="margin-left: 6rem!important;">
-                                                    Applied Tags:
-                                                </div>
-                                                <div class = "col-7">
-                                                    {% for item in applied_tags %}
-                                                        <span class="badge rounded-pill bg-other-tag tagFoundSpan" title="{{item}}_selected">
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <!-- Put the applied tags here-->
+                            <div class = "row" style = "margin-top: 1.5rem!important; margin-bottom: 1rem!important;">
+                                <div class = "col-2" style="margin-left: 6rem!important;">
+                                    Applied Tags:
+                                </div>
+                                <div class = "col-7">
+                                    {% for item in applied_tags %}
+                                        <span class="badge rounded-pill bg-other-tag tagFoundSpan" title="{{item}}_selected">
                                                             <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
-                                                                onchange="tagCheckedSelected(this)">
+                                                                   onchange="tagCheckedSelected(this)">
                                                             <label for="{{item}}_input____s" id="{{item}}_label____s">{{enum_to_website_output(item)}}</label>
                                                         </span>
-                                                    {% endfor %}
-                                                </div>
-                                                </div>
-                                          </div>
-                                      </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                                    <!-- Privacy settings-->
-                                    <div class="mb-3" style="margin: 1rem!important;">
-                                            <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Privacy</label>
-                                          <!-- Help documentation-->
-                                            <label title="Set the privacy settings of your resource.&nbsp<br>&nbsp;&nbsp<br>Public resources are viewable by anyone, whereas private resources are
+                    <!-- Privacy settings-->
+                    <div class="mb-3" style="margin: 1rem!important;">
+                        <label for="Bodyform" class="form-label" style="font-weight: bold; font-size: larger">Privacy</label>
+                        <!-- Help documentation-->
+                        <label title="Set the privacy settings of your resource.&nbsp<br>&nbsp;&nbsp<br>Public resources are viewable by anyone, whereas private resources are
                                                           restricted to user accounts which you specify below.
                                                           You must enter at least one account or your resource will still be treated as public."
-                                                   data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html = "true">
+                               data-bs-toggle="popover" data-bs-placement="right" data-content="Content" data-bs-html = "true">
 
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
-                                                         <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                                         <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
-                                                </svg>
-                                            </label>
-                                          <div class="card flex-fill" id="privacyUpload">
-                                              <!-- Dropdown options-->
-                                              <div class="d-flex">
-                                                  <p class="h6" style="margin: 1.5rem!important;">Access: </p>
-                                                    <div class="dropdown px-3" style="margin: 1rem!important;">
-                                                        <select class="btn btn-primary dropdown-toggle" name="visibility_choice" onchange="showDiv(this)" style="min-width: 100px; height: 100%"
-                                                             id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            {% for visibility in ['Public', 'Private'] %}
-                                                                {% if visibility == current_visibility %}
-                                                                    <option class="dropdown-item" style="background-color: white"  value="{{ visibility }}" selected >{{ visibility }}</option>
-                                                                {% else %}
-                                                                    <option class="dropdown-item" style="background-color: white"  value="{{ visibility }}" >{{ visibility }}</option>
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        </select>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="17" fill="currentColor" class="bi bi-question-circle" style = "margin-bottom: 6px" viewBox="0 0 16 16">
+                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+                            </svg>
+                        </label>
+                        <div class="card flex-fill" id="privacyUpload">
+                            <!-- Dropdown options-->
+                            <div class="d-flex">
+                                <p class="h6" style="margin: 1.5rem!important;">Access: </p>
+                                <div class="dropdown px-3" style="margin: 1rem!important;">
+                                    <select class="btn btn-primary dropdown-toggle" name="visibility_choice" onchange="showDiv(this)" style="min-width: 100px; height: 100%"
+                                            id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                        {% for visibility in ['Public', 'Private'] %}
+                                            {% if visibility == current_visibility %}
+                                                <option class="dropdown-item" style="background-color: white"  value="{{ visibility }}" selected >{{ visibility }}</option>
+                                            {% else %}
+                                                <option class="dropdown-item" style="background-color: white"  value="{{ visibility }}" >{{ visibility }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <script type="text/javascript">
+                                    function showDiv(visibility) {
+                                        console.log(visibility.value);
+                                        if (visibility.value !=="Public") {
+                                            document.getElementById("hidden_div").style.display = "block";
+                                        } else {
+                                            document.getElementById('hidden_div').style.display = "none";
+                                        }
+                                    }
 
-{#                                                        <button class="btn btn-primary dropdown-toggle form-control" style="min-width: 100px; height: 100%" type="button"#}
-{#                                                            id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false" name="privacy">#}
-{#                                                            Public#}
-{#                                                        </button>#}
-{#                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton1">#}
-{#                                                            <a class="dropdown-item" href='javascript:;' >Public </a>#}
-{#                                                            <a class="dropdown-item" href='javascript:;' >Private</a>#}
-{#                                                        </div>#}
-                                                    </div>
-                                              <script type="text/javascript">
-                                                      function showDiv(visibility) {
-                                                          console.log(visibility.value);
-                                                          if (visibility.value !=="Public") {
-                                                            document.getElementById("hidden_div").style.display = "block";
-                                                        } else {
-                                                            document.getElementById('hidden_div').style.display = "none";
-                                                        }
-                                                    }
+                                    // call this when the page is ready, in case visibility is not Public and personnel is not loaded
+                                    document.addEventListener("readystatechange", event => {
+                                        if (event.target.readyState === "complete") {
+                                            showDiv(document.getElementById("dropdownMenuButton1"));
+                                        }
+                                    });
+                                </script>
+                            </div>
+                            <!-- Search bar for users-->
+                            <div id="hidden_div" class = "row" style="margin-bottom: 2rem!important; display: none">
+                                <p class="h6" style="margin: 1.5rem; margin-bottom: 0rem!important;">Private User Access: </p>
+                                <div class="input-group" style="margin: 1.5rem; margin-left: 2rem!important; padding: 0rem; padding-right: 50px!important; ">
+                                    <input type="email" id="new_personnel" class="form-control" placeholder="Enter emails of accounts you wish to access your resource" style="width: 60%">
+                                    <button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;" onclick="add_personnel()">Add to Personnel</button>
+                                </div>
+                                <!-- List of all the users -->
+                                <ul class="list-group" id="personnel" style="margin-left: 2rem!important; margin-bottom: 2rem!important; padding-right: 65px!important">
+                                    <div class = "overflow-auto" style="max-height: 208px">
+                                        {%  for email in personnel_emails %}
+                                            <li class="list-group-item text-start"> {{ email }}
+                                                <button type="button" class="btn-close" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close"
+                                                        onclick="parentNode.parentNode.removeChild(parentNode)">
+                                                </button>
+                                                <input type="hidden" name="personnel_ids" value="{{ email }}"/>
+                                            </li>
+                                        {% endfor %}
+                                    </div>
+                                </ul>
 
-                                                    // call this when the page is ready, in case visibility is not Public and personnel is not loaded
-                                                    document.addEventListener("readystatechange", event => {
-                                                        if (event.target.readyState === "complete") {
-                                                          showDiv(document.getElementById("dropdownMenuButton1"));
-                                                      }
-                                                    });
-                                              </script>
-                                                </div>
-                                              <!-- Search bar for users-->
-                                              <div id="hidden_div" class = "row" style="margin-bottom: 2rem!important; display: none">
-                                                  <p class="h6" style="margin: 1.5rem; margin-bottom: 0rem!important;">Private User Access: </p>
-                                                  <div class="input-group" style="margin: 1.5rem; margin-left: 2rem!important; padding: 0rem; padding-right: 50px!important; ">
-                                                      <input type="email" id="new_personnel" class="form-control" placeholder="Enter emails of accounts you wish to access your resource" style="width: 60%">
-                                                      <button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;" onclick="add_personnel()">Add to Personnel</button>
-                                                    </div>
-                                                  <!-- List of all the users -->
-                                                  <ul class="list-group" id="personnel" style="margin-left: 2rem!important; margin-bottom: 2rem!important; padding-right: 65px!important">
-                                                      <div class = "overflow-auto" style="max-height: 208px">
-                                                          {%  for email in personnel_emails %}
-                                                            <li class="list-group-item text-start"> {{ email }}
-                                                                <button type="button" class="btn-close" style="margin-top: 5px" data-bs-dismiss="alert" aria-label="Close"
-                                                                        onclick="parentNode.parentNode.removeChild(parentNode)">
-                                                                </button>
-                                                                <input type="hidden" name="personnel_ids" value="{{ email }}"/>
-                                                            </li>
-                                                          {% endfor %}
-                                                      </div>
-                                                    </ul>
-
-                                              </div>
-                                          </div>
-                                      </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="float-end mt-2 pt-1" style="margin-top: 1rem!important;">
-                        <!-- Button to update the post-->
-                      <input type="submit"  class="btn btn-primary btn" style="margin-right: 1rem!important;" value="Update Resource">
-                        <!-- Button to clear the title and body of the post-->
-                        <button type="Button" class="btn btn-outline-danger btn" onclick="return window.location.href='{{ url_for("resource", rid=rid) }}';">Discard Draft</button>
-                    </div>
-                 </form>
+                </div>
+                <div class="float-end mt-2 pt-1" style="margin-top: 1rem!important;">
+                    <!-- Button to update the post-->
+                    <input type="submit"  class="btn btn-primary btn" style="margin-right: 1rem!important;" value="Update Resource" onclick = "toggleForm()">
+                    <!-- Button to clear the title and body of the post-->
+                    <button type="Button" class="btn btn-outline-danger btn" onclick="return window.location.href='{{ url_for("resource", rid=rid) }}';">Discard Draft</button>
+                </div>
+            </form>
 
         </div>
 
@@ -532,7 +520,23 @@
     <script>
         var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
         var popoverList = popoverTriggerList.map(function(popoverTriggerEl) {
-        return new bootstrap.Popover(popoverTriggerEl)
-})
+            return new bootstrap.Popover(popoverTriggerEl)
+        })
+    </script>
+    <script>
+     let postSubmit = false;
+     window.addEventListener('beforeunload', (event) => {
+        if (!postSubmit) {
+            alert("Not submit");
+            event.returnValue = 'You have unfinished changes!';
+
+         }
+        });
+
+    </script>
+     <script>
+    function toggleForm() {
+        postSubmit = true;
+    }
     </script>
 {% endblock %}
