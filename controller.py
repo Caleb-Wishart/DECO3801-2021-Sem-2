@@ -398,7 +398,7 @@ def resource(rid=None):
         creater = conn.query(User).filter_by(uid=creater.uid).first()
     creater_rating_whole = int(creater.user_rating)
     # get if a user's honor rating is greater than int.5
-    creater_rating_half = 0 if creater.user_rating - creater_rating_whole < .5 else 1
+    creater_rating_half = 0 if round(float(creater.user_rating), 1) - float(creater_rating_whole) < .5 else 1
     # empty stars
     creater_rating_unchecked = 5 - creater_rating_whole - creater_rating_half
 
@@ -732,7 +732,7 @@ def profile(uid=None):
     # get user rating number
     user_rating_whole = int(user.user_rating)
     # get if a user's honor rating is greater than int.5
-    user_rating_half = 0 if float(user.user_rating) - float(user_rating_whole) < .5 else 1
+    user_rating_half = 0 if round(float(user.user_rating), 1) - float(user_rating_whole) < .5 else 1
     # empty stars
     user_rating_unchecked = 5 - user_rating_whole - user_rating_half
 
