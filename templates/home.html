@@ -84,30 +84,30 @@
                 <!-- Bottom Section-->
                 <div class="row">
                     <div class="col">
-                        <div class="d-flex" style="margin-left: 10px; margin-right: 10px">
-                            {# <!--Views-->
-                           <p class="card-text px-1" style="margin-bottom: 0.5rem!important">
-                                Views: 5000
-                            </p> #}
-                            <!-- Upvotes and Downvotes-->
-                            <p class="card-text px-1" style="margin-bottom: 0.5rem!important">
-                                <%= res.upvote_count %>
-                            </p>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="pink" class="bi bi-arrow-up-circle-fill" style="margin-top: 4px" xviewBox="0 0 16 16">
-                                    <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
+                        <div class="d-flex">
+                                <p class="card-text px-1" >
+                                    <%= res.upvote_count %>
+                                </p>
+                                <!--Downvotes-->
+                                <svg xmlns="http://www.w3.org/2000/svg"  width="17" height="17" fill="#2e9cfa" class="bi bi-arrow-up-circle-fill" viewBox="0 0 16 16" style="margin-top: 4px!important; margin-left: 3px!important"
+                                     >
+                            <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"
+                            />
                             </svg>
-                            <p class="card-text px-1" style="margin-bottom: 0.5rem!important">
-                                <%= res.downvote_count %>
-                            </p>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="pink" class="bi bi-arrow-up-circle-fill" style="margin-top: 4px" xviewBox="0 0 16 16">
-                                <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
+                                <p class="card-text px-1" style="margin-left: 4px!important;">
+                                    <%= res.downvote_count %>
+                                </p>
+                              <svg  xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="#ff4545" class="bi bi-arrow-down-circle-fill" viewBox="0 0 16 16" style="margin-top: 4px!important; margin-left: 3px!important">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"
+                            />
                             </svg>
-                        </div>
+
+                    </div>
                         <!-- Subject and Grade-->
-                        <dt class="h6 px-1" style="margin-left: 10px">
+                        <dt class="h6 px-1" style="margin-left: 10px; text-transform: capitalize">
                             Subject: <%= res.subject.replace(/_/g, ' ') %>
                         </dt>
-                        <dt class="h6 px-1" style="margin-left: 10px">
+                        <dt class="h6 px-1" style="margin-left: 10px; text-transform: capitalize">
                             Year Level: <%= res.grade.replace(/_/g, ' ') %>
                         </dt>
                     </div>
