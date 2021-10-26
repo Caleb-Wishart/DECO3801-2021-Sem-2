@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
 {% block style %}
-
 <style>
+    /* Styling for the upvotes and downvotes*/
     .clickedUp {
         fill: #2e9cfa;
     }
@@ -28,9 +28,11 @@
         <!-- New Comment Reply -->
         <div class="col-1" style="border-right: 1px dashed #333;">
         </div>
+         <!-- Avatar -->
         <div class="col-1" align="center">
             <img class="avatar" src="{{url_for('static',filename=current_user.avatar_link)}}" , alt="Profile Icon">
         </div>
+         <!-- Username -->
         <div class="col">
             <div class="row">
                 <p class="h6"><strong>{{current_user.username}}</strong></p>
@@ -56,6 +58,7 @@
                     <div class="col-1" align="center">
                         <img class="avatar" src="{{url_for('static',filename='')}}/<%= comm.author.avatar_link %>" , alt="Profile Icon">
                     </div>
+                    <!-- Username -->
                     <div class="col">
                         <div class="row">
                             <p class="h6"><strong><%= comm.author.username %></strong></p>
@@ -78,7 +81,6 @@
 
                 <% _.each(comm.replies,  function(reply) { %>
                 <!-- Comment Reply -->
-
                 <dic class = "row">
                     <div class="col-1" style="border-right: 1px dashed #333; height: 12px">
                     </div>
@@ -253,9 +255,9 @@
     <div class="row p-3">
         <!-- Resource Thumbnail -->
         <div class="col d-flex" style="padding-left: 0px!important">
-            <div class="card">
+            <div>
                 <img src="{{url_for('static', filename=banner.thumbnail_link)}}" , alt="Resource image" , width="900" ,
-                    height="275">
+                    height="300">
             </div>
         </div>
     <!-- Top row right hand side -->
@@ -483,8 +485,6 @@
                 </div>
             </div>
             {% endif %}
-            {#<div id="result">
-            </div>#}
     </div>
     <div class="row p-3 collapse show" id = "Collapse1" style="padding-top: 0!important; width: 94%">
         <div id="result">
@@ -492,7 +492,8 @@
     </div>
 </div>
     <script>
-function highlight(image, bool) { //Changes what button is currently active or not
+
+function highlight(image, bool) { //Changes what button for upvote and downvote is currently active or not
 
     if (bool) { //If we clicked a upvote
         $(image).toggleClass("clickedUp") //Toggle it
