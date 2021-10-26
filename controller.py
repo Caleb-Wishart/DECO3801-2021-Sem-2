@@ -707,22 +707,38 @@ def resourceComment():
 # -----{ PAGES.PROFILE }-------------------------------------------------------
 
 @app.route('/profile', methods=["GET"])
+@app.route("/profile/<uid>", methods=["GET"])
 @login_required
-def profile():
+def profile(uid=None):
     """
     The default view of a users profile,
     this can be used to view your own profiles.
     Specified with the GET request
     """
-    # get hold number
-    user_rating_whole = int(current_user.user_rating)
+    is_user_themself = True
+
+    if not uid or (uid.isnumeric() and int(uid) == current_user.uid):
+        # not uid specified, load current user's profile
+        user = current_user
+    else:
+        # load up other user's profile
+        is_user_themself = False
+        uid = int(uid)
+        user, _ = get_user_and_resource_instance(uid=uid, rid=-1)
+
+        if not user:
+            abort(404, description="This user does not exist.")
+
+    # get user rating number
+    user_rating_whole = int(user.user_rating)
     # get if a user's honor rating is greater than int.5
-    user_rating_half = 0 if current_user.user_rating - user_rating_whole < .5 else 1
+    user_rating_half = 0 if float(user.user_rating) - float(user_rating_whole) < .5 else 1
     # empty stars
     user_rating_unchecked = 5 - user_rating_whole - user_rating_half
 
-    return render_template('profile.html', title='Profile', user=current_user.serialize,
-                           teaching_areas=get_user_teaching_areas(current_user.uid), rating_whole=user_rating_whole,
+    return render_template('profile.html', title='Profile', user=user.serialize,
+                           teaching_areas=get_user_teaching_areas(user.uid),
+                           rating_whole=user_rating_whole, is_user_themself=is_user_themself,
                            rating_half=user_rating_half, rating_unchecked=user_rating_unchecked)
 
 

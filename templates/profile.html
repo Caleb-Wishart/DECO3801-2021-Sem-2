@@ -49,65 +49,6 @@
 
 {% block script %}
 
-    <script type="text/template" id="profile_card">
-     <% _.each(data,  function(res) { %>
-        <!-- Individual card -->
-     <div class="box shadow-sm flex-fill" style="margin: 1.1rem; margin-bottom: 0.55rem!important; margin-top: 0.55rem!important; color: black">
-         <a class="row">
-             <!-- Thumbnail for a channel.  -->
-             <div class="col-2" style="width: 12%">
-                 <img src="https://via.placeholder.com/65"
-                      alt="Logo", width="60", style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
-             </div>
-
-             <div class="col-3" style="margin-top: 10px!important; margin-bottom: 5px!important;">
-                 <!-- Title -->
-                 <div class = "row">
-                     <div class="fw-bold" style="padding: 0rem!important; font-size: small">
-                         Title
-                     </div>
-                 </div>
-             </div>
-             <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important;">
-                 <!-- Date Created -->
-                 <div class = "row">
-                     <div class="fw-bold" style="padding: 0rem!important; font-size: small">
-                         Date Created
-                     </div>
-                 </div>
-                 <div class = "row">
-                     <div style="padding: 0rem!important; font-size: small">
-                         (Actual Date)
-                     </div>
-                 </div>
-             </div>
-             <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important;">
-                 <!-- Privacy Status -->
-                 <div class = "row">
-                     <div class="fw-bold" style="padding: 0rem!important; font-size: small">
-                         Privacy
-                     </div>
-                 </div>
-                 <div class = "row">
-                     <div style="padding: 0rem!important; font-size: small">
-                         (Actual Privacy)
-                     </div>
-                 </div>
-             </div>
-
-             <div class="col" style="margin-top: 10px!important; margin-bottom: 5px!important;">
-                 <!-- Manage -->
-                 <div class = "row text-center">
-                     <button type="button" class="btn btn-primary" style="width: 50%; margin: auto; margin-top: 5px!important; margin-bottom: 5px!important;">Manage</button>
-                 </div>
-
-             </div>
-         </a>
-     </div>
-
-    <% }); %>
-    </script>
-
 
     <script>
     //Dropdown menu
@@ -141,20 +82,22 @@
                             <p class="h6">{{ user['bio'] }}</p>
                         </div>
                     </div>
-                    <div class="col">
-                        <div class="row" style="padding: 5px; margin-top: 0.5rem">
-                            <button type="button" class="btn btn-primary" onclick="window.location.href='{{ url_for('settings', uid=user['uid']) }}'">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" style="margin-right: 6px; margin-bottom: 2px" class="bi bi-gear-fill" viewBox="0 0 16 16">
-                                    <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"></path>
-                                </svg> Account Settings
-                            </button>
+                    {% if is_user_themself %}
+                        <div class="col">
+                            <div class="row" style="padding: 5px; margin-top: 0.5rem">
+                                <button type="button" class="btn btn-primary" onclick="window.location.href='{{ url_for('settings', uid=user['uid']) }}'">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" style="margin-right: 6px; margin-bottom: 2px" class="bi bi-gear-fill" viewBox="0 0 16 16">
+                                        <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"></path>
+                                    </svg> Account Settings
+                                </button>
+                            </div>
+                            <div class="row" style="padding: 5px; margin-top: 0.5rem; margin-bottom: 0.5rem">
+                                <button type="button" class="btn btn-primary" onclick="window.location.href='{{ url_for('logout') }}'">
+                                    Sign Out
+                                </button>
+                            </div>
                         </div>
-                        <div class="row" style="padding: 5px; margin-top: 0.5rem; margin-bottom: 0.5rem">
-                            <button type="button" class="btn btn-primary" onclick="window.location.href='{{ url_for('logout') }}'">
-                                Sign Out
-                            </button>
-                        </div>
-                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -239,7 +182,8 @@
             </div>
         </div>
 
-        <!-- All Resource Content -->
+        {% if is_user_themself %}
+            <!-- All Resource Content -->
         <div class="col" style="padding: 0">
             <div class="card" style = "background-color: #fbfbfb">
                 <div class="card-body">
@@ -287,7 +231,7 @@
                         </select>
                     </div>
                 </div>
-                </div>
+            </div>
 
 
                 <script type="text/template" id="studio_card">
@@ -550,8 +494,10 @@
                             })
                     });
                 </script>
+                </div>
             </div>
-        </div>
+        {% endif %}
+
     </div>
 </div>
 {% endblock %}
