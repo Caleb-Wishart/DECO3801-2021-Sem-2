@@ -315,7 +315,7 @@
                                             </label>
                                           <div class="card flex-fill" id="thumbnailUpload">
                                               <div class="row">
-                                                  <div class = "col-9">
+                                                  <div class = "col-8">
                                                       {% if thumbnails_filename != "" %}
                                                           <dd id="resourceThumbNailName" class="font-weight-bold" style="margin: 1rem!important;">
                                                           {{ "Current thumbnails: " + thumbnails_filename}}</dd>
@@ -325,9 +325,9 @@
                                                       {% endif %}
 
                                                   </div>
-                                                    <div class="col-3" style="margin-top: 0rem!important;">
+                                                    <div class="col-4" style="margin-top: 0rem!important;">
                                                         <!-- Button to upload the thumbnail-->
-                                                        <label for="thumbnail-upload" class="btn btn-primary btn" style="margin: 1rem; margin-left: 4rem!important;">
+                                                        <label for="thumbnail-upload" class="btn btn-primary btn" style="margin: 1rem; margin-left: 6rem!important;">
                                                             Upload Thumbnail
                                                         </label>
                                                         {{ form.thumbnail(id="thumbnail-upload", style="display:none;", onchange="javascript:updateThumbNailName()") }}
@@ -404,7 +404,7 @@
                                                 </div>
                                               </div>
                                             <div class = "row" style = "margin-top: 1.5rem!important; margin-bottom: 1rem!important;">
-                                                <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
+                                                <div class = "col-2" style="margin-left: 6rem!important;">
                                                     Matching Tags:
                                                 </div>
                                                 <div class = "col-7">
@@ -419,7 +419,7 @@
                                             </div>
                                             <!-- Put the applied tags here-->
                                             <div class = "row" style = "margin-top: 1.5rem!important; margin-bottom: 1rem!important;">
-                                                <div class = "col-2" style="margin-left: 6rem!important; margin-top: 1rem!important;">
+                                                <div class = "col-2" style="margin-left: 6rem!important;">
                                                     Applied Tags:
                                                 </div>
                                                 <div class = "col-7">
@@ -458,9 +458,9 @@
                                                              id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                                             {% for visibility in ['Public', 'Private'] %}
                                                                 {% if visibility == current_visibility %}
-                                                                    <option class="dropdown-item" value="{{ visibility }}" selected >{{ visibility }}</option>
+                                                                    <option class="dropdown-item" style="background-color: white"  value="{{ visibility }}" selected >{{ visibility }}</option>
                                                                 {% else %}
-                                                                    <option class="dropdown-item" value="{{ visibility }}" >{{ visibility }}</option>
+                                                                    <option class="dropdown-item" style="background-color: white"  value="{{ visibility }}" >{{ visibility }}</option>
                                                                 {% endif %}
                                                             {% endfor %}
                                                         </select>
@@ -495,12 +495,12 @@
                                               <!-- Search bar for users-->
                                               <div id="hidden_div" class = "row" style="margin-bottom: 2rem!important; display: none">
                                                   <p class="h6" style="margin: 1.5rem; margin-bottom: 0rem!important;">Private User Access: </p>
-                                                  <div class="input-group" style="margin: 1.5rem; margin-left: 2rem!important; padding: 0rem; padding-right: 100px!important; ">
-                                                      <input type="email" id="new_personnel" class="form-control" placeholder="Enter emails of accounts you wish to access your resource" style="width: 95%">
+                                                  <div class="input-group" style="margin: 1.5rem; margin-left: 2rem!important; padding: 0rem; padding-right: 50px!important; ">
+                                                      <input type="email" id="new_personnel" class="form-control" placeholder="Enter emails of accounts you wish to access your resource" style="width: 60%">
                                                       <button type="button" class="btn btn-primary btn" style="margin-right: 1rem!important;" onclick="add_personnel()">Add to Personnel</button>
                                                     </div>
                                                   <!-- List of all the users -->
-                                                  <ul class="list-group" id="personnel" style="margin-left: 2rem!important; margin-bottom: 2rem!important; padding-right: 100px!important">
+                                                  <ul class="list-group" id="personnel" style="margin-left: 2rem!important; margin-bottom: 2rem!important; padding-right: 65px!important">
                                                       <div class = "overflow-auto" style="max-height: 208px">
                                                           {%  for email in personnel_emails %}
                                                             <li class="list-group-item"> {{ email }}
@@ -521,7 +521,7 @@
                         <!-- Button to update the post-->
                       <input type="submit"  class="btn btn-primary btn" style="margin-right: 1rem!important;" value="Update Resource">
                         <!-- Button to clear the title and body of the post-->
-                        <button type="Button" class="btn btn-outline-primary btn" onclick="return window.location.href='{{ url_for("resource", rid=rid) }}';">Discard Draft</button>
+                        <button type="Button" class="btn btn-outline-danger btn" onclick="return window.location.href='{{ url_for("resource", rid=rid) }}';">Discard Draft</button>
                     </div>
                  </form>
 
