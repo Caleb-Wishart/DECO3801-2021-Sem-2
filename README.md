@@ -8,7 +8,7 @@
 ### Project Members:
 * Adrian Rahul Kamal Rajkamal (Overall Project Manager | Front-end, Marketing & User Research)
 * Matthew Dean (Front-end | Documentarian, Production Manager)
-* Xurong Liang (DB Administrator | Back-end, Server-Database interaction)
+* Xurong Liang (DB Administrator | Back-end, Server-Database Interaction)
 * Alexander Dubravcic (Front-end | Documentarian, Quality Assurance)
 * Kyle Macaskill (Front-end lead | UI / UX Architect, Designer)
 * Caleb Wishart (Sysadmin | Back-end, Client-Server interaction)
@@ -21,13 +21,13 @@ ___
 The core of the user facing website runs on the web trio HTML5, CSS3, JS.
 
 Webpages are sourced from the [templates](/templates/) folder.
-The core of each page is the [base.html](/templates/base.html). This contains the common HTML head for the CDN links, style and webpage scripts. A webpage header and footer. Each page is then dynamically changed by extending on this base page using the [JINJA](https://jinja.palletsprojects.com/en/3.0.x/) <img src="https://www.vectorlogo.zone/logos/pocoo_jinja/pocoo_jinja-icon.svg" width=20/> templating engine.
+The core of each page is the [base.html](/templates/base.html). This contains the common HTML head for the CDN links, style and webpage scripts. A webpage header and footer. Each page is then dynamically changed by extending on this base page using the [JINJA2](https://jinja.palletsprojects.com/en/3.0.x/) <img src="https://www.vectorlogo.zone/logos/pocoo_jinja/pocoo_jinja-icon.svg" width=20/> templating engine.
 ```jinja
 {% extends 'base.html' %}
 ```
 
 ### HTML5 <img src="https://img.icons8.com/color/20/000000/html-5--v1.png"/>
-The HTML is written pure with dynaic elements added using the JINJA engine. The snippet below would set the contents of the `<p>` tag to the supplied description field of the JSON strucutre in the variable channel.
+The HTML is written pure with dynamic elements added using the JINJA2 engine. The snippet below would set the contents of the `<p>` tag to the supplied description field of the JSON strucutre in the variable channel.
 ```jinja
 <p> {{ channel.description }}</p>
 ```
@@ -36,7 +36,7 @@ The HTML is written pure with dynaic elements added using the JINJA engine. The 
 The CSS is augmented using the [Bootstrap5](https://getbootstrap.com/) <img src="https://img.icons8.com/color/20/000000/bootstrap.png"/> framework which provides many useful presets for design such as cards and colours.
 ```HTML
 <button class="btn btn-primary">Post a comment</button>
-```
+
 <style>
     /* Sourced from BOOTSTRAP5 */
     .btn-primary {
@@ -59,6 +59,7 @@ The CSS is augmented using the [Bootstrap5](https://getbootstrap.com/) <img src=
         transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
     }
 </style>
+```
 
 <button class="btn btn-primary float-end" disabled>Post a comment</button>
 
@@ -265,7 +266,7 @@ Variables can be provided to all webpages with the flask context processor.
 def defaults():
     """Provides the default context processors
     Returns:
-        dict: Variables for JINJA context
+        dict: Variables for JINJA2 context
             current_user: the user the is currently logged in or the Anonymous user
             subject : A list of all subjects with their names
             grade : A list of all grades with their names
