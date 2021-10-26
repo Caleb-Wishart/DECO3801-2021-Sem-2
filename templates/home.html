@@ -28,8 +28,8 @@
 }
 
 .card:hover {
-  -webkit-transform: scale(1.035, 1.035);
-  transform: scale(1.035, 1.035);
+  -webkit-transform: scale(1.025, 1.025);
+  transform: scale(1.025, 1.025);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 .card:hover::after {
@@ -263,7 +263,7 @@ function doAJAX() {
 
                 <!-- Resource Card-->
                 <div class="row">
-                    <div  style="margin-right: 4.5rem!important; margin-left: 12px!important; margin-bottom: 1rem!important;"  id="result">
+                    <div  style="margin-right: 4.5rem!important; margin-left: 12px!important; margin-bottom: 1rem!important; margin-top: 1rem!important;"  id="result">
                     </div>
 
                 </div>
@@ -319,7 +319,7 @@ function doAJAX() {
                 <div class="row">
                     <div class="d-flex justify-content-center">
                          <a href="{{url_for('resource_new')}}" class="btn btn-primary d-md-block shadow" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
-                            <dd class="text-center font-weight-bold">Create New Resource</dd>
+                            <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important;">Create New Resource +</dd>
                          </a>
                     </div>
                 </div>
@@ -333,7 +333,7 @@ function doAJAX() {
                 <div class="row">
                     <div class="d-flex justify-content-center">
                          <a href="{{url_for('create_or_modify_channel')}}" class="btn btn-primary d-md-block shadow" style = "width: 100%" aria-haspopup="true" aria-expanded="false">
-                            <dd class="text-center font-weight-bold">Create New Channel</dd>
+                            <dd class="text-center font-weight-bold" style="margin-top: 2.5px!important; margin-bottom: 4px!important;">Create New Channel +</dd>
                          </a>
                     </div>
                 </div>
