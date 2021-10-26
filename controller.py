@@ -210,10 +210,10 @@ def homeAJAX():
                find_resources()]
         while len(resources) != 3:
             random.shuffle(rec)
-            if rec[0]['cid'] in b:
+            if rec[0]['rid'] in b:
                 continue
             resources += [rec[0]]
-            b.append(cen[0]['cid'])
+            b.append(rec[0]['rid'])
 
     elif len(resources) > 3:
         resources = resources[:3]
@@ -348,7 +348,7 @@ def register():
                     user = get_user(email)
                     user_auth(user.email, True)
                     login_user(user, remember=False)
-                    return redirect(url_for('home'))
+                    return redirect(url_for('settings'))
                 flash('Something went wrong, please try again', "error")
         else:
             data['emailUsed'] = 'You must provide a valid email'
