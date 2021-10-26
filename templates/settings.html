@@ -1,68 +1,5 @@
 {% extends 'base.html' %}
 
-{% block style %}
-    <style>
-        a:link {
-            text-decoration: none;
-        }
-
-        a:visited {
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: none;
-        }
-
-        a:active {
-            text-decoration: none;
-        }
-        .btn-primary {
-            background-color: #ff8fab;
-            color: white;
-            border-color: #ff8fab;
-        }
-        .btn-primary:hover {
-            color:white;
-            background-color: #3a78ef;
-        }
-
-        .btn-outline-primary {
-            background-color: rgb(255, 255, 255);
-            color:#000000;
-            border-color: white;
-        }
-
-        .btn-outline-primary:hover {
-            color:white;
-            background-color: #3a78ef;
-        }
-
-        .btn-check:checked+.btn-outline-primary {
-            color: white;
-            background-color:  #ff8fab;
-            border-color:   #ff8fab;
-        }
-        .bg-primary {
-            background-color: #ff8fab!important;
-        }
-        .btn-close {
-            width: 0.5rem;
-            height: 0.5rem;
-        }
-
-        .banner-image {
-          border-radius: 100px;
-      }
-
-      .profile-image {
-          margin-top: -25px;
-          margin-left: -25px;
-          border-radius: 500px;
-      }
-    </style>
-{% endblock %}
-
 {% block script %}
 <script>
 // Tags button
@@ -155,11 +92,11 @@
 {% endblock %}
 
 {% block content %}
-<div class="container" style="margin-bottom: 3rem!important;">
+<div class="container" style="margin-bottom: 3rem!important; margin-top: 1rem!important;  padding-left: 200px; padding-right: 200px">
     <!-- Title Section -->
     <div class="row">
         <dt class="col-sm-9" style="font-size: x-large; margin-top:2rem!important; margin-bottom: 2rem!important;">
-            Basic Settings
+            Account Settings
         </dt>
     </div>
 
@@ -174,7 +111,7 @@
                          <div class="row pe-5">
                              <div class="col text-center" style="margin-top: 3rem">
                                  <img id="avatar" src="{{ url_for('static', filename=user_info['avatar_link']) }}"
-                                      class="profile-image" width="312px" height="312px">
+                                      class="profile-image" width="200px" height="200px">
                              </div>
                          </div>
                          <div style="margin-top: 0rem!important;" class="row pe-5">
@@ -182,7 +119,7 @@
                                  <input type="file" id="avatar_upload" style="display:none;" name="avatar">
                                  <button type="button" id="avatar_upload_button"
                                          class="btn btn-primary btn" style="margin-top:
-                                 1rem; margin-bottom: 1rem; border-radius: 100px">Change Profile Picture</button>
+                                 1rem; margin-bottom: 1rem; ">Change Profile Picture</button>
                              </div>
                          </div>
                      </div>
