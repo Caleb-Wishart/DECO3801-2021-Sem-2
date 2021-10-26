@@ -127,7 +127,7 @@
                          <div class="row">
                              <div class="col" style="margin-top: 5rem; margin-right: 2rem; margin-left: 0">
                                  <img  src="{{ url_for('static', filename=user_info['profile_background_link']) }}"
-                                      class="banner-image" height="250" id="profile_background">
+                                      class="banner-image" height="200" id="profile_background">
                              </div>
                          </div>
                          <div class="row pe-5">
@@ -135,7 +135,7 @@
                                  <input type="file" id="background_upload" style="display:none;" name="profile_background">
                                  <button type="button" class="btn btn-primary btn"
                                          id="background_upload_button" style="margin-top: 1rem; margin-bottom: 1rem;
-                                 border-radius: 100px">Change Profile Background</button>
+                               ">Change Profile Background</button>
                              </div>
                          </div>
                      </div>
@@ -163,16 +163,16 @@
                  </div>
                  <!-- email (fake, do not change in DB) -->
                 <div class="mb-3 row" style="margin: 1rem!important;">
-                    <label style="font-size: large; font-weight:inherit" for="inputInstitution" class="col-sm-1 col-form-label">Email</label>
-                    <div class="col-sm-7">
+                    <label style="font-size: large; font-weight:inherit; margin-top: 1rem!important; margin-left: 2rem!important;" for="inputInstitution" class="col-sm-1 col-form-label">Email</label>
+                    <div class="col">
                         <input class="form-control required" value="{{ user_info['email'] }}" id="email" name="email" type="email">
                     </div>
                 </div>
 
                  <!-- Username -->
                  <div class="mb-3 row" style="margin: 1rem!important;">
-                     <label style="font-size: large; font-weight:inherit" for="inputPosition" class="col-sm-1 col-form-label">Username</label>
-                     <div class="col-sm-7">
+                     <label style="font-size: large; font-weight:inherit; margin-left: 2rem!important;" for="inputPosition" class="col-sm-1 col-form-label">Username</label>
+                     <div class="col">
                          <input class="form-control required" value="{{ user_info['username'] }}"
                                  name="username" type="text" id="username">
                      </div>
@@ -293,7 +293,7 @@
                 <!-- Button to update-->
                 <input type="submit" name="submit" value="Update" form="edit_form" class="btn btn-primary btn" style="margin-right: 1rem!important;"/>
                  {# redirect to profile page #}
-                <button type="Button" class="btn btn-outline-primary btn" onclick="window.location.href='{{ url_for('profile') }}';">Discard Draft</button>
+                <button type="Button" class="btn btn-outline-danger btn" onclick="window.location.href='{{ url_for('profile') }}';">Discard Draft</button>
 
              </div>
          </form>
