@@ -869,14 +869,14 @@ def settings():
 
         avatar_path, profile_background_path = "NULL", "NULL"
         if avatar and avatar.filename != "":
-            avatar_path = posixpath.join("avatar", secure_filename(avatar.filename))
-            avatar.save(posixpath.join("static", avatar_path))
+            avatar_path = os.path.join("avatar", secure_filename(avatar.filename))
+            avatar.save(os.path.join("static", avatar_path))
 
         if profile_background and profile_background.filename != "":
-            profile_background_path = posixpath.join("profile_background",
+            profile_background_path = os.path.join("profile_background",
                                                      secure_filename(
                                                          profile_background.filename))
-            profile_background.save(posixpath.join("static", profile_background_path))
+            profile_background.save(os.path.join("static", profile_background_path))
 
         user, _ = get_user_and_resource_instance(uid=current_user.uid, rid=-1)
 

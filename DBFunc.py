@@ -25,7 +25,7 @@ VERBOSE = False
 # on the contrary, when DB is not in this mode, any operations within the transaction
 # that causes commit error will be roll-backed. Error message will be shown as
 # a warning on screen
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 # link to default user profile background
 DEFAULT_PROFILE_BACKGROUND_LINK = "profile_background/default_background.jpg"
@@ -611,10 +611,9 @@ def modify_resource(rid: int, title=None, resource_link=None,
 
         if resource_thumbnail_links:
             thumbnails = conn.query(ResourceThumbnail).filter(
-                ResourceThumbnail.rid == rid,
-                ResourceThumbnail.thumbnail_link.in_(resource_thumbnail_links))
+                ResourceThumbnail.rid == rid)
             deleted_thumbnails = set()
-            for i in thumbnails:
+            for i in thumbnails.all():
                 deleted_thumbnails.add(i.thumbnail_link)
                 conn.delete(i)
             new_thumbnails = list(set(
@@ -626,11 +625,6 @@ def modify_resource(rid: int, title=None, resource_link=None,
 
         # commit before making changes to resource access
         conn.add(resource)
-
-        # test: here fake unique constraint violation
-        # test = conn.query(Resource).filter_by(rid=2).first()
-        # test.title = "Temp title"
-        # conn.add(test)
 
         if not try_to_commit(conn):
             warnings.warn("Error committing")
