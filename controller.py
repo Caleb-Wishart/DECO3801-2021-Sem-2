@@ -336,7 +336,7 @@ def register():
             if password != passwordConfirm:
                 data['passwordDif'] = True
             if len(password) < 8:
-                data['passwordMsg'] = "Make sure your password is at lest 8 letters"
+                data['passwordMsg'] = "Make sure your password is at least 8 letters"
             elif re_search('[0-9]', password) is None:
                 data['passwordMsg'] = "Make sure your password has a number in it"
             elif re_search('[A-Z]', password) is None:
