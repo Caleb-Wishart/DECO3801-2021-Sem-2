@@ -575,6 +575,7 @@ def resource_edit(rid=None):
         grade = website_input_to_enum(request.form.get('grades'), Grade)
         description = form.description.data
         is_public = True if request.form.get("visibility_choice") == 'Public' else False
+        tags_id = [get_tags()[t] for t in request.form if t == request.form.get(t) and t in get_tags(t)]
 
         thumbnail_path = None
         if resource_thumbnail_file and resource_thumbnail_file.filename != "":
@@ -589,7 +590,8 @@ def resource_edit(rid=None):
 
         if isinstance(modify_resource(rid=rid, title=title, subject=subject, grade=grade,
                                       is_public=is_public, description=description,
-                                      resource_thumbnail_links=thumbnail_path),
+                                      resource_thumbnail_links=thumbnail_path,
+                                      tags_id=tags_id),
                       ErrorCode):
             flash("Something went wrong, please try again.", "error")
             return redirect(url_for("resource_edit", rid=rid))
@@ -863,7 +865,8 @@ def settings():
     """
     if request.method == "GET":
         return render_template("settings.html", title="User Settings",
-                               user_info=current_user.serialize)
+                               user_info=current_user.serialize,
+                               teaching_areas=[ta.teaching_area.name.lower() for ta in get_user_teaching_areas(current_user.uid)])
     else:
         # POST method
         username, bio, old_password, new_password = \
@@ -995,6 +998,7 @@ def create_or_modify_channel(cid=None):
         else:
             # modify channel
             cid = int(cid)
+            kwargs["applied_tags"] = get_all_tags_for_channel(cid=cid)
 
             if not user_has_access_to_channel(cid=cid, uid=current_user.uid):
                 # no permission, go back to channel home page
@@ -1478,6 +1482,6 @@ def defaults():
             tag : A list of all tags with their names
     """
     return dict(current_user=current_user,
-                subjects=[e.name.lower() for e in Subject],
-                grades=[e.name.lower() for e in Grade],
+                subjects=[e.name.lower() for e in Subject if e.name != "NULL"],
+                grades=[e.name.lower() for e in Grade if e.name != "NULL"],
                 tags=[e.replace(' ', '_') for e in get_tags().keys()])

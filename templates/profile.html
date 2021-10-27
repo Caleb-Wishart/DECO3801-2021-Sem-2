@@ -82,7 +82,7 @@
                               <p class="h6">{{ user['bio'] }}</p>
                           </div>
                       </div>
-                    {% if is_user_themself %}               
+                    {% if is_user_themself %}
                         <div class="col">
                             <div class="row" style="padding: 5px; margin-top: 0.5rem">
                                 <button type="button" class="btn btn-primary" onclick="window.location.href='{{ url_for('settings', uid=user['uid']) }}'">
