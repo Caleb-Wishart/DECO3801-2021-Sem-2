@@ -37,6 +37,28 @@ The CSS is augmented using the [Bootstrap5](https://getbootstrap.com/) <img src=
 ```HTML
 <button class="btn btn-primary">Post a comment</button>
 ```
+```CSS
+/* Sourced from BOOTSTRAP5 */
+    .btn-primary {
+        background-color: #1488eb;
+        color: white;
+        border-color: #1488eb;
+    }
+    .btn {
+        display: inline-block;
+        font-weight: 400;
+        line-height: 1.5;
+        text-align: center;
+        text-decoration: none;
+        vertical-align: middle;
+        user-select: none;
+        border: 1px solid transparent;
+        padding: .375rem .75rem;
+        font-size: 1rem;
+        border-radius: .25rem;
+        transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    }
+```
 
 <style>
     /* Sourced from BOOTSTRAP5 */
