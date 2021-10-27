@@ -5,7 +5,6 @@
 # works of OfficialTeamName (cond'). All rights reserved.
 ###############################################################################
 import random
-
 from DBFunc import *
 from random import choice, sample, randint
 from faker import Faker
@@ -61,7 +60,6 @@ def add_pseudo_channel_post_and_replies(cid: int, accessors_id: list):
     on this post and comment by users in accessors_id
     """
     poster_uid = choice(accessors_id)
-    # warnings.warn(f"channel {cid} with personnel {accessors_id}, selected poster {poster_uid}")
     channel_post = post_on_channel(uid=poster_uid, title=choice(random_texts),
                                    cid=cid, text=" ".join(sample(random_texts,
                                                                  k=random.randint(1, 10))))
@@ -320,7 +318,6 @@ for i in range(6, 11):
     compliment = list(set(users_id) - set(creaters))
     # creater must included in personnel
     personnel = creaters + sample(compliment, k=random.randint(0, min(3, len(compliment))))
-    # print(personnel)
     personnel = list(set(personnel))
     globals()[f"src{i}"] = add_resource(title=resource_titles[i - OFFSET],
                                         resource_link=resource_links[i - OFFSET],
@@ -375,7 +372,6 @@ for i in range(0, 5):
                                           description=channel_descriptions[i],
                                           tags_id=sample(list(tags.values()), k=random.randint(1, len(tags))),
                                           personnel_id=personnel)
-    # print(f"personnel for cid = {globals()[f'cid{i}']} is {personnel}")
 
     max_cont = len(personnel) if visibility[i] != ChannelVisibility.PUBLIC else len(users_id)
     for j in range(random.randint(0, max_cont)):
