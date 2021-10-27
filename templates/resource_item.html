@@ -24,6 +24,10 @@
 {% block script %}
 
 <script type="text/template" id="commentreply">
+    <div class = "row">
+        <div class="col-1" style="border-right: 1px dashed #333; height: 12px"></div>
+        <div class="col"></div>
+    </div>
     <div class="row" id="commentReply">
         <!-- New Comment Reply -->
         <div class="col-1" style="border-right: 1px dashed #333;">
@@ -81,12 +85,12 @@
 
                 <% _.each(comm.replies,  function(reply) { %>
                 <!-- Comment Reply -->
-                <dic class = "row">
+                <div class = "row">
                     <div class="col-1" style="border-right: 1px dashed #333; height: 12px">
                     </div>
                     <div class="col">
                     </div>
-                </dic>
+                </div>
                 <div class="row">
                     <div class="col-1" style="border-right: 1px dashed #333;">
                     </div>
@@ -457,9 +461,6 @@
                     <button class="btn btn-outline-primary float-end" style="margin-right: 2rem!important; "
                             data-bs-toggle = "collapse" href="#Collapse1" role = "button" aria-expanded="false" aria-controls="Collapse1" id = "showComments" onclick="changeName()">
                         Hide Comments</button>
-                    {#<a class = "btn btn-primary justify-content-center" data-bs-toggle = "collapse" href="#Collapse1" role = "button" aria-expanded="false" aria-controls="Collapse1" id = "ShowInfo">
-                            Show Information
-                        </a>#}
                     <button class="btn btn-primary float-end" onclick='$("#newComment").attr("hidden",$("#newComment").is(":hidden") ? false : true) ;'>Post a comment</button>
                 {% endif %}
             </div>
