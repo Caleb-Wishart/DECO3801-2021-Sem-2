@@ -994,7 +994,7 @@ def create_or_modify_channel(cid=None):
         else:
             # modify channel
             cid = int(cid)
-            kwargs["applied_tags"] = get_all_tags_for_channel(cid=cid)
+            kwargs["applied_tags"] = [t.replace(" ", "_") for t in get_all_tags_for_channel(cid=cid)]
 
             if not user_has_access_to_channel(cid=cid, uid=current_user.uid):
                 # no permission, go back to channel home page
