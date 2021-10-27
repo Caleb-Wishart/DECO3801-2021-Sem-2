@@ -2,7 +2,7 @@
 # This script defines the backend functions that respond to all webpage requests.
 #
 #
-# works of OfficialTeamName (con'd). All rights reserved.
+# works of OfficialTeamName (con.d). All rights reserved.
 ##################################################################################
 from flask import Flask, request, render_template, redirect, url_for, abort, flash, Response, jsonify
 from sqlalchemy.sql.expression import func
@@ -17,10 +17,6 @@ from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import HTTPException, InternalServerError
 from re import search as re_search
-# If in branch use the following
-# from .DBFunc import *
-# from .forms import LoginForm, RegisterForm, ResourceForm
-# If in main use the following
 from DBFunc import *
 from forms import LoginForm, RegisterForm, ResourceForm
 
@@ -163,8 +159,8 @@ def index():
 @app.route('/home')
 def home():
     """The home page of the website
-    Shows recomendations based on the user profile or if not authenticated the
-    most upvoted
+    Shows recommendations based on the user profile or if not authenticated the
+    most upvote
 
     Also the end point of the search function where the search is a get method
     """
@@ -185,8 +181,8 @@ def homeAJAX():
     returns it in json format
     """
     areas = get_user_teaching_areas(current_user.uid)
-    grades = [ta.grade for ta in areas if ta.grade != None]
-    subjects = [ta.teaching_area for ta in areas if ta.teaching_area != None]
+    grades = [ta.grade for ta in areas if ta.grade is not None]
+    subjects = [ta.teaching_area for ta in areas if ta.teaching_area is not None]
 
     resources = [dict(r.serialize, author=get_resource_author(r.rid)[0].serialize, tags=get_resource_tags(r.rid),
                       banner=get_resource_thumbnail(r.rid).serialize if get_resource_thumbnail(
@@ -1399,7 +1395,6 @@ def vote_channel_post_or_comment():
             res = conn.query(PostComment).filter_by(post_comment_id=post_id_or_comment_id).first()
 
         return jsonify({
-            # "id": post_id_or_comment_id,
             "upvote_count": res.upvote_count,
             "downvote_count": res.downvote_count
         })

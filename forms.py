@@ -2,7 +2,7 @@
 # Configuration of flask forms for the application.
 #
 #
-# works of OfficialTeamName (con'd). All rights reserved.
+# works of OfficialTeamName (con.d). All rights reserved.
 ###########################################################################
 from flask_wtf import FlaskForm
 from wtforms import TextField, PasswordField, TextAreaField, FileField

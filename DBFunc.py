@@ -3,7 +3,7 @@
 # modify the DB objects
 #
 #
-# works of OfficialTeamName (con'd). All rights reserved.
+# works of OfficialTeamName (con.d). All rights reserved.
 ##################################################################
 import traceback
 
@@ -12,9 +12,6 @@ from sqlalchemy import or_
 from sqlalchemy.orm import sessionmaker
 from werkzeug.security import generate_password_hash
 import random
-# use this in branch
-# from .DBStructure import *
-# use this in main
 from DBStructure import *
 
 # define if you want method output messages for debugging
@@ -1377,9 +1374,6 @@ def modify_channel_personnel(uid, cid, modification: Modification):
     res = get_user_and_channel_instance(uid=uid, cid=cid)
     if isinstance(res, ErrorCode):
         return res
-    # if channel.visibility == ChannelVisibility.PUBLIC:
-    #     warnings.warn("Channel is public")
-    #     return ErrorCode.INVALID_CHANNEL
 
     with Session() as conn:
         if modification == Modification.MODIFY_DELETE:
