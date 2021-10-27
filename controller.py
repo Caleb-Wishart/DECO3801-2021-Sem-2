@@ -2,7 +2,7 @@
 # This script defines the backend functions that respond to all webpage requests.
 #
 #
-# works of OfficialTeamName (con'd). All rights reserved.
+# works of OfficialTeamName (con.d). All rights reserved.
 ##################################################################################
 from flask import Flask, request, render_template, redirect, url_for, abort, flash, Response, jsonify
 from sqlalchemy.sql.expression import func
@@ -17,10 +17,6 @@ from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import HTTPException, InternalServerError
 from re import search as re_search
-# If in branch use the following
-# from .DBFunc import *
-# from .forms import LoginForm, RegisterForm, ResourceForm
-# If in main use the following
 from DBFunc import *
 from forms import LoginForm, RegisterForm, ResourceForm
 
@@ -163,8 +159,8 @@ def index():
 @app.route('/home')
 def home():
     """The home page of the website
-    Shows recomendations based on the user profile or if not authenticated the
-    most upvoted
+    Shows recommendations based on the user profile or if not authenticated the
+    most upvote
 
     Also the end point of the search function where the search is a get method
     """
@@ -185,8 +181,8 @@ def homeAJAX():
     returns it in json format
     """
     areas = get_user_teaching_areas(current_user.uid)
-    grades = [ta.grade for ta in areas if ta.grade != None]
-    subjects = [ta.teaching_area for ta in areas if ta.teaching_area != None]
+    grades = [ta.grade for ta in areas if ta.grade is not None]
+    subjects = [ta.teaching_area for ta in areas if ta.teaching_area is not None]
 
     resources = [dict(r.serialize, author=get_resource_author(r.rid)[0].serialize, tags=get_resource_tags(r.rid),
                       banner=get_resource_thumbnail(r.rid).serialize if get_resource_thumbnail(
@@ -210,10 +206,10 @@ def homeAJAX():
                find_resources()]
         while len(resources) != 3:
             random.shuffle(rec)
-            if rec[0]['cid'] in b:
+            if rec[0]['rid'] in b:
                 continue
             resources += [rec[0]]
-            b.append(cen[0]['cid'])
+            b.append(rec[0]['rid'])
 
     elif len(resources) > 3:
         resources = resources[:3]
@@ -268,7 +264,7 @@ def login():
         if DEMO:
             if email == "demo" and form.password.data == "demo":
                 login_user(DemoUser(), remember=False)
-                if 'next' in request.args:
+                if 'next' in request.args and request.args.get("next") != 'https://officialteamname.uqcloud.net/logout':
                     return redirect(request.args.get("next"))
                 return redirect(url_for('home'))
 
@@ -277,7 +273,7 @@ def login():
             if user != ErrorCode.INVALID_USER and check_password_hash(user.hash_password, form.password.data):
                 user_auth(user.email, True)
                 login_user(user, remember=False)
-                if 'next' in request.args:
+                if 'next' in request.args and request.args.get("next") != 'https://officialteamname.uqcloud.net/logout':
                     return redirect(request.args.get("next"))
                 return redirect(url_for('home'))
         flash('That username or password was incorrect', "error")
@@ -336,7 +332,7 @@ def register():
             if password != passwordConfirm:
                 data['passwordDif'] = True
             if len(password) < 8:
-                data['passwordMsg'] = "Make sure your password is at lest 8 letters"
+                data['passwordMsg'] = "Make sure your password is at least 8 letters"
             elif re_search('[0-9]', password) is None:
                 data['passwordMsg'] = "Make sure your password has a number in it"
             elif re_search('[A-Z]', password) is None:
@@ -348,7 +344,7 @@ def register():
                     user = get_user(email)
                     user_auth(user.email, True)
                     login_user(user, remember=False)
-                    return redirect(url_for('home'))
+                    return redirect(url_for('settings'))
                 flash('Something went wrong, please try again', "error")
         else:
             data['emailUsed'] = 'You must provide a valid email'
@@ -398,7 +394,7 @@ def resource(rid=None):
         creater = conn.query(User).filter_by(uid=creater.uid).first()
     creater_rating_whole = int(creater.user_rating)
     # get if a user's honor rating is greater than int.5
-    creater_rating_half = 0 if creater.user_rating - creater_rating_whole < .5 else 1
+    creater_rating_half = 0 if round(float(creater.user_rating), 1) - float(creater_rating_whole) < .5 else 1
     # empty stars
     creater_rating_unchecked = 5 - creater_rating_whole - creater_rating_half
 
@@ -575,6 +571,7 @@ def resource_edit(rid=None):
         grade = website_input_to_enum(request.form.get('grades'), Grade)
         description = form.description.data
         is_public = True if request.form.get("visibility_choice") == 'Public' else False
+        tags_id = [get_tags()[t] for t in request.form if t == request.form.get(t) and t in get_tags(t)]
 
         thumbnail_path = None
         if resource_thumbnail_file and resource_thumbnail_file.filename != "":
@@ -589,7 +586,8 @@ def resource_edit(rid=None):
 
         if isinstance(modify_resource(rid=rid, title=title, subject=subject, grade=grade,
                                       is_public=is_public, description=description,
-                                      resource_thumbnail_links=thumbnail_path),
+                                      resource_thumbnail_links=thumbnail_path,
+                                      tags_id=tags_id),
                       ErrorCode):
             flash("Something went wrong, please try again.", "error")
             return redirect(url_for("resource_edit", rid=rid))
@@ -707,22 +705,38 @@ def resourceComment():
 # -----{ PAGES.PROFILE }-------------------------------------------------------
 
 @app.route('/profile', methods=["GET"])
+@app.route("/profile/<uid>", methods=["GET"])
 @login_required
-def profile():
+def profile(uid=None):
     """
     The default view of a users profile,
     this can be used to view your own profiles.
     Specified with the GET request
     """
-    # get hold number
-    user_rating_whole = int(current_user.user_rating)
+    is_user_themself = True
+
+    if not uid or (uid.isnumeric() and int(uid) == current_user.uid):
+        # not uid specified, load current user's profile
+        user = current_user
+    else:
+        # load up other user's profile
+        is_user_themself = False
+        uid = int(uid)
+        user, _ = get_user_and_resource_instance(uid=uid, rid=-1)
+
+        if not user:
+            abort(404, description="This user does not exist.")
+
+    # get user rating number
+    user_rating_whole = int(user.user_rating)
     # get if a user's honor rating is greater than int.5
-    user_rating_half = 0 if current_user.user_rating - user_rating_whole < .5 else 1
+    user_rating_half = 0 if round(float(user.user_rating), 1) - float(user_rating_whole) < .5 else 1
     # empty stars
     user_rating_unchecked = 5 - user_rating_whole - user_rating_half
 
-    return render_template('profile.html', title='Profile', user=current_user.serialize,
-                           teaching_areas=get_user_teaching_areas(current_user.uid), rating_whole=user_rating_whole,
+    return render_template('profile.html', title='Profile', user=user.serialize,
+                           teaching_areas=get_user_teaching_areas(user.uid),
+                           rating_whole=user_rating_whole, is_user_themself=is_user_themself,
                            rating_half=user_rating_half, rating_unchecked=user_rating_unchecked)
 
 
@@ -797,7 +811,7 @@ def load_studio_contents():
                 if get_resource_thumbnail(item.rid) != ErrorCode.INVALID_RESOURCE \
                 else 'img/placeholder.png'
             info["view_link"] = url_for("resource", rid=item.rid)
-            info["is_public"] = "Public" if True else "Private"
+            info["is_public"] = "Public" if info["is_public"] else "Private"
 
             out.append(info)
     else:
@@ -847,7 +861,8 @@ def settings():
     """
     if request.method == "GET":
         return render_template("settings.html", title="User Settings",
-                               user_info=current_user.serialize)
+                               user_info=current_user.serialize,
+                               teaching_areas=[ta.teaching_area.name.lower() for ta in get_user_teaching_areas(current_user.uid)])
     else:
         # POST method
         username, bio, old_password, new_password = \
@@ -938,6 +953,10 @@ def about():
          "upvotes are more popular and resources with more downvotes are less popular. In order to balance out "
          "upvotes and downvotes on a resource, we use an algorithm to decide how popular it is. Resources are sorted "
          "by popularity after you search."],
+         ["What do I do if I see a resource that breaks TOS?",
+         "On each resource page there is a report button located below the resources listed tags. If you believe the "
+         "resource is breaking our Terms of Service, click the button to notify our moderators to investigate it, and "
+         "if it has broken TOS, it will be swiftly removed from our site."],
     ]
     return render_template('about.html', title='About Us', name="About Us", faqs=faqs, num=len(faqs))
 
@@ -979,6 +998,7 @@ def create_or_modify_channel(cid=None):
         else:
             # modify channel
             cid = int(cid)
+            kwargs["applied_tags"] = [t.replace(" ", "_") for t in get_all_tags_for_channel(cid=cid)]
 
             if not user_has_access_to_channel(cid=cid, uid=current_user.uid):
                 # no permission, go back to channel home page
@@ -1383,7 +1403,6 @@ def vote_channel_post_or_comment():
             res = conn.query(PostComment).filter_by(post_comment_id=post_id_or_comment_id).first()
 
         return jsonify({
-            # "id": post_id_or_comment_id,
             "upvote_count": res.upvote_count,
             "downvote_count": res.downvote_count
         })
@@ -1462,6 +1481,6 @@ def defaults():
             tag : A list of all tags with their names
     """
     return dict(current_user=current_user,
-                subjects=[e.name.lower() for e in Subject],
-                grades=[e.name.lower() for e in Grade],
+                subjects=[e.name.lower() for e in Subject if e.name != "NULL"],
+                grades=[e.name.lower() for e in Grade if e.name != "NULL"],
                 tags=[e.replace(' ', '_') for e in get_tags().keys()])

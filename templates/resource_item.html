@@ -336,7 +336,7 @@
                     <div class="col-3">
                         <div class="row">
                             <div class = "card-body" style="padding: 0; padding-left: 0.5em!important; padding-right: 1em!important">
-                                <label class="h6" style="margin-right: 0.5rem"><strong>{{author.username}}</strong></label>
+                            <label class="h6" style="margin-right: 0.5rem"><strong onclick="location.href='{{ url_for("profile", uid=author.uid) }}'">{{author.username}}</strong></label>
                                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
                                 {% for i in range(rating_whole) %}
                                     <!-- These ones for filled stars -->

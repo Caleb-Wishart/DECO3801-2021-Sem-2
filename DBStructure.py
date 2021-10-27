@@ -15,7 +15,7 @@
 # section.
 #
 #
-# Works of OfficialTeamName (con'd). All rights reserved.
+# Works of OfficialTeamName (con.d). All rights reserved.
 #############################################################################
 import datetime
 import enum
@@ -540,7 +540,7 @@ class ResourceCommentReply(Base):
 
     @property
     def serialize(self):
-        """Return object data in serialisable format """
+        """Return object data in serializable format """
         return {
             "resource_comment_id": self.resource_comment_id,
             "reply": self.reply,

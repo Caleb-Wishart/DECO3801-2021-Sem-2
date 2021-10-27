@@ -119,6 +119,7 @@
         // Tags search
         $(document).on("keyup", "#search_tags", function (e) {
             var search_term = $('input[name=tags]').val().toLowerCase();
+            console.log(search_term);
             var spanBoxes = document.getElementsByClassName('tagSearchSpan');
             for (var i = 0; i < spanBoxes.length; i++) {
                 box = spanBoxes[i];
@@ -397,12 +398,18 @@
                                     Applied Tags:
                                 </div>
                                 <div class = "col-7">
-                                    {% for item in applied_tags %}
-                                        <span class="badge rounded-pill bg-other-tag tagFoundSpan" title="{{item}}_selected">
-                                                            <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
-                                                                   onchange="tagCheckedSelected(this)">
-                                                            <label for="{{item}}_input____s" id="{{item}}_label____s">{{enum_to_website_output(item)}}</label>
-                                                        </span>
+                                    {% for item in tags %}
+                                        {% if item in applied_tags %}
+                                            <span class="badge rounded-pill bg-other-tag tagFoundSpan" title="{{item}}_selected">
+                                            <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
+                                                onchange="tagCheckedSelected(this)" checked>
+                                        {% else %}
+                                            <span class="badge rounded-pill bg-other-tag tagFoundSpan" title="{{item}}_selected" hidden>
+                                            <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
+                                                onchange="tagCheckedSelected(this)">
+                                        {% endif %}
+                                                <label for="{{item}}_input____s" id="{{item}}_label____s">{{enum_to_website_output(item)}}</label>
+                                                </span>
                                     {% endfor %}
                                 </div>
                             </div>

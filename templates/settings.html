@@ -279,9 +279,15 @@
                         </div>
                         <div class = "col-7">
                             {% for item in subjects %}
+                                {% if item in teaching_areas %}
+                                <span class="badge rounded-pill bg-other-tag tagFoundSpan" title="{{item}}_selected">
+                                    <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
+                                            onchange="tagCheckedSelected(this)" checked>
+                                {% else %}
                                 <span class="badge rounded-pill bg-other-tag tagFoundSpan" title="{{item}}_selected" hidden>
-                                                            <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
-                                                                   onchange="tagCheckedSelected(this)">
+                                    <input type="checkbox" hidden id="{{item}}_input____s" name="{{item}}" value="{{item}}"
+                                            onchange="tagCheckedSelected(this)">
+                                {% endif %}
                                                             <label for="{{item}}_input____s" id="{{item}}_label____s">{{enum_to_website_output(item)}}</label>
                                                         </span>
                             {% endfor %}

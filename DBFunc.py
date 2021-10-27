@@ -3,7 +3,7 @@
 # modify the DB objects
 #
 #
-# works of OfficialTeamName (con'd). All rights reserved.
+# works of OfficialTeamName (con.d). All rights reserved.
 ##################################################################
 import traceback
 
@@ -12,9 +12,6 @@ from sqlalchemy import or_
 from sqlalchemy.orm import sessionmaker
 from werkzeug.security import generate_password_hash
 import random
-# use this in branch
-# from .DBStructure import *
-# use this in main
 from DBStructure import *
 
 # define if you want method output messages for debugging
@@ -261,7 +258,6 @@ def modify_user(uid: int, username=None, password=None, email=None,
                 user.avatar_link = avatar_link
 
         conn.add(user)
-
         if teaching_areas_to_add:
             modify_user_teaching_areas(uid=uid, conn=conn, teaching_areas=teaching_areas_to_add,
                                        modification=Modification.MODIFY_ADD)
@@ -411,9 +407,10 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
         warnings.warn("Please specify the User allowed to access this resource")
         return ErrorCode.INCORRECT_PERSONNEL
 
+    created_at = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
     resource = Resource(title=title, resource_link=resource_link, grade=grade,
                         difficulty=difficulty, subject=subject, is_public=is_public,
-                        description=description)
+                        description=description, created_at=created_at)
 
     with Session() as conn:
 
@@ -824,7 +821,7 @@ def find_resources(title_type="like", title=None,
 
         if sort_by != "natural":
             if sort_by == "newest":
-                resources = resources.order_by(Resource.created_at)
+                resources = resources.order_by(Resource.created_at.desc())
             elif sort_by == "upvotes":
                 resources = resources.order_by(Resource.upvote_count.desc())
 
@@ -1164,8 +1161,9 @@ def reply_to_resource_comment(uid, resource_comment_id, reply):
             warnings.warn("uid is invalid")
             return ErrorCode.INVALID_USER
 
+        created_at = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
         reply_to_comment = ResourceCommentReply(resource_comment_id=resource_comment_id,
-                                                reply=reply, uid=uid)
+                                                reply=reply, uid=uid, created_at=created_at)
         conn.add(reply_to_comment)
         if not try_to_commit(conn):
             warnings.warn(f"user {uid} failed to reply to resource comment {resource_comment_id}")
@@ -1266,10 +1264,11 @@ def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subj
             warnings.warn("Admin id is invalid")
             return ErrorCode.INVALID_USER
 
+        created_at = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
         # phase 1: create instance
         channel = Channel(name=name, visibility=visibility, admin_uid=admin_uid,
                           subject=subject, grade=grade, description=description,
-                          avatar_link=avatar_link)
+                          avatar_link=avatar_link, created_at=created_at)
         conn.add(channel)
         if not try_to_commit(conn):
             warnings.warn(f"channel {name} cannot be created")
@@ -1374,9 +1373,6 @@ def modify_channel_personnel(uid, cid, modification: Modification):
     res = get_user_and_channel_instance(uid=uid, cid=cid)
     if isinstance(res, ErrorCode):
         return res
-    # if channel.visibility == ChannelVisibility.PUBLIC:
-    #     warnings.warn("Channel is public")
-    #     return ErrorCode.INVALID_CHANNEL
 
     with Session() as conn:
         if modification == Modification.MODIFY_DELETE:
@@ -1563,7 +1559,9 @@ def post_on_channel(uid, title, text, channel_name=None, cid=None):
                 warnings.warn(f"User {uid} is not in channel {channel.name}")
                 return ErrorCode.INCORRECT_PERSONNEL
 
-        channel_post = ChannelPost(uid=uid, cid=channel.cid, title=title, init_text=text)
+        created_at = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
+        channel_post = ChannelPost(uid=uid, cid=channel.cid, title=title, init_text=text,
+                                   created_at=created_at)
         conn.add(channel_post)
         if not try_to_commit(conn):
             warnings.warn(f"post {title} by user {uid} failed to be added to {channel.name}")
