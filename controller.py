@@ -811,7 +811,7 @@ def load_studio_contents():
                 if get_resource_thumbnail(item.rid) != ErrorCode.INVALID_RESOURCE \
                 else 'img/placeholder.png'
             info["view_link"] = url_for("resource", rid=item.rid)
-            info["is_public"] = "Public" if True else "Private"
+            info["is_public"] = "Public" if info["is_public"] else "Private"
 
             out.append(info)
     else:
