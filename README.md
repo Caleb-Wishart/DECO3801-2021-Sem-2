@@ -14,7 +14,7 @@
 * Caleb Wishart (Sysadmin | Back-end, Client-Server Interaction)
 
 ## Our Website
-Doctrina is a website made for teachers to share in class activities, resources and more with each other. It is designed so that you - the teacher - finds it easier to do the thing you love most: teach! We help you find worksheets, tutorials and questions for your students so you can spoend more time teaching them, rather then putting time into creating said worksheets, tutorials and questions.
+Doctrina is a website made for teachers to share in class activities, resources and more with each other. It is designed so that you - the teacher - finds it easier to do the thing you love most: teach! We help you find worksheets, tutorials and questions for your students so you can spend more time teaching them, rather then putting time into creating said worksheets, tutorials and questions.
 # About
 ## Front End
 ___
