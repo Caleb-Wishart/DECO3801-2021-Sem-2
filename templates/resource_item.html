@@ -24,6 +24,10 @@
 {% block script %}
 
 <script type="text/template" id="commentreply">
+    <div class = "row">
+        <div class="col-1" style="border-right: 1px dashed #333; height: 12px"></div>
+        <div class="col"></div>
+    </div>
     <div class="row" id="commentReply">
         <!-- New Comment Reply -->
         <div class="col-1" style="border-right: 1px dashed #333;">
@@ -81,12 +85,12 @@
 
                 <% _.each(comm.replies,  function(reply) { %>
                 <!-- Comment Reply -->
-                <dic class = "row">
+                <div class = "row">
                     <div class="col-1" style="border-right: 1px dashed #333; height: 12px">
                     </div>
                     <div class="col">
                     </div>
-                </dic>
+                </div>
                 <div class="row">
                     <div class="col-1" style="border-right: 1px dashed #333;">
                     </div>
