@@ -825,7 +825,7 @@ def find_resources(title_type="like", title=None,
 
         if sort_by != "natural":
             if sort_by == "newest":
-                resources = resources.order_by(Resource.created_at)
+                resources = resources.order_by(Resource.created_at.desc())
             elif sort_by == "upvotes":
                 resources = resources.order_by(Resource.upvote_count.desc())
 
