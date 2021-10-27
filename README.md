@@ -11,7 +11,7 @@
 * Xurong Liang (DB Administrator | Back-end, Server-Database Interaction)
 * Alexander Dubravcic (Front-end | Documentarian, Quality Assurance)
 * Kyle Macaskill (Front-end lead | UI / UX Architect, Designer)
-* Caleb Wishart (Sysadmin | Back-end, Client-Server interaction)
+* Caleb Wishart (Sysadmin | Back-end, Client-Server Interaction)
 
 ## Our Website
 Doctrina is a website made for teachers to share in class activities, resources and more with each other. It is designed so that you - the teacher - finds it easier to do the thing you love most: teach! We help you find worksheets, tutorials and questions for your students so you can spoend more time teaching them, rather then putting time into creating said worksheets, tutorials and questions.

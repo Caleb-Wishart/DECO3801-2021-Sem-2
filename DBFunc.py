@@ -258,7 +258,6 @@ def modify_user(uid: int, username=None, password=None, email=None,
                 user.avatar_link = avatar_link
 
         conn.add(user)
-
         if teaching_areas_to_add:
             modify_user_teaching_areas(uid=uid, conn=conn, teaching_areas=teaching_areas_to_add,
                                        modification=Modification.MODIFY_ADD)
