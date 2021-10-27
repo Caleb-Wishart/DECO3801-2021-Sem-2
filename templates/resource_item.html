@@ -449,9 +449,26 @@
                         No additional tags
                     {% endif %}
                 </p>
-                <button type="button" style = "width: 200px" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                <button type="button" style = "width: 145px" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reportModal">
                     <div class = "text-start">
                         Report Resource
+                    </div>
+                    <div class="modal fade" id="reportModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteModalLabel">Delete Resource</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Are you sure you want to delete this resource
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a href="{{url_for('resource')}}" class="btn btn-primary">Yes</a>
+                                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
+                                        </div>
+                                    </div>
+                                </div>
                     </div>
                 </button>
             </div>
