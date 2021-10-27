@@ -259,6 +259,7 @@
             <div class="col-3">
                 <!-- Notifications-->
                 <div class="row">
+                    {% if current_user.is_authenticated %}
                     <div class="dropdown float-end">
                         <button class="btn btn-primary dropdown-toggle float-end" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                             Notifications <span class="badge bg-danger" id="numspan">6 <!-- number of notifications go here --> </span>
@@ -290,6 +291,21 @@
                             </li>
                         </ul>
                     </div>
+                    {% else %}
+                    <div class="dropdown float-end">
+                        <button class="btn btn-primary dropdown-toggle float-end" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                            Notifications <span class="badge bg-danger" id="numspan">0 <!-- number of notifications go here --> </span>
+                        </button>
+                        <ul class="dropdown-menu overflow-auto" aria-labelledby="dropdownMenuButton1" style="max-height: 300px">
+                            <li><a class="dropdown-item">
+                                <button class="d-flex justify-content-center" onclick="$('#numspan').text(0);$('.m-active').remove();">
+                                    Clear All Notifications
+                                </button>
+                            </a>
+                            </li>
+                        </ul>
+                    </div>
+                    {% endif %}
                 </div>
                 <!-- Contribute to Community-->
                 <hr style="margin-top: 5rem!important; margin-bottom: 1rem!important;">
