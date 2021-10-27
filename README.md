@@ -37,9 +37,8 @@ The CSS is augmented using the [Bootstrap5](https://getbootstrap.com/) <img src=
 ```HTML
 <button class="btn btn-primary">Post a comment</button>
 ```
-
-<style>
-    /* Sourced from BOOTSTRAP5 */
+```CSS
+/* Sourced from BOOTSTRAP5 */
     .btn-primary {
         background-color: #1488eb;
         color: white;
@@ -59,9 +58,7 @@ The CSS is augmented using the [Bootstrap5](https://getbootstrap.com/) <img src=
         border-radius: .25rem;
         transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
     }
-</style>
-
-<button class="btn btn-primary float-end" disabled>Post a comment</button>
+```
 
 Additionally Bootstrap has a flavour of custom Icons which we used in conjunction with the [w3 SVG's](http://www.w3.org/2000/svg) to use custom Icons in our webpage to break up the static text styles.
 ```html
@@ -69,9 +66,6 @@ Additionally Bootstrap has a flavour of custom Icons which we used in conjunctio
     <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
 </svg>
 ```
-<svg xmlns="http://www.w3.org/2000/svg"  width="17" height="17" fill="#2e9cfa" class="bi bi-arrow-up-circle-fill" viewBox="0 0 16 16" style="margin-bottom: 2px!important; margin-left: 2px!important">
-    <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
-</svg>
 
 ### Javascript <img src="https://img.icons8.com/color/20/000000/javascript--v1.png"/>
 
