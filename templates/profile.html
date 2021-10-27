@@ -73,7 +73,7 @@
                     <img src="{{ url_for("static", filename=user['profile_background_link'])}}" class="banner-image" height="250">
                     <div class="row pe-5" style="margin-top: 1rem">
                         <div class="col-2">
-                            <img src="{{ url_for('static', filename=user['avatar_link']) }}" width="100px" height="100px" style="margin-top:6px">
+                            <img src="{{ url_for('static', filename=user['avatar_link']) }}" width="100px" height="100px" style="margin-top:6px; margin-bottom: 0.5rem; border-radius: 15%">
                         </div>
                     <div class="col-8">
                           <p class="h4" style="text-align: left">{{ user['username']}}</p>
@@ -241,7 +241,7 @@
                                 <!-- Thumbnail for a channel.  -->
                                 <div class="col-2" style="width: 12%" onclick="location.href = '<%= res.view_link %>'">
                                     <img src="{{ url_for('static', filename='') }}/<%= res['avatar_link']%>"
-                                         alt="Logo" width="60" style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
+                                         alt="Logo" width="60" height = "55" style="margin:10px!important; margin-left:15px!important; margin-right: 15px!important;">
                                 </div>
 
                                 <div class="col-3" style="margin-top: 10px!important; margin-bottom: 5px!important;" onclick="location.href = '<%= res.view_link %>'">
