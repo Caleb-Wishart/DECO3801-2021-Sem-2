@@ -250,11 +250,11 @@
         <div class="d-flex justify-content-center">
             {% for category, message in messages %}
             {% if category == "error" %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <div class="alert alert-warning alert-dismissible fade show" role="alert" style="position: absolute; top: 30px">
             {% elif category == "info" %}
-                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <div class="alert alert-info alert-dismissible fade show" role="alert" style="position: absolute; top: 30px">
             {% else %}
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert" style="position: absolute; top: 30px">
             {% endif %}
                 <div>
                     {% if category == "error" %}
