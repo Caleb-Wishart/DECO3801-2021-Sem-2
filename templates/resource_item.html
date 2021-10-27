@@ -416,6 +416,12 @@
                             <a class = "btn btn-primary" href="{{ url_for('resource_edit', rid=rid) }}">
                                 Edit Resource
                             </a>
+                        {% else %}
+                        <button type="button" style = "width: 145px" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reportModal">
+                            <div class = "text-start d-flex">
+                                Report Resource
+                            </div>
+                        </button>
                         {% endif %}
                     </div>
                 {% endfor %}
@@ -449,11 +455,6 @@
                         No additional tags
                     {% endif %}
                 </p>
-                <button type="button" style = "width: 145px" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reportModal">
-                    <div class = "text-start">
-                        Report Resource
-                    </div>
-                </button>
                  <div class="modal fade" id="reportModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
@@ -466,7 +467,7 @@
                                             sure you want to report this resource?
                                         </div>
                                         <div class="modal-footer">
-                                            <a href="{{url_for('resource')}}" class="btn btn-primary">Yes</a>
+                                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Yes</button>
                                             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
                                         </div>
                                     </div>
