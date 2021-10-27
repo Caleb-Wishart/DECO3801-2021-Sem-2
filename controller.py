@@ -954,7 +954,7 @@ def about():
          "upvotes and downvotes on a resource, we use an algorithm to decide how popular it is. Resources are sorted "
          "by popularity after you search."],
          ["What do I do if I see a resource that breaks TOS?",
-         "On each resource page there is a report button located below the resources listed tags. If you believe the "
+         "On each resource page there is a report button located next to the author name. If you believe the "
          "resource is breaking our Terms of Service, click the button to notify our moderators to investigate it, and "
          "if it has broken TOS, it will be swiftly removed from our site."],
     ]
