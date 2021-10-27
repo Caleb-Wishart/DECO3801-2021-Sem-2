@@ -268,7 +268,7 @@ def login():
         if DEMO:
             if email == "demo" and form.password.data == "demo":
                 login_user(DemoUser(), remember=False)
-                if 'next' in request.args:
+                if 'next' in request.args and request.args.get("next") != 'https://officialteamname.uqcloud.net/logout':
                     return redirect(request.args.get("next"))
                 return redirect(url_for('home'))
 
@@ -277,7 +277,7 @@ def login():
             if user != ErrorCode.INVALID_USER and check_password_hash(user.hash_password, form.password.data):
                 user_auth(user.email, True)
                 login_user(user, remember=False)
-                if 'next' in request.args:
+                if 'next' in request.args and request.args.get("next") != 'https://officialteamname.uqcloud.net/logout':
                     return redirect(request.args.get("next"))
                 return redirect(url_for('home'))
         flash('That username or password was incorrect', "error")
@@ -336,7 +336,7 @@ def register():
             if password != passwordConfirm:
                 data['passwordDif'] = True
             if len(password) < 8:
-                data['passwordMsg'] = "Make sure your password is at lest 8 letters"
+                data['passwordMsg'] = "Make sure your password is at least 8 letters"
             elif re_search('[0-9]', password) is None:
                 data['passwordMsg'] = "Make sure your password has a number in it"
             elif re_search('[A-Z]', password) is None:
@@ -398,7 +398,7 @@ def resource(rid=None):
         creater = conn.query(User).filter_by(uid=creater.uid).first()
     creater_rating_whole = int(creater.user_rating)
     # get if a user's honor rating is greater than int.5
-    creater_rating_half = 0 if creater.user_rating - creater_rating_whole < .5 else 1
+    creater_rating_half = 0 if round(float(creater.user_rating), 1) - float(creater_rating_whole) < .5 else 1
     # empty stars
     creater_rating_unchecked = 5 - creater_rating_whole - creater_rating_half
 
@@ -734,7 +734,7 @@ def profile(uid=None):
     # get user rating number
     user_rating_whole = int(user.user_rating)
     # get if a user's honor rating is greater than int.5
-    user_rating_half = 0 if float(user.user_rating) - float(user_rating_whole) < .5 else 1
+    user_rating_half = 0 if round(float(user.user_rating), 1) - float(user_rating_whole) < .5 else 1
     # empty stars
     user_rating_unchecked = 5 - user_rating_whole - user_rating_half
 

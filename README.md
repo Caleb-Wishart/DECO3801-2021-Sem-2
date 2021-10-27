@@ -8,10 +8,10 @@
 ### Project Members:
 * Adrian Rahul Kamal Rajkamal (Overall Project Manager | Front-end, Marketing & User Research)
 * Matthew Dean (Front-end | Documentarian, Production Manager)
-* Xurong Liang (DB Administrator | Back-end, Server-Database interaction)
+* Xurong Liang (DB Administrator | Back-end, Server-Database Interaction)
 * Alexander Dubravcic (Front-end | Documentarian, Quality Assurance)
 * Kyle Macaskill (Front-end lead | UI / UX Architect, Designer)
-* Caleb Wishart (Sysadmin | Back-end, Client-Server interaction)
+* Caleb Wishart (Sysadmin | Back-end, Client-Server Interaction)
 
 ## Our Website
 Doctrina is a website made for teachers to share in class activities, resources and more with each other. It is designed so that you - the teacher - finds it easier to do the thing you love most: teach! We help you find worksheets, tutorials and questions for your students so you can spoend more time teaching them, rather then putting time into creating said worksheets, tutorials and questions.
@@ -21,13 +21,13 @@ ___
 The core of the user facing website runs on the web trio HTML5, CSS3, JS.
 
 Webpages are sourced from the [templates](/templates/) folder.
-The core of each page is the [base.html](/templates/base.html). This contains the common HTML head for the CDN links, style and webpage scripts. A webpage header and footer. Each page is then dynamically changed by extending on this base page using the [JINJA](https://jinja.palletsprojects.com/en/3.0.x/) <img src="https://www.vectorlogo.zone/logos/pocoo_jinja/pocoo_jinja-icon.svg" width=20/> templating engine.
+The core of each page is the [base.html](/templates/base.html). This contains the common HTML head for the CDN links, style and webpage scripts. A webpage header and footer. Each page is then dynamically changed by extending on this base page using the [JINJA2](https://jinja.palletsprojects.com/en/3.0.x/) <img src="https://www.vectorlogo.zone/logos/pocoo_jinja/pocoo_jinja-icon.svg" width=20/> templating engine.
 ```jinja
 {% extends 'base.html' %}
 ```
 
 ### HTML5 <img src="https://img.icons8.com/color/20/000000/html-5--v1.png"/>
-The HTML is written pure with dynaic elements added using the JINJA engine. The snippet below would set the contents of the `<p>` tag to the supplied description field of the JSON strucutre in the variable channel.
+The HTML is written pure with dynamic elements added using the JINJA2 engine. The snippet below would set the contents of the `<p>` tag to the supplied description field of the JSON strucutre in the variable channel.
 ```jinja
 <p> {{ channel.description }}</p>
 ```
@@ -37,8 +37,8 @@ The CSS is augmented using the [Bootstrap5](https://getbootstrap.com/) <img src=
 ```HTML
 <button class="btn btn-primary">Post a comment</button>
 ```
-<style>
-    /* Sourced from BOOTSTRAP5 */
+```CSS
+/* Sourced from BOOTSTRAP5 */
     .btn-primary {
         background-color: #1488eb;
         color: white;
@@ -58,9 +58,7 @@ The CSS is augmented using the [Bootstrap5](https://getbootstrap.com/) <img src=
         border-radius: .25rem;
         transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
     }
-</style>
-
-<button class="btn btn-primary float-end" disabled>Post a comment</button>
+```
 
 Additionally Bootstrap has a flavour of custom Icons which we used in conjunction with the [w3 SVG's](http://www.w3.org/2000/svg) to use custom Icons in our webpage to break up the static text styles.
 ```html
@@ -68,9 +66,6 @@ Additionally Bootstrap has a flavour of custom Icons which we used in conjunctio
     <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
 </svg>
 ```
-<svg xmlns="http://www.w3.org/2000/svg"  width="17" height="17" fill="#2e9cfa" class="bi bi-arrow-up-circle-fill" viewBox="0 0 16 16" style="margin-bottom: 2px!important; margin-left: 2px!important">
-    <path d="M16 8A8 8 0 1 0 0 8a8 8 0 0 0 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
-</svg>
 
 ### Javascript <img src="https://img.icons8.com/color/20/000000/javascript--v1.png"/>
 
@@ -265,7 +260,7 @@ Variables can be provided to all webpages with the flask context processor.
 def defaults():
     """Provides the default context processors
     Returns:
-        dict: Variables for JINJA context
+        dict: Variables for JINJA2 context
             current_user: the user the is currently logged in or the Anonymous user
             subject : A list of all subjects with their names
             grade : A list of all grades with their names
