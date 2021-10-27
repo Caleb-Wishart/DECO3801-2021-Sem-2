@@ -77,7 +77,9 @@
                         </div>
                     <div class="col-8">
                           <p class="h4" style="text-align: left">{{ user['username']}}</p>
-                          <p class="h6" style="text-align: left">{{ user['email'] }}</p>
+                            {% if is_user_themself %}
+                                 <p class="h6" style="text-align: left">{{ user['email'] }}</p>
+                            {% endif %}
                           <div class="card-body overflow-auto" style="max-height: 350px; text-align: justify; margin: 1rem 0 0 0; padding: 0; margin-right: 1.2rem!important;">
                               <p class="h6">{{ user['bio'] }}</p>
                           </div>
