@@ -268,7 +268,7 @@ def login():
         if DEMO:
             if email == "demo" and form.password.data == "demo":
                 login_user(DemoUser(), remember=False)
-                if 'next' in request.args:
+                if 'next' in request.args and request.args.get("next") != 'https://officialteamname.uqcloud.net/logout':
                     return redirect(request.args.get("next"))
                 return redirect(url_for('home'))
 
@@ -277,7 +277,7 @@ def login():
             if user != ErrorCode.INVALID_USER and check_password_hash(user.hash_password, form.password.data):
                 user_auth(user.email, True)
                 login_user(user, remember=False)
-                if 'next' in request.args:
+                if 'next' in request.args and request.args.get("next") != 'https://officialteamname.uqcloud.net/logout':
                     return redirect(request.args.get("next"))
                 return redirect(url_for('home'))
         flash('That username or password was incorrect', "error")
