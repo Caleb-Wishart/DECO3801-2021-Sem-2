@@ -3,7 +3,7 @@
 # modify the DB objects
 #
 #
-# works of OfficialTeamName (con'd). All rights reserved.
+# works of OfficialTeamName (con.d). All rights reserved.
 ##################################################################
 import traceback
 

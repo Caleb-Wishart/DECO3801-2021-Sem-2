@@ -2,7 +2,7 @@
 # This script is used to import dummy resources/users/channel comments to our website
 #
 #
-# works of OfficialTeamName (cond'). All rights reserved.
+# works of OfficialTeamName (con.d). All rights reserved.
 ###############################################################################
 import random
 from DBFunc import *

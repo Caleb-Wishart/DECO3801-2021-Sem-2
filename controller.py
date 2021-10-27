@@ -2,7 +2,7 @@
 # This script defines the backend functions that respond to all webpage requests.
 #
 #
-# works of OfficialTeamName (con'd). All rights reserved.
+# works of OfficialTeamName (con.d). All rights reserved.
 ##################################################################################
 from flask import Flask, request, render_template, redirect, url_for, abort, flash, Response, jsonify
 from sqlalchemy.sql.expression import func
