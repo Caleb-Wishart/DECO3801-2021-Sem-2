@@ -4,6 +4,12 @@
     <img width="500" img src="static/img/logo.png" />
 </p>
 
+## NOTICE ABOUT COPYRIGHT
+This code is not open source licenced.
+It is not to be directly copied for any instance or offering of the DECO3801 course program.
+For other programs talk to your course coordinator on usage. In such a case any use or changes to this code should be documented.
+
+
 ## Offical Team Name (cont.d)
 ### Project Members:
 * Adrian Rahul Kamal Rajkamal (Overall Project Manager | Front-end, Marketing & User Research)
