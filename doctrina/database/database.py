@@ -5,24 +5,56 @@
 #
 # works of OfficialTeamName (con.d). All rights reserved.
 ##################################################################
-import traceback
-
-import sqlalchemy.exc
-from sqlalchemy import or_
-from sqlalchemy.orm import sessionmaker
-from werkzeug.security import generate_password_hash
+import datetime
+import enum
 import random
-from DBStructure import *
+import traceback
+from typing import Optional
 
-# define if you want method output messages for debugging
-VERBOSE = False
+import pytz
+from flask import current_app
+from sqlalchemy import Enum, or_
+from sqlalchemy.exc import SQLAlchemyError
+from werkzeug.security import generate_password_hash
+
+from doctrina import db_session, login_manager
+from doctrina.database.models import (
+    AnonymousUser,
+    Channel,
+    ChannelPersonnel,
+    ChannelPost,
+    ChannelPostVoteInfo,
+    ChannelTagRecord,
+    ChannelVisibility,
+    DemoUser,
+    Grade,
+    PostComment,
+    PostCommentVoteInfo,
+    PrivateResourcePersonnel,
+    Resource,
+    ResourceComment,
+    ResourceCommentReply,
+    ResourceCreater,
+    ResourceDifficulty,
+    ResourceTagRecord,
+    ResourceThumbnail,
+    ResourceView,
+    ResourceVoteInfo,
+    Subject,
+    Tag,
+    User,
+    UserTeachingAreas,
+)
+
+# Controlls logging messages
+VERBOSE = current_app.config.get("DATABASE_VERBOSE", False)
 
 # this controls how DB response in case of sql commit error:
 # if DEBUG_MODE is on, when error in commit happens, simply raise error and exit program
 # on the contrary, when DB is not in this mode, any operations within the transaction
 # that causes commit error will be roll-backed. Error message will be shown as
 # a warning on screen
-DEBUG_MODE = False
+DEBUG_MODE = current_app.config.get("DATABASE_DEBUG", False)
 
 # link to default user profile background
 DEFAULT_PROFILE_BACKGROUND_LINK = "profile_background/default_background.jpg"
@@ -31,12 +63,62 @@ DEFAULT_USER_AVATAR_LINK = "avatar/1.png"
 # link to default channel avatar
 DEFAULT_CHANNEL_AVATAR_LINK = "channel_avatar/logo_icon.png"
 
+# starting timestamp of UTC
+EPOCH = datetime.datetime.utcfromtimestamp(0)
+
+
+# UTILS
+
+
+def enum_to_website_output(item: enum.Enum) -> str:
+    """
+    Convert an enum value to human friendly format: to lowercase, capitalize first
+    letter of each word and get rid of underscore, if any
+
+    e.g. Subject.MATHS_A -> "Maths A:
+
+    :param item: The enum item to convert
+    :return The human friendly string value of the enum item. If enum is None then
+            returns "None" string
+    """
+    if not item:
+        return "None"
+
+    name = item.name
+    if len(name) == 2:
+        # Subject.IT/PE, no need to convert to lowercase
+        return name
+    return name.replace("_", " ", 1).title()
+
+
+def website_input_to_enum(readable_string: str, enum_class: enum.EnumMeta) -> Enum | None:
+    """
+    Convert a human readable enum value to an appropriate enum variable.
+    i.e. applicable to Subject, Grade and ChannelVisibility only
+
+    :param readable_string: The enum string value human can understand
+    :param enum_class: The class of this enum value to return
+    :return if corresponding enum variable in the nominated enum_class is found,
+            it returns it. Otherwise
+    """
+    value = readable_string.upper().replace(" ", "_", 1)
+    try:
+        return enum_class[value]
+    except KeyError:
+        # no such enum variable
+        current_app.logger.warn(f"value {readable_string} not found in enum class {enum_class}")
+        return None
+
+
+# CODES
+
 
 class ErrorCode(enum.Enum):
     """
     This is a enum class representing all the possible error codes when
     calling the methods below
     """
+
     # user id/info incorrect
     INVALID_USER = 1
     # resource id/info incorrect
@@ -53,21 +135,20 @@ class ErrorCode(enum.Enum):
     COMMIT_ERROR = 8
     # email exists in DB
     EMAIL_USED = 9
+    # No Error
+    NONE = 0
 
 
 class Modification(enum.Enum):
     """
     Defining the type of modification to be done
     """
+
     MODIFY_ADD = 0
     MODIFY_DELETE = 1
 
 
-engine = create_engine(DBPATH)
-Session = sessionmaker(engine)
-
-# starting timestamp of UTC
-EPOCH = datetime.datetime.utcfromtimestamp(0)
+# DB Actions
 
 
 def try_to_commit(trans):
@@ -87,17 +168,23 @@ def try_to_commit(trans):
     try:
         trans.commit()
         return True
-    except sqlalchemy.exc.SQLAlchemyError:
+    except SQLAlchemyError:
         # errors while commit, show as warning
-        warnings.warn(traceback.format_exc())
+        current_app.logger.warn(traceback.format_exc())
         trans.rollback()
-        warnings.warn("Transaction is roll-backed")
+        current_app.logger.warn("Transaction is roll-backed")
     return False
 
 
-def add_user(username, password, email, teaching_areas: dict = None,
-             bio=None, avatar_link=DEFAULT_USER_AVATAR_LINK,
-             profile_background_link=DEFAULT_PROFILE_BACKGROUND_LINK):
+def add_user(
+    username,
+    password,
+    email,
+    teaching_areas: dict | None = None,
+    bio=None,
+    avatar_link=DEFAULT_USER_AVATAR_LINK,
+    profile_background_link=DEFAULT_PROFILE_BACKGROUND_LINK,
+):
     """
     Add a new user to table user and add teaching_areas to
     user_teaching_areas table
@@ -115,43 +202,47 @@ def add_user(username, password, email, teaching_areas: dict = None,
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     email = email.lower()
-    user = User(username=username, avatar_link=avatar_link,
-                hash_password=generate_password_hash(password, "sha256"),
-                email=email, bio=bio,
-                created_at=datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane")),
-                profile_background_link=profile_background_link)
+    user = User(
+        username=username,
+        avatar_link=avatar_link,
+        hash_password=generate_password_hash(password, "sha256"),
+        email=email,
+        bio=bio,
+        created_at=datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane")),
+        profile_background_link=profile_background_link,
+    )
 
-    with Session() as conn:
-        if conn.query(User).filter_by(email=email).one_or_none():
-            warnings.warn("This email address is registered")
+    with db_session() as conn:
+        if User.query.filter_by(email=email).one_or_none():
+            current_app.logger.warn("This email address is registered")
             return ErrorCode.EMAIL_USED
 
         # phase 1: add a new user
         conn.add(user)
         if not try_to_commit(conn):
-            warnings.warn(f"failed to commit user creation {username}")
+            current_app.logger.warn(f"failed to commit user creation {username}")
             return ErrorCode.COMMIT_ERROR
 
         # phase 2: find id of new user -- using email,
         # then update teaching_areas table
-        user = conn.query(User).filter_by(email=email).one()
+        user = User.query.filter_by(email=email).one()
 
         if teaching_areas:
-            modify_user_teaching_areas(uid=user.uid, conn=conn, teaching_areas=teaching_areas,
-                                       modification=Modification.MODIFY_ADD)
+            modify_user_teaching_areas(
+                uid=user.uid, conn=conn, teaching_areas=teaching_areas, modification=Modification.MODIFY_ADD
+            )
         if not try_to_commit(conn):
-            warnings.warn(f"failed to commit user creation {username}")
+            current_app.logger.warn(f"failed to commit user creation {username}")
             conn.delete(user)
             # rollback obsolete user object
             conn.commit()
             return ErrorCode.COMMIT_ERROR
-        if VERBOSE:
+        if current_app.config.get("VERBOSE", False):
             print(f"User {username} created")
         return user.uid
 
 
-def modify_user_teaching_areas(uid, conn, modification: Modification,
-                               teaching_areas: dict = None):
+def modify_user_teaching_areas(uid, conn, modification: Modification, teaching_areas: Optional[dict] = None):
     """
     Modify a sequence of teaching areas to user instance
 
@@ -161,6 +252,8 @@ def modify_user_teaching_areas(uid, conn, modification: Modification,
     :param teaching_areas: Mapping of teaching area - [is_public, grade (optional)] list
             e.g. [Subject.ENGLISH: [True], Subject.MATHS_C: [False, Grade.YEAR_1]
     """
+    if teaching_areas is None:
+        teaching_areas = {}
     for area, info in teaching_areas.items():
         grade = None
         if len(info) == 2:
@@ -170,33 +263,38 @@ def modify_user_teaching_areas(uid, conn, modification: Modification,
         if isinstance(area, Subject):
             if modification == Modification.MODIFY_ADD:
                 # insert new user teaching areas
-                teaching_area = conn.query(UserTeachingAreas). \
-                    filter_by(uid=uid, teaching_area=area,
-                              is_public=is_public, grade=grade).one_or_none()
+                teaching_area = UserTeachingAreas.query.filter_by(
+                    uid=uid, teaching_area=area, is_public=is_public, grade=grade
+                ).one_or_none()
                 if teaching_area is None:
-                    new_teach_area = UserTeachingAreas(uid=uid, teaching_area=area,
-                                                       is_public=is_public, grade=grade)
-                    warnings.warn("Added new teaching area: " + area.name)
+                    new_teach_area = UserTeachingAreas(uid=uid, teaching_area=area, is_public=is_public, grade=grade)
+                    current_app.logger.warn("Added new teaching area: " + area.name)
                     conn.add(new_teach_area)
             else:
                 # delete user teaching areas
-                teaching_area = conn.query(UserTeachingAreas). \
-                    filter_by(uid=uid, teaching_area=area,
-                              is_public=is_public, grade=grade).one_or_none()
+                teaching_area = UserTeachingAreas.query.filter_by(
+                    uid=uid, teaching_area=area, is_public=is_public, grade=grade
+                ).one_or_none()
                 if teaching_area:
                     conn.delete(teaching_area)
 
 
 def get_user_teaching_areas(uid: int):
-    with Session() as conn:
-        return conn.query(UserTeachingAreas).filter_by(uid=uid).all()
+    with db_session():
+        return UserTeachingAreas.query.filter_by(uid=uid).all()
 
 
-def modify_user(uid: int, username=None, password=None, email=None,
-                teaching_areas_to_add: dict = None,
-                teaching_areas_to_delete: dict = None,
-                profile_background_link: str = "NULL",
-                bio: str = "NULL", avatar_link: str = "NULL"):
+def modify_user(
+    uid: int,
+    username=None,
+    password=None,
+    email=None,
+    teaching_areas_to_add: Optional[dict] = None,
+    teaching_areas_to_delete: Optional[dict] = None,
+    profile_background_link: str = "NULL",
+    bio: str = "NULL",
+    avatar_link: str = "NULL",
+):
     """
     Modify the information of a user instance
 
@@ -226,15 +324,15 @@ def modify_user(uid: int, username=None, password=None, email=None,
             ErrorCode.EMAIL_USED if new email is already registered
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
-    with Session() as conn:
-        user = conn.query(User).filter_by(uid=uid).one_or_none()
+    with db_session() as conn:
+        user = User.query.filter_by(uid=uid).one_or_none()
         if not user:
-            warnings.warn("Invalid uid")
+            current_app.logger.warn("Invalid uid")
             return ErrorCode.INVALID_USER
 
         if email:
-            if isinstance(User, get_user(email)):
-                warnings.warn("email is already registered")
+            if isinstance(get_user(email), User):
+                current_app.logger.warn("email is already registered")
                 return ErrorCode.EMAIL_USED
             user.email = email
         if username:
@@ -259,14 +357,16 @@ def modify_user(uid: int, username=None, password=None, email=None,
 
         conn.add(user)
         if teaching_areas_to_add:
-            modify_user_teaching_areas(uid=uid, conn=conn, teaching_areas=teaching_areas_to_add,
-                                       modification=Modification.MODIFY_ADD)
+            modify_user_teaching_areas(
+                uid=uid, conn=conn, teaching_areas=teaching_areas_to_add, modification=Modification.MODIFY_ADD
+            )
         if teaching_areas_to_delete:
-            modify_user_teaching_areas(uid=uid, conn=conn, teaching_areas=teaching_areas_to_delete,
-                                       modification=Modification.MODIFY_DELETE)
+            modify_user_teaching_areas(
+                uid=uid, conn=conn, teaching_areas=teaching_areas_to_delete, modification=Modification.MODIFY_DELETE
+            )
 
         if not try_to_commit(conn):
-            warnings.warn("Error committing")
+            current_app.logger.warn("Error committing")
             return ErrorCode.COMMIT_ERROR
 
 
@@ -279,14 +379,31 @@ def remove_resource(rid: int):
 
     :param rid: The id of resource to be removed
     """
-    with Session() as conn:
-        resource = conn.query(Resource).filter_by(rid=rid).one_or_none()
+    with db_session() as conn:
+        resource = Resource.query.filter_by(rid=rid).one_or_none()
         if resource:
             conn.delete(resource)
             conn.commit()
 
 
-def get_user(email):
+def user_auth(user, login=True) -> ErrorCode:
+    """
+    Changes users authentication status
+
+    :param email: email of user
+    :param login: Is this a `login` attempt, defaults to True
+    :return: status code
+    """
+    with db_session() as conn:
+        user.authenticated = login
+        conn.add(user)
+        if not try_to_commit(conn):
+            current_app.logger.warn("failed to commit updated user")
+            return ErrorCode.COMMIT_ERROR
+        return ErrorCode.NONE
+
+
+def get_user(identifier: str | int) -> User | None:
     """
     Retrieve the User with the unique email as the key
 
@@ -294,27 +411,28 @@ def get_user(email):
     :return: User structure on success
              ErrorCode.INVALID_USER if no match
     """
-    email = email.lower()
-    with Session() as conn:
-        user = conn.query(User).filter_by(email=email).one_or_none()
-        if user:
-            if VERBOSE:
-                warnings.warn(f"email {email} is registered by user uid = {user.uid}")
-            return user
-        warnings.warn(f"No user has email {email}")
-        return ErrorCode.INVALID_USER
-
-
-def user_auth(email, login=True):
-    with Session() as conn:
-        user = get_user(email)
-        if user == ErrorCode.INVALID_USER:
-            return ErrorCode.INVALID_USER
-        user.authenticated = login
-        conn.add(user)
-        if not try_to_commit(conn):
-            warnings.warn(f"failed to commit updated user")
-            return ErrorCode.COMMIT_ERROR
+    if isinstance(identifier, str):
+        email = identifier.lower()
+        with db_session():
+            user = User.query.filter_by(email=email).one_or_none()
+            if user:
+                if VERBOSE:
+                    current_app.logger.warn(f"email {email} is registered by user uid = {user.uid}")
+                return user
+            current_app.logger.warn(f"No user has email {email}")
+            return None
+    elif isinstance(identifier, int):
+        uid = identifier
+        with db_session():
+            user = User.query.filter_by(uid=uid).one_or_none()
+            if user:
+                if VERBOSE:
+                    current_app.logger.warn(f"uid {uid} is registered to user email = {user.email}")
+                return user
+            current_app.logger.warn(f"No user has id {uid}")
+            return None
+    else:
+        raise NotImplementedError()
 
 
 def add_tag(tag_name, tag_description=None):
@@ -327,18 +445,18 @@ def add_tag(tag_name, tag_description=None):
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     tag = Tag(tag_name=tag_name, tag_description=tag_description)
-    with Session() as conn:
-        if conn.query(Tag).filter_by(tag_name=tag_name).one_or_none():
-            warnings.warn("tag already exists")
+    with db_session() as conn:
+        if Tag.query.filter_by(tag_name=tag_name).one_or_none():
+            current_app.logger.warn("tag already exists")
             return
 
         conn.add(tag)
         if not try_to_commit(conn):
-            warnings.warn(f"tag {tag_name} creation failed")
+            current_app.logger.warn(f"tag {tag_name} creation failed")
             return ErrorCode.COMMIT_ERROR
-        print(f"tag {tag_name} added") if VERBOSE else None
+        print(f"tag {tag_name} added") if current_app.config.get("VERBOSE", False) else None
 
-        return conn.query(Tag).filter_by(tag_name=tag_name).one().tag_id
+        return Tag.query.filter_by(tag_name=tag_name).one().tag_id
 
 
 def get_tags(mapping="name2id") -> dict:
@@ -358,8 +476,8 @@ def get_tags(mapping="name2id") -> dict:
     if mapping not in ["name2id", "id2name"]:
         mapping = "name2id"
 
-    with Session() as conn:
-        tags = conn.query(Tag).all()
+    with db_session():
+        tags = Tag.query.all()
 
         for i in tags:
             if mapping == "name2id":
@@ -369,10 +487,19 @@ def get_tags(mapping="name2id") -> dict:
     return out
 
 
-def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: Subject,
-                 grade: Grade, creaters_id: list = None, is_public=True,
-                 private_personnel_id: list = None, tags_id: list = None,
-                 description=None, resource_thumbnail_links: list = None):
+def add_resource(
+    title,
+    resource_link,
+    difficulty: ResourceDifficulty,
+    subject: Subject,
+    grade: Grade,
+    creaters_id: Optional[list] = None,
+    is_public=True,
+    private_personnel_id: Optional[list] = None,
+    tags_id: Optional[list] = None,
+    description=None,
+    resource_thumbnail_links: Optional[list] = None,
+):
     """
     Add a resource to resource table
 
@@ -404,26 +531,33 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
         creaters_id = []
 
     if not is_public and not private_personnel_id:
-        warnings.warn("Please specify the User allowed to access this resource")
+        current_app.logger.warn("Please specify the User allowed to access this resource")
         return ErrorCode.INCORRECT_PERSONNEL
 
     created_at = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
-    resource = Resource(title=title, resource_link=resource_link, grade=grade,
-                        difficulty=difficulty, subject=subject, is_public=is_public,
-                        description=description, created_at=created_at)
+    resource = Resource(
+        title=title,
+        resource_link=resource_link,
+        grade=grade,
+        difficulty=difficulty,
+        subject=subject,
+        is_public=is_public,
+        description=description,
+        created_at=created_at,
+    )
 
-    with Session() as conn:
+    with db_session() as conn:
 
         # phase 1: add new resource
         conn.add(resource)
         if not try_to_commit(conn):
-            warnings.warn(f"resource {title} creation failed")
+            current_app.logger.warn(f"resource {title} creation failed")
             return ErrorCode.COMMIT_ERROR
 
         # phase 2: find the new row, update private_resource_personnel info, tag info
         # and resource_creater table, resource_thumbnail
-        warnings.warn(resource_link)
-        resource = conn.query(Resource).filter_by(resource_link=resource_link).one()
+        current_app.logger.warn(resource_link)
+        resource = Resource.query.filter_by(resource_link=resource_link).one()
 
         # get rid of duplicate
         creaters_id = list(set(creaters_id))
@@ -457,12 +591,12 @@ def add_resource(title, resource_link, difficulty: ResourceDifficulty, subject: 
                 tag_record = ResourceTagRecord(rid=resource.rid, tag_id=i)
                 conn.add(tag_record)
         if not try_to_commit(conn):
-            warnings.warn(f"resource {title} creation failed")
+            current_app.logger.warn(f"resource {title} creation failed")
             # roll back process
             conn.delete(resource)
             conn.commit()
             return ErrorCode.COMMIT_ERROR
-        if VERBOSE:
+        if current_app.config.get("VERBOSE", False):
             print(f"Resource {title} added")
         return resource.rid
 
@@ -475,8 +609,8 @@ def is_resource_public(rid: int):
     :return: True if the resource is public, False otherwise.
              ErrorCode.INVALID_RESOURCE is resource id is invalid
     """
-    with Session() as conn:
-        resource = conn.query(Resource).filter_by(rid=rid).one_or_none()
+    with db_session():
+        resource = Resource.query.filter_by(rid=rid).one_or_none()
 
         if not resource:
             # resource not exist
@@ -497,19 +631,18 @@ def modify_resource_personnel(rid, uid, modification: Modification):
     """
     user, resource = get_user_and_resource_instance(uid=uid, rid=rid)
     if not user:
-        warnings.warn("uid is invalid")
+        current_app.logger.warn("uid is invalid")
         return ErrorCode.INVALID_USER
     elif not resource:
-        warnings.warn("rid is invalid")
+        current_app.logger.warn("rid is invalid")
         return ErrorCode.INVALID_RESOURCE
 
-    with Session() as conn:
+    with db_session() as conn:
         if modification == Modification.MODIFY_DELETE:
             # delete
-            personnel = conn.query(PrivateResourcePersonnel).filter_by(uid=uid, rid=rid). \
-                one_or_none()
+            personnel = PrivateResourcePersonnel.query.filter_by(uid=uid, rid=rid).one_or_none()
             if not personnel:
-                warnings.warn("Delete failed: User not in personnel")
+                current_app.logger.warn("Delete failed: User not in personnel")
                 return ErrorCode.INCORRECT_PERSONNEL
             conn.delete(personnel)
             msg = "deleted"
@@ -519,17 +652,26 @@ def modify_resource_personnel(rid, uid, modification: Modification):
             conn.add(personnel)
             msg = "added"
         if not try_to_commit(conn):
-            warnings.warn(f"User {uid} cannot be added to personnel of resource {rid}")
+            current_app.logger.warn(f"User {uid} cannot be added to personnel of resource {rid}")
             return ErrorCode.COMMIT_ERROR
         print(f"user {uid} is {msg} from/to personnel of resource {rid}")
 
 
-def modify_resource(rid: int, title=None, resource_link=None,
-                    difficulty: ResourceDifficulty = None, subject: Subject = None,
-                    grade: Grade = None, creaters_id: list = None, is_public: bool = None,
-                    ids_to_delete_from_personnel: list = None, description="NULL",
-                    ids_to_add_to_personnel: list = None, tags_id: list = None,
-                    resource_thumbnail_links: list = None):
+def modify_resource(
+    rid: int,
+    title=None,
+    resource_link=None,
+    difficulty: Optional[ResourceDifficulty] = None,
+    subject: Optional[Subject] = None,
+    grade: Optional[Grade] = None,
+    creaters_id: Optional[list] = None,
+    is_public: Optional[bool] = None,
+    ids_to_delete_from_personnel: Optional[list] = None,
+    description="NULL",
+    ids_to_add_to_personnel: Optional[list[int]] = None,
+    tags_id: Optional[list] = None,
+    resource_thumbnail_links: Optional[list] = None,
+):
     """
     This method is used to modify the information of a resource
 
@@ -558,10 +700,10 @@ def modify_resource(rid: int, title=None, resource_link=None,
             ErrorCode.INVALID_RESOURCE is rid is invalid
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
-    with Session() as conn:
-        resource = conn.query(Resource).filter_by(rid=rid).one_or_none()
+    with db_session() as conn:
+        resource = Resource.query.filter_by(rid=rid).one_or_none()
         if not resource:
-            warnings.warn("Invalid rid")
+            current_app.logger.warn("Invalid rid")
             return ErrorCode.INVALID_RESOURCE
         if title:
             resource.title = title
@@ -579,9 +721,9 @@ def modify_resource(rid: int, title=None, resource_link=None,
             resource.description = None
 
         if creaters_id:
-            creaters = conn.query(ResourceCreater).filter(
-                ResourceCreater.uid.in_(creaters_id),
-                ResourceCreater.rid == rid).all()
+            creaters = ResourceCreater.query.filter(
+                ResourceCreater.uid.in_(creaters_id), ResourceCreater.rid == rid
+            ).all()
             deleted_creaters = set()
             for i in creaters:
                 conn.delete(i)
@@ -593,9 +735,7 @@ def modify_resource(rid: int, title=None, resource_link=None,
                     conn.add(creater)
 
         if tags_id:
-            tags = conn.query(ResourceTagRecord).filter(
-                ResourceTagRecord.rid == rid,
-                ResourceTagRecord.tag_id.in_(tags_id))
+            tags = ResourceTagRecord.query.filter(ResourceTagRecord.rid == rid, ResourceTagRecord.tag_id.in_(tags_id))
             deleted_tags = set()
             for i in tags:
                 conn.delete(i)
@@ -607,14 +747,12 @@ def modify_resource(rid: int, title=None, resource_link=None,
                     conn.add(tag)
 
         if resource_thumbnail_links:
-            thumbnails = conn.query(ResourceThumbnail).filter(
-                ResourceThumbnail.rid == rid)
+            thumbnails = ResourceThumbnail.query.filter(ResourceThumbnail.rid == rid)
             deleted_thumbnails = set()
             for i in thumbnails.all():
                 deleted_thumbnails.add(i.thumbnail_link)
                 conn.delete(i)
-            new_thumbnails = list(set(
-                resource_thumbnail_links).difference(deleted_thumbnails))
+            new_thumbnails = list(set(resource_thumbnail_links).difference(deleted_thumbnails))
             if new_thumbnails:
                 for i in new_thumbnails:
                     thumbnail = ResourceThumbnail(rid=rid, thumbnail_link=i)
@@ -624,32 +762,26 @@ def modify_resource(rid: int, title=None, resource_link=None,
         conn.add(resource)
 
         if not try_to_commit(conn):
-            warnings.warn("Error committing")
+            current_app.logger.warn("Error committing")
             return ErrorCode.COMMIT_ERROR
 
-        if is_public is not None or \
-                ids_to_add_to_personnel or ids_to_delete_from_personnel:
+        if is_public is not None or ids_to_add_to_personnel or ids_to_delete_from_personnel:
             if not resource.is_public:
                 if is_public is not None and is_public:
                     # originally private, now public
                     resource.is_public = True
-                    for i in conn.query(PrivateResourcePersonnel). \
-                            filter_by(rid=rid).all():
+                    for i in PrivateResourcePersonnel.query.filter_by(rid=rid).all():
                         conn.delete(i)
                 elif is_public is None:
                     # modify the personnel for a private resource
                     if ids_to_add_to_personnel:
                         # only add new records to personnel
                         for i in ids_to_add_to_personnel:
-                            modify_resource_personnel(
-                                rid=rid, uid=i,
-                                modification=Modification.MODIFY_ADD)
+                            modify_resource_personnel(rid=rid, uid=i, modification=Modification.MODIFY_ADD)
                     if ids_to_delete_from_personnel:
                         # only delete records from personnel
                         for i in ids_to_delete_from_personnel:
-                            modify_resource_personnel(
-                                rid=rid, uid=i,
-                                modification=Modification.MODIFY_DELETE)
+                            modify_resource_personnel(rid=rid, uid=i, modification=Modification.MODIFY_DELETE)
             else:
                 # resource is originally public
                 if not is_public:
@@ -657,24 +789,23 @@ def modify_resource(rid: int, title=None, resource_link=None,
                     # to personnel
                     resource.is_public = False
                     # creaters must have access to private resource
-                    creaters = conn.query(ResourceCreater).filter_by(rid=rid).all()
-                    if not ids_to_add_to_personnel:
+                    creaters = ResourceCreater.query.filter_by(rid=rid).all()
+                    if ids_to_add_to_personnel is None:
                         ids_to_add_to_personnel = []
-                    ids_to_add_to_personnel = set(ids_to_add_to_personnel)
+                    ids_to_add_to_personnel = list(set(ids_to_add_to_personnel))
                     for i in creaters:
-                        ids_to_add_to_personnel.add(i.uid)
+                        ids_to_add_to_personnel.append(i.uid)
                     for i in ids_to_add_to_personnel:
-                        modify_resource_personnel(
-                            rid=rid, uid=i, modification=Modification.MODIFY_ADD)
+                        modify_resource_personnel(rid=rid, uid=i, modification=Modification.MODIFY_ADD)
         conn.add(resource)
         if not try_to_commit(conn):
-            warnings.warn("Error committing")
+            current_app.logger.warn("Error committing")
             return ErrorCode.COMMIT_ERROR
 
 
 def get_resource_thumbnail(rid):
-    with Session() as conn:
-        res = conn.query(ResourceThumbnail).filter_by(rid=rid).one_or_none()
+    with db_session():
+        res = ResourceThumbnail.query.filter_by(rid=rid).one_or_none()
         return res if res is not None else ErrorCode.INVALID_RESOURCE
 
 
@@ -689,27 +820,26 @@ def user_has_access_to_resource(uid, rid):
     """
     user, resource = get_user_and_resource_instance(uid=uid, rid=rid)
     if not user:
-        warnings.warn("uid is invalid")
+        current_app.logger.warn("uid is invalid")
         return ErrorCode.INVALID_USER
     elif not resource:
-        warnings.warn("rid is invalid")
+        current_app.logger.warn("rid is invalid")
         return ErrorCode.INVALID_RESOURCE
     if resource.is_public:
         # NOTE: Here changed error to True since all users have access to
         # public channels
         return True
 
-    with Session() as conn:
-        return conn.query(PrivateResourcePersonnel).filter_by(uid=uid, rid=rid). \
-                   one_or_none() is not None
+    with db_session():
+        return PrivateResourcePersonnel.query.filter_by(uid=uid, rid=rid).one_or_none() is not None
 
 
 def get_resource_author(rid):
-    with Session() as conn:
+    with db_session() as conn:
         uids = [t[0] for t in conn.query(ResourceCreater.uid).filter_by(rid=rid).all()]
         authors = []
         for uid in uids:
-            authors.append(conn.query(User).filter_by(uid=uid).one_or_none())
+            authors.append(User.query.filter_by(uid=uid).one_or_none())
         return list(filter(lambda x: x is not None, authors))
 
 
@@ -720,7 +850,7 @@ def get_resource_tags(rid):
     :param rid: The resource id
     :return a list of all resource tags instances to this resource, if any
     """
-    with Session() as conn:
+    with db_session() as conn:
         tag_ids = [t[0] for t in conn.query(ResourceTagRecord.tag_id).filter_by(rid=rid)]
         res = []
         for i in tag_ids:
@@ -728,51 +858,59 @@ def get_resource_tags(rid):
         return [r[0] for r in res if r is not None]
 
 
-def find_resources(title_type="like", title=None,
-                   created_type="after", created=EPOCH,
-                   difficulty=None, subject=None, tags=None,
-                   vote_type="more", votes=None,
-                   grade=None, email=None, sort_by="natural"
-                   ):
+def find_resources(
+    title_type="like",
+    title=None,
+    created_type="after",
+    created=EPOCH,
+    difficulty=None,
+    subject=None,
+    tags=None,
+    vote_type="more",
+    votes=None,
+    grade=None,
+    email=None,
+    sort_by="natural",
+):
     """Find a resource using the specific keys.
 
-        If any param does not fall into the valid values the default will be
-        used in its place.
+    If any param does not fall into the valid values the default will be
+    used in its place.
 
-        If no parameters are passed the method should return all Resources.
+    If no parameters are passed the method should return all Resources.
 
-        :param title_type   : SQL search restriction for the title.
-            Valid values are ["like","exact"]
-            Defaults to "like".
-        :param title        : title to search for
-            Defaults to "".
-        :param created_type : SQL search restriction for the creation date.
-            Valid values are ["after","before"]
-            Defaults to "after".
-        :param created      : date to search for as a datetime object.
-            Defaults to epoch.
-        :param difficulty   : The difficult rating of the resource.
-            Valid values are ResourceDifficulty enum values.
-            Defaults to None.
-        :param subject      : The subject of the resource.
-            Valid values are Subject enum values.
-            Defaults to None.
-        :param tags      : The tags of the resource.
-            Valid values are a list.
-            Defaults to None.
-        :param vote_type    : SQL search restriction for the votes.
-            Valid values are ["more","less"]. Refers to specified amount
-            Defaults to "more".
-        :param votes        : The number of upvotes a resource has.
-            Defaults to None.
-        :param grade        : The grade of the resource
-            Valid values are the Grade enum values
-            Defaults to None.
-        :param email         : The logged in users email
-            Defaults to None.
-        :param sort_by         : The sort by parameter
-            Valid values are ["natural","newest","upvotes","trending"].
-            Defaults to "natural".
+    :param title_type   : SQL search restriction for the title.
+        Valid values are ["like","exact"]
+        Defaults to "like".
+    :param title        : title to search for
+        Defaults to "".
+    :param created_type : SQL search restriction for the creation date.
+        Valid values are ["after","before"]
+        Defaults to "after".
+    :param created      : date to search for as a datetime object.
+        Defaults to epoch.
+    :param difficulty   : The difficult rating of the resource.
+        Valid values are ResourceDifficulty enum values.
+        Defaults to None.
+    :param subject      : The subject of the resource.
+        Valid values are Subject enum values.
+        Defaults to None.
+    :param tags      : The tags of the resource.
+        Valid values are a list.
+        Defaults to None.
+    :param vote_type    : SQL search restriction for the votes.
+        Valid values are ["more","less"]. Refers to specified amount
+        Defaults to "more".
+    :param votes        : The number of upvotes a resource has.
+        Defaults to None.
+    :param grade        : The grade of the resource
+        Valid values are the Grade enum values
+        Defaults to None.
+    :param email         : The logged in users email
+        Defaults to None.
+    :param sort_by         : The sort by parameter
+        Valid values are ["natural","newest","upvotes","trending"].
+        Defaults to "natural".
     """
     # Args Checking
     if title_type not in ["like", "exact"]:
@@ -786,15 +924,15 @@ def find_resources(title_type="like", title=None,
     if tags is None:
         tags = []
 
-    with Session() as conn:
+    with db_session():
         # get User if exists
-        user = conn.query(User).filter_by(email=email).one_or_none()
+        user = User.query.filter_by(email=email).one_or_none()
 
-        resources = conn.query(Resource)
+        resources = Resource.query
 
         if title is not None and isinstance(title, str):
             if title_type == "like":
-                resources = resources.filter(Resource.title.ilike(f'%{title}%'))
+                resources = resources.filter(Resource.title.ilike(f"%{title}%"))
             else:
                 resources = resources.filter_by(title=title)
 
@@ -825,16 +963,16 @@ def find_resources(title_type="like", title=None,
             elif sort_by == "upvotes":
                 resources = resources.order_by(Resource.upvote_count.desc())
 
-        if user is None and email != 'demo':
+        if user is None and email != "demo":
             resources = resources.filter_by(is_public=True)
             result = resources.all()
-        elif email != 'demo':
+        elif email != "demo":
             result = filter(lambda res: user_has_access_to_resource(user.uid, res.rid), resources.all())
         else:
             result = resources.all()
 
         for tag in tags:
-            warnings.warn(f"Searching for tag {tag}")
+            current_app.logger.warn(f"Searching for tag {tag}")
             result = filter(lambda res: tag in get_resource_tags(res.rid), result)
         result = list(result)
         if sort_by == "trending":
@@ -843,10 +981,17 @@ def find_resources(title_type="like", title=None,
     return result
 
 
-def find_channels(title_type="like", channel_name=None,
-                  subject: Subject = None, is_public: bool = True,
-                  grade: Grade = None, caller_uid=None, admin_uid=None, tag_ids: list = None,
-                  sort_by_newest_date: bool = False):
+def find_channels(
+    title_type="like",
+    channel_name=None,
+    subject: Optional[Subject] = None,
+    is_public: bool = True,
+    grade: Optional[Grade] = None,
+    caller_uid=None,
+    admin_uid=None,
+    tag_ids: Optional[list] = None,
+    sort_by_newest_date: bool = False,
+):
     """
     find_channels method mainly follows the style of find_resources() and is capable
     of finding channels that match all the conditions specified in parameter values
@@ -881,22 +1026,21 @@ def find_channels(title_type="like", channel_name=None,
     if title_type not in ["like", "exact"]:
         title_type = "like"
 
-    with Session() as conn:
+    with db_session():
         # list of channel id projects
         channel_id_obj = []
         if tag_ids:
-            channel_id_obj = conn.query(ChannelTagRecord).filter(
-                ChannelTagRecord.tag_id.in_(tag_ids)).all()
+            channel_id_obj = ChannelTagRecord.query.filter(ChannelTagRecord.tag_id.in_(tag_ids)).all()
         if channel_id_obj:
             # find channels that match the tags, if any
             cids = set()
             for i in channel_id_obj:
                 cids.add(i.cid)
             cids = tuple(cids)
-            channels = conn.query(Channel).filter(Channel.cid.in_(cids))
+            channels = Channel.query.filter(Channel.cid.in_(cids))
         else:
             # no tag_id supplied, get all the channels
-            channels = conn.query(Channel)
+            channels = Channel.query
 
         if subject:
             channels = channels.filter_by(subject=subject)
@@ -908,19 +1052,22 @@ def find_channels(title_type="like", channel_name=None,
                 channels = channels.filter_by(visibility=ChannelVisibility.PUBLIC)
             else:
                 channels = channels.filter(
-                    or_(Channel.visibility == ChannelVisibility.FULLY_PRIVATE,
-                        Channel.visibility == ChannelVisibility.INVITE_ONLY))
+                    or_(
+                        Channel.visibility == ChannelVisibility.FULLY_PRIVATE,
+                        Channel.visibility == ChannelVisibility.INVITE_ONLY,
+                    )
+                )
 
         if channel_name:
             if title_type == "like":
-                channels = channels.filter(Channel.name.ilike(f'%{channel_name}%'))
+                channels = channels.filter(Channel.name.ilike(f"%{channel_name}%"))
             else:
                 # exact match
                 channels = channels.filter_by(name=channel_name)
 
         if caller_uid and caller_uid != -2:
             # find all private channels this caller has access to
-            personnel = conn.query(ChannelPersonnel).filter_by(uid=caller_uid).all()
+            personnel = ChannelPersonnel.query.filter_by(uid=caller_uid).all()
             accessible = set()
             for i in personnel:
                 accessible.add(i.cid)
@@ -928,8 +1075,7 @@ def find_channels(title_type="like", channel_name=None,
 
             # return channels that this user can access: either public or
             # private but accessible
-            channels = channels.filter(or_(Channel.visibility == ChannelVisibility.PUBLIC,
-                                           Channel.cid.in_(accessible)))
+            channels = channels.filter(or_(Channel.visibility == ChannelVisibility.PUBLIC, Channel.cid.in_(accessible)))
         elif admin_uid:
             channels = channels.filter_by(admin_uid=admin_uid)
 
@@ -958,12 +1104,12 @@ def find_channel_posts(cid: int, sort_algo: str = "date", title_type="like", tit
     if title_type not in ["like", "exact"]:
         title_type = "like"
 
-    with Session() as conn:
-        # posts = conn.query(ChannelPost)
-        posts = conn.query(ChannelPost).filter_by(cid=cid)
+    with db_session():
+        # posts = ChannelPost.query
+        posts = ChannelPost.query.filter_by(cid=cid)
         if title:
             if title_type == "like":
-                posts = posts.filter(ChannelPost.title.ilike(f'%{title}%'))
+                posts = posts.filter(ChannelPost.title.ilike(f"%{title}%"))
             else:
                 # exact match
                 posts = posts.filter_by(title=title)
@@ -1000,9 +1146,9 @@ def vote_resource(uid, rid, upvote=True):
 
     user, resource = res
 
-    with Session() as conn:
+    with db_session() as conn:
         # try to find if there is an entry in vote_info
-        vote_info = conn.query(ResourceVoteInfo).filter_by(uid=uid, rid=rid).one_or_none()
+        vote_info = ResourceVoteInfo.query.filter_by(uid=uid, rid=rid).one_or_none()
 
         if vote_info:
             if vote_info.is_upvote != upvote:
@@ -1018,8 +1164,8 @@ def vote_resource(uid, rid, upvote=True):
                     resource.upvote_count -= 1
                 msg = "updated"
             else:
-                if VERBOSE:
-                    warnings.warn("user cannot vote the same item twice")
+                if current_app.config.get("VERBOSE", False):
+                    current_app.logger.warn("user cannot vote the same item twice")
                 return ErrorCode.SAME_VOTE_TWICE
         else:
             # new vote
@@ -1033,10 +1179,10 @@ def vote_resource(uid, rid, upvote=True):
         conn.add(vote_info)
         conn.add(resource)
         if not try_to_commit(conn):
-            warnings.warn(f"user {uid} vote resource {rid} failed")
+            current_app.logger.warn(f"user {uid} vote resource {rid} failed")
             return ErrorCode.COMMIT_ERROR
-        if VERBOSE:
-            warnings.warn(f"Vote info {msg} for resource {rid}, user {uid} upvoted = {upvote}")
+        if current_app.config.get("VERBOSE", False):
+            current_app.logger.warn(f"Vote info {msg} for resource {rid}, user {uid} upvoted = {upvote}")
 
 
 def get_user_and_resource_instance(uid, rid):
@@ -1049,11 +1195,25 @@ def get_user_and_resource_instance(uid, rid):
     :param rid: The resource id
     :return The tuple of form User, Resource
     """
-    with Session() as conn:
-        resource = conn.query(Resource).filter_by(rid=rid).one_or_none()
-        user = conn.query(User).filter_by(uid=uid).one_or_none()
+    with db_session():
+        resource = Resource.query.filter_by(rid=rid).one_or_none()
+        user = User.query.filter_by(uid=uid).one_or_none()
 
     return user, resource
+
+
+def get_resource(rid):
+    """
+    Try to get instances Resource using provided rid
+
+    Can use this to check if the rid is valid
+
+    :param rid: The resource id
+    :return The  Resource
+    """
+    with db_session():
+        resource = Resource.query.filter_by(rid=rid).one_or_none()
+    return resource
 
 
 def user_viewed_resource(uid, rid):
@@ -1070,13 +1230,13 @@ def user_viewed_resource(uid, rid):
     if isinstance(res, ErrorCode):
         return res
 
-    with Session() as conn:
+    with db_session() as conn:
         resource_view = ResourceView(rid=rid, uid=uid)
         conn.add(resource_view)
         if not try_to_commit(conn):
-            warnings.warn(f"User {uid} view resource {rid} record cannot be committed")
+            current_app.logger.warn(f"User {uid} view resource {rid} record cannot be committed")
             return ErrorCode.COMMIT_ERROR
-    print(f"user {uid} viewed resource {rid}") if VERBOSE else None
+    print(f"user {uid} viewed resource {rid}") if current_app.config.get("VERBOSE", False) else None
 
 
 def check_user_and_resource_validity(uid, rid):
@@ -1090,10 +1250,10 @@ def check_user_and_resource_validity(uid, rid):
     """
     user, resource = get_user_and_resource_instance(uid, rid)
     if not resource:
-        warnings.warn("rid is invalid")
+        current_app.logger.warn("rid is invalid")
         return ErrorCode.INVALID_RESOURCE
     elif not user:
-        warnings.warn("uid is invalid")
+        current_app.logger.warn("uid is invalid")
         return ErrorCode.INVALID_USER
     return user, resource
 
@@ -1114,16 +1274,15 @@ def comment_to_resource(uid, rid, comment):
         return res
 
     created_at = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
-    with Session() as conn:
+    with db_session() as conn:
         resource_comment = ResourceComment(uid=uid, rid=rid, comment=comment, created_at=created_at)
         conn.add(resource_comment)
         if not try_to_commit(conn):
-            warnings.warn(f"User {uid} comment resource {rid} failed")
+            current_app.logger.warn(f"User {uid} comment resource {rid} failed")
             return ErrorCode.COMMIT_ERROR
-    if VERBOSE:
+    if current_app.config.get("VERBOSE", False):
         print(f"user {uid} commented resource {rid}")
-    return conn.query(ResourceComment). \
-        filter_by(uid=uid, rid=rid, created_at=created_at).one().resource_comment_id
+    return ResourceComment.query.filter_by(uid=uid, rid=rid, created_at=created_at).one().resource_comment_id
 
 
 def remove_resource_comment(resource_comment_id: int):
@@ -1132,9 +1291,8 @@ def remove_resource_comment(resource_comment_id: int):
 
     :param resource_comment_id: The id of the resource comment to be removed
     """
-    with Session() as conn:
-        comment = conn.query(ResourceComment). \
-            filter_by(resource_comment_id=resource_comment_id).one_or_none()
+    with db_session() as conn:
+        comment = ResourceComment.query.filter_by(resource_comment_id=resource_comment_id).one_or_none()
         if comment:
             conn.delete(comment)
             try_to_commit(conn)
@@ -1150,23 +1308,23 @@ def reply_to_resource_comment(uid, resource_comment_id, reply):
     :return void on Success.
             ErrorCode.INVALID_RESOURCE/_USER if rid/uid is invalid.
     """
-    with Session() as conn:
-        user = conn.query(User).filter_by(uid=uid).one_or_none()
-        resource_comment = conn.query(ResourceComment). \
-            filter_by(resource_comment_id=resource_comment_id).one_or_none()
+    with db_session() as conn:
+        user = User.query.filter_by(uid=uid).one_or_none()
+        resource_comment = ResourceComment.query.filter_by(resource_comment_id=resource_comment_id).one_or_none()
         if not resource_comment:
-            warnings.warn("resource comment id is invalid")
+            current_app.logger.warn("resource comment id is invalid")
             return ErrorCode.INVALID_RESOURCE
         elif not user:
-            warnings.warn("uid is invalid")
+            current_app.logger.warn("uid is invalid")
             return ErrorCode.INVALID_USER
 
         created_at = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
-        reply_to_comment = ResourceCommentReply(resource_comment_id=resource_comment_id,
-                                                reply=reply, uid=uid, created_at=created_at)
+        reply_to_comment = ResourceCommentReply(
+            resource_comment_id=resource_comment_id, reply=reply, uid=uid, created_at=created_at
+        )
         conn.add(reply_to_comment)
         if not try_to_commit(conn):
-            warnings.warn(f"user {uid} failed to reply to resource comment {resource_comment_id}")
+            current_app.logger.warn(f"user {uid} failed to reply to resource comment {resource_comment_id}")
 
         if VERBOSE:
             print(f"user {uid} replied to resource comment {resource_comment_id}")
@@ -1186,14 +1344,15 @@ def remove_resource_comment_reply(resource_comment_id: int, created_at=None):
      :param resource_comment_id: The resource comment the replies related to
      :param created_at: The datetime when replies to be deleted was created
     """
-    with Session() as conn:
+    with db_session() as conn:
         if created_at:
-            resource_comment_reply = conn.query(ResourceCommentReply). \
-                filter_by(resource_comment_id=resource_comment_id,
-                          created_at=created_at).one_or_none()
+            resource_comment_reply = ResourceCommentReply.query.filter_by(
+                resource_comment_id=resource_comment_id, created_at=created_at
+            ).one_or_none()
         else:
-            resource_comment_reply = conn.query(ResourceCommentReply). \
-                filter_by(resource_comment_id=resource_comment_id).one_or_none()
+            resource_comment_reply = ResourceCommentReply.query.filter_by(
+                resource_comment_id=resource_comment_id
+            ).one_or_none()
         if resource_comment_reply:
             conn.delete(resource_comment_reply)
             try_to_commit(conn)
@@ -1206,8 +1365,8 @@ def get_resource_comments(rid: int) -> list:
     :param rid: The resource id
     :return a list of all comment instances to this resource, if any
     """
-    with Session() as conn:
-        return conn.query(ResourceComment).filter_by(rid=rid).all()
+    with db_session():
+        return ResourceComment.query.filter_by(rid=rid).all()
 
 
 def get_resource_comment_replies(resource_comment_instance_list: list) -> dict:
@@ -1221,18 +1380,25 @@ def get_resource_comment_replies(resource_comment_instance_list: list) -> dict:
             resource_comment instance -> [resource_comment_reply objects with that resource_comment_id]
     """
     out = {}
-    with Session() as conn:
+    with db_session():
         for i in resource_comment_instance_list:
-            replies = conn.query(ResourceCommentReply).filter_by(
-                resource_comment_id=i.resource_comment_id).all()
+            replies = ResourceCommentReply.query.filter_by(resource_comment_id=i.resource_comment_id).all()
             if replies:
                 out[i] = replies
         return out
 
 
-def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subject = None,
-                   grade: Grade = None, description=None, tags_id: list = None,
-                   personnel_id: list = None, avatar_link: str = DEFAULT_CHANNEL_AVATAR_LINK):
+def create_channel(
+    name,
+    visibility: ChannelVisibility,
+    admin_uid,
+    subject: Optional[Subject] = None,
+    grade: Optional[Grade] = None,
+    description=None,
+    tags_id: Optional[list] = None,
+    personnel_id: Optional[list] = None,
+    avatar_link: str = DEFAULT_CHANNEL_AVATAR_LINK,
+):
     """
     Create a channel
 
@@ -1258,24 +1424,31 @@ def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subj
     if not avatar_link:
         avatar_link = DEFAULT_CHANNEL_AVATAR_LINK
 
-    with Session() as conn:
-        admin = conn.query(User).filter_by(uid=admin_uid).one_or_none()
+    with db_session() as conn:
+        admin = User.query.filter_by(uid=admin_uid).one_or_none()
         if not admin:
-            warnings.warn("Admin id is invalid")
+            current_app.logger.warn("Admin id is invalid")
             return ErrorCode.INVALID_USER
 
         created_at = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
         # phase 1: create instance
-        channel = Channel(name=name, visibility=visibility, admin_uid=admin_uid,
-                          subject=subject, grade=grade, description=description,
-                          avatar_link=avatar_link, created_at=created_at)
+        channel = Channel(
+            name=name,
+            visibility=visibility,
+            admin_uid=admin_uid,
+            subject=subject,
+            grade=grade,
+            description=description,
+            avatar_link=avatar_link,
+            created_at=created_at,
+        )
         conn.add(channel)
         if not try_to_commit(conn):
-            warnings.warn(f"channel {name} cannot be created")
+            current_app.logger.warn(f"channel {name} cannot be created")
             return ErrorCode.COMMIT_ERROR
 
         # phase 2: use name (unique) to retrieve instance for next step operation
-        channel = conn.query(Channel).filter_by(name=name).one()
+        channel = Channel.query.filter_by(name=name).one()
         # get rid of duplicate
         if tags_id:
             tags_id = list(set(tags_id))
@@ -1296,7 +1469,7 @@ def create_channel(name, visibility: ChannelVisibility, admin_uid, subject: Subj
                 conn.add(personnel)
 
         if not try_to_commit(conn):
-            warnings.warn(f"channel {name} cannot be created")
+            current_app.logger.warn(f"channel {name} cannot be created")
             # delete obsolete channel object
             conn.delete(channel)
             conn.commit()
@@ -1315,8 +1488,8 @@ def get_all_tags_for_channel(cid: int) -> list:
     :param cid: The id of the channel
     :return a list of tag names related to this channel (subject + grade + other tags)
     """
-    with Session() as conn:
-        channel = conn.query(Channel).filter_by(cid=cid).first()
+    with db_session():
+        channel = Channel.query.filter_by(cid=cid).first()
         if not channel:
             return []
 
@@ -1326,7 +1499,7 @@ def get_all_tags_for_channel(cid: int) -> list:
         if channel.subject:
             tags.append(enum_to_website_output(channel.subject).replace("_", " ", 1))
 
-        tag_records = conn.query(ChannelTagRecord).filter_by(cid=cid).all()
+        tag_records = ChannelTagRecord.query.filter_by(cid=cid).all()
 
         tag_map = get_tags(mapping="id2name")
         for i in tag_records:
@@ -1346,14 +1519,14 @@ def get_user_and_channel_instance(uid, cid):
     :return On success, the tuple of form User, Channel is returned
             ErrorCode.INVALID_USER/-CHANNEL if uid/rid is incorrect
     """
-    with Session() as conn:
-        user = conn.query(User).filter_by(uid=uid).one_or_none()
-        channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
+    with db_session():
+        user = User.query.filter_by(uid=uid).one_or_none()
+        channel = Channel.query.filter_by(cid=cid).one_or_none()
         if not user:
-            warnings.warn("uid invalid")
+            current_app.logger.warn("uid invalid")
             return ErrorCode.INVALID_USER
         if not channel:
-            warnings.warn("cid invalid")
+            current_app.logger.warn("cid invalid")
             return ErrorCode.INVALID_CHANNEL
     return user, channel
 
@@ -1374,13 +1547,12 @@ def modify_channel_personnel(uid, cid, modification: Modification):
     if isinstance(res, ErrorCode):
         return res
 
-    with Session() as conn:
+    with db_session() as conn:
         if modification == Modification.MODIFY_DELETE:
             # delete
-            personnel = conn.query(ChannelPersonnel).filter_by(uid=uid, cid=cid). \
-                one_or_none()
+            personnel = ChannelPersonnel.query.filter_by(uid=uid, cid=cid).one_or_none()
             if not personnel:
-                warnings.warn("personnel does not exists")
+                current_app.logger.warn("personnel does not exists")
                 return ErrorCode.INCORRECT_PERSONNEL
             conn.delete(personnel)
             msg = "deleted"
@@ -1391,46 +1563,54 @@ def modify_channel_personnel(uid, cid, modification: Modification):
             msg = "created"
 
         if not try_to_commit(conn):
-            warnings.warn(f"user {uid} is failed to be {msg} from/to personnel of channel {cid}")
+            current_app.logger.warn(f"user {uid} is failed to be {msg} from/to personnel of channel {cid}")
             return ErrorCode.COMMIT_ERROR
         if VERBOSE:
             print(f"user {uid} is {msg} from/to personnel of channel {cid}")
 
 
-def modify_channel(cid: int, name=None, visibility: ChannelVisibility = None,
-                   admin_uid=None, subject: Subject = Subject.NULL,
-                   grade: Grade = Grade.NULL, description="NULL", tags_id: list = None,
-                   personnel_ids: list = None, avatar_link: str = None):
+def modify_channel(
+    cid: int,
+    name=None,
+    visibility: Optional[ChannelVisibility] = None,
+    admin_uid=None,
+    subject: Subject = Subject.NULL,
+    grade: Grade = Grade.NULL,
+    description="NULL",
+    tags_id: Optional[list | set] = None,
+    personnel_ids: Optional[list] = None,
+    avatar_link: Optional[str] = None,
+):
     """
-        This method is used to modify the information of a channel
+    This method is used to modify the information of a channel
 
-        Notes:
-        1. Only fill in the parameters that needed to be modified.
-        2. For tags_id lists, every element will be checked, if that element
-        already exists for this resource, it will then be removed; if an element
-        does not exist for this resource, it will then be added.
+    Notes:
+    1. Only fill in the parameters that needed to be modified.
+    2. For tags_id lists, every element will be checked, if that element
+    already exists for this resource, it will then be removed; if an element
+    does not exist for this resource, it will then be added.
 
-        :param cid: The id of channel to be modified
-        :param name: The new name of the channel
-        :param visibility: The new visibility of the channel
-        :param subject: The new subject tag. By default, Subject.NULL does not change
-                        the subject tag; None clears original subject tag
-        :param grade: The new grade tag. By default, Grade.NULL does not change
-                        the grade tag; None clears original grade tag
-        :param admin_uid: The new admin of this channel
-        :param personnel_ids: The new personnel ids. This will overwrite the original personnel
-        :param tags_id: The tag ids to be removed/added
-        :param description: The new description of the channel. By default, "NULL" does
-                            not change description contents; None clears original description
-        :param avatar_link: The link to the avatar of a Channel
-        :return on success, void is returned.
-                ErrorCode.INVALID_CHANNEL if cid is invalid
-                ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
-        """
-    with Session() as conn:
-        channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
+    :param cid: The id of channel to be modified
+    :param name: The new name of the channel
+    :param visibility: The new visibility of the channel
+    :param subject: The new subject tag. By default, Subject.NULL does not change
+                    the subject tag; None clears original subject tag
+    :param grade: The new grade tag. By default, Grade.NULL does not change
+                    the grade tag; None clears original grade tag
+    :param admin_uid: The new admin of this channel
+    :param personnel_ids: The new personnel ids. This will overwrite the original personnel
+    :param tags_id: The tag ids to be removed/added
+    :param description: The new description of the channel. By default, "NULL" does
+                        not change description contents; None clears original description
+    :param avatar_link: The link to the avatar of a Channel
+    :return on success, void is returned.
+            ErrorCode.INVALID_CHANNEL if cid is invalid
+            ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
+    """
+    with db_session() as conn:
+        channel = Channel.query.filter_by(cid=cid).one_or_none()
         if not channel:
-            warnings.warn("Invalid cid")
+            current_app.logger.warn("Invalid cid")
             return ErrorCode.INVALID_CHANNEL
         if avatar_link:
             channel.avatar_link = avatar_link
@@ -1445,7 +1625,7 @@ def modify_channel(cid: int, name=None, visibility: ChannelVisibility = None,
         if description != "NULL":
             channel.description = description
         if tags_id:
-            old_tags = conn.query(ChannelTagRecord).filter_by(cid=cid).all()
+            old_tags = ChannelTagRecord.query.filter_by(cid=cid).all()
             deleted_tags = set()
             tags_id = set(tags_id)
             for i in old_tags:
@@ -1461,25 +1641,24 @@ def modify_channel(cid: int, name=None, visibility: ChannelVisibility = None,
             if visibility == ChannelVisibility.PUBLIC:
                 # originally private, now public
                 channel.visibility = visibility
-                conn.query(ChannelPersonnel).filter_by(cid=cid).delete()
+                ChannelPersonnel.query.filter_by(cid=cid).delete()
             elif visibility != ChannelVisibility.PUBLIC:
                 # originally public, now private
                 channel.visibility = visibility
                 # admin must be in the channel personnel
-                if not conn.query(ChannelPersonnel).filter_by(uid=admin_uid, cid=cid).first():
-                    modify_channel_personnel(uid=admin_uid, cid=cid,
-                                             modification=Modification.MODIFY_ADD)
+                if not ChannelPersonnel.query.filter_by(uid=admin_uid, cid=cid).first():
+                    modify_channel_personnel(uid=admin_uid, cid=cid, modification=Modification.MODIFY_ADD)
         # commit before proceed to personnel modification
         conn.add(channel)
         if not try_to_commit(conn):
-            warnings.warn("Error committing")
+            current_app.logger.warn("Error committing")
             return ErrorCode.COMMIT_ERROR
 
         # now deal with ids add/delete to/from personnel
-        channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
+        channel = Channel.query.filter_by(cid=cid).one_or_none()
         # new visibility
         if channel.visibility != ChannelVisibility.PUBLIC and personnel_ids:
-            old_personnel = conn.query(ChannelPersonnel).filter_by(cid=cid).all()
+            old_personnel = ChannelPersonnel.query.filter_by(cid=cid).all()
             for i in old_personnel:
                 if admin_uid != i.uid:
                     # admin newly added above, no need to delete that
@@ -1489,7 +1668,7 @@ def modify_channel(cid: int, name=None, visibility: ChannelVisibility = None,
                 modify_channel_personnel(uid=i, cid=cid, modification=Modification.MODIFY_ADD)
 
         if not try_to_commit(conn):
-            warnings.warn("Error committing")
+            current_app.logger.warn("Error committing")
             return ErrorCode.COMMIT_ERROR
 
 
@@ -1501,7 +1680,7 @@ def user_has_access_to_channel(uid, cid):
     :param cid: The id of channel to check
     :return True/False on success.
     """
-    with Session() as conn:
+    with db_session():
         res = get_user_and_channel_instance(uid=uid, cid=cid)
         if isinstance(res, ErrorCode):
             # invalid user or channel instance, return False directly
@@ -1512,8 +1691,7 @@ def user_has_access_to_channel(uid, cid):
             # public channels
             return True
 
-        personnel = conn.query(ChannelPersonnel).filter_by(uid=uid, cid=cid). \
-            one_or_none()
+        personnel = ChannelPersonnel.query.filter_by(uid=uid, cid=cid).one_or_none()
         return personnel is not None
 
 
@@ -1535,45 +1713,43 @@ def post_on_channel(uid, title, text, channel_name=None, cid=None):
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
     if not channel_name and not cid:
-        warnings.warn("Please supply channel name or cid")
+        current_app.logger.warn("Please supply channel name or cid")
         return ErrorCode.INVALID_CHANNEL
-    with Session() as conn:
-        if not conn.query(User).filter_by(uid=uid).one_or_none():
-            warnings.warn("invalid uid")
+    with db_session() as conn:
+        if not User.query.filter_by(uid=uid).one_or_none():
+            current_app.logger.warn("invalid uid")
             return ErrorCode.INVALID_USER
 
         if cid:
-            channel = conn.query(Channel).filter_by(cid=cid).one_or_none()
+            channel = Channel.query.filter_by(cid=cid).one_or_none()
         else:
-            channel = conn.query(Channel).filter_by(name=channel_name).one_or_none()
+            channel = Channel.query.filter_by(name=channel_name).one_or_none()
 
         if not channel:
-            warnings.warn("Invalid channel name")
+            current_app.logger.warn("Invalid channel name")
             return ErrorCode.INVALID_CHANNEL
 
         if channel.visibility != ChannelVisibility.PUBLIC:
             # not public, check if user is in the personnel
-            personnel = conn.query(ChannelPersonnel). \
-                filter_by(cid=channel.cid, uid=uid).one_or_none()
+            personnel = ChannelPersonnel.query.filter_by(cid=channel.cid, uid=uid).one_or_none()
             if not personnel:
-                warnings.warn(f"User {uid} is not in channel {channel.name}")
+                current_app.logger.warn(f"User {uid} is not in channel {channel.name}")
                 return ErrorCode.INCORRECT_PERSONNEL
 
         created_at = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
-        channel_post = ChannelPost(uid=uid, cid=channel.cid, title=title, init_text=text,
-                                   created_at=created_at)
+        channel_post = ChannelPost(uid=uid, cid=channel.cid, title=title, init_text=text, created_at=created_at)
         conn.add(channel_post)
         if not try_to_commit(conn):
-            warnings.warn(f"post {title} by user {uid} failed to be added to {channel.name}")
+            current_app.logger.warn(f"post {title} by user {uid} failed to be added to {channel.name}")
             return ErrorCode.COMMIT_ERROR
 
-        channel_post = conn.query(ChannelPost).filter_by(cid=channel.cid, title=title).one()
+        channel_post = ChannelPost.query.filter_by(cid=channel.cid, title=title).one()
         if VERBOSE:
             print(f"post {title} by user {uid} is added to {channel.name}")
         return channel_post.post_id
 
 
-def modify_channel_post(post_id: int, title: str = None, text: str = None):
+def modify_channel_post(post_id: int, title: Optional[str] = None, text: Optional[str] = None):
     """
     Modify the text or title of a channel post
 
@@ -1584,10 +1760,10 @@ def modify_channel_post(post_id: int, title: str = None, text: str = None):
             ErrorCode.INVALID_POST if post id is invalid
             ErrorCode.COMMIT_ERROR if error while committing
     """
-    with Session() as conn:
-        post = conn.query(ChannelPost).filter_by(post_id=post_id).one_or_none()
+    with db_session() as conn:
+        post = ChannelPost.query.filter_by(post_id=post_id).one_or_none()
         if not post:
-            warnings.warn("Invalid post id")
+            current_app.logger.warn("Invalid post id")
             return ErrorCode.INVALID_POST
         if title:
             post.title = title
@@ -1597,7 +1773,7 @@ def modify_channel_post(post_id: int, title: str = None, text: str = None):
         conn.add(post)
 
         if not try_to_commit(conn):
-            warnings.warn("Error committing")
+            current_app.logger.warn("Error committing")
             return ErrorCode.COMMIT_ERROR
 
 
@@ -1607,8 +1783,8 @@ def remove_channel_post(post_id: int):
 
     :param post_id: The id of channel post comment
     """
-    with Session() as conn:
-        post = conn.query(ChannelPost).filter_by(post_id=post_id).one_or_none()
+    with db_session() as conn:
+        post = ChannelPost.query.filter_by(post_id=post_id).one_or_none()
         if post:
             conn.delete(post)
             try_to_commit(conn)
@@ -1627,24 +1803,22 @@ def comment_on_channel_post(uid, post_id, text):
             ErrorCode.INVALID_POST if post_id is invalid
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
-    with Session() as conn:
-        if not conn.query(User).filter_by(uid=uid).one_or_none():
-            warnings.warn("uid is invalid")
+    with db_session() as conn:
+        if not User.query.filter_by(uid=uid).one_or_none():
+            current_app.logger.warn("uid is invalid")
             return ErrorCode.INVALID_USER
-        elif not conn.query(ChannelPost).filter_by(post_id=post_id).one_or_none():
-            warnings.warn("post_id is invalid")
+        elif not ChannelPost.query.filter_by(post_id=post_id).one_or_none():
+            current_app.logger.warn("post_id is invalid")
             return ErrorCode.INVALID_POST
 
         created_at = datetime.datetime.now(tz=pytz.timezone("Australia/Brisbane"))
-        post_comment = PostComment(post_id=post_id, uid=uid, created_at=created_at,
-                                   text=text)
+        post_comment = PostComment(post_id=post_id, uid=uid, created_at=created_at, text=text)
         conn.add(post_comment)
         if not try_to_commit(conn):
-            warnings.warn(f"Comment to post {post_id} by user {uid} failed")
+            current_app.logger.warn(f"Comment to post {post_id} by user {uid} failed")
             return ErrorCode.COMMIT_ERROR
 
-        post_comment = conn.query(PostComment).filter_by(post_id=post_id, uid=uid,
-                                                         created_at=created_at).one()
+        post_comment = PostComment.query.filter_by(post_id=post_id, uid=uid, created_at=created_at).one()
         if VERBOSE:
             print(f"Comment to post {post_id} by user {uid} is created")
         return post_comment.post_comment_id
@@ -1656,9 +1830,8 @@ def remove_channel_post_comment(post_comment_id: int):
 
     :param post_comment_id: The id of channel post comment
     """
-    with Session() as conn:
-        channel_post_comment = conn.query(PostComment). \
-            filter_by(post_comment_id=post_comment_id).one_or_none()
+    with db_session() as conn:
+        channel_post_comment = PostComment.query.filter_by(post_comment_id=post_comment_id).one_or_none()
         if channel_post_comment:
             conn.delete(channel_post_comment)
             try_to_commit(conn)
@@ -1678,18 +1851,18 @@ def vote_channel_post(uid, post_id, upvote=True):
             post before.
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
-    with Session() as conn:
-        user = conn.query(User).filter_by(uid=uid).one_or_none()
-        post = conn.query(ChannelPost).filter_by(post_id=post_id).one_or_none()
+    with db_session() as conn:
+        user = User.query.filter_by(uid=uid).one_or_none()
+        post = ChannelPost.query.filter_by(post_id=post_id).one_or_none()
         if not user:
-            warnings.warn("uid is invalid")
+            current_app.logger.warn("uid is invalid")
             return ErrorCode.INVALID_USER
         elif not post:
-            warnings.warn("post id is invalid")
+            current_app.logger.warn("post id is invalid")
             return ErrorCode.INVALID_POST
 
         # try to find if there is an entry in vote_info
-        vote = conn.query(ChannelPostVoteInfo).filter_by(uid=uid, post_id=post_id).one_or_none()
+        vote = ChannelPostVoteInfo.query.filter_by(uid=uid, post_id=post_id).one_or_none()
         if vote:
             if vote.is_upvote != upvote:
                 # user voted, now change vote
@@ -1704,7 +1877,7 @@ def vote_channel_post(uid, post_id, upvote=True):
                     post.upvote_count -= 1
             else:
                 if VERBOSE:
-                    warnings.warn("user cannot vote the same item twice")
+                    current_app.logger.warn("user cannot vote the same item twice")
                 return ErrorCode.SAME_VOTE_TWICE
         else:
             # new vote
@@ -1717,7 +1890,7 @@ def vote_channel_post(uid, post_id, upvote=True):
         conn.add(vote)
         conn.add(post)
         if not try_to_commit(conn):
-            warnings.warn(f"User {uid} failed vote to post {post_id}")
+            current_app.logger.warn(f"User {uid} failed vote to post {post_id}")
             return ErrorCode.COMMIT_ERROR
         if VERBOSE:
             print(f"User {uid} voted post {post_id}, is_upvote = {upvote}")
@@ -1737,20 +1910,18 @@ def vote_channel_post_comment(uid, post_comment_id, upvote=True):
             post comment before.
             ErrorCode.COMMIT_ERROR if cannot commit (used when DEBUG_MODE is False)
     """
-    with Session() as conn:
-        user = conn.query(User).filter_by(uid=uid).one_or_none()
-        post_comment = conn.query(PostComment).filter_by(post_comment_id=post_comment_id). \
-            one_or_none()
+    with db_session() as conn:
+        user = User.query.filter_by(uid=uid).one_or_none()
+        post_comment = PostComment.query.filter_by(post_comment_id=post_comment_id).one_or_none()
         if not user:
-            warnings.warn("uid is invalid")
+            current_app.logger.warn("uid is invalid")
             return ErrorCode.INVALID_USER
         elif not post_comment:
-            warnings.warn("post id is invalid")
+            current_app.logger.warn("post id is invalid")
             return ErrorCode.INVALID_POST
 
         # try to find if there is an entry in vote_info
-        vote = conn.query(PostCommentVoteInfo).filter_by(
-            uid=uid, post_comment_id=post_comment_id).one_or_none()
+        vote = PostCommentVoteInfo.query.filter_by(uid=uid, post_comment_id=post_comment_id).one_or_none()
         if vote:
             if vote.is_upvote != upvote:
                 # user voted, now change vote
@@ -1765,12 +1936,11 @@ def vote_channel_post_comment(uid, post_comment_id, upvote=True):
                     post_comment.upvote_count -= 1
             else:
                 if VERBOSE:
-                    warnings.warn("user cannot vote the same item twice")
+                    current_app.logger.warn("user cannot vote the same item twice")
                 return ErrorCode.SAME_VOTE_TWICE
         else:
             # new vote
-            vote = PostCommentVoteInfo(uid=uid, post_comment_id=post_comment_id,
-                                       is_upvote=upvote)
+            vote = PostCommentVoteInfo(uid=uid, post_comment_id=post_comment_id, is_upvote=upvote)
             if upvote:
                 post_comment.upvote_count += 1
             else:
@@ -1779,7 +1949,7 @@ def vote_channel_post_comment(uid, post_comment_id, upvote=True):
         conn.add(vote)
         conn.add(post_comment)
         if not try_to_commit(conn):
-            warnings.warn(f"User {uid} failed to vote post {post_comment_id}")
+            current_app.logger.warn(f"User {uid} failed to vote post {post_comment_id}")
             return ErrorCode.COMMIT_ERROR
         if VERBOSE:
             print(f"User {uid} voted post {post_comment_id}, is_upvote = {upvote}")
@@ -1793,13 +1963,12 @@ def get_channel_post_comments(post_id: int):
     :return If the post_id is valid, a list of post comments are returned
             ErrorCode.INVALID_POST if post_id is invalid
     """
-    with Session() as conn:
-        post = conn.query(ChannelPost).filter_by(post_id=post_id).one_or_none()
+    with db_session():
+        post = ChannelPost.query.filter_by(post_id=post_id).one_or_none()
         if not post:
-            warnings.warn("The post id is invalid")
+            current_app.logger.warn("The post id is invalid")
             return ErrorCode.INVALID_POST
-        return conn.query(PostComment).filter_by(post_id=post_id). \
-            order_by(PostComment.created_at.asc()).all()
+        return PostComment.query.filter_by(post_id=post_id).order_by(PostComment.created_at.asc()).all()
 
 
 def get_channel_post(cid: int):
@@ -1810,5 +1979,20 @@ def get_channel_post(cid: int):
     :return If the cid is valid, a list of posts belong to that channel are returned
             ErrorCode.INVALID_POST if post_id is invalid
     """
-    with Session() as conn:
-        return conn.query(ChannelPost).filter_by(cid=cid).all()
+    with db_session():
+        return ChannelPost.query.filter_by(cid=cid).all()
+
+
+# FLASK LOGIN
+login_manager.anonymous_user = AnonymousUser
+
+
+@login_manager.user_loader
+def load_user(user_email):
+    """
+    :param unicode user_id: user_id (email) user to retrieve
+    """
+    if current_app.config["DEMO"]:
+        if user_email == "demo":
+            return DemoUser()
+    return get_user(user_email)

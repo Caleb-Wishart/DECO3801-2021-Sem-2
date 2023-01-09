@@ -1,0 +1,19 @@
+{% extends "errors/error.html" %}
+
+{% block error_content %}
+    <h1>{{e.code}} {{e.name}}</h1>
+    {% if e.code == 404 %}
+        <pre class="lead text-white">{{'This is not the page you are looking for'}}</pre>
+    {% endif %}
+    <pre class="lead text-white">{{e.description}}
+        {% if e.code == 500 %}
+            <br>{{'Contact the page admin'}}
+        {% endif %}
+    </pre>
+
+    {% if fail %}
+    <p class="lead">
+        {{fail}}
+    </p>
+    {% endif %}
+{% endblock %}

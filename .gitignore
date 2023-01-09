@@ -1,12 +1,19 @@
-bin/*
-env/*
-include/
-lib/*
-pyvenv.cfg
-pass.txt
-branch/
+# Doctrina
+doctrina/static/avatar/*
+doctrina/static/resource/*
+doctrina/static/files_for_testing/*
+doctrina/static/thumbnail/*
+
+# Byte-compiled / optimized / DLL files
 __pycache__/
-static/avatar/*
-static/resource/*
-static/files_for_testing/*
-static/thumbnail/*
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
