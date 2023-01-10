@@ -9,7 +9,7 @@ class Config(object):
     DBUSERNAME = getenv("POSTGRES_USER", "doctrina")
     DBPASSWORD = getenv("POSTGRES_PASSWORD")
 
-    DBDATABASE = getenv("POSTGRES_DB")
+    DBDATABASE = getenv("POSTGRES_DB", "doctrina")
 
     DBHOST = getenv("POSTGRES_HOST", "postgres")
     DBPORT = getenv("POSTGRES_PORT", "5432")
@@ -21,7 +21,7 @@ class Config(object):
     DATABASE_VERBOSE = False
 
     # ==== REDIS ====
-    REDIS_URL = getenv("REDIS_URL")
+    REDIS_URL = getenv("REDIS_URL", "redis://NOT_SET")
 
     # ==== SESSIONS ====
     SECRET_KEY = b"\xbdOhV3\x93\x1e\x1a\xca\xdb/\xd0"

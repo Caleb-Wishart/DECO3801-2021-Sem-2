@@ -3,6 +3,7 @@ doctrina/static/avatar/*
 doctrina/static/resource/*
 doctrina/static/files_for_testing/*
 doctrina/static/thumbnail/*
+logs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

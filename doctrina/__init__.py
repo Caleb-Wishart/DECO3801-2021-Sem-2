@@ -22,7 +22,8 @@ login_manager.login_message_category = "error"
 
 redis_client = FlaskRedis()
 
-server_session = Session()  # Not to be used, instead use flask.session, used for cookies in flask_login
+# Not to be used, instead use flask.session, used for cookies in flask_login
+server_session = Session()
 
 bootstrap = Bootstrap5()
 
@@ -40,26 +41,6 @@ def create_app(config_class=Config):
     server_session.init_app(app)
     bootstrap.init_app(app)
 
-    # load all Blueprints
-    from pages.auth import bp as auth_bp
-    from pages.channel import bp as channel_bp
-    from pages.errors import bp as error_bp
-    from pages.generic import bp as generic_bp
-    from pages.profile import bp as profile_bp
-    from pages.resource import bp as resource_bp
-
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(channel_bp)
-    app.register_blueprint(error_bp)
-    app.register_blueprint(generic_bp)
-    app.register_blueprint(profile_bp)
-    app.register_blueprint(resource_bp)
-
-    # Contexts used throughout
-    from pages.contexts import context as context_bp
-
-    app.register_blueprint(context_bp)
-
     # configure logging
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.INFO)
@@ -75,11 +56,16 @@ def create_app(config_class=Config):
     app.logger.addHandler(file_handler)
 
     with app.app_context():
+        # load all Blueprints and context
+        from doctrina.pages import load_context, register_all_blueprints
+
+        load_context(app)
+        register_all_blueprints(app)
+
+        # Create DB
         db.create_all()
 
     return app
 
 
 from .database import models
-
-# ʕ •ᴥ•ʔ
