@@ -1,30 +1,28 @@
+{% from 'bootstrap5/utils.html' import render_messages %}
+{% from 'bootstrap5/nav.html' import render_nav_item %}
 <!doctype html>
-<html>
+<html lang="en">
 
 <head>
-    <title>{{title}}</title>
+    {% block head %}
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% if title %}
+        {{ title }}
+        {% else %}
+        {{ 'Doctrina' }}
+        {% endif %}
+    </title>
     <!-- Title icon -->
     <link rel="icon" href="{{url_for('static', filename='img/logo_icon.png')}}" type="image/icon type">
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossorigin="anonymous"></script>
+
+    {% block style %}
+    <!-- Bootstrap CSS -->
+    {{ bootstrap.load_css() }}
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-    <!-- JQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <!-- Underscore JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.1/underscore-min.js"
-        integrity="sha512-ZuOjyqq409+q6uc49UiBF3fTeyRyP8Qs0Jf/7FxH5LfhqBMzrR5cwbpDA4BgzSo884w6q/+oNdIeHenOqhISGw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!-- backbone JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.4.0/backbone-min.js"
-        integrity="sha512-9EgQDzuYx8wJBppM4hcxK8iXc5a1rFLp/Chug4kIcSWRDEgjMiClF8Y3Ja9/0t8RDDg19IfY5rs6zaPS9eaEBw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <!-- Background -->
     <style>
         body {
@@ -32,259 +30,249 @@
             /* background-image: url({{url_for('static', filename='img/hex_back.png')}}),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
             /* Background colours */
             background-color: #FFFFFF;
-            background-image: radial-gradient(rgb(250 , 250 , 250 ), rgb(250 , 250 , 250 ), rgb(250 , 250 , 250 ));
+            background-image: radial-gradient(rgb(250, 250, 250), rgb(250, 250, 250), rgb(250, 250, 250));
             background-color: rgb(254, 239, 255);
+            /* Sizing */
+            display: flex;
+            flex-direction: column;
         }
 
         /*Subject tag for resources*/
         .bg-subject-tag {
-            background-color:#00b8ff !important;
-            width: auto; margin: 0.25rem!important;
+            background-color: #00b8ff !important;
+            width: auto;
+            margin: 0.25rem !important;
         }
 
         /*Year tag for resources*/
         .bg-year-tag {
             background-color: #00b8ff !important;
-            width: auto; margin: 0.25rem!important;
+            width: auto;
+            margin: 0.25rem !important;
         }
+
         /*Hover effect for shadow cards*/
         .shadow-sm:hover {
-             box-shadow: 0 0 11px rgba(33,33,33,.2);
+            box-shadow: 0 0 11px rgba(33, 33, 33, .2);
         }
 
         /*Other tag for resources*/
         .bg-other-tag {
             background-color: #00b8ff !important;
-            width: auto; margin: 0.25rem!important;
+            width: auto;
+            margin: 0.25rem !important;
         }
+
         /*Button styling across the website*/
-          .btn-primary {
-              background-color: #1488eb;
-              color: white;
-              border-color: #1488eb;
-          }
-        /*Button hover styling across the website*/
-      .btn-primary:hover {
-          color:white;
-          background-color: #0000FF;
-          border-color: #0000FF;
-      }
-
-
-      /*Button styling across the website*/
-      .btn-check:checked+.btn-outline-primary {
-          color: white;
-          background-color:  #1488eb;
-          border-color:   #1488eb;
-      }
-      /*Changing white background to a cream colour*/
-      .bg-white {
-          background-color: #ffd6e1;
-      }
-
-      .btn-close {
-          width: 0.5rem;
-          height: 0.5rem;
-      }
-    </style>
-    <!-- Additional web page style sheets -->
-<style>
-    a:link {
-        text-decoration: none;
-    }
-
-    a:visited {
-        text-decoration: none;
-    }
-
-    a:hover {
-        text-decoration: none;
-    }
-
-    a:active {
-        text-decoration: none;
-    }
-
-
-        body {
-            /* Adds a Hex honeycomb background */
-            /* background-image: url(
-        {{url_for('static', filename='img/hex_back.png')}} ),radial-gradient(rgb(254, 239, 255),rgb(246, 244, 255),rgb(254, 239, 255)); */
-
-            background-color: #ffffff;
-            background-image: radial-gradient(rgb(255, 255, 255), rgb(255, 255, 255), rgb(255, 255, 255));#}
+        .btn-primary {
+            background-color: #1488eb;
+            color: white;
+            border-color: #1488eb;
         }
 
-     /* Styling buttons*/
-    .btn-primary:hover {
-        color:white;
-        background-color: #1488eb;
-    }
+        /*Button hover styling across the website*/
+        .btn-primary:hover {
+            color: white;
+            background-color: #0000FF;
+            border-color: #0000FF;
+        }
 
-    .btn-check:checked+.btn-outline-primary {
-        {#color: white;
-        background-color:  #ff8fab;
-        border-color:   #ff8fab;#}
 
-        background-color: #1488eb;
-        color: white;
-        border-color: #1488eb;
-    }
-    .bg-white {
-        {#background-color: #ffd6e1;#}
-        background-color: #1488eb;
-    }
-    .bg-primary {
-        {#background-color: #ff8fab!important;#}
-        background-color: #00b8ff !important;
+        /*Button styling across the website*/
+        .btn-check:checked+.btn-outline-primary {
+            color: white;
+            background-color: #1488eb;
+            border-color: #1488eb;
+        }
 
-    }
+        /*Changing white background to a cream colour*/
+        .bg-white {
+            background-color: #ffd6e1;
+        }
 
-    .btn-close {
-        width: 0.5rem;
-        height: 0.5rem;
-    }
-    a {
-        color: #000000;
-        text-decoration: none  ;
-    }
-     /* Styling help documentation */
-    .popover {
-        max-width: 400px;
-        whtie-space: pre-line;
-    }
-    /* Styling for avatar class*/
-    .avatar {
-        vertical-align: middle;
-        width: 50px;
-        height: 50px;
-        border-radius: 20%;
-    }
-    /* Styling for the navbar*/
-    li:after {
-      background: none repeat scroll 0 0 transparent;
-      bottom: 0;
-      content: "";
-      display: block;
-      height: 2px;
-      left: 50%;
-      position: absolute;
-      background: #fff;
-      transition: width 0.3s ease 0s, left 0.3s ease 0s;
-      width: 0;
-    }
-    li:hover:after {
-      width: 50%;
-        left: 5rem;
-        right: 2rem;
-    }
-    .btn:active {
-                transform: scale(0.98);
-                /* Scaling button to 0.98 to its original size */
-                box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
-                /* Lowering the shadow */
-            }
-    ul {
-      list-style: none;
-      display: table;
-      text-align: center;
-    }
-    li {
-      display: table-cell;
-      position: relative;
-    }
+        .btn-close {
+            width: 0.5rem;
+            height: 0.5rem;
+        }
 
-</style>
-    {% block style %}{% endblock %}
-    <!-- Additional web page JS -->
-    {% block script %}{% endblock %}
+        .content {
+            flex: 1 0 auto;
+        }
+
+        .footer {
+            flex-shrink: 0;
+            margin: 20px;
+        }
+
+        a:link {
+            text-decoration: none;
+        }
+
+        a:visited {
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: none;
+        }
+
+        a:active {
+            text-decoration: none;
+        }
+
+        a {
+            color: #000000;
+            text-decoration: none;
+        }
+
+        /* Styling help documentation */
+        .popover {
+            max-width: 400px;
+            whtie-space: pre-line;
+        }
+
+        /* Styling for avatar class*/
+        .avatar {
+            vertical-align: middle;
+            width: 50px;
+            height: 50px;
+            border-radius: 20%;
+        }
+
+        /* Styling for the navbar*/
+        li:after {
+            background: none repeat scroll 0 0 transparent;
+            bottom: 0;
+            content: "";
+            display: block;
+            height: 2px;
+            left: 50%;
+            position: absolute;
+            background: #fff;
+            transition: width 0.3s ease 0s, left 0.3s ease 0s;
+            width: 0;
+        }
+
+        li:hover:after {
+            width: 50%;
+            left: 5rem;
+            right: 2rem;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+            /* Scaling button to 0.98 to its original size */
+            box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+            /* Lowering the shadow */
+        }
+
+        ul {
+            list-style: none;
+            display: table;
+            text-align: center;
+        }
+
+        li {
+            display: table-cell;
+            position: relative;
+        }
+    </style>
+    {% endblock %}
 </head>
 
 <body>
     <!-- Nav Bar -->
-    <header class="shadow bg-light text-dark sticky-top" style = "padding: 0.8rem!important; background-color: #1488eb!important;" >
+    <header class="shadow bg-light text-dark sticky-top"
+        style="padding: 0.8rem!important; background-color: #1488eb!important;">
         <div class="container-fluid">
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                 <!-- Logo / Home-->
-                <a class="navbar-brand" style = "margin-right: auto!important; margin-left: auto!important;" href="{{url_for('home')}}"
+                <a class="navbar-brand" style="margin-right: auto!important; margin-left: auto!important;"
+                    href="{{url_for('home')}}"
                     class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-                    <img src="{{url_for('static', filename='img/whitelogo.png')}}" , alt="Logo" , width="150" , height="45">
+                    <img src="{{url_for('static', filename='img/whitelogo.png')}}" , alt="Logo" , width="150" ,
+                        height="45">
                 </a>
                 <!-- Links for the web page (Key Sections)-->
-                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0" style = "margin-right: auto!important; margin-left: auto!important">
-                    <li><a href="{{url_for('resource')}}" class="h4 nav-link px-4 pt-3 text-light" style = "padding-left: 7rem!important; padding-right: 7rem!important;
+                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0"
+                    style="margin-right: auto!important; margin-left: auto!important">
+                    <li><a href="{{url_for('resource')}}" class="h4 nav-link px-4 pt-3 text-light" style="padding-left: 7rem!important; padding-right: 7rem!important;
                     margin-left: auto; margin-right: auto; font-size: 1.2rem">Resources</a></li>
-                    <li><a href="{{url_for('view_channel')}}" class="h4 nav-link px-4 pt-3 text-light" style = "padding-left: 7rem!important; padding-right: 7rem!important;
+                    <li><a href="{{url_for('view_channel')}}" class="h4 nav-link px-4 pt-3 text-light" style="padding-left: 7rem!important; padding-right: 7rem!important;
                     margin-left: auto; margin-right: auto; font-size: 1.2rem">Channels</a></li>
-                    <li><a href="{{url_for('about')}}" class="h4 nav-link px-4 pt-3 text-light" style = "padding-left: 7rem!important; padding-right: 4rem!important;
+                    <li><a href="{{url_for('about')}}" class="h4 nav-link px-4 pt-3 text-light" style="padding-left: 7rem!important; padding-right: 4rem!important;
                     margin-left: auto; margin-right: auto; font-size: 1.2rem">FAQs</a></li>
                 </ul>
                 <!-- User Profile and Image-->
                 {% if current_user.is_authenticated %}
-                <a class="navbar-brand" style = "margin-right: auto!important; margin-left: auto!important;" href="{{url_for('profile')}}"
+                <a class="navbar-brand" style="margin-right: auto!important; margin-left: auto!important;"
+                    href="{{url_for('profile')}}"
                     class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
                     <div class="d-flex">
                         <p class="h4 nav-link px-4 pt-3 text-light" style="padding-left: 0rem!important; padding-right: 1.5rem!important;
                     margin-left: auto; margin-right: auto; font-size: 1rem"> {{current_user.username}}</p>
-                        <img src="{{url_for('static',filename=current_user.avatar_link)}}" , alt="profile" , width="50" ,
-                        height="50" style="border-radius: 15%">
+                        <img src="{{url_for('static',filename=current_user.avatar_link)}}" , alt="profile" , width="50"
+                            , height="50" style="border-radius: 15%">
                     </div>
                 </a>
                 {% else %}
-                <a class="navbar-brand" style = "margin-right: auto!important; margin-left: auto!important;" href="{{url_for('login')}}?next={{request.url}}"
+                <a class="navbar-brand" style="margin-right: auto!important; margin-left: auto!important;"
+                    href="{{url_for('login')}}?next={{request.url}}"
                     class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
                     <div class="d-flex">
                         <p class="h4 nav-link px-4 pt-3 text-light" style="padding-left: 0rem!important; padding-right: 1.5rem!important;
                     margin-left: auto; margin-right: auto; font-size: 1.2rem"> Login </p>
-                        <img style="margin: auto; border-radius: 15%" src="{{url_for('static', filename='img/default_profile.png')}}" , class = "avatar" alt="profile" , width="30" ,
-                            height="30">
+                        <img style="margin: auto; border-radius: 15%"
+                            src="{{url_for('static', filename='img/default_profile.png')}}" , class="avatar"
+                            alt="profile" , width="30" , height="30">
                     </div>
                 </a>
                 {% endif %}
             </div>
         </div>
     </header>
-    <!-- Alerts -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        <div class="d-flex justify-content-center">
-            {% for category, message in messages %}
-            {% if category == "error" %}
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            {% elif category == "info" %}
-                <div class="alert alert-info alert-dismissible fade show" role="alert">
-            {% else %}
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {% endif %}
-                <div>
-                    {% if category == "error" %}
-                        <i class="bi bi-exclamation-triangle"></i>
-                    {% elif category == "info" %}
-                        <i class="bi bi-info-circle"></i>
-                    {% else %}
-                    {% endif %}
-                     {{ message }}
-                </div>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
     {% endwith %}
     <!-- Web Page content -->
-    {% block content %}{% endblock %}
+    {% block webpage_content %}
+    <main class="container content">
+        <!-- Alerts -->
+        {{ render_messages(container=True, dismissible=True, dismiss_animate=True, transform={
+        'critical': 'danger',
+        'error': 'warning',
+        'info': 'info',
+        'warning': 'warning',
+        'debug': 'primary',
+        'message': 'primary',
+        }) }}
 
+        {# application content needs to be provided in the content block #}
+        {% block content %}
+        {% endblock %}
+    </main>
     <!-- Footer -->
-    <footer class="page-footer font-small blue">
-
-      <!-- Copyright -->
-      <div class="footer-copyright text-center py-3" style="font-size: small; color: grey">
-          Copyright © 2021 OfficialTeamName (cont.d) Inc. All rights reserved.
-      </div>
-      <!-- Copyright -->
-
+    <footer class="page-footer text-center font-small blue">
+        {% block footer %}
+        <!-- Copyright -->
+        <small> &copy; {{ now.year }} OfficialTeamName (cont.d) Inc. All rights reserved.
+        </small>
+        {% endblock %}
     </footer>
-    <!-- Footer -->
+    {% endblock %}
+
+    {% block script %}
+    <!-- Optional JavaScript -->
+    {{ bootstrap.load_js(with_jquery=False) }}
+    <!-- JQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <!-- Underscore JS -->
+    <script src="https://cdn.jsdelivr.net/npm/underscore@1.13.6/underscore-umd.js"
+        integrity="sha256-Vr+EVDkFf79h6ZJZBbPFvqiIhmBBidy1MSvVKB5EFfU=" crossorigin="anonymous"></script>
+    <!-- backbone JS -->
+    <script src="https://cdn.jsdelivr.net/npm/backbone@1.4.1/backbone.js"
+        integrity="sha256-FkODvs7aPX5Xakb6kMZ6HWPCFypelD3SILlaMG68KW8=" crossorigin="anonymous"></script>
+    {% endblock %}
 </body>
 
 </html>

@@ -2,7 +2,7 @@ import random
 from typing import Optional
 
 import pytz
-from flask import flash, jsonify, request, url_for
+from flask import jsonify, request, url_for
 from flask_login import current_user
 
 from doctrina import db_session
@@ -18,6 +18,7 @@ from doctrina.database.database import (
     vote_channel_post_comment,
 )
 from doctrina.database.models import ChannelPost, PostComment, User, dump_datetime
+from doctrina.utils import flash
 
 from . import bp
 

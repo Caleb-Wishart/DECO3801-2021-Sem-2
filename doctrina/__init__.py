@@ -50,7 +50,7 @@ def create_app(config_class=Config):
     app.logger.addHandler(stream_handler)
     if not os.path.exists("logs"):
         os.mkdir("logs")
-    file_handler = RotatingFileHandler("logs/catchup.log", maxBytes=10240, backupCount=10)
+    file_handler = RotatingFileHandler("logs/doctinra.log", maxBytes=10240, backupCount=10)
     file_handler.setLevel(logging.INFO)
     file_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(pathname)s:%(lineno)d - %(message)s"))
     app.logger.addHandler(file_handler)

@@ -1,9 +1,10 @@
-from flask import current_app, flash, redirect, render_template, request, url_for
+from flask import current_app, redirect, render_template, request, url_for
 from flask_login import current_user, login_user, logout_user
 
 from doctrina import db_session
 from doctrina.database.database import ErrorCode, add_user, get_user, user_auth
 from doctrina.database.models import DemoUser, User
+from doctrina.utils import flash
 
 from . import bp
 from .forms import LoginForm, RegisterForm

@@ -1,6 +1,6 @@
 from os import path
 
-from flask import abort, flash, jsonify, redirect, render_template, request, url_for
+from flask import abort, jsonify, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
@@ -23,6 +23,7 @@ from doctrina.database.models import (
     Subject,
     User,
 )
+from doctrina.utils import flash
 
 from . import bp
 

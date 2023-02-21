@@ -2,7 +2,7 @@ import posixpath
 from os import path
 from typing import Optional
 
-from flask import abort, current_app, flash, redirect, render_template, request, url_for
+from flask import abort, current_app, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 
@@ -33,6 +33,7 @@ from doctrina.database.models import (
     User,
     dump_datetime,
 )
+from doctrina.utils import flash
 
 from . import bp
 from .forms import ResourceForm
