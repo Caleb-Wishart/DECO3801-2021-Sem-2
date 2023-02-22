@@ -2,9 +2,11 @@
 ## Index
 Part 1: Connecting to the UQCloud
 
-Part 2: Updating the project code
+Part 2: Mounting via SSHFS (Optional)
 
-Part 3: Debugging errors
+Part 3: Updating the project code
+
+Part 4: Debugging errors
 ___
 ## Part 1: Connecting to the UQCloud
 
@@ -64,8 +66,20 @@ ___
    ```bash
    ssh deco3801
    ```
+   
 ___
-## Part 2: Updating the project code
+## Part 2: Mounting via SSHFS
+
+Instead of changing code via SSH you can mount the remote file system locally using SSHFS.
+
+
+The following line will mount moss to a local folder called MOSS under the home directory.
+
+`sudo sshfs -o allow_other,default_permissions -o IdentityFile=~/.ssh/id_rsa_moss moss:/home/students/sxxxxxxx ~/MOSS`
+
+Note that here we are using the same identity file and SSH config shortcut that we defined in Part 1.
+___
+## Part 3: Updating the project code
 
 The live project code can be found in the `/var/www/uwsgi` directory.
 
@@ -86,7 +100,7 @@ git pull
 sudo refresh
 ```
 ___
-## Part 3: Debugging errors
+## Part 4: Debugging errors
 
 The following commands are available system wide
 ```bash
