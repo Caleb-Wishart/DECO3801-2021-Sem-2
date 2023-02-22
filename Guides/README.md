@@ -29,6 +29,13 @@ ___
       User YourUsername
       Port 22
    ```
+   If the file doesn't exist you can run the following commands
+   ```bash
+   mkdir ~/.ssh
+   touch ~/.ssh/config
+   printf 'Host moss\n  HostName moss.labs.eait.uq.edu.au\n  # IdentityFile "~/.ssh/id_rsa_moss"\n  User sxxxxxxxx\n  Port 22' >> ~/.ssh/config 
+   ```
+
 2. Create the SSH keys (If you don't already have one)
 
    ```bash
